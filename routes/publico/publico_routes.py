@@ -91,7 +91,7 @@ async def processar_cadastro_prestador(
 # Rota para cadastro de cliente
 @router.get("/cadastro/cliente")
 async def get_page(request: Request):
-    return templates.TemplateResponse("cliente/cadastro.html", {"request": request})
+    return templates.TemplateResponse("publico/cadastro.html", {"request": request})
 
 
 # Rota para processar o formulário de cadastro
