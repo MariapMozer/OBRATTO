@@ -81,9 +81,9 @@ SELECT
     p.area_atuacao,
     p.razao_social,
     p.descricao_servicos,
-    u.tipo_usuario
-    u.foto,
+    u.tipo_usuario,
     u.data_cadastro,
+    u.foto,
     u.token_redefinicao,
     u.data_token
 FROM prestador p

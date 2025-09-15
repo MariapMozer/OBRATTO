@@ -1,14 +1,16 @@
-import datetime
+from datetime import datetime
 from typing import Optional
 from fastapi import APIRouter, Form, Request, status
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from data.cliente import cliente_repo
 from data.cliente.cliente_model import Cliente
+from data.fornecedor import fornecedor_repo
 from data.fornecedor.fornecedor_model import Fornecedor
-from data.prestador import prestador_repo
+from data.prestador import prestador_repo, prestador_sql
 from data.prestador.prestador_model import Prestador
 from data.usuario import usuario_repo
+from data.usuario.usuario_model import Usuario
 from utils.security import criar_hash_senha, gerar_token_redefinicao, verificar_senha
 
 router = APIRouter()
@@ -28,7 +30,7 @@ async def mostrar_escolha_cadastro(request: Request):
 
 # Cadastro do prestador
 @router.get("/cadastro/prestador")
-async def exibir_cadastro_fornecedor(request: Request):
+async def exibir_cadastro_prestador(request: Request):
     return templates.TemplateResponse("prestador/perfil/prestador_cadastro.html", {"request": request})
 
 # Rota para processar o formulário de cadastro
@@ -39,6 +41,7 @@ async def processar_cadastro_prestador(
     email: str = Form(...),
     telefone: str = Form(...),
     senha: str = Form(...),
+    confirmar_senha: str = Form(...),
     cpf_cnpj: str = Form(...),
     endereco: str = Form(...),
     area_atuacao: str = Form(...),
@@ -46,17 +49,21 @@ async def processar_cadastro_prestador(
     descricao_servicos: Optional[str] = Form(None)
 ):
 
-    # Verificar se email já existe
-    if prestador_repo.obter_por_email(email):
+    if senha != confirmar_senha:
         return templates.TemplateResponse(
-            "cadastro.html",
+            "prestador/perfil/prestador_cadastro.html",
+            {"request": request, "erro": "As senhas não coincidem."}
+        )
+    # Verificar se email já existe
+    if prestador_repo.obter_prestador_por_email(email):
+        return templates.TemplateResponse(
+            "prestador/perfil/prestador_cadastro.html",
             {"request": request, "erro": "Email já cadastrado"}
         )
     
     # Criar hash da senha
     senha_hash = criar_hash_senha(senha)
     
-    # Criar usuário
     prestador = Prestador(
         id=0,
         nome=nome,
@@ -66,16 +73,19 @@ async def processar_cadastro_prestador(
         telefone=telefone,
         endereco=endereco,
         tipo_usuario="Prestador",
-        data_cadastro=None, 
-        foto=None,
+        data_cadastro=datetime.now(), 
+        foto=None,        
         token_redefinicao=None,
-        data_token=None, 
+        data_token=None,
         area_atuacao=area_atuacao,
         razao_social=razao_social,
-        descricao_servicos=descricao_servicos)
-    
-    prestador_id = prestador_repo.inserir(prestador) 
-    return RedirectResponse("/login", status.HTTP_303_SEE_OTHER)
+        descricao_servicos=descricao_servicos
+    )
+    prestador_id = prestador_repo.inserir_prestador(prestador)
+    if prestador_id:
+        return RedirectResponse("/login", status.HTTP_303_SEE_OTHER)
+    else:
+        return RedirectResponse("/cadastro/prestador")
 
 
 # Rota para cadastro de cliente
@@ -91,38 +101,55 @@ async def post_cadastro(
     nome: str = Form(...),
     email: str = Form(...),
     senha: str = Form(...),
-    cpf_cnpj: str = Form(None),
-    telefone: str = Form(None),
-    endereco: str = Form(None),
-    data_cadastro: str = Form(None),
+    confirmar_senha: str = Form(...),
+    cpf_cnpj: str = Form(...),
+    telefone: str = Form(...),
+    endereco: str = Form(...),
     foto: str = Form(None),
-    token_definicao: str = Form(None),
-    data_token: str = Form(None),
-    genero: str = Form(None),
-    data_nascimento: str = Form(None),
-    tipo_pessoa: str = Form("cliente")):
+    genero: str = Form(...),
+    data_nascimento: str = Form(...)):
+
+
+    if senha != confirmar_senha:
+        return templates.TemplateResponse(
+            "cliente/cadastro.html",
+            {"request": request, "erro": "As senhas não coincidem."}
+        )
     # Verificar se email já existe
     if cliente_repo.obter_cliente_por_email(email):
         return templates.TemplateResponse(
-            "cadastro.html",
+            "cliente/cadastro.html",
             {"request": request, "erro": "Email já cadastrado"}
         )
-   
+
     # Criar hash da senha
     senha_hash = criar_hash_senha(senha)
-   
-    # Criar usuário
+    
     cliente = Cliente(
         id=0,
         nome=nome,
         email=email,
         senha=senha_hash,
-        perfil="cliente"
+        cpf_cnpj=cpf_cnpj,
+        telefone=telefone,
+        endereco=endereco,
+        tipo_usuario="Cliente",
+        data_cadastro=None, 
+        foto=foto,
+        token_redefinicao=None,
+        data_token=None,
+        genero=genero,
+        data_nascimento=data_nascimento
     )
-   
-    cliente_id = cliente_repo.inserir(cliente)
-    return RedirectResponse("/login", status.HTTP_303_SEE_OTHER)
 
+    cliente_id = cliente_repo.inserir_cliente(cliente)
+    if cliente_id:
+        return RedirectResponse("/login", status.HTTP_303_SEE_OTHER)
+    else:
+        return RedirectResponse("/cadastro/cliente")
+
+
+# Rota para cadastro de fornecedor
 @router.get("/cadastro/fornecedor")
 async def exibir_cadastro_fornecedor(request: Request):
     return templates.TemplateResponse("fornecedor/cadastro_fornecedor.html", {"request": request})
@@ -130,55 +157,55 @@ async def exibir_cadastro_fornecedor(request: Request):
 # Cadastro de fornecedor (POST)
 
 @router.post("/cadastro/fornecedor")
-async def cadastrar_fornecedor(
+async def processar_cadastro_prestador(
     request: Request,
     nome: str = Form(...),
     email: str = Form(...),
-    senha: str = Form(...),
-    cpf_cnpj: str = Form(...),
     telefone: str = Form(...),
+    senha: str = Form(...),
+    confirmar_senha: str = Form(...),
+    cpf_cnpj: str = Form(...),
     endereco: str = Form(...),
-    razao_social: str = Form(...)
+    razao_social: Optional[str] = Form(None)
+   
 ):
-    
-    # Verificar se o email já existe
-    usuario_existente = usuario_repo.obter_usuario_por_email(email)
-    if usuario_existente:
-        from fastapi import status
-        from fastapi.responses import RedirectResponse
-        return RedirectResponse(
-            "/fornecedor/cadastro?erro=email_existe",
-            status_code=status.HTTP_303_SEE_OTHER
+
+    if senha != confirmar_senha:
+        return templates.TemplateResponse(
+            "fornecedor/cadastro_fornecedor.html",
+            {"request": request, "erro": "As senhas não coincidem."}
         )
-    # Criar o novo fornecedor
+    # Verificar se email já existe
+    if fornecedor_repo.obter_fornecedor_por_email(email):
+        return templates.TemplateResponse(
+            "fornecedor/cadastro_fornecedor.html",
+            {"request": request, "erro": "Email já cadastrado"}
+        )
+    
+    # Criar hash da senha
     senha_hash = criar_hash_senha(senha)
-    novo_fornecedor = Fornecedor(
+    
+    fornecedor = Fornecedor(
         id=0,
         nome=nome,
         email=email,
         senha=senha_hash,
         cpf_cnpj=cpf_cnpj,
         telefone=telefone,
-        data_cadastro=datetime.now(),
         endereco=endereco,
         tipo_usuario="Fornecedor",
-        razao_social=razao_social
+        data_cadastro=datetime.now(), 
+        foto=None,        
+        token_redefinicao=None,
+        data_token=None,
+        razao_social=razao_social,
+       
     )
-    from data.fornecedor import fornecedor_repo
-    id_gerado = fornecedor_repo.inserir_fornecedor(novo_fornecedor)
-    from fastapi import status
-    from fastapi.responses import RedirectResponse
-    if id_gerado:
-        return RedirectResponse(
-            f"/fornecedor/perfil_publico/{id_gerado}",
-            status_code=status.HTTP_303_SEE_OTHER
-        )
+    fornecedor_id = fornecedor_repo.inserir_fornecedor(fornecedor)
+    if fornecedor.id:
+        return RedirectResponse("/login", status.HTTP_303_SEE_OTHER)
     else:
-        return RedirectResponse(
-            "/fornecedor/cadastro?erro=erro_cadastro",
-            status_code=status.HTTP_303_SEE_OTHER
-        )
-
+        return RedirectResponse("fornecedor/cadastro")
 #---------------------------------------------------------------------
 
 #--------------LOGIN/LOGOUT-----------------------------

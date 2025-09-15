@@ -5,10 +5,21 @@
 </head>
 <body>
     <h1>Cadastro de Prestador</h1>
-    <form method="post" action="/prestador/cadastrar">
+    <form method="post">
         <label>Nome:</label><input type="text" name="nome"><br>
         <label>Email:</label><input type="email" name="email"><br>
+        <label>Telefone:</label><input type="text" name="telefone"><br>
+        <label>Senha:</label><input type="password" name="senha"><br>
+        <label>Confirmar Senha:</label><input type="password" name="confirmar_senha"><br>
+        <label>CPF / CNPJ:</label><input type="text" name="cpf_cnpj"><br>
+        <label>Endereço:</label><input type="text" name="endereco"><br>
+        <label>Área de Atuação:</label><input type="text" name="area_atuacao"><br>
+        <label>Razão Social:</label><input type="text" name="razao_social"><br>
+        <label>Descrição dos Serviços:</label><textarea name="descricao_servicos"></textarea><br>
         <button type="submit">Cadastrar</button>
+        {% if erro %}
+            <p style="color:red;">{{ erro }}</p>
+        {% endif %}
     </form>
 </body>
 </html>

@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional, List
 from data.usuario.usuario_model import Usuario
-from data.usuario.usuario_sql import ATUALIZAR_SENHA_USUARIO, ATUALIZAR_TIPO_USUARIO, CRIAR_TABELA_USUARIO, INSERIR_USUARIO, OBTER_USUARIO_POR_EMAIL, OBTER_USUARIO_POR_ID, ATUALIZAR_USUARIO, DELETAR_USUARIO, OBTER_USUARIO_POR_PAGINA, OBTER_USUARIOS_POR_PERFIL
+from data.usuario.usuario_sql import *
 from utils.db import open_connection
 
 
@@ -26,6 +26,9 @@ def inserir_usuario(usuario: Usuario) -> Optional[int]:
             usuario.cpf_cnpj,
             usuario.telefone,
             usuario.data_cadastro,
+            usuario.foto,
+            usuario.token_redefinicao,
+            usuario.data_token,
             usuario.endereco,
             usuario.tipo_usuario
         ))
@@ -47,6 +50,9 @@ def obter_usuario_por_email(email: str) -> Optional[Usuario]:
                 cpf_cnpj=row["cpf_cnpj"],
                 telefone=row["telefone"],
                 data_cadastro=row["data_cadastro"],
+                foto=row["foto"],
+                token_redefinicao=row["token_redefinicao"],
+                data_token=row["data_token"],
                 endereco=row["endereco"],
                 tipo_usuario=row["tipo_usuario"]
             )
@@ -66,6 +72,9 @@ def obter_usuario_por_id(id: int) -> Optional[Usuario]:
                 cpf_cnpj=row["cpf_cnpj"],
                 telefone=row["telefone"],
                 data_cadastro=row["data_cadastro"],
+                foto=row["foto"],
+                token_redefinicao=row["token_redefinicao"],
+                data_token=row["data_token"],
                 endereco=row["endereco"],
                 tipo_usuario=row["tipo_usuario"]
             )
@@ -89,6 +98,9 @@ def obter_usuarios_por_pagina (pg_num: int, pg_size:int) -> List[Usuario]:
                 cpf_cnpj=row["cpf_cnpj"],
                 telefone=row["telefone"],
                 data_cadastro=row["data_cadastro"],
+                foto=row["foto"],
+                token_redefinicao=row["token_redefinicao"],
+                data_token=row["data_token"],
                 endereco=row["endereco"],
                 tipo_usuario=row["tipo_usuario"]
             ) for row in rows
@@ -114,6 +126,9 @@ def obter_todos_por_perfil(tipo_usuario: str) -> List[Usuario]:
                     cpf_cnpj=row["cpf_cnpj"],
                     telefone=row["telefone"],
                     data_cadastro=row["data_cadastro"],
+                    foto=row["foto"],
+                    token_redefinicao=row["token_redefinicao"],
+                    data_token=row["data_token"],
                     endereco=row["endereco"],
                     tipo_usuario=row["tipo_usuario"]
                 ) for row in rows
@@ -137,6 +152,9 @@ def atualizar_usuario(usuario: Usuario) -> bool:
             usuario.cpf_cnpj,
             usuario.telefone,
             usuario.data_cadastro,
+            usuario.foto,
+            usuario.token_redefinicao,
+            usuario.data_token,
             usuario.endereco,
             usuario.tipo_usuario,
             usuario.id
