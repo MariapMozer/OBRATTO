@@ -36,7 +36,8 @@ async def cadastrar_promocao_post(request: Request):
         mensagem = f"Promoção cadastrada para o produto {produto.nome}!"
     else:
         mensagem = "Produto não encontrado."
-    return templates.TemplateResponse("fornecedor/promocao/cadastrar_promocoes.html", {"request": request, "mensagem": mensagem})
+    return templates.TemplateResponse("fornecedor/promocao/cadastrar_promocoes.html", 
+    {"request": request, "mensagem": mensagem})
 
 
 # Rota para alterar promoção (GET)
@@ -60,7 +61,8 @@ async def alterar_promocao_post(request: Request):
         mensagem = f"Promoção alterada para o produto {produto.nome}!"
     else:
         mensagem = "Produto não encontrado."
-    return templates.TemplateResponse("fornecedor/promocaoalterar_promocoes.html", {"request": request, "mensagem": mensagem})
+    return templates.TemplateResponse("fornecedor/promocaoalterar_promocoes.html", 
+    {"request": request, "mensagem": mensagem})
 
 
 @router.post("/excluir")
@@ -68,7 +70,8 @@ async def alterar_promocao_post(request: Request):
 async def excluir_promocao_post(request: Request):
     dados = await request.form()
     id_promocao = dados.get("id")
-    return RedirectResponse(url=f"/fornecedor/promocoes/confirmar_exclusao?id={id_promocao}", status_code=303)
+    return RedirectResponse(url=f"/fornecedor/promocoes/confirmar_exclusao?id={id_promocao}", 
+    status_code=303)
 
 # Rota para confirmar exclusão de promoção (GET)
 @router.get("/confirmar_exclusao")
@@ -101,4 +104,6 @@ async def confirmar_exclusao_promocao_post(request: Request):
         mensagem = f"Promoção removida do produto {produto.nome}. O preço voltou ao normal."
     else:
         mensagem = "Produto não encontrado."
-    return templates.TemplateResponse("fornecedor/promocao/confirmar_exclusao_promocao.html", {"request": request, "mensagem": mensagem})
+    return templates.TemplateResponse("fornecedor/promocao/confirmar_exclusao_promocao.html", 
+    {"request": request, 
+     "mensagem": mensagem})
