@@ -54,6 +54,23 @@ ORDER BY f.razao_social
 LIMIT ? OFFSET ?;
 """
 
+OBTER_FORNECEDOR_POR_EMAIL = """
+SELECT
+    f.id,
+    u.nome,
+    u.email,
+    u.senha,
+    u.cpf_cnpj,
+    u.telefone,
+    u.data_cadastro,
+    u.endereco,
+    f.razao_social,
+    u.tipo_usuario
+FROM fornecedor f
+JOIN usuario u ON f.id = u.id
+WHERE u.email = ?;
+"""
+
 
 ATUALIZAR_FORNECEDOR = """
 UPDATE fornecedor

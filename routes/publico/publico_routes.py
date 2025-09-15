@@ -6,11 +6,13 @@ from fastapi.templating import Jinja2Templates
 from data.cliente import cliente_repo
 from data.cliente.cliente_model import Cliente
 from data.fornecedor import fornecedor_repo
+from data.fornecedor import fornecedor_sql
 from data.fornecedor.fornecedor_model import Fornecedor
 from data.prestador import prestador_repo, prestador_sql
 from data.prestador.prestador_model import Prestador
 from data.usuario import usuario_repo
 from data.usuario.usuario_model import Usuario
+from tests.test_fornecedor_planos import fornecedor_id
 from utils.security import criar_hash_senha, gerar_token_redefinicao, verificar_senha
 
 router = APIRouter()
@@ -157,7 +159,7 @@ async def exibir_cadastro_fornecedor(request: Request):
 # Cadastro de fornecedor (POST)
 
 @router.post("/cadastro/fornecedor")
-async def processar_cadastro_prestador(
+async def processar_cadastro_fornecedor(
     request: Request,
     nome: str = Form(...),
     email: str = Form(...),
@@ -199,13 +201,18 @@ async def processar_cadastro_prestador(
         token_redefinicao=None,
         data_token=None,
         razao_social=razao_social,
-       
     )
+
     fornecedor_id = fornecedor_repo.inserir_fornecedor(fornecedor)
-    if fornecedor.id:
-        return RedirectResponse("/login", status.HTTP_303_SEE_OTHER)
-    else:
-        return RedirectResponse("fornecedor/cadastro")
+    if not fornecedor_id:
+        return templates.TemplateResponse(
+            "fornecedor/cadastro_fornecedor.html",
+            {"request": request, "erro": "Erro ao cadastrar fornecedor."}
+        )
+
+       
+    
+   
 #---------------------------------------------------------------------
 
 #--------------LOGIN/LOGOUT-----------------------------
