@@ -1,0 +1,526 @@
+/* Paleta de cores Obratto */
+:root {
+    --cor-primaria: #171370;
+    --cor-secundaria: #E8894B;
+    --cor-terciaria: #B8B2BB;
+    --cor-quaternaria: #E1DEE3;
+    --cor-branca: #FFFFFF;
+    --cor-preta: #000000;
+    --cor-cinza-escuro: #333333;
+    --cor-cinza-claro: #F8F9FA;
+}
+
+/* Reset e configurações gerais */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    /* font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: var(--cor-cinza-escuro);
+    background: linear-gradient(135deg, var(--cor-primaria) 0%, var(--cor-secundaria) 100%);
+    min-height: 100vh; */
+    background: #B8B2BB;
+}
+
+/* Navbar */
+.fundo-azul {
+    background-color: var(--cor-primaria) !important;
+}
+
+.navbar-brand img {
+    transition: transform 0.3s ease;
+}
+
+.navbar-brand:hover img {
+    transform: scale(1.05);
+}
+
+/* Container principal do cadastro */
+.cadastro-main {
+    min-height: calc(100vh - 80px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+}
+
+.cadastro-container {
+    max-width: 900px;
+    width: 100%;
+    background: #f5f5f5;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 600px;
+}
+
+/* Lado esquerdo - Informações */
+.cadastro-info {
+    background: linear-gradient(135deg, var(--cor-primaria) 0%, var(--cor-secundaria) 100%);
+    color: var(--cor-branca);
+    padding: 3rem 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    position: relative;
+}
+
+.cadastro-info::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('../img/tela_fundo.png') center/cover;
+    opacity: 0.1;
+    z-index: 1;
+}
+
+.cadastro-info-content {
+    position: relative;
+    z-index: 2;
+}
+
+.cadastro-logo {
+    width: 120px;
+    height: auto;
+    margin-bottom: 2rem;
+    filter: brightness(0) invert(1);
+}
+
+.cadastro-info h2 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.cadastro-info p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+.cadastro-benefits {
+    list-style: none;
+    text-align: left;
+}
+
+.cadastro-benefits li {
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    font-size: 1rem;
+}
+
+.cadastro-benefits li i {
+    margin-right: 0.75rem;
+    color: var(--cor-branca);
+    font-size: 1.2rem;
+}
+
+/* Lado direito - Formulário */
+.cadastro-form-container {
+    padding: 3rem 2rem;
+    overflow-y: auto;
+}
+
+.cadastro-form-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.cadastro-form-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--cor-primaria);
+    margin-bottom: 0.5rem;
+}
+
+.cadastro-form-header p {
+    color: var(--cor-terciaria);
+    font-size: 1rem;
+}
+
+/* Indicador de progresso */
+.progress-indicator {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.progress-step {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: var(--cor-quaternaria);
+    color: var(--cor-cinza-escuro);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    margin: 0 0.5rem;
+    position: relative;
+    font-size: 0.9rem;
+}
+
+.progress-step.active {
+    background: var(--cor-secundaria);
+    color: var(--cor-branca);
+}
+
+.progress-step.completed {
+    background: var(--cor-primaria);
+    color: var(--cor-branca);
+}
+
+.progress-step::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    width: 30px;
+    height: 2px;
+    background: var(--cor-quaternaria);
+    transform: translateY(-50%);
+}
+
+.progress-step:last-child::after {
+    display: none;
+}
+
+.progress-step.completed::after {
+    background: var(--cor-primaria);
+}
+
+/* Seções do formulário */
+.form-section {
+    margin-bottom: 1.5rem;
+}
+
+.section-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--cor-primaria);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--cor-quaternaria);
+    display: flex;
+    align-items: center;
+}
+
+.section-title i {
+    margin-right: 0.5rem;
+    color: var(--cor-secundaria);
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-label {
+    font-weight: 600;
+    color: var(--cor-primaria);
+    margin-bottom: 0.5rem;
+    display: block;
+    font-size: 0.9rem;
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px 14px;
+    border: 2px solid var(--cor-quaternaria);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    background-color: var(--cor-branca);
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--cor-secundaria);
+    box-shadow: 0 0 0 0.2rem rgba(232, 137, 75, 0.25);
+    transform: translateY(-1px);
+}
+
+.form-control:hover {
+    border-color: var(--cor-terciaria);
+}
+
+.form-select {
+    width: 100%;
+    padding: 10px 14px;
+    border: 2px solid var(--cor-quaternaria);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    background-color: var(--cor-branca);
+    cursor: pointer;
+}
+
+.form-select:focus {
+    outline: none;
+    border-color: var(--cor-secundaria);
+    box-shadow: 0 0 0 0.2rem rgba(232, 137, 75, 0.25);
+}
+
+.form-select:hover {
+    border-color: var(--cor-terciaria);
+}
+
+/* Grid responsivo para campos */
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+}
+
+.form-row.two-cols {
+    grid-template-columns: 1fr 1fr;
+}
+
+.form-row.three-cols {
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
+/* Botões */
+.btn-cadastrar {
+    background: linear-gradient(135deg, var(--cor-primaria) 0%, var(--cor-secundaria) 100%);
+    color: var(--cor-branca);
+    border: none;
+    padding: 12px 30px;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn-cadastrar:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(23, 19, 112, 0.3);
+    color: var(--cor-branca);
+}
+
+.btn-cadastrar:active {
+    transform: translateY(-1px);
+}
+
+.btn-voltar {
+    background: transparent;
+    color: var(--cor-primaria);
+    border: 2px solid var(--cor-primaria);
+    padding: 10px 25px;
+    border-radius: 20px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+    margin-right: 1rem;
+}
+
+.btn-voltar:hover {
+    background: var(--cor-primaria);
+    color: var(--cor-branca);
+    transform: translateY(-1px);
+}
+
+/* Checkbox personalizado */
+.form-check {
+    margin-bottom: 1rem;
+}
+
+.form-check-input {
+    width: 1.1rem;
+    height: 1.1rem;
+    border: 2px solid var(--cor-quaternaria);
+    border-radius: 3px;
+}
+
+.form-check-input:checked {
+    background-color: var(--cor-secundaria);
+    border-color: var(--cor-secundaria);
+}
+
+.form-check-input:focus {
+    box-shadow: 0 0 0 0.2rem rgba(232, 137, 75, 0.25);
+}
+
+.form-check-label {
+    color: var(--cor-cinza-escuro);
+    font-size: 0.9rem;
+    margin-left: 0.5rem;
+}
+
+/* Links */
+.text-primary-custom {
+    color: var(--cor-primaria) !important;
+}
+
+.text-secondary-custom {
+    color: var(--cor-secundaria) !important;
+}
+
+/* Validação de campos */
+.form-control.is-invalid {
+    border-color: #dc3545;
+}
+
+.form-control.is-valid {
+    border-color: #28a745;
+}
+
+.invalid-feedback {
+    color: #dc3545;
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
+}
+
+.valid-feedback {
+    color: #28a745;
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
+}
+
+/* Footer simples */
+.footer-simple {
+    background: var(--cor-cinza-escuro);
+    color: var(--cor-branca);
+    text-align: center;
+    padding: 1.5rem 0;
+    margin-top: auto;
+}
+
+.footer-simple p {
+    margin: 0;
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+/* Responsividade */
+@media (max-width: 992px) {
+    .cadastro-container {
+        grid-template-columns: 1fr;
+        max-width: 600px;
+    }
+    
+    .cadastro-info {
+        padding: 2rem 1.5rem;
+        min-height: 300px;
+    }
+    
+    .cadastro-info h2 {
+        font-size: 1.8rem;
+    }
+    
+    .cadastro-form-container {
+        padding: 2rem 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .cadastro-main {
+        padding: 1rem;
+    }
+    
+    .cadastro-container {
+        border-radius: 15px;
+    }
+    
+    .cadastro-info {
+        padding: 1.5rem 1rem;
+    }
+    
+    .cadastro-info h2 {
+        font-size: 1.6rem;
+    }
+    
+    .cadastro-form-container {
+        padding: 1.5rem 1rem;
+    }
+    
+    .cadastro-form-header h1 {
+        font-size: 1.6rem;
+    }
+    
+    .form-row.two-cols,
+    .form-row.three-cols {
+        grid-template-columns: 1fr;
+    }
+    
+    .btn-voltar {
+        margin-right: 0;
+        margin-bottom: 1rem;
+        width: 100%;
+    }
+    
+    .btn-cadastrar {
+        width: 100%;
+    }
+}
+
+@media (max-width: 576px) {
+    .progress-step {
+        width: 30px;
+        height: 30px;
+        font-size: 0.8rem;
+    }
+    
+    .progress-step::after {
+        width: 25px;
+    }
+    
+    .cadastro-info h2 {
+        font-size: 1.4rem;
+    }
+    
+    .cadastro-info p {
+        font-size: 1rem;
+    }
+    
+    .cadastro-benefits li {
+        font-size: 0.9rem;
+    }
+}
+
+/* Animações */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+/* Utilitários */
+.bg-primary-custom {
+    background-color: var(--cor-primaria) !important;
+}
+
+.bg-secondary-custom {
+    background-color: var(--cor-secundaria) !important;
+}
+
