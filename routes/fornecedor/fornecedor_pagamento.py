@@ -148,7 +148,11 @@ async def processar_pagamento(
 # Callback de sucesso do Mercado Pago
 @router.get("/sucesso")
 @requer_autenticacao(['fornecedor'])
-async def pagamento_sucesso(request: Request, payment_id: str = None, status: str = None, external_reference: str = None):
+async def pagamento_sucesso(
+    request: Request, 
+    payment_id: str = None, 
+    status: str = None, 
+    external_reference: str = None):
     if payment_id:
         payment_info = mp_config.get_payment_info(payment_id)
         if payment_info.get("status") == "approved":
@@ -158,10 +162,13 @@ async def pagamento_sucesso(request: Request, payment_id: str = None, status: st
                 metodo_pagamento=payment_info.get("payment_method_id")
             )
             return templates.TemplateResponse("publico/pagamento/pagamento_sucesso.html", {
-                "request": request, "payment_info": payment_info, "mensagem": "Pagamento aprovado com sucesso! Seu plano está ativo."
+                "request": request, 
+                "payment_info": payment_info, 
+                "mensagem": "Pagamento aprovado com sucesso! Seu plano está ativo."
             })
     return templates.TemplateResponse("publico/pagamento/pagamento_sucesso.html", {
-        "request": request, "mensagem": "Pagamento processado com sucesso!"
+        "request": request, 
+        "mensagem": "Pagamento processado com sucesso!"
     })
 
 # Callback de falha do Mercado Pago
@@ -182,13 +189,6 @@ async def pagamento_pendente(request: Request):
 
 
 # ===== ROTAS DE GERENCIAMENTO DE CARTÕES =====
-
-
-# Exemplo de função para buscar id do usuário logado (pode ser adaptada para seu sistema de autenticação)
-def get_current_user_id(request):
-    # Apenas fornecedor
-    id_fornecedor = request.session.get("id_fornecedor")
-    return id_fornecedor
 
 @router.get("/cartoes")
 @requer_autenticacao(['fornecedor'])
@@ -249,10 +249,7 @@ async def adicionar_cartao(
             "id_fornecedor": fornecedor_id,
             "mensagem": f"Erro ao processar cartão: {str(e)}"
         })
-    return templates.TemplateResponse("publico/pagamento/pagamento_erro.html", {
-        "request": request,
-        "mensagem": "Acesso permitido apenas para fornecedores."
-    })
+   
 
 # Mostrar formulário para editar cartão
 
@@ -305,13 +302,10 @@ async def editar_cartao(
             "id_fornecedor": fornecedor_id,
             "mensagem": f"Erro ao processar alterações: {str(e)}"
         })
-    return templates.TemplateResponse("publico/pagamento/pagamento_erro.html", {
-        "request": request,
-        "mensagem": "Acesso permitido apenas para fornecedores."
-    })
+    
 
 # Mostrar confirmação de exclusão
-@router.get("/cartoes/excluir/{id_cartao}")
+@router.get("/cartoes/excluir/{id_cartao}") # Nesse caso é perigoso?
 @requer_autenticacao(['fornecedor'])
 async def mostrar_confirmar_exclusao(request: Request, id_cartao: int, usuario_logado: dict = None):
     fornecedor_id = usuario_logado.id
@@ -347,14 +341,10 @@ async def excluir_cartao(request: Request, id_cartao: int, usuario_logado: dict 
             "cartao": cartao if 'cartao' in locals() else None,
             "mensagem": f"Erro ao processar exclusão: {str(e)}"
         })
-    return templates.TemplateResponse("publico/pagamento/pagamento_erro.html", {
-        "request": request,
-        "mensagem": "Acesso permitido apenas para fornecedores."
-    })
+    finally:
+        pass
 
 # Definir cartão como principal
-
-
 
 @router.post("/cartoes/definir_principal")
 @requer_autenticacao(['fornecedor'])
@@ -365,8 +355,10 @@ async def definir_cartao_principal(request: Request, usuario_logado: dict = None
 
     cartao = cartao_repo.obter_cartao_por_id(int(id_cartao))
     if not cartao or cartao.id_fornecedor != int(fornecedor_id):
-        return RedirectResponse(url=f"/publico/pagamento/cartoes?id_fornecedor={fornecedor_id}", status_code=303)
+        return RedirectResponse(url=f"/publico/pagamento/cartoes?id_fornecedor={fornecedor_id}", 
+        status_code=303)
     cartao_repo.definir_todos_nao_principal(int(fornecedor_id))
     cartao.principal = True
     cartao_repo.atualizar_cartao(cartao)
-    return RedirectResponse(url=f"/publico/pagamento/cartoes?id_fornecedor={fornecedor_id}", status_code=303)
+    return RedirectResponse(url=f"/publico/pagamento/cartoes?id_fornecedor={fornecedor_id}", 
+    status_code=303)
