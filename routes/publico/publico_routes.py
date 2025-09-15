@@ -1,9 +1,11 @@
+import datetime
 from typing import Optional
 from fastapi import APIRouter, Form, Request, status
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from data.cliente import cliente_repo
 from data.cliente.cliente_model import Cliente
+from data.fornecedor.fornecedor_model import Fornecedor
 from data.prestador import prestador_repo
 from data.prestador.prestador_model import Prestador
 from data.usuario import usuario_repo
@@ -22,14 +24,15 @@ async def get_root(request: Request):
 async def mostrar_escolha_cadastro(request: Request):
     return templates.TemplateResponse("publico/escolha_cadastro.html", {"request": request})
 
+#--------------CADASTRO-----------------------------
 
 # Cadastro do prestador
-@router.get("/cadastro")
+@router.get("/cadastro/prestador")
 async def exibir_cadastro_fornecedor(request: Request):
     return templates.TemplateResponse("prestador/perfil/prestador_cadastro.html", {"request": request})
 
 # Rota para processar o formulário de cadastro
-@router.post("/cadastro")
+@router.post("/cadastro/prestador")
 async def processar_cadastro_prestador(
     request: Request,
     nome: str = Form(...),
@@ -76,13 +79,13 @@ async def processar_cadastro_prestador(
 
 
 # Rota para cadastro de cliente
-@router.get("/cadastro")
+@router.get("/cadastro/cliente")
 async def get_page(request: Request):
     return templates.TemplateResponse("cliente/cadastro.html", {"request": request})
 
 
 # Rota para processar o formulário de cadastro
-@router.post("/cadastro")
+@router.post("/cadastro/cliente")
 async def post_cadastro(
     request: Request,
     nome: str = Form(...),
@@ -120,12 +123,69 @@ async def post_cadastro(
     cliente_id = cliente_repo.inserir(cliente)
     return RedirectResponse("/login", status.HTTP_303_SEE_OTHER)
 
+@router.get("/cadastro/fornecedor")
+async def exibir_cadastro_fornecedor(request: Request):
+    return templates.TemplateResponse("fornecedor/cadastro_fornecedor.html", {"request": request})
+
+# Cadastro de fornecedor (POST)
+
+@router.post("/cadastro/fornecedor")
+async def cadastrar_fornecedor(
+    request: Request,
+    nome: str = Form(...),
+    email: str = Form(...),
+    senha: str = Form(...),
+    cpf_cnpj: str = Form(...),
+    telefone: str = Form(...),
+    endereco: str = Form(...),
+    razao_social: str = Form(...)
+):
+    
+    # Verificar se o email já existe
+    usuario_existente = usuario_repo.obter_usuario_por_email(email)
+    if usuario_existente:
+        from fastapi import status
+        from fastapi.responses import RedirectResponse
+        return RedirectResponse(
+            "/fornecedor/cadastro?erro=email_existe",
+            status_code=status.HTTP_303_SEE_OTHER
+        )
+    # Criar o novo fornecedor
+    senha_hash = criar_hash_senha(senha)
+    novo_fornecedor = Fornecedor(
+        id=0,
+        nome=nome,
+        email=email,
+        senha=senha_hash,
+        cpf_cnpj=cpf_cnpj,
+        telefone=telefone,
+        data_cadastro=datetime.now(),
+        endereco=endereco,
+        tipo_usuario="Fornecedor",
+        razao_social=razao_social
+    )
+    from data.fornecedor import fornecedor_repo
+    id_gerado = fornecedor_repo.inserir_fornecedor(novo_fornecedor)
+    from fastapi import status
+    from fastapi.responses import RedirectResponse
+    if id_gerado:
+        return RedirectResponse(
+            f"/fornecedor/perfil_publico/{id_gerado}",
+            status_code=status.HTTP_303_SEE_OTHER
+        )
+    else:
+        return RedirectResponse(
+            "/fornecedor/cadastro?erro=erro_cadastro",
+            status_code=status.HTTP_303_SEE_OTHER
+        )
+
+#---------------------------------------------------------------------
+
+#--------------LOGIN/LOGOUT-----------------------------
 
 @router.get("/entrar")
 async def mostrar_login(request: Request):
     return templates.TemplateResponse("publico/login.html", {"request": request})
-
-# Rota POST para processar login
 
 @router.post("/entrar")
 async def processar_login(request: Request, email: str = Form(...), senha: str = Form(...)):
@@ -165,6 +225,9 @@ async def logout(request: Request):
     request.session.clear()
     return RedirectResponse("/", status_code=status.HTTP_303_SEE_OTHER)
 
+#-----------------------------------------------------
+
+#--------------RECUPERAR SENHA-----------------------------
 
 @router.get("/recuperar-senha")
 async def recuperar_senha_get(request: Request):
@@ -204,62 +267,7 @@ async def resetar_senha_post(request: Request, token: str = Form(...), nova_senh
         mensagem = "Token inválido ou expirado."
         return templates.TemplateResponse("publico/redefinir_senha.html", {"request": request, "mensagem": mensagem, "token": token})
 
-
-# @router.get("/cadastro")
-# async def exibir_cadastro_fornecedor(request: Request):
-#     return templates.TemplateResponse("fornecedor/cadastro_fornecedor.html", {"request": request})
-
-# # Cadastro de fornecedor (POST)
-
-# @router.post("/cadastro")
-# async def cadastrar_fornecedor(
-#     request: Request,
-#     nome: str = Form(...),
-#     email: str = Form(...),
-#     senha: str = Form(...),
-#     cpf_cnpj: str = Form(...),
-#     telefone: str = Form(...),
-#     endereco: str = Form(...),
-#     razao_social: str = Form(...)
-# ):
-    
-#     # Verificar se o email já existe
-#     usuario_existente = usuario_repo.obter_usuario_por_email(email)
-#     if usuario_existente:
-#         from fastapi import status
-#         from fastapi.responses import RedirectResponse
-#         return RedirectResponse(
-#             "/fornecedor/cadastro?erro=email_existe",
-#             status_code=status.HTTP_303_SEE_OTHER
-#         )
-#     # Criar o novo fornecedor
-#     senha_hash = criar_hash_senha(senha)
-#     novo_fornecedor = Fornecedor(
-#         id=0,
-#         nome=nome,
-#         email=email,
-#         senha=senha_hash,
-#         cpf_cnpj=cpf_cnpj,
-#         telefone=telefone,
-#         data_cadastro=datetime.now(),
-#         endereco=endereco,
-#         tipo_usuario="Fornecedor",
-#         razao_social=razao_social
-#     )
-#     from data.fornecedor import fornecedor_repo
-#     id_gerado = fornecedor_repo.inserir_fornecedor(novo_fornecedor)
-#     from fastapi import status
-#     from fastapi.responses import RedirectResponse
-#     if id_gerado:
-#         return RedirectResponse(
-#             f"/fornecedor/perfil_publico/{id_gerado}",
-#             status_code=status.HTTP_303_SEE_OTHER
-#         )
-#     else:
-#         return RedirectResponse(
-#             "/fornecedor/cadastro?erro=erro_cadastro",
-#             status_code=status.HTTP_303_SEE_OTHER
-#         )
+#-----------------------------------------------------
 
 # Rota para perfil público do prestador
 @router.get("/perfil_publico")
@@ -270,3 +278,8 @@ async def exibir_perfil_publico(request: Request):
 @router.get("/perfil/publico")
 async def exibir_perfil_publico(request: Request):
     return templates.TemplateResponse("cliente/perfil_publico.html", {"request": request})
+
+# Rota para perfil público do fornecedor
+@router.get("/fornecedor/perfil_publico")
+async def exibir_perfil_publico(request: Request):
+    return templates.TemplateResponse("fornecedor/perfil_publico.html", {"request": request})
