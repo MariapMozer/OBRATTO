@@ -12,7 +12,6 @@ from data.prestador import prestador_repo, prestador_sql
 from data.prestador.prestador_model import Prestador
 from data.usuario import usuario_repo
 from data.usuario.usuario_model import Usuario
-from tests.test_fornecedor_planos import fornecedor_id
 from utils.security import criar_hash_senha, gerar_token_redefinicao, verificar_senha
 
 router = APIRouter()

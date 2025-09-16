@@ -100,60 +100,33 @@ async function realizarLogin() {
     const usuario = document.getElementById("usuario").value;
     const senha = document.getElementById("senha").value;
     const lembrarMe = document.getElementById("lembrarMe").checked;
-    
+
     btnLogin.innerHTML = "<i class=\"bi bi-hourglass-split me-2\"></i>Entrando...";
     btnLogin.disabled = true;
-    
-    try {
-        // AQUI VOCÊ DEVE FAZER A CHAMADA REAL PARA SUA API DE LOGIN
-        // Exemplo usando fetch (você precisará adaptar para sua API):
-        // const response = await fetch("/api/login", {
-        //     method: "POST",
-        //     headers: {
-        //         "Content-Type": "application/json",
-        //     },
-        //     body: JSON.stringify({ usuario, senha }),
-        // });
-        
-        // const data = await response.json();
-        
-        // if (response.ok) {
-        //     // Login bem-sucedido
-        //     if (lembrarMe) {
-        //         salvarDados(usuario);
-        //     } else {
-        //         limparDadosSalvos();
-        //     }
-        //     mostrarSucesso();
-        //     setTimeout(() => {
-        //         window.location.href = "/dashboard"; // Redirecionar para o dashboard
-        //     }, 2000);
-        // } else {
-        //     // Login falhou
-        //     mostrarErro(data.message || "Credenciais inválidas.");
-        //     btnLogin.innerHTML = textoOriginal;
-        //     btnLogin.disabled = false;
-        // }
 
-        // --- SIMULAÇÃO TEMPORÁRIA PARA TESTE (REMOVER EM PRODUÇÃO) ---
-        await new Promise(resolve => setTimeout(resolve, 1500)); // Simula delay da rede
-        if (usuario === "teste@teste.com" && senha === "123456") {
-            if (lembrarMe) {
-                salvarDados(usuario);
-            } else {
-                limparDadosSalvos();
-            }
-            mostrarSucesso();
-            setTimeout(() => {
-                window.location.href = "/dashboard";
-            }, 2000);
+    try {
+        // Criando FormData para enviar como formulário tradicional
+        const formData = new FormData();
+        formData.append("email", usuario);  // tua rota espera "email"
+        formData.append("senha", senha);
+
+        const response = await fetch("/entrar", {
+            method: "POST",
+            body: formData
+        });
+
+        if (response.redirected) {
+            // Se login deu certo, o FastAPI redireciona
+            if (lembrarMe) salvarDados(usuario);
+            else limparDadosSalvos();
+
+            window.location.href = response.url; 
         } else {
+            // Se não houve redirect, provavelmente veio a página de login com erro
             mostrarErro("Usuário ou senha inválidos.");
             btnLogin.innerHTML = textoOriginal;
             btnLogin.disabled = false;
         }
-        // --- FIM DA SIMULAÇÃO TEMPORÁRIA ---
-
     } catch (error) {
         console.error("Erro ao realizar login:", error);
         mostrarErro("Ocorreu um erro ao tentar fazer login. Tente novamente.");
