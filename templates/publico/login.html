@@ -1,51 +1,112 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Obratto - Login</title>
-
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Bootstrap Icons -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-
-  <!-- CSS personalizado -->
-  <link rel="stylesheet" href="/static/css/login.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/static/css/login.css">
+    <title>Obratto :: Login</title>
 </head>
-<body>
-  <!-- Cabeçalho -->
-<header>
-    <nav class="navbar navbar-expand-lg navbar-dark fundo-azul">
-                <div class="container-fluid">
-                    <a class="navbar-brand" href="#">
-                        <img src="/static/img/logo.png" alt="Logo" id="logo" class="logo-padding">
-                    </a>
+<body class="d-flex flex-column min-vh-100">
+   <main class="login-main">
+        <div class="login-container fade-in-up">
+            <!-- Lado esquerdo - Informações -->
+            <div class="login-info">
+                <div class="login-info-content">
+                    <img src="/static/img/logo_branca.png" alt="Obratto Logo" class="login-logo">
+                    <h2>Bem-vindo de volta!</h2>
+                    <p>Acesse sua conta e continue aproveitando todos os recursos da nossa plataforma de construção civil.</p>
+                    
+                    <ul class="login-benefits">
+                        <li>
+                            <i class="bi bi-check-circle-fill"></i>
+                            Acesso rápido e seguro
+                        </li>
+                        <li>
+                            <i class="bi bi-check-circle-fill"></i>
+                            Seus projetos salvos
+                        </li>
+                        <li>
+                            <i class="bi bi-check-circle-fill"></i>
+                            Histórico de atividades
+                        </li>
+                        <li>
+                            <i class="bi bi-check-circle-fill"></i>
+                            Suporte personalizado
+                        </li>
+                    </ul>
                 </div>
-            </nav>
-</header>
+            </div>
 
-<main class="container">
-    <div class="login-texto">
-        <h2 class="titulo">Bem-vindo à Obratto!</h2>
-        <p class="subtitulo">Construa com mais eficiência,<br> construa com Obratto.</p>
-        <input type="text" placeholder="Digite seu e-mail ou nome de usuário">
-        <input type="password" placeholder="Digite sua senha">
-        <div class="botoes">
-            <button class="btn-entrar">Entrar</button>
-        </div>
-            <p class="cadastro-link">
-                Não tem conta? <a href="/cadastro">Cadastre-se</a>
-            </p>
-        </div>
-    </div>
-    
-    <div class="login-logo">
-        <img src="/static/img/logo_color.png" alt="Logo grande">
-    </div>
+            <!-- Lado direito - Formulário de Login -->
+            <div class="login-form-container">
+                <div class="login-form-header">
+                    <h1>Entrar</h1>
+                    <p>Digite suas credenciais para acessar</p>
+                </div>
 
-</main>
-<footer class="fundo-azul text-center text-white py-3">
-    © 2025 Obratto - Todos os direitos reservados
-</footer>
+                <!-- Formulário de Login -->
+                <form id="loginForm" novalidate>
+                    <div class="form-group">
+                        <label for="usuario" class="form-label">Nome de usuário ou E-mail *</label>
+                        <div class="input-group">
+                            <span class="input-group-icon">
+                                <i class="bi bi-person-fill"></i>
+                            </span>
+                            <input type="text" class="form-control" id="usuario" name="usuario" 
+                                   placeholder="Digite seu nome de usuário ou e-mail" required>
+                        </div>
+                        <div class="invalid-feedback">
+                            Por favor, digite seu nome de usuário ou e-mail.
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="senha" class="form-label">Senha *</label>
+                        <div class="input-group">
+                            <span class="input-group-icon">
+                                <i class="bi bi-lock-fill"></i>
+                            </span>
+                            <input type="password" class="form-control" id="senha" name="senha" 
+                                   placeholder="Digite sua senha" required>
+                            <button type="button" class="input-group-toggle" id="toggleSenha">
+                                <i class="bi bi-eye-fill"></i>
+                            </button>
+                        </div>
+                        <div class="invalid-feedback">
+                            Por favor, digite sua senha.
+                        </div>
+                    </div>
+
+                    <!-- Opções adicionais -->
+                    <div class="form-options">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="lembrarMe" name="lembrarMe">
+                            <label class="form-check-label" for="lembrarMe">
+                                Lembrar de mim
+                            </label>
+                        </div>
+                        <a href="#" class="forgot-password">Esqueceu a senha?</a>
+                    </div>
+
+                    <!-- Botão de login -->
+                    <button type="submit" class="btn-login">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>
+                        Entrar
+                    </button>
+                </form>
+
+                <!-- Link para cadastro -->
+                <div class="text-center mt-4">
+                    <p class="mb-0 small">Não tem uma conta? <a href="/escolha_cadastro" class="text-primary-custom fw-bold">Cadastre-se</a></p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/login.js"></script>
 </body>
 </html>
+
