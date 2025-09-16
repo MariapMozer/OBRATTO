@@ -73,14 +73,16 @@
 
                         <div class="form-row two-cols">
                             <div class="form-group">
-                                <label for="dataNascimento" class="form-label">Data de Nascimento </label>
-                                <input type="date" class="form-control" id="dataNascimento" name="dataNascimento">
-                
+                                <label for="dataNascimento" class="form-label">Data de Nascimento *</label>
+                                <input type="date" class="form-control" id="dataNascimento" name="dataNascimento" required>
+                                <div class="invalid-feedback">
+                                Por favor, digite uma data válida.
+                            </div>
                             </div>
 
                             <div class="form-group">
-                                <label for="genero" class="form-label">Gênero </label>
-                                <select class="form-select" id="genero" name="genero" >
+                                <label for="genero" class="form-label">Gênero *</label>
+                                <select class="form-select" id="genero" name="genero" required >
                                     <option value="">Selecione seu gênero</option>
                                     <option value="masculino">Masculino</option>
                                     <option value="feminino">Feminino</option>
@@ -93,15 +95,21 @@
 
                         <div class="form-row two-cols">
                             <div class="form-group">
-                                <label for="cpf" class="form-label">CPF </label>
+                                <label for="cpf" class="form-label">CPF *</label>
                                 <input type="text" class="form-control" id="cpf" name="cpf" 
-                                       placeholder="000.000.000-00" maxlength="14">
+                                       placeholder="000.000.000-00" maxlength="14" required>
+                                <div class="invalid-feedback">
+                                Por favor, digite um CPF válido.
+                                </div>
                             </div>
 
                             <div class="form-group">
-                                <label for="telefone" class="form-label">Telefone </label>
+                                <label for="telefone" class="form-label">Telefone *</label>
                                 <input type="tel" class="form-control" id="telefone" name="telefone" 
-                                       placeholder="(00) 00000-0000" maxlength="15">
+                                       placeholder="(00) 00000-0000" maxlength="15" required>
+                                <div class="invalid-feedback">
+                                Por favor, digite um telefone válido.
+                                </div>
                             </div>
                         </div>
 
@@ -121,8 +129,8 @@
 
                         <div class="form-row two-cols">
                             <div class="form-group">
-                                <label for="estado" class="form-label">Estado </label>
-                                <select class="form-select" id="estado" name="estado">
+                                <label for="estado" class="form-label">Estado *</label>
+                                <select class="form-select" id="estado" name="estado" required>
                                     <option value="">Selecione o estado</option>
                                     <option value="AC">Acre</option>
                                     <option value="AL">Alagoas</option>
@@ -152,25 +160,34 @@
                                     <option value="SE">Sergipe</option>
                                     <option value="TO">Tocantins</option>
                                 </select>
+                                <div class="invalid-feedback">
+                                    Por favor, selecione um estado.
                             </div>
 
                             <div class="form-group">
-                                <label for="cidade" class="form-label">Cidade</label>
+                                <label for="cidade" class="form-label">Cidade *</label>
                                 <input type="text" class="form-control" id="cidade" name="cidade" 
-                                       placeholder="Digite sua cidade">
+                                       placeholder="Digite sua cidade" required>
+                                <div class="invalid-feedback">
+                                    Por favor, digite sua cidade.
                             </div>
+                        
                         </div>
 
                         <div class="form-group">
-                            <label for="bairro" class="form-label">Bairro </label>
-                            <input type="text" class="form-control" id="bairro" name="bairro" 
-                                   placeholder="Digite seu bairro">
+                            <label for="bairro" class="form-label">Bairro *</label>
+                            <input type="text" class="form-control" id="bairro" name="bairro"
+                                   placeholder="Digite seu bairro" required>
+                            <div class="invalid-feedback">
+                                Por favor, digite seu bairro.
                         </div>
 
                         <div class="form-group">
-                            <label for="rua" class="form-label">Rua/Endereço </label>
+                            <label for="rua" class="form-label">Rua e Número *</label>
                             <input type="text" class="form-control" id="rua" name="rua" 
-                                   placeholder="Digite sua rua e número">
+                                   placeholder="Digite sua rua e número" required>
+                            <div class="invalid-feedback">
+                                Por favor, digite sua rua e número.
                         </div>
 
                         <div class="d-flex justify-content-between mt-3">
