@@ -25,7 +25,7 @@ async def get_root(request: Request):
 
 @router.get("/escolha_cadastro")
 async def mostrar_escolha_cadastro(request: Request):
-    return templates.TemplateResponse("publico/escolha_cadastro.html", {"request": request})
+    return templates.TemplateResponse("publico/login_cadastro/escolha_cadastro.html", {"request": request})
 
 #--------------CADASTRO-----------------------------
 
@@ -153,7 +153,7 @@ async def post_cadastro(
 # Rota para cadastro de fornecedor
 @router.get("/cadastro/fornecedor")
 async def exibir_cadastro_fornecedor(request: Request):
-    return templates.TemplateResponse("fornecedor/cadastro_fornecedor.html", {"request": request})
+    return templates.TemplateResponse("publico/fornecedor2/cadastro_fornecedor.html", {"request": request})
 
 # Cadastro de fornecedor (POST)
 
@@ -173,13 +173,13 @@ async def processar_cadastro_fornecedor(
 
     if senha != confirmar_senha:
         return templates.TemplateResponse(
-            "fornecedor/cadastro_fornecedor.html",
+            "publico/fornecedor2/cadastro_fornecedor.html",
             {"request": request, "erro": "As senhas não coincidem."}
         )
     # Verificar se email já existe
     if fornecedor_repo.obter_fornecedor_por_email(email):
         return templates.TemplateResponse(
-            "fornecedor/cadastro_fornecedor.html",
+            "publico/fornecedor2/cadastro_fornecedor.html",
             {"request": request, "erro": "Email já cadastrado"}
         )
     
@@ -205,7 +205,7 @@ async def processar_cadastro_fornecedor(
     fornecedor_id = fornecedor_repo.inserir_fornecedor(fornecedor)
     if not fornecedor_id:
         return templates.TemplateResponse(
-            "fornecedor/cadastro_fornecedor.html",
+            "publico/fornecedor2/cadastro_fornecedor.html",
             {"request": request, "erro": "Erro ao cadastrar fornecedor."}
         )
 
@@ -218,16 +218,16 @@ async def processar_cadastro_fornecedor(
 
 @router.get("/entrar")
 async def mostrar_login(request: Request):
-    return templates.TemplateResponse("publico/login.html", {"request": request})
+    return templates.TemplateResponse("publico/login_cadastro/login.html", {"request": request})
 
 @router.post("/entrar")
 async def processar_login(request: Request, email: str = Form(...), senha: str = Form(...)):
     if not email or not senha:
-        return templates.TemplateResponse("publico/login.html", {"request": request, "erro": "Preencha todos os campos."}, status_code=status.HTTP_400_BAD_REQUEST)
+        return templates.TemplateResponse("publico/login_cadastro/login.html", {"request": request, "erro": "Preencha todos os campos."}, status_code=status.HTTP_400_BAD_REQUEST)
 
     usuario = usuario_repo.obter_usuario_por_email(email)
     if not usuario or not verificar_senha(senha, usuario.senha):
-        return templates.TemplateResponse("publico/login.html", {"request": request, "erro": "Email ou senha inválidos"}, status_code=status.HTTP_401_UNAUTHORIZED)
+        return templates.TemplateResponse("publico/login_cadastro/login.html", {"request": request, "erro": "Email ou senha inválidos"}, status_code=status.HTTP_401_UNAUTHORIZED)
 
     # Cria sessão completa
     usuario_dict = {
@@ -264,7 +264,7 @@ async def logout(request: Request):
 
 @router.get("/recuperar-senha")
 async def recuperar_senha_get(request: Request):
-    return templates.TemplateResponse("publico/recuperar_senha.html", {"request": request})
+    return templates.TemplateResponse("publico/login_cadastro/recuperar_senha.html", {"request": request})
 
 
 @router.post("/recuperar-senha")
@@ -285,7 +285,7 @@ async def recuperar_senha_post(request: Request, email: str = Form(...)):
 
 @router.get("/resetar-senha")
 async def resetar_senha_get(request: Request, token: str):
-    return templates.TemplateResponse("publico/redefinir_senha.html", {"request": request, "token": token})
+    return templates.TemplateResponse("publico/login_cadastro/redefinir_senha.html", {"request": request, "token": token})
 
 @router.post("/resetar-senha")
 async def resetar_senha_post(request: Request, token: str = Form(...), nova_senha: str = Form(...)):
@@ -295,10 +295,11 @@ async def resetar_senha_post(request: Request, token: str = Form(...), nova_senh
         usuario.token_redefinicao = None
         usuario_repo.atualizar_usuario(usuario)
         mensagem = "Senha redefinida com sucesso! Faça login."
-        return RedirectResponse("/publico/login", status_code=303)
+        return RedirectResponse("/publico/login_cadastro/login.html", status_code=303)
     else:
         mensagem = "Token inválido ou expirado."
-        return templates.TemplateResponse("publico/redefinir_senha.html", {"request": request, "mensagem": mensagem, "token": token})
+        return templates.TemplateResponse("publico/login_cadastro/redefinir_senha.html", {"request": request, 
+        "mensagem": mensagem, "token": token})
 
 #-----------------------------------------------------
 
@@ -315,4 +316,4 @@ async def exibir_perfil_publico(request: Request):
 # Rota para perfil público do fornecedor
 @router.get("/fornecedor/perfil_publico")
 async def exibir_perfil_publico(request: Request):
-    return templates.TemplateResponse("fornecedor/perfil_publico.html", {"request": request})
+    return templates.TemplateResponse("publico/perfil_publico_fornecedor.html", {"request": request})
