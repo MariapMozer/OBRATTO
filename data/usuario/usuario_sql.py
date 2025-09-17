@@ -69,6 +69,17 @@ SET senha = ?
 WHERE id = ?
 """
 
+
+# Adicionar coluna foto à tabela existente (se não existir)
+ADICIONAR_COLUNA_FOTO = """
+ALTER TABLE usuario ADD COLUMN foto TEXT
+"""
+
+# Atualizar apenas a foto do usuário
+ATUALIZAR_FOTO = """
+UPDATE usuario SET foto = ? WHERE id = ?
+"""
+
 DELETAR_USUARIO = """
 DELETE FROM usuario
 WHERE id = ?
