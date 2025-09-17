@@ -186,6 +186,10 @@ async def processar_cadastro_fornecedor(
     # Criar hash da senha
     senha_hash = criar_hash_senha(senha)
     
+
+    # Garante que razao_social nunca seja None ou string vazia
+    razao_social_final = razao_social if razao_social and razao_social.strip() else nome
+
     fornecedor = Fornecedor(
         id=0,
         nome=nome,
@@ -199,7 +203,7 @@ async def processar_cadastro_fornecedor(
         foto=None,        
         token_redefinicao=None,
         data_token=None,
-        razao_social=razao_social,
+        razao_social=razao_social_final,
     )
 
     fornecedor_id = fornecedor_repo.inserir_fornecedor(fornecedor)
