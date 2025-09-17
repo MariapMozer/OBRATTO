@@ -113,13 +113,13 @@ async def post_cadastro(
 
     if senha != confirmar_senha:
         return templates.TemplateResponse(
-            "cliente/cadastro.html",
+            "cliente/cadastro_cliente.html",
             {"request": request, "erro": "As senhas não coincidem."}
         )
     # Verificar se email já existe
     if cliente_repo.obter_cliente_por_email(email):
         return templates.TemplateResponse(
-            "cliente/cadastro.html",
+            "cliente/cadastro_cliente.html",
             {"request": request, "erro": "Email já cadastrado"}
         )
 
@@ -304,12 +304,12 @@ async def resetar_senha_post(request: Request, token: str = Form(...), nova_senh
 #-----------------------------------------------------
 
 # Rota para perfil público do prestador
-@router.get("/perfil_publico")
+@router.get("/prestador/perfil_publico")
 async def exibir_perfil_publico(request: Request):
     return templates.TemplateResponse("prestador/perfil_publico.html", {"request": request})
 
 # Rota para perfil público do cliente
-@router.get("/perfil/publico")
+@router.get("/cliente/perfil_publico")
 async def exibir_perfil_publico(request: Request):
     return templates.TemplateResponse("cliente/perfil_publico.html", {"request": request})
 
