@@ -1,5 +1,5 @@
 import os
-from fastapi import APIRouter, Request, Form, HTTPException, UploadFile, status
+from fastapi import APIRouter, Request, Form, HTTPException, UploadFile, status, File
 from fastapi.responses import HTMLResponse, RedirectResponse
 from typing import Optional, List
 from config import templates
@@ -29,7 +29,7 @@ async def alterar_foto(request: Request):
 @requer_autenticacao()
 async def alterar_foto(
     request: Request,
-    foto: UploadFile = File(...),  # ← Recebe arquivo de foto
+    foto: UploadFile = File(...), 
     usuario_logado: dict = None
 ):
     # 1. Validar tipo de arquivo
