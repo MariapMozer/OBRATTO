@@ -100,7 +100,7 @@ def obter_proximo_numero(produto_id: int) -> int:
 
     return max(numeros) + 1  # ← Próximo número na sequência
 
-def salvar_nova_foto(produto_id: int, arquivo, como_principal: bool = False) -> bool:
+# def salvar_nova_foto(produto_id: int, arquivo, como_principal: bool = False) -> bool:
     """Salva uma nova foto do produto"""
     criar_diretorio_produto(produto_id)
     codigo_produto = f"{produto_id:06d}"
@@ -119,7 +119,7 @@ def salvar_nova_foto(produto_id: int, arquivo, como_principal: bool = False) -> 
     caminho_destino = f"{obter_diretorio_produto(produto_id)}/{codigo_produto}-{numero:03d}.jpg"
     return processar_imagem(arquivo, caminho_destino)
 
-def excluir_foto(produto_id: int, numero: int) -> bool:
+# def excluir_foto(produto_id: int, numero: int) -> bool:
     """Remove uma foto específica e reordena as restantes"""
     codigo_produto = f"{produto_id:06d}"
     diretorio = obter_diretorio_produto(produto_id)

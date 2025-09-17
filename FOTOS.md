@@ -1,3 +1,5 @@
+```javascript
+
 document.addEventListener('DOMContentLoaded', function() {
     const fotoInput = document.getElementById('foto');
     const fotoAtual = document.getElementById('foto-atual');
