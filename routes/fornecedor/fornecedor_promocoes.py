@@ -15,13 +15,13 @@ async def listar_promocoes(request: Request):
     return templates.TemplateResponse("fornecedor/promocao/promocoes.html", {"request": request})
 
 
-# Rota para cadastrar promoção (GET)
+# Rota para cadastrar promoção 
 @router.get("/cadastrar")
 @requer_autenticacao(['fornecedor'])
 async def cadastrar_promocao(request: Request):
     return templates.TemplateResponse("fornecedor/promocao/cadastrar_promocoes.html", {"request": request})
 
-# Rota para cadastrar promoção (POST)
+# Rota para cadastrar promoção 
 @router.post("/cadastrar")
 @requer_autenticacao(['fornecedor'])
 async def cadastrar_promocao_post(request: Request):
@@ -39,14 +39,13 @@ async def cadastrar_promocao_post(request: Request):
     return templates.TemplateResponse("fornecedor/promocao/cadastrar_promocoes.html", 
     {"request": request, "mensagem": mensagem})
 
-
-# Rota para alterar promoção (GET)
+# Rota para alterar promoção 
 @router.get("/alterar")
 @requer_autenticacao(['fornecedor'])
 async def alterar_promocao(request: Request):
-    return templates.TemplateResponse("fornecedor/promocaoalterar_promocoes.html", {"request": request})
+    return templates.TemplateResponse("fornecedor/promocao/alterar_promocoes.html", {"request": request})
 
-# Rota para alterar promoção (POST)
+# Rota para alterar promoção 
 @router.post("/alterar")
 @requer_autenticacao(['fornecedor'])
 async def alterar_promocao_post(request: Request):
@@ -61,7 +60,7 @@ async def alterar_promocao_post(request: Request):
         mensagem = f"Promoção alterada para o produto {produto.nome}!"
     else:
         mensagem = "Produto não encontrado."
-    return templates.TemplateResponse("fornecedor/promocaoalterar_promocoes.html", 
+    return templates.TemplateResponse("fornecedor/promocao/alterar_promocoes.html", 
     {"request": request, "mensagem": mensagem})
 
 
@@ -73,7 +72,7 @@ async def excluir_promocao_post(request: Request):
     return RedirectResponse(url=f"/fornecedor/promocoes/confirmar_exclusao?id={id_promocao}", 
     status_code=303)
 
-# Rota para confirmar exclusão de promoção (GET)
+# Rota para confirmar exclusão de promoção 
 @router.get("/confirmar_exclusao")
 @requer_autenticacao(['fornecedor'])
 async def confirmar_exclusao_promocao(request: Request):
@@ -89,8 +88,7 @@ async def confirmar_exclusao_promocao(request: Request):
         {"request": request, "id": id_promocao, "produto": produto}
     )
 
-
-# Rota para confirmar exclusão de promoção (POST)
+# Rota para confirmar exclusão de promoção
 @router.post("/confirmar_exclusao")
 @requer_autenticacao(['fornecedor'])
 async def confirmar_exclusao_promocao_post(request: Request):
