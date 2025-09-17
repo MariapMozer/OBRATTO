@@ -1,6 +1,6 @@
 from utils.db import open_connection
 from data.cartao.cartao_model import CartaoCredito
-from data.cartao import cartao_sql
+from data.cartao import cartao_sql 
 from typing import List, Optional
 from datetime import datetime
 import hashlib

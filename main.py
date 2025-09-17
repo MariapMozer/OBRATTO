@@ -14,7 +14,7 @@ from routes.fornecedor import fornecedor_solicitacoes_orcamento
 from routes.administrador import administrador_anuncios
 from routes.administrador import administrador_usuarios
 from routes import prestador
-from routes.prestador import prestador_agenda, prestador_contratacoes, prestador_perfil
+from routes.prestador import prestador_agenda, prestador_contratacoes, prestador_pagamento, prestador_perfil
 from routes.prestador import prestador_planos
 from routes.prestador import prestador_solicitacoes
 from routes.prestador import prestador_servicos
@@ -59,6 +59,7 @@ app.include_router(prestador_planos.router, prefix="/prestador")
 app.include_router(prestador_solicitacoes.router, prefix="/prestador")   
 app.include_router(prestador_servicos.router, prefix="/prestador")
 app.include_router(prestador_contratacoes.router, prefix="/prestador")
+app.include_router(prestador_pagamento.router, prefix="/prestador" )
 
 
 # CLIENTE
