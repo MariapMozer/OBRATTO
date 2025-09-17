@@ -177,6 +177,13 @@ def atualizar_senha_usuario(usuario_id: int, nova_senha: str) -> bool:
         return (cursor.rowcount > 0)
 
 
+def atualizar_foto(id: int, caminho_foto: str) -> bool:
+    """Atualiza apenas a foto do usuário"""
+    with open_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute(ATUALIZAR_FOTO, (caminho_foto, id))
+        return cursor.rowcount > 0
+
 def deletar_usuario(usuario_id: int) -> bool:
     with open_connection() as conn:
         cursor = conn.cursor()
