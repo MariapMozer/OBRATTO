@@ -1,12 +1,14 @@
 
 from fastapi import APIRouter, Request, Form, Depends, File, UploadFile
 from fastapi.templating import Jinja2Templates
+from fastapi.responses import RedirectResponse
 from data.administrador import administrador_repo
+from data.fornecedor import fornecedor_repo
+from data.prestador import prestador_repo
 from utils.auth_decorator import requer_autenticacao
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
-
 administrador_usuarios = APIRouter()
 
 # Rota para exibir o formulário de cadastro do administrador
@@ -186,3 +188,38 @@ async def post_excluir_cliente(request: Request, id: int = Form(...), usuario_lo
 async def get_cliente_por_id(request: Request, id: int, usuario_logado: dict = None):
     cliente = administrador_repo.obter_cliente_por_id(id)
     return templates.TemplateResponse("administrador/detalhes_cliente.html", {"request": request, "cliente": cliente})
+
+# Rota para listar todos os usuários aguardando verificação de selo
+@router.get("/verificacao_selo")
+@requer_autenticacao(['administrador'])
+async def listar_usuarios_aguardando_selo(request: Request, usuario_logado: dict = None):
+    fornecedores = [f for f in fornecedor_repo.obter_fornecedor() if not getattr(f, 'selo_confianca', False)]
+    prestadores = []
+    try:
+        prestadores = [p for p in prestador_repo.obter_prestador() if not getattr(p, 'selo_confianca', False)]
+    except Exception:
+        pass
+
+    return templates.TemplateResponse(
+        "administrador/verificacao_usuario.html",
+        {"request": request, "fornecedores": fornecedores, "prestadores": prestadores}
+    )
+
+@router.post("/aprovar_selo_fornecedor")
+@requer_autenticacao(['administrador'])
+async def aprovar_selo_fornecedor(request: Request, id: int = Form(...), usuario_logado: dict = None):
+    fornecedor = fornecedor_repo.obter_fornecedor_por_id(id)
+    if fornecedor:
+        fornecedor.selo_confianca = True
+        fornecedor_repo.atualizar_fornecedor(fornecedor)
+    return RedirectResponse("/admin/verificacao_selo", status_code=303)
+
+# Aprovar selo de confiança para prestador
+@router.post("/aprovar_selo_prestador")
+@requer_autenticacao(['administrador'])
+async def aprovar_selo_prestador(request: Request, id: int = Form(...), usuario_logado: dict = None):
+    prestador = prestador_repo.obter_prestador_por_id(id)
+    if prestador:
+        prestador.selo_confianca = True
+        prestador_repo.atualizar_prestador(prestador)
+    return RedirectResponse("/admin/verificacao_selo", status_code=303)

@@ -1,0 +1,24 @@
+<!-- adicionar histórico de planos -->
+<h2>Histórico de Planos</h2>
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Plano</th>
+            <th>Status</th>
+            <th>Data de Início</th>
+            <th>Data de Término</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in historico %}
+        <tr>
+            <td>{{ item.id }}</td>
+            <td>{{ item.plano.nome }}</td>
+            <td>{{ item.status }}</td>
+            <td>{{ item.data_inicio }}</td>
+            <td>{{ item.data_termino }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

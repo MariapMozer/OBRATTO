@@ -4,12 +4,13 @@ CREATE TABLE IF NOT EXISTS prestador (
     area_atuacao TEXT NOT NULL,
     razao_social TEXT,
     descricao_servicos TEXT,
+    selo_confianca INTEGER DEFAULT 0,
     FOREIGN KEY (id) REFERENCES usuario(id)
 );
 """
 INSERIR_PRESTADOR = """
-INSERT INTO prestador (id, area_atuacao, razao_social, descricao_servicos)
-VALUES (?, ?, ?, ?);
+INSERT INTO prestador (id, area_atuacao, razao_social, descricao_servicos, selo_confianca)
+VALUES (?, ?, ?, ?, ?);
 """
 
 OBTER_PRESTADOR = """
@@ -26,6 +27,7 @@ SELECT
     u.tipo_usuario,
     p.razao_social,
     p.descricao_servicos,
+    p.selo_confianca,
     u.foto,
     u.data_cadastro,
     u.token_redefinicao,
@@ -47,6 +49,7 @@ SELECT
     p.area_atuacao,
     p.razao_social,
     p.descricao_servicos,
+    p.selo_confianca,
     u.tipo_usuario,
     u.foto,
     u.data_cadastro,
@@ -58,7 +61,7 @@ WHERE p.id = ?;
 """
 OBTER_PRESTADOR_POR_PAGINA = """
 SELECT u.id, u.nome, u.email, u.senha, u.cpf_cnpj, u.telefone,
-       u.data_cadastro, u.endereco, p.area_atuacao, p.razao_social, p.descricao_servicos, u.tipo_usuario, u.foto,
+       u.data_cadastro, u.endereco, p.area_atuacao, p.razao_social, p.descricao_servicos, p.selo_confianca, u.tipo_usuario, u.foto,
     u.data_cadastro,
     u.token_redefinicao,
     u.data_token
@@ -81,6 +84,7 @@ SELECT
     p.area_atuacao,
     p.razao_social,
     p.descricao_servicos,
+    p.selo_confianca,
     u.tipo_usuario,
     u.data_cadastro,
     u.foto,
@@ -93,7 +97,7 @@ WHERE u.email = ?;
 
 ATUALIZAR_PRESTADOR = """
 UPDATE prestador
-SET area_atuacao = ? razao_social = ?, descricao_servicos = ?,
+SET area_atuacao = ?, razao_social = ?, descricao_servicos = ?, selo_confianca = ?
 WHERE id = ?;
 """
 DELETAR_PRESTADOR = """

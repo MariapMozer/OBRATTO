@@ -1,3 +1,4 @@
+
 from fastapi import APIRouter, Request, Form, UploadFile, File, HTTPException
 from utils.auth_decorator import requer_autenticacao
 from fastapi.templating import Jinja2Templates
@@ -5,6 +6,7 @@ from data.fornecedor.fornecedor_model import Fornecedor
 from data.fornecedor import fornecedor_repo
 from utils.security import criar_hash_senha
 from data.usuario import usuario_repo
+from data.avaliacao import avaliacao_repo
 from datetime import datetime
 
 router = APIRouter()
@@ -135,7 +137,15 @@ async def visualizar_conta(request: Request, usuario_logado: dict = None):
         {"request": request, 
          "fornecedor": fornecedor})
 
-
+# Visualizar avaliações recebidas pelo fornecedor
+@router.get("/avaliacoes")
+@requer_autenticacao(['fornecedor'])
+async def visualizar_avaliacoes_recebidas(request: Request, usuario_logado: dict = None):
+    avaliacoes = avaliacao_repo.obter_avaliacoes_por_fornecedor(usuario_logado.id)
+    return templates.TemplateResponse(
+        "fornecedor/avaliacoes_recebidas.html",
+        {"request": request, "avaliacoes": avaliacoes}
+    )
 
 
 

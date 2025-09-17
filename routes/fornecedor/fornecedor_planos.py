@@ -1,4 +1,3 @@
-
 from fastapi import APIRouter, Request, Form
 from utils.auth_decorator import requer_autenticacao
 from fastapi.templating import Jinja2Templates
@@ -225,4 +224,13 @@ async def assinar_plano(request: Request, plano_id: int = Form(...), id_forneced
     response = RedirectResponse(f"/publico/pagamento/formulario?plano_id={plano_id}&id_fornecedor={id_fornecedor}&tipo=assinatura", status_code=303)
     return response
 
-
+# Histórico de planos do fornecedor
+@router.get("/historico")
+@requer_autenticacao(['fornecedor'])
+async def historico_planos(request: Request, id_fornecedor: int = 1):
+    historico = inscricao_plano_repo.obter_historico_planos_por_fornecedor(id_fornecedor)
+    return templates.TemplateResponse("fornecedor/planos/historico_planos.html", {
+        "request": request,
+        "historico": historico,
+        "id_fornecedor": id_fornecedor
+    })
