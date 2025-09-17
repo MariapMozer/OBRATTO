@@ -2,6 +2,8 @@ import os
 from PIL import Image
 from typing import List, Optional
 
+# Funções destinadas ao Prestador 
+
 def obter_diretorio_produto(produto_id: int) -> str:
     """Retorna o caminho do diretório de fotos de um produto"""
     codigo_produto = f"{produto_id:06d}"  # ← Formata com 6 dígitos (000001)
@@ -189,3 +191,6 @@ def reordenar_fotos(produto_id: int, nova_ordem: List[int]) -> bool:
             return False
 
     return True
+
+
+# Funções destinadas ao fornecedor
