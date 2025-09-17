@@ -130,6 +130,41 @@ class CartaoRepository:
         except Exception as e:
             print(f"Erro ao obter cartões: {e}")
             return []
+        
+
+
+    def obter_cartoes_por_prestador(self, id_prestador: int) -> List[CartaoCredito]:
+        try:
+            with open_connection() as con:
+                cursor = con.cursor()
+                cursor.execute(cartao_sql.SQL_OBTER_CARTOES_POR_PRESTADOR, (id_prestador,))
+                rows = cursor.fetchall()
+                
+                cartoes = []
+                for row in rows:
+                    cartao = CartaoCredito(
+                        id_cartao=row[0],
+                        id_prestador=row[1],
+                        nome_titular=row[2],
+                        numero_cartao_criptografado=row[3],
+                        ultimos_4_digitos=row[4],
+                        mes_vencimento=row[5],
+                        ano_vencimento=row[6],
+                        bandeira=row[7],
+                        apelido=row[8],
+                        principal=bool(row[9]),
+                        ativo=bool(row[10]),
+                        data_criacao=row[11],
+                        data_atualizacao=row[12]
+                    )
+                    cartoes.append(cartao)
+                
+                return cartoes
+                
+        except Exception as e:
+            print(f"Erro ao obter cartões: {e}")
+            return []
+          
     
     def obter_cartao_por_id(self, id_cartao: int) -> Optional[CartaoCredito]:
         """Obtém um cartão específico por ID"""
