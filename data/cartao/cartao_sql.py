@@ -41,6 +41,16 @@ WHERE id_fornecedor = ? AND ativo = TRUE
 ORDER BY principal DESC, data_criacao DESC
 """
 
+# Obter cartões por prestador
+SQL_OBTER_CARTOES_POR_PRESTADOR = """
+SELECT id_cartao, id_prestador, nome_titular, numero_cartao_criptografado,
+       ultimos_4_digitos, mes_vencimento, ano_vencimento, bandeira,
+       apelido, principal, ativo, data_criacao, data_atualizacao
+FROM cartao_credito 
+WHERE id_prestador = ? AND ativo = TRUE
+ORDER BY principal DESC, data_criacao DESC
+"""
+
 # Obter cartão por ID
 SQL_OBTER_CARTAO_POR_ID = """
 SELECT id_cartao, id_fornecedor, nome_titular, numero_cartao_criptografado,
