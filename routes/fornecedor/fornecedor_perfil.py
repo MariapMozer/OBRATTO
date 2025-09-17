@@ -1,4 +1,5 @@
 
+from asyncio import open_connection
 from fastapi import APIRouter, Request, Form, UploadFile, File, HTTPException
 from utils.auth_decorator import requer_autenticacao
 from fastapi.templating import Jinja2Templates
@@ -149,4 +150,11 @@ async def visualizar_avaliacoes_recebidas(request: Request, usuario_logado: dict
 
 
 
+# atualizar foto de perfil
 
+def atualizar_foto(id: int, caminho_foto: str) -> bool:
+    """Atualiza apenas a foto do usuário"""
+    with open_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute(ATUALIZAR_FOTO, (caminho_foto, id))
+        return cursor.rowcount > 0

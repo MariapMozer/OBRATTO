@@ -14,7 +14,7 @@ class Usuario:
     endereco: str
     tipo_usuario: str
     data_cadastro: Optional[str] = None
-    foto: Optional[str] = None
+    foto: str = None
     token_redefinicao: Optional[str] = None
     data_token: Optional[str] = None
 
