@@ -32,7 +32,7 @@ async def mostrar_escolha_cadastro(request: Request):
 # Cadastro do prestador
 @router.get("/cadastro/prestador")
 async def exibir_cadastro_prestador(request: Request):
-    return templates.TemplateResponse("prestador/perfil/prestador_cadastro.html", {"request": request})
+    return templates.TemplateResponse("prestador/prestador_cadastro.html", {"request": request})
 
 # Rota para processar o formulário de cadastro
 @router.post("/cadastro/prestador")
@@ -52,13 +52,13 @@ async def processar_cadastro_prestador(
 
     if senha != confirmar_senha:
         return templates.TemplateResponse(
-            "prestador/perfil/prestador_cadastro.html",
+            "prestador/prestador_cadastro.html",
             {"request": request, "erro": "As senhas não coincidem."}
         )
     # Verificar se email já existe
     if prestador_repo.obter_prestador_por_email(email):
         return templates.TemplateResponse(
-            "prestador/perfil/prestador_cadastro.html",
+            "prestador/prestador_cadastro.html",
             {"request": request, "erro": "Email já cadastrado"}
         )
     
@@ -306,7 +306,7 @@ async def resetar_senha_post(request: Request, token: str = Form(...), nova_senh
 # Rota para perfil público do prestador
 @router.get("/perfil_publico")
 async def exibir_perfil_publico(request: Request):
-    return templates.TemplateResponse("prestador/perfil/perfil_publico.html", {"request": request})
+    return templates.TemplateResponse("prestador/perfil_publico.html", {"request": request})
 
 # Rota para perfil público do cliente
 @router.get("/perfil/publico")
