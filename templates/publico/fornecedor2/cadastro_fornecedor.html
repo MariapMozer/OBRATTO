@@ -55,6 +55,8 @@
 
                 <!-- Formulário de Cadastro -->
                 <form id="cadastroForm" action="/cadastro/fornecedor" method="post" novalidate>
+                    <!-- Campo oculto para endereço completo -->
+                    <input type="hidden" id="endereco" name="endereco">
                     <!-- Seção 1: Dados Pessoais -->
                     <div class="form-section" id="secao1">
                         <h3 class="section-title">
@@ -64,8 +66,8 @@
 
                         <div class="form-group">
                             <label for="nomeCompleto" class="form-label">Nome Completo *</label>
-                            <input type="text" class="form-control" id="nomeCompleto" name="nomeCompleto" 
-                                   placeholder="Digite seu nome completo" required>
+                <input type="text" class="form-control" id="nome" name="nome" 
+                    placeholder="Digite seu nome completo" required>
                             <div class="invalid-feedback">
                                 Por favor, digite seu nome completo.
                             </div>
@@ -73,8 +75,8 @@
 
                         <div class="form-group">
                             <label for="razaoSocial" class="form-label">Razão Social *</label>
-                            <input type="text" class="form-control" id="razaoSocial" name="razaoSocial" 
-                                   placeholder="Digite sua razão social" required>
+                <input type="text" class="form-control" id="razao_social" name="razao_social" 
+                    placeholder="Digite sua razão social" required>
                             <div class="invalid-feedback">
                                 Por favor, digite um nome.
                             </div>
@@ -83,7 +85,7 @@
                         <div class="form-row two-cols">
                             <div class="form-group">
                                 <label for="documento" class="form-label">CPF ou CNPJ *</label>
-                                <input type="text" class="form-control" id="documento" name="documento" 
+                                <input type="text" class="form-control" id="cpf_cnpj" name="cpf_cnpj" 
                                     placeholder="Digite seu CPF ou CNPJ" required>
                                 <div class="invalid-feedback">
                                     Por favor, digite um CPF ou CNPJ válido.
@@ -216,8 +218,8 @@
 
                         <div class="form-group">
                             <label for="confirmarSenha" class="form-label">Confirmar Senha *</label>
-                            <input type="password" class="form-control" id="confirmarSenha" name="confirmarSenha" 
-                                   placeholder="Confirme sua senha" minlength="8" required>
+                <input type="password" class="form-control" id="confirmar_senha" name="confirmar_senha" 
+                    placeholder="Confirme sua senha" minlength="8" required>
                             <div class="invalid-feedback">
                                 As senhas não coincidem.
                             </div>

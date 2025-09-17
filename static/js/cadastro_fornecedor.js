@@ -74,7 +74,15 @@
         document.getElementById('cadastroForm').addEventListener('submit', function(e) {
             if (!validarSecao(3)) {
                 e.preventDefault();
+                return;
             }
+            // Montar endereço completo antes de enviar
+            var estado = document.getElementById('estado').value;
+            var cidade = document.getElementById('cidade').value;
+            var bairro = document.getElementById('bairro').value;
+            var rua = document.getElementById('rua').value;
+            var enderecoCompleto = `${rua}, ${bairro}, ${cidade} - ${estado}`;
+            document.getElementById('endereco').value = enderecoCompleto;
             // Se passar na validação, o form será enviado normalmente
         });
 
