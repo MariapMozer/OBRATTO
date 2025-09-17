@@ -7,6 +7,7 @@ from routes.publico import publico_routes
 from routes.fornecedor import fornecedor_pagamento
 from routes.fornecedor import fornecedor_produtos
 from routes.fornecedor import fornecedor_planos
+from routes.fornecedor import fornecedor_mensagens
 from routes.fornecedor import fornecedor_perfil
 from routes.fornecedor import fornecedor_promocoes
 from routes.fornecedor import fornecedor_solicitacoes_orcamento
@@ -44,6 +45,7 @@ app.include_router(fornecedor_solicitacoes_orcamento.router, prefix="/fornecedor
 app.include_router(fornecedor_produtos.router, prefix="/fornecedor/produtos")
 app.include_router(fornecedor_planos.router, prefix="/fornecedor/planos")
 app.include_router(fornecedor_pagamento.router, prefix="/fornecedor/pagamento")
+app.include_router(fornecedor_mensagens.router, prefix="/fornecedor/mensagens")
 
 # ADMINISTRADOR
 app.include_router(administrador_usuarios.router, prefix="/administrador")
