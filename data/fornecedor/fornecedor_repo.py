@@ -22,7 +22,8 @@ def inserir_fornecedor(fornecedor: Fornecedor) -> Optional[int]:
         if id_usuario_gerado:
             cursor.execute(INSERIR_FORNECEDOR, (
                 id_usuario_gerado,
-                fornecedor.razao_social
+                fornecedor.razao_social,
+                int(getattr(fornecedor, 'selo_confianca', False))
             ))
             conn.commit()
             return id_usuario_gerado
@@ -45,6 +46,7 @@ def obter_fornecedor() -> List[Fornecedor]:
                 data_cadastro=None,
                 endereco=row["endereco"],
                 razao_social=row["razao_social"],
+                selo_confianca=bool(row["selo_confianca"]) if "selo_confianca" in row.keys() else False,
                 tipo_usuario=row["tipo_usuario"]
             ))
         return fornecedores
@@ -69,6 +71,7 @@ def obter_fornecedor_por_id(fornecedor_id: int) -> Optional[Fornecedor]:
                 data_cadastro=row["data_cadastro"],
                 endereco=row["endereco"],
                 razao_social=row["razao_social"],
+                selo_confianca=bool(row["selo_confianca"]) if "selo_confianca" in row.keys() else False,
                 tipo_usuario=row["tipo_usuario"]
             )
         return None
@@ -89,6 +92,7 @@ def obter_fornecedor_por_pagina(conn, limit: int, offset: int) -> list[Fornecedo
             data_cadastro=row["data_cadastro"],
             endereco=row["endereco"],
             razao_social=row["razao_social"],
+            selo_confianca=bool(row["selo_confianca"]) if "selo_confianca" in row.keys() else False,
             tipo_usuario=row["tipo_usuario"]
         )
         for row in rows
@@ -115,6 +119,7 @@ def obter_fornecedor_por_email(email: str) -> Optional[Fornecedor]:
                 data_cadastro=data_cadastro,
                 endereco=row["endereco"],
                 razao_social=row["razao_social"],
+                selo_confianca=bool(row["selo_confianca"]) if "selo_confianca" in row.keys() else False,
                 tipo_usuario=row["tipo_usuario"]
             )
         return None
@@ -143,10 +148,11 @@ def atualizar_fornecedor(fornecedor: Fornecedor) -> bool:
         # Atualiza os dados específicos do fornecedor
         cursor.execute("""
             UPDATE fornecedor
-            SET razao_social = ?
+            SET razao_social = ?, selo_confianca = ?
             WHERE id = ?
         """, (
             fornecedor.razao_social,
+            int(getattr(fornecedor, 'selo_confianca', False)),
             fornecedor.id
         ))
 

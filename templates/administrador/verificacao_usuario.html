@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Usuários aguardando verificação do selo de confiança</h2>
+
+<h3>Fornecedores</h3>
+{% if fornecedores %}
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Nome</th>
+            <th>Email</th>
+            <th>Razão Social</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for f in fornecedores %}
+        <tr>
+            <td>{{ f.nome }}</td>
+            <td>{{ f.email }}</td>
+            <td>{{ f.razao_social }}</td>
+            <td>
+                <form method="post" action="/admin/aprovar_selo_fornecedor" style="display:inline;">
+                    <input type="hidden" name="id" value="{{ f.id }}">
+                    <button type="submit" class="btn btn-success btn-sm">Aprovar Selo</button>
+                </form>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>Nenhum fornecedor aguardando verificação.</p>
+{% endif %}
+
+<h3>Prestadores</h3>
+{% if prestadores %}
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Nome</th>
+            <th>Email</th>
+            <th>Área de Atuação</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for p in prestadores %}
+        <tr>
+            <td>{{ p.nome }}</td>
+            <td>{{ p.email }}</td>
+            <td>{{ p.area_atuacao }}</td>
+            <td>
+                <form method="post" action="/admin/aprovar_selo_prestador" style="display:inline;">
+                    <input type="hidden" name="id" value="{{ p.id }}">
+                    <button type="submit" class="btn btn-success btn-sm">Aprovar Selo</button>
+                </form>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>Nenhum prestador aguardando verificação.</p>
+{% endif %}
+{% endblock %}

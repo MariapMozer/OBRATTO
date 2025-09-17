@@ -23,6 +23,7 @@ def inserir_prestador(prestador: Prestador) -> Optional[int]:
                 prestador.area_atuacao,
                 prestador.razao_social,
                 prestador.descricao_servicos,
+                int(getattr(prestador, 'selo_confianca', False))
             ))
             conn.commit()
             return id_usuario_gerado
@@ -36,6 +37,8 @@ def obter_prestador() -> List[Prestador]:
         rows = cursor.fetchall()
         prestadores = []
         for row in rows:
+            if "selo_confianca" in row:
+                row["selo_confianca"] = bool(row["selo_confianca"])
             prestadores.append(Prestador(**row))
         return prestadores
 
@@ -48,6 +51,8 @@ def obter_prestador_por_id(prestador_id: int) -> Optional[Prestador]:
         if row:
             if isinstance(row.get("data_cadastro"), str):
                 row["data_cadastro"] = datetime.fromisoformat(row["data_cadastro"])
+            if "selo_confianca" in row:
+                row["selo_confianca"] = bool(row["selo_confianca"])
             return Prestador(**row)
         return None
     
@@ -67,12 +72,13 @@ def obter_prestador_por_pagina(conn, limit: int, offset: int) -> list[Prestador]
             data_cadastro=row["data_cadastro"],
             endereco=row["endereco"],
             area_atuacao=row["area_atuacao"],
-            tipo_usuario=row["tipo_pessoa"],
+            tipo_usuario=row.get("tipo_usuario", row.get("tipo_pessoa", None)),
             razao_social=row["razao_social"],
             descricao_servicos=row["descricao_servicos"],
-            foto=row["foto"],
-            token_redefinicao=row["token_redefinicao"],
-            data_token=row["data_token"],
+            selo_confianca=bool(row["selo_confianca"]) if "selo_confianca" in row.keys() else False,
+            foto=row.get("foto"),
+            token_redefinicao=row.get("token_redefinicao"),
+            data_token=row.get("data_token"),
         )
         for row in rows
     ]
@@ -87,6 +93,8 @@ def obter_prestador_por_email(email: str) -> Optional[Prestador]:
         if row:
             if isinstance(row.get("data_cadastro"), str):
                 row["data_cadastro"] = datetime.fromisoformat(row["data_cadastro"])
+            if "selo_confianca" in row:
+                row["selo_confianca"] = bool(row["selo_confianca"])
             return Prestador(**row)
         return None
 
@@ -98,6 +106,7 @@ def atualizar_prestador(prestador: Prestador) -> bool:
             prestador.area_atuacao,
             prestador.razao_social,
             prestador.descricao_servicos,
+            int(getattr(prestador, 'selo_confianca', False)),
             prestador.id,
         ))
         conn.commit()

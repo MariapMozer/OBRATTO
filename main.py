@@ -3,7 +3,6 @@ from contextlib import asynccontextmanager
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 
-# from routes.publico import publico_pagamento
 from routes.publico import publico_routes
 from routes.fornecedor import fornecedor_pagamento
 from routes.fornecedor import fornecedor_produtos

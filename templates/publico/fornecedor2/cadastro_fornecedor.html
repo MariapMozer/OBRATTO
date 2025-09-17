@@ -54,7 +54,7 @@
                 </div>
 
                 <!-- Formulário de Cadastro -->
-                <form id="cadastroForm" novalidate>
+                <form id="cadastroForm" action="/cadastro/fornecedor" method="post" novalidate>
                     <!-- Seção 1: Dados Pessoais -->
                     <div class="form-section" id="secao1">
                         <h3 class="section-title">
@@ -72,8 +72,8 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="nomeCompleto" class="form-label">Razão Social *</label>
-                            <input type="text" class="form-control" id="nomeCompleto" name="nomeCompleto" 
+                            <label for="razaoSocial" class="form-label">Razão Social *</label>
+                            <input type="text" class="form-control" id="razaoSocial" name="razaoSocial" 
                                    placeholder="Digite sua razão social" required>
                             <div class="invalid-feedback">
                                 Por favor, digite um nome.

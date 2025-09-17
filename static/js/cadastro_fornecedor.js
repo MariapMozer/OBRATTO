@@ -70,13 +70,12 @@
         });
 
         // Submissão do formulário
+
         document.getElementById('cadastroForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            if (validarSecao(3)) {
-                // Aqui você pode adicionar a lógica para enviar os dados
-                alert('Cadastro realizado com sucesso!');
+            if (!validarSecao(3)) {
+                e.preventDefault();
             }
+            // Se passar na validação, o form será enviado normalmente
         });
 
         // Animação de entrada
