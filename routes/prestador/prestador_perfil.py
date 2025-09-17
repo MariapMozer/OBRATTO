@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Request, Form, HTTPException, status
+import os
+from fastapi import APIRouter, Request, Form, HTTPException, UploadFile, status
 from fastapi.responses import HTMLResponse, RedirectResponse
 from typing import Optional, List
 from config import templates
@@ -7,6 +8,7 @@ from fastapi.templating import Jinja2Templates
 from data.cliente.cliente_model import Cliente
 from data.prestador import prestador_repo
 from data.prestador.prestador_model import Prestador
+from data.usuario import usuario_repo
 from utils.auth_decorator import criar_sessao, requer_autenticacao
 from utils.security import criar_hash_senha, verificar_senha
 
@@ -74,5 +76,6 @@ async def processar_exclusao_perfil_prestador(request: Request,
     descricao_servicos: Optional[str] = Form(None)
     ):
     return templates.TemplateResponse("prestador/perfil/excluir.html", {"request": request})
+
 
 
