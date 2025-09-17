@@ -34,6 +34,12 @@ ORDER BY id_inscricao_plano
 LIMIT ? OFFSET ?;
 """
 
+OBTER_ASSINATURA_ATIVA_POR_PRESTADOR = """
+SELECT * FROM inscricao_plano
+WHERE id_prestador = ?
+ORDER BY id_inscricao_plano DESC LIMIT 1
+"""
+
 
 ATUALIZAR_INSCRICAO_PLANO = """
 UPDATE inscricao_plano

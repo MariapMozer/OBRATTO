@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagamento Prestador - Obratto</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background: #007bff;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: 2rem auto;
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 0.3rem;
+        }
+        input, select {
+            width: 100%;
+            padding: 0.7rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .form-actions {
+            margin-top: 1.5rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+        button, a {
+            padding: 0.7rem 1.2rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .resumo {
+            background: #e9f5ff;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+        }
+        .resumo p {
+            margin: 0.3rem 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>OBRATTO - Pagamento</h1>
+    </header>
+
+    <div class="container">
+        <h2>Finalizar Pagamento</h2>
+
+        <!-- Resumo do plano -->
+        <div class="resumo">
+            <p><strong>Plano:</strong> {{ plano.nome_plano }}</p>
+            <p><strong>Tipo:</strong> {{ plano.tipo_plano }}</p>
+            <p><strong>Valor:</strong> R$ {{ "%.2f"|format(plano.valor_mensal) }}</p>
+        </div>
+
+        <!-- Formulário -->
+        <form method="post" action="/prestador/processar_pagamento">
+        <input type="hidden" name="plano_id" value="{{ plano.id_plano }}">
+        <input type="hidden" name="id_prestador" value="{{ id_prestador }}">
+        <input type="hidden" name="tipo_operacao" value="{{ tipo_operacao }}">
+        <input type="hidden" name="valor" value="{{ plano.valor_mensal }}">
+            
+            <div class="form-group">
+                <label for="nome">Nome Completo</label>
+                <input type="text" id="nome" name="nome" required>
+            </div>
+
+            <div class="form-group">
+                <label for="cpf">CPF</label>
+                <input type="text" id="cpf" name="cpf" required>
+            </div>
+
+            <div class="form-group">
+                <label for="telefone">Telefone</label>
+                <input type="text" id="telefone" name="telefone" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">E-mail</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="metodo">Método de Pagamento</label>
+                <select id="metodo" name="metodo" required>
+                    <option value="cartao">Cartão de Crédito</option>
+                    <option value="pix">PIX</option>
+                    <option value="boleto">Boleto</option>
+                </select>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">💳 Pagar</button>
+                <!-- <a href="/fornecedor/planos/listar" class="btn-secondary">Cancelar</a> -->
+            </div>
+        </form>
+    </div>
+</body>
+</html>
