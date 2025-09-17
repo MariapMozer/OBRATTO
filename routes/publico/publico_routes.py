@@ -317,3 +317,10 @@ async def exibir_perfil_publico(request: Request):
 @router.get("/fornecedor/perfil_publico")
 async def exibir_perfil_publico(request: Request):
     return templates.TemplateResponse("publico/perfil_publico_fornecedor.html", {"request": request})
+
+#-----------------------------------------------------
+#----------------- MENSAGEM --------------------------
+
+@router.get("/Mensagens")
+async def mostrar_mensagens(request: Request):
+    return templates.TemplateResponse("publico/mensagens/.html", {"request": request})
