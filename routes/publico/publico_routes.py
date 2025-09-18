@@ -14,7 +14,7 @@ from data.usuario import usuario_repo
 from data.usuario.usuario_model import Usuario
 from data.mensagem.mensagem_model import Mensagem
 from data.mensagem import mensagem_repo
-from utils.security import verificar_autenticacao
+# from utils.security import verificar_autenticacao
 import os
 import uuid
 

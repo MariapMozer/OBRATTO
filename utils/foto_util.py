@@ -4,11 +4,28 @@ from typing import List, Optional
 
 # Funções destinadas ao Prestador 
 
-def obter_diretorio_produto(produto_id: int) -> str:
-    """Retorna o caminho do diretório de fotos de um produto"""
-    codigo_produto = f"{produto_id:06d}"  # ← Formata com 6 dígitos (000001)
+def obter_diretorio_servico(servico_id: int) -> str:
+    """Retorna o caminho do diretório de fotos de um servico"""
+    codigo_servico = f"{servico_id:06d}"  # ← Formata com 6 dígitos (000001)
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    return os.path.join(base_dir, "static", "img", "products", codigo_produto)
+    return os.path.join(base_dir, "static", "img", "servico", codigo_servico)
+
+
+def obter_url_diretorio_servico(servico_id: int) -> str:
+    """Retorna a URL do diretório de fotos de um servico"""
+    codigo_servico = f"{servico_id:06d}"
+    return f"/static/img/servico/{codigo_servico}"
+
+
+def criar_diretorio_servico(servico_id: int) -> bool:
+    """Cria o diretório de fotos do servico se não existir"""
+    try:
+        diretorio = obter_diretorio_servico(servico_id)
+        os.makedirs(diretorio, exist_ok=True)
+        return True
+    except:
+        return False
+
 
 def processar_imagem(arquivo, caminho_destino: str) -> bool:
     """
@@ -48,19 +65,19 @@ def processar_imagem(arquivo, caminho_destino: str) -> bool:
         print(f"Erro ao processar imagem: {e}")
         return False
 
-def obter_foto_principal(produto_id: int) -> Optional[str]:
+def obter_foto_principal(servico_id: int) -> Optional[str]:
     """Retorna a URL da foto principal do produto ou None se não existir"""
-    codigo_produto = f"{produto_id:06d}"
-    caminho_foto = obter_diretorio_produto(produto_id) + f"/{codigo_produto}-001.jpg"
+    codigo_servico = f"{servico_id:06d}"
+    caminho_foto = obter_diretorio_servico(servico_id) + f"/{codigo_servico}-001.jpg"
 
     if os.path.exists(caminho_foto):
-        return f"/static/img/products/{codigo_produto}/{codigo_produto}-001.jpg"
+        return f"/static/img/servico/{codigo_servico}/{codigo_servico}-001.jpg"
     return None
 
-def obter_todas_fotos(produto_id: int) -> List[str]:
+def obter_todas_fotos(servico_id: int) -> List[str]:
     """Retorna lista de URLs de todas as fotos do produto ordenadas"""
-    codigo_produto = f"{produto_id:06d}"
-    diretorio = obter_diretorio_produto(produto_id)
+    codigo_servico = f"{servico_id:06d}"
+    diretorio = obter_diretorio_servico(servico_id)
 
     if not os.path.exists(diretorio):
         return []
@@ -70,17 +87,17 @@ def obter_todas_fotos(produto_id: int) -> List[str]:
 
     # Filtrar apenas arquivos JPG do produto
     for arquivo in arquivos:
-        if arquivo.startswith(codigo_produto) and arquivo.endswith('.jpg'):
-            fotos.append(f"/static/img/products/{codigo_produto}/{arquivo}")
+        if arquivo.startswith(codigo_servico) and arquivo.endswith('.jpg'):
+            fotos.append(f"/static/img/produservico/{codigo_servico}/{arquivo}")
 
     # Ordenar por número sequencial (001, 002, 003...)
     fotos.sort()
     return fotos
 
-def obter_proximo_numero(produto_id: int) -> int:
+def obter_proximo_numero(servico_id: int) -> int:
     """Retorna o próximo número sequencial disponível para uma nova foto"""
-    codigo_produto = f"{produto_id:06d}"
-    diretorio = obter_diretorio_produto(produto_id)
+    codigo_servico = f"{servico_id:06d}"
+    diretorio = obter_diretorio_servico(servico_id)
 
     if not os.path.exists(diretorio):
         return 1
@@ -89,7 +106,7 @@ def obter_proximo_numero(produto_id: int) -> int:
     arquivos = os.listdir(diretorio)
 
     for arquivo in arquivos:
-        if arquivo.startswith(codigo_produto) and arquivo.endswith('.jpg'):
+        if arquivo.startswith(codigo_servico) and arquivo.endswith('.jpg'):
             # Extrair número do arquivo (XXXXXX-NNN.jpg)
             try:
                 numero_str = arquivo.split('-')[1].split('.')[0]
@@ -102,32 +119,32 @@ def obter_proximo_numero(produto_id: int) -> int:
 
     return max(numeros) + 1  # ← Próximo número na sequência
 
-# def salvar_nova_foto(produto_id: int, arquivo, como_principal: bool = False) -> bool:
-    """Salva uma nova foto do produto"""
-    criar_diretorio_produto(produto_id)
-    codigo_produto = f"{produto_id:06d}"
+def salvar_nova_foto(servico_id: int, arquivo, como_principal: bool = False) -> bool:
+    """Salva uma nova foto do servico"""
+    criar_diretorio_servico(servico_id)
+    codigo_servico = f"{servico_id:06d}"
 
     if como_principal:
         # Salvar como foto principal (001)
         numero = 1
         # Se já existe foto principal, mover as outras para frente
-        if obter_foto_principal(produto_id):
-            _mover_fotos_para_frente(produto_id)
+        if obter_foto_principal(servico_id):
+            _mover_fotos_para_frente(servico_id)
     else:
         # Adicionar como próxima foto na sequência
-        numero = obter_proximo_numero(produto_id)
+        numero = obter_proximo_numero(servico_id)
 
     # Gerar caminho do arquivo
-    caminho_destino = f"{obter_diretorio_produto(produto_id)}/{codigo_produto}-{numero:03d}.jpg"
+    caminho_destino = f"{obter_diretorio_servico(servico_id)}/{codigo_servico}-{numero:03d}.jpg"
     return processar_imagem(arquivo, caminho_destino)
 
-# def excluir_foto(produto_id: int, numero: int) -> bool:
+def excluir_foto(servico_id: int, numero: int) -> bool:
     """Remove uma foto específica e reordena as restantes"""
-    codigo_produto = f"{produto_id:06d}"
-    diretorio = obter_diretorio_produto(produto_id)
+    codigo_servico = f"{servico_id:06d}"
+    diretorio = obter_diretorio_servico(servico_id)
 
     # Remover o arquivo específico
-    caminho_foto = f"{diretorio}/{codigo_produto}-{numero:03d}.jpg"
+    caminho_foto = f"{diretorio}/{codigo_servico}-{numero:03d}.jpg"
 
     if os.path.exists(caminho_foto):
         try:
@@ -136,12 +153,12 @@ def obter_proximo_numero(produto_id: int) -> int:
             return False
 
     # Reordenar fotos restantes para não ter gaps na numeração
-    return reordenar_fotos_automatico(produto_id)
+    return reordenar_fotos_automatico(servico_id)
 
-def reordenar_fotos(produto_id: int, nova_ordem: List[int]) -> bool:
+def reordenar_fotos(servico_id: int, nova_ordem: List[int]) -> bool:
     """Reordena as fotos conforme a nova ordem especificada"""
-    codigo_produto = f"{produto_id:06d}"
-    diretorio = obter_diretorio_produto(produto_id)
+    codigo_servico = f"{servico_id:06d}"
+    diretorio = obter_diretorio_servico(servico_id)
 
     if not os.path.exists(diretorio):
         return False
@@ -149,7 +166,7 @@ def reordenar_fotos(produto_id: int, nova_ordem: List[int]) -> bool:
     # Mapear arquivos existentes
     arquivos_existentes = {}
     for arquivo in os.listdir(diretorio):
-        if arquivo.startswith(codigo_produto) and arquivo.endswith('.jpg'):
+        if arquivo.startswith(codigo_servico) and arquivo.endswith('.jpg'):
             try:
                 numero_str = arquivo.split('-')[1].split('.')[0]
                 numero = int(numero_str)
@@ -183,7 +200,7 @@ def reordenar_fotos(produto_id: int, nova_ordem: List[int]) -> bool:
     for i in range(len(nova_ordem)):
         novo_numero = i + 1
         caminho_temp = temp_files[i]
-        caminho_final = f"{diretorio}/{codigo_produto}-{novo_numero:03d}.jpg"
+        caminho_final = f"{diretorio}/{codigo_servico}-{novo_numero:03d}.jpg"
 
         try:
             os.rename(caminho_temp, caminho_final)
