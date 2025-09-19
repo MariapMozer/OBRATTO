@@ -151,7 +151,7 @@ async def post_cadastro(
 
     cliente_id = cliente_repo.inserir_cliente(cliente)
     if cliente_id:
-        return RedirectResponse("/login", status.HTTP_303_SEE_OTHER)
+        return RedirectResponse("/entrar", status.HTTP_303_SEE_OTHER)
     else:
         return RedirectResponse("/cadastro/cliente")
 

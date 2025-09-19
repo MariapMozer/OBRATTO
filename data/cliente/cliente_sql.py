@@ -44,7 +44,7 @@ SELECT
     u.endereco,
     u.tipo_usuario,
     c.genero,
-    c.data_nascimento
+    c.data_nascimento,
     u.foto,
     u.token_redefinicao,
     u.data_token

@@ -17,6 +17,8 @@ def criar_tabela_usuario() -> bool:
 
 
 def inserir_usuario(usuario: Usuario) -> Optional[int]:
+    if not usuario.data_cadastro:
+        usuario.data_cadastro = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     with open_connection() as conn:
         cursor = conn.cursor()
         cursor.execute(INSERIR_USUARIO, (
@@ -34,7 +36,6 @@ def inserir_usuario(usuario: Usuario) -> Optional[int]:
         ))
         conn.commit()
         return cursor.lastrowid
-
 
 def obter_usuario_por_email(email: str) -> Optional[Usuario]:
     with open_connection() as conn:

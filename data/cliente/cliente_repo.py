@@ -19,7 +19,7 @@ def inserir_cliente(cliente: Cliente) -> Optional[int]:
         cursor = conn.cursor()
         id_usuario_gerado = inserir_usuario(cliente)
         if id_usuario_gerado:
-            data_nascimento_str = cliente.data_nascimento.isoformat()
+            data_nascimento_str = cliente.data_nascimento
             cursor.execute(INSERIR_CLIENTE, (
                 id_usuario_gerado,
                 cliente.genero,
@@ -74,7 +74,7 @@ def obter_cliente_por_id(cliente_id: int) -> Optional[Cliente]:
                 tipo_usuario=row["tipo_usuario"],
                 foto=row["foto"],
                 token_redefinicao=row["token_redefinicao"],
-                data_token=row["data_token"],
+                data_token=row["data_token"]
             )
         return None
     
