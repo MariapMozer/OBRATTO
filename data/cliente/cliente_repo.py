@@ -126,3 +126,9 @@ def atualizar_cliente(cliente: Cliente) -> bool:
 
 def deletar_cliente(cliente_id: int) -> bool:
     return deletar_usuario(cliente_id)
+
+def atualizar_foto(id: int, caminho_foto: str) -> bool:
+    with open_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("UPDATE cliente SET foto = ? WHERE id = ?", (caminho_foto, id))
+        return cursor.rowcount > 0

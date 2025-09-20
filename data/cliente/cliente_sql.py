@@ -78,3 +78,8 @@ DELETAR_CLIENTE = """
 DELETE FROM cliente
 WHERE id = ?;
 """
+
+
+ALTER_TABLE_CLIENTE = """ADD COLUMN foto TEXT;"""
+
+UPDATE_CLIENTE = """ SET foto = ? WHERE id = ?;"""

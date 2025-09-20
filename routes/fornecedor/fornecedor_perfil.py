@@ -1,6 +1,7 @@
 
 from asyncio import open_connection
 from fastapi import APIRouter, Request, Form, UploadFile, File, HTTPException
+from data.usuario.usuario_sql import ATUALIZAR_FOTO
 from utils.auth_decorator import requer_autenticacao
 from fastapi.templating import Jinja2Templates
 from data.fornecedor.fornecedor_model import Fornecedor
