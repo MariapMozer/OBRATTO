@@ -8,9 +8,14 @@ from data.cliente import cliente_repo
 from data.cliente.cliente_model import Cliente
 from utils.auth_decorator import requer_autenticacao
 from utils.security import criar_hash_senha
+from fastapi import status
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
+
+UPLOAD_DIR = "static/uploads/cliente"
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+
 
 @router.get("/")
 async def get_page(request: Request):
@@ -22,15 +27,15 @@ async def get_page(request: Request):
 async def exibir_perfil_cliente(request: Request):
     return templates.TemplateResponse("cliente/perfil/perfil.html", {"request": request})
 
-# Editar perfil
-@router.get("/editar")
+# Editar dados do perfil
+@router.get("/editar/dados")
 @requer_autenticacao(["cliente"])
 async def editar_perfil_cliente(request: Request):
-    return templates.TemplateResponse("cliente/perfil/editar.html", {"request": request})
+    return templates.TemplateResponse("cliente/perfil/editar_dados.html", {"request": request})
 
 
-# Rota para processar o formulário de edição
-@router.post("/editar")
+# Rota para processar o formulário de edição de dados do perfil
+@router.post("/editar/dados")
 @requer_autenticacao(["cliente"])
 async def processar_edicao_perfil_cliente(
     request: Request,
@@ -45,58 +50,65 @@ async def processar_edicao_perfil_cliente(
     foto: Optional[UploadFile] = File(None),  # ← arquivo enviado
     usuario_logado: dict = None
 ):
-    # Atualizar dados no banco
-    cliente = Cliente(
-        id=usuario_logado["id"],
-        nome=nome,
-        email=email,
-        senha=criar_hash_senha(senha) if senha else usuario_logado["senha"],
-        telefone=telefone,
-        cpf_cnpj=cpf_cnpj,
-        endereco=endereco,
-        genero=genero,
-        data_nascimento=data_nascimento,
-        foto=usuario_logado.get("foto")
-    )
+    pass
 
-    # Atualizar foto, se houver upload
-    if foto:
-        tipos_permitidos = ["image/jpeg", "image/png", "image/jpg"]
-        if foto.content_type not in tipos_permitidos:
-            return templates.TemplateResponse(
-                "cliente/perfil/editar.html",
-                {"request": request, "erro": "Tipo de arquivo inválido"}
-            )
+# Editar foto de perfil
+@router.get("/editar/fotos")
+@requer_autenticacao(["cliente"])
+async def editar_foto_perfil_cliente(request: Request, usuario_logado: dict = None):
+    return templates.TemplateResponse("cliente/perfil/editar_foto.html", {
+    "request": request,
+    "cliente": usuario_logado
+})
 
-        upload_dir = "static/uploads/clientes"
-        os.makedirs(upload_dir, exist_ok=True)
 
-        extensao = foto.filename.split(".")[-1]
-        nome_arquivo = f"{usuario_logado['id']}_{secrets.token_hex(8)}.{extensao}"
-        caminho_arquivo = os.path.join(upload_dir, nome_arquivo)
+# Rota para processar o formulário de edição de foto
+@router.post("/editar/fotos")
+@requer_autenticacao(["cliente"])
+async def alterar_foto(
+    request: Request,
+    foto: UploadFile = File(...),  # ← Recebe arquivo de foto
+    usuario_logado: dict = None
+):
+    # 1. Validar tipo de arquivo
+    tipos_permitidos = ["image/jpeg", "image/png", "image/jpg"]
+    if foto.content_type not in tipos_permitidos:
+        return RedirectResponse("/perfil?erro=tipo_invalido", status.HTTP_303_SEE_OTHER)
 
-        conteudo = await foto.read()
+    # 2. Criar diretório se não existir
+    upload_dir = "static/uploads/cliente"
+    os.makedirs(upload_dir, exist_ok=True)
+
+    # 3. Gerar nome único para evitar conflitos
+    import secrets
+    extensao = foto.filename.split(".")[-1]
+    nome_arquivo = f"{usuario_logado['id']}_{secrets.token_hex(8)}.{extensao}"
+    caminho_arquivo = os.path.join(upload_dir, nome_arquivo)
+
+    # 4. Salvar arquivo no sistema
+    try:
+        conteudo = await foto.read()  # ← Lê conteúdo do arquivo
         with open(caminho_arquivo, "wb") as f:
             f.write(conteudo)
 
-        cliente.foto = f"/static/uploads/clientes/{nome_arquivo}"
+        # 5. Salvar caminho no banco de dados
+        caminho_relativo = f"/static/uploads/cliente/{nome_arquivo}"
+        cliente_repo.atualizar_foto(usuario_logado['id'], caminho_relativo)
 
-    # Atualizar no banco
-    from data.cliente import cliente_repo
-    cliente_repo.atualizar(cliente)
+        # 6. Atualizar sessão do usuário
+        usuario_logado['foto'] = caminho_relativo
+        from utils.auth_decorator import criar_sessao
+        criar_sessao(request, usuario_logado)
 
-    # Atualizar sessão
-    usuario_logado.update({"foto": cliente.foto})
-    from utils.auth_decorator import criar_sessao
-    criar_sessao(request, usuario_logado)
+    except Exception as e:
+        return RedirectResponse("/perfil?erro=upload_falhou", status.HTTP_303_SEE_OTHER)
 
-    return RedirectResponse("/perfil", status_code=303)
-
+    return RedirectResponse("/perfil?foto_sucesso=1", status.HTTP_303_SEE_OTHER)
 
 # Excluir perfil
 @router.get("/excluir")
 @requer_autenticacao(["cliente"])
-async def excluir_perfil_prestador(request: Request):
+async def excluir_perfil_cliente(request: Request):
     return templates.TemplateResponse("cliente/excluir.html", {"request": request})
 
 # Rota para processar a exclusão do perfil
@@ -104,18 +116,12 @@ async def excluir_perfil_prestador(request: Request):
 @requer_autenticacao(["cliente"])
 async def processar_exclusao_perfil_cliente(
     request: Request,
-    nome: str = Form(...),
-    email: str = Form(...),
-    senha: str = Form(...),
-    telefone: str = Form(...),
-    cpf_cnpj: str = Form(...),
-    endereco: str = Form(...),
-    data_cadastro: str = Form(...),
-    genero: str = Form(...),
-    data_nascimento: str = Form(...),
-    tipo_usuario: str = "cliente",
-    foto: Optional[str] = None,
-    token_redefinicao: Optional[str] = None,
-    data_token: Optional[str] = None
-    ):
-    return templates.TemplateResponse("cliente/excluir.html", {"request": request})
+    usuario_logado: dict = None
+):
+    cliente_id = usuario_logado["id"]
+
+    # Excluir cliente no banco
+    cliente_repo.deletar_cliente(cliente_id)
+
+    # Redirecionar para logout (encerra sessão)
+    return RedirectResponse("/logout", status.HTTP_303_SEE_OTHER)
