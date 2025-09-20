@@ -1,0 +1,99 @@
+<div class="row">
+    <div class="col-md-8">
+        <h3>Fotos Existentes</h3>
+        {% if fotos %}
+        <div class="row g-3" id="galeria-fotos">
+            {% for foto in fotos %}
+            {% set foto_numero = foto.split('-')[-1].split('.')[0] | int %}
+            <div class="col-md-4" data-numero="{{ foto_numero }}" draggable="true">
+                <div class="card">
+                    <!-- Marcar primeira foto como principal -->
+                    {% if loop.index == 1 %}
+                    <div class="badge bg-primary position-absolute top-0 start-0 m-2">Principal</div>
+                    {% endif %}
+
+                    <img src="{{ foto }}"
+                         class="card-img-top"
+                         style="width: 100%; aspect-ratio: 1/1; object-fit: cover;"
+                         alt="Foto {{ foto_numero }}">
+
+                    <div class="card-body text-center">
+                        <p class="card-text small">Foto {{ "{:03d}".format(foto_numero) }}</p>
+
+                        <!-- Botão excluir desabilitado para foto principal -->
+                        {% if loop.index == 1 %}
+                        <button type="button" class="btn btn-danger btn-sm" disabled
+                                title="A foto principal não pode ser excluída">
+                            <i class="bi-trash"></i> Excluir
+                        </button>
+                        {% else %}
+                        <form method="post"
+                              action="/admin/produtos/{{ produto.id }}/galeria/excluir/{{ foto_numero }}"
+                              onsubmit="return confirm('Deseja realmente excluir esta foto?')"
+                              style="display: inline;">
+                            <button type="submit" class="btn btn-danger btn-sm">
+                                <i class="bi-trash"></i> Excluir
+                            </button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Seção de reordenação (apenas se há mais de 1 foto) -->
+        {% if fotos|length > 1 %}
+        <div class="mt-4">
+            <h4>Reordenar Fotos</h4>
+            <p class="text-muted">Arraste as fotos para reordená-las. A primeira foto será sempre a principal.</p>
+            <form method="post" action="/admin/produtos/{{ produto.id }}/galeria/reordenar" id="form-reordenar">
+                <input type="hidden" name="nova_ordem" id="nova_ordem">
+                <button type="button" class="btn btn-success" onclick="salvarOrdem()">
+                    <i class="bi-check"></i> Salvar Nova Ordem
+                </button>
+            </form>
+        </div>
+        {% endif %}
+
+        {% else %}
+        <!-- Estado vazio -->
+        <div class="text-center py-5">
+            <i class="bi-images" style="font-size: 4rem; color: #dee2e6;"></i>
+            <p class="text-muted mt-3">Nenhuma foto cadastrada para este produto.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h3>Adicionar Fotos</h3>
+
+                <!-- Upload múltiplo -->
+                <form method="post"
+                      action="/admin/produtos/{{ produto.id }}/galeria/upload"
+                      enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="fotos" class="form-label">Selecionar Fotos</label>
+                        <input type="file"
+                               class="form-control"
+                               id="fotos"
+                               name="fotos"
+                               accept="image/*"
+                               multiple
+                               required>  <!-- ← multiple permite várias fotos -->
+                        <div class="form-text">
+                            Selecione uma ou mais fotos.<br>
+                            Formatos aceitos: JPG, PNG, GIF, WEBP.<br>
+                            As imagens serão cortadas para formato quadrado.
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi-upload"></i> Enviar Fotos
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

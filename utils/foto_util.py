@@ -244,4 +244,4 @@ def reordenar_fotos(servico_id: int, nova_ordem: List[int]) -> bool:
     return True
 
 
-# Funções destinadas ao fornecedor
+# --------- Funções destinadas ao fornecedor -----------

@@ -67,3 +67,5 @@ async def alterar_foto(
 
     return RedirectResponse("/perfil?foto_sucesso=1", status.HTTP_303_SEE_OTHER)
 
+
+# ------------ Fornecedor ----------------

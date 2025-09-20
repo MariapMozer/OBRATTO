@@ -10,4 +10,19 @@
     </ul>
     <a href="/servicos/novo">Cadastrar Novo Serviço</a>
 </body>
+
+<td>
+    <img src="{{ servico.foto_principal or '/static/img/placeholder.png' }}"
+         alt="Foto do servico"
+         style="width: 50px; height: 50px; object-fit: cover;">
+</td>
+
+<!-- Adicionar botão para acessar galeria -->
+<td class="text-center">
+    <a href="/admin/servico/{{ servico.id }}/galeria"
+       class="btn btn-warning btn-sm"
+       title="Galeria de Fotos">
+        <i class="bi-images"></i>
+    </a>
+</td>
 </html>

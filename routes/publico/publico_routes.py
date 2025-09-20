@@ -151,7 +151,7 @@ async def post_cadastro(
 
     cliente_id = cliente_repo.inserir_cliente(cliente)
     if cliente_id:
-        return RedirectResponse("/entrar", status.HTTP_303_SEE_OTHER)
+        return RedirectResponse("/login", status.HTTP_303_SEE_OTHER)
     else:
         return RedirectResponse("/cadastro/cliente")
 
@@ -226,11 +226,11 @@ async def processar_cadastro_fornecedor(
 
 #--------------LOGIN/LOGOUT-----------------------------
 
-@router.get("/entrar")
+@router.get("/login")
 async def mostrar_login(request: Request):
     return templates.TemplateResponse("publico/login_cadastro/login.html", {"request": request})
 
-@router.post("/entrar")
+@router.post("/login")
 async def processar_login(request: Request, email: str = Form(...), senha: str = Form(...)):
     if not email or not senha:
         return templates.TemplateResponse("publico/login_cadastro/login.html", {"request": request, "erro": "Preencha todos os campos."}, status_code=status.HTTP_400_BAD_REQUEST)

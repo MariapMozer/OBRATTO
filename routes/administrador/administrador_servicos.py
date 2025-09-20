@@ -99,34 +99,34 @@ async def post_galeria_reordenar(
 
     return RedirectResponse(f"/admin/servico/{id}/galeria", status.HTTP_303_SEE_OTHER)
 
-# Modificar rota de cadastro para aceitar foto principal
-@router.post("/cadastrar")
-@requer_autenticacao(["admin"])
-async def post_cadastrar(
-    request: Request,
-    titulo: str = Form(...),
-    descricao: str = Form(...),
-    categoria: float = Form(...),
-    valor_base: int = Form(...),
-    nome_prestador: int = Form(...),
-    foto: Optional[UploadFile] = File(None),  # ← Foto opcional no cadastro
-    usuario_logado: dict = None
-):
-    # 1. Criar produto primeiro
-    servico = Servico(
-        id=0, titlo=titulo, descricao=descricao,
-        categoria=categoria, valor_base=valor_base, nome_prestador=nome_prestador,
-    )
-    servico_id = servico_repo.inserir_servico(servico)
+# # Modificar rota de cadastro para aceitar foto principal
+# @router.post("/cadastrar")
+# @requer_autenticacao(["admin"])
+# async def post_cadastrar(
+#     request: Request,
+#     titulo: str = Form(...),
+#     descricao: str = Form(...),
+#     categoria: float = Form(...),
+#     valor_base: int = Form(...),
+#     nome_prestador: int = Form(...),
+#     foto: Optional[UploadFile] = File(None),  # ← Foto opcional no cadastro
+#     usuario_logado: dict = None
+# ):
+#     # 1. Criar produto primeiro
+#     servico = Servico(
+#         id=0, titlo=titulo, descricao=descricao,
+#         categoria=categoria, valor_base=valor_base, nome_prestador=nome_prestador,
+#     )
+#     servico_id = servico_repo.inserir_servico(servico)
 
-    if servico_id:
-        # 2. Salvar foto se foi enviada
-        if foto and foto.filename:
-            try:
-                salvar_nova_foto(servico_id, foto.file, como_principal=True)
-            except Exception as e:
-                print(f"Erro ao salvar foto: {e}")
+#     if servico_id:
+#         # 2. Salvar foto se foi enviada
+#         if foto and foto.filename:
+#             try:
+#                 salvar_nova_foto(servico_id, foto.file, como_principal=True)
+#             except Exception as e:
+#                 print(f"Erro ao salvar foto: {e}")
 
-        return RedirectResponse("/admin/servico", status.HTTP_303_SEE_OTHER)
+#         return RedirectResponse("/admin/servico", status.HTTP_303_SEE_OTHER)
 
-    # Erro ao criar produto...
+#     # Erro ao criar produto...

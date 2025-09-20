@@ -1,18 +1,32 @@
-from fastapi import APIRouter, Request, Form, HTTPException, status
+from datetime import datetime
+import os
+import uuid
+from fastapi import APIRouter, File, Request, Form, HTTPException, UploadFile, status
 from fastapi.responses import HTMLResponse, RedirectResponse
 from typing import Optional, List
 from config import templates
+from data.servico import servico_repo
+from data.servico.servico_model import Servico
 from utils.auth_decorator import requer_autenticacao
+from utils.foto_util import obter_foto_principal
 router = APIRouter()
-
+UPLOAD_DIR = "static/uploads"
 
 # Tudo funcionando perfeitamente
 
 # Rota para listar serviços do Prestador 
 @router.get("/meus/servicos")
-async def listar_servicos(request: Request):
-    return templates.TemplateResponse("prestador/servicos/meus_servicos.html", {"request": request})
+@requer_autenticacao(["prestador"])
+async def gets(request: Request, usuario_logado: dict = None):
+    servicos = servico_repo.obter_servico()
 
+    # Adicionar informação de foto para cada produto
+    for servico in servicos:
+        servico.foto_principal = obter_foto_principal(servico.id)  # ← Adiciona foto
+
+    return templates.TemplateResponse(
+        "prestador/servicos/meus_servicos.html", {"request": request, "servicos": servicos}
+    )
 
 # Rota para cadastrar novo serviço
 @router.get("/novo")
@@ -23,15 +37,47 @@ async def form_novo_servicos(request: Request):
 # Rota para processar o formulário de novo serviço
 @router.post("/novo")
 @requer_autenticacao(["prestador"])
-async def processar_novo_servico(request: Request,
-    id_servico: int = Form(...), 
-    id_prestador: int = Form(...), 
+async def processar_novo_servico(
+    request: Request,
+    id_servico: int = Form(...),
+    id_prestador: int = Form(...),
     titulo: str = Form(...),
     descricao: str = Form(...),
     categoria: str = Form(...),
     valor_base: float = Form(...),
-    nome_prestador: str = Form(...)):
-    return templates.TemplateResponse("prestador/servicos/novo.html", {"request": request})
+    nome_prestador: str = Form(...),
+    foto: UploadFile = File(None)   # << aqui entra a foto
+):
+    # trata upload da foto
+    nome_arquivo = None
+    if foto and foto.filename:
+        ext = os.path.splitext(foto.filename)[1]
+        nome_arquivo = f"{uuid.uuid4()}{ext}"
+        caminho = os.path.join(UPLOAD_DIR, nome_arquivo)
+        with open(caminho, "wb") as f:
+            f.write(await foto.read())
+
+    servico = Servico(
+        id=0,
+        id_prestador=id_prestador,
+        titulo=titulo,
+        descricao=descricao,
+        categoria=categoria,
+        valor_base=valor_base,
+        nome_prestador=nome_prestador,
+        data_cadastro=datetime.now(),
+        foto=nome_arquivo
+    )
+
+    servico_id = servico_repo.inserir_servico(servico)
+    if servico_id:
+        return RedirectResponse("/meus/servicos", status.HTTP_303_SEE_OTHER)
+    else:
+        return templates.TemplateResponse(
+            "prestador/servicos/novo.html",
+            {"request": request, "erro": "Erro ao cadastrar serviço."}
+        )
+
 
 # Editar serviço
 @router.get("/editar/servicos")
