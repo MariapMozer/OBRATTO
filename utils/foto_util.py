@@ -138,6 +138,40 @@ def salvar_nova_foto(servico_id: int, arquivo, como_principal: bool = False) -> 
     caminho_destino = f"{obter_diretorio_servico(servico_id)}/{codigo_servico}-{numero:03d}.jpg"
     return processar_imagem(arquivo, caminho_destino)
 
+def _mover_fotos_para_frente(servico_id: int) -> None:
+    """Move todas as fotos uma posição para frente (002 → 003, 001 → 002)"""
+    codigo_servico = f"{servico_id:06d}"
+    diretorio = obter_diretorio_servico(servico_id)
+
+    if not os.path.exists(diretorio):
+        return
+
+    # Listar arquivos existentes e ordenar por número decrescente
+    arquivos_existentes = []
+    for arquivo in os.listdir(diretorio):
+        if arquivo.startswith(codigo_servico) and arquivo.endswith('.jpg'):
+            try:
+                numero_str = arquivo.split('-')[1].split('.')[0]
+                numero = int(numero_str)
+                arquivos_existentes.append((numero, arquivo))
+            except:
+                continue
+
+    arquivos_existentes.sort(reverse=True)  # ← Ordena do maior para o menor
+
+    # Renomear cada arquivo para o próximo número
+    for numero, arquivo in arquivos_existentes:
+        novo_numero = numero + 1
+        caminho_atual = f"{diretorio}/{arquivo}"
+        novo_nome = f"{codigo_servico}-{novo_numero:03d}.jpg"
+        caminho_novo = f"{diretorio}/{novo_nome}"
+
+        try:
+            os.rename(caminho_atual, caminho_novo)
+        except:
+            continue
+
+
 def excluir_foto(servico_id: int, numero: int) -> bool:
     """Remove uma foto específica e reordena as restantes"""
     codigo_servico = f"{servico_id:06d}"
@@ -153,7 +187,7 @@ def excluir_foto(servico_id: int, numero: int) -> bool:
             return False
 
     # Reordenar fotos restantes para não ter gaps na numeração
-    return reordenar_fotos_automatico(servico_id)
+    return reordenar_fotos(servico_id)
 
 def reordenar_fotos(servico_id: int, nova_ordem: List[int]) -> bool:
     """Reordena as fotos conforme a nova ordem especificada"""
