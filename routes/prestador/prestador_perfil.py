@@ -19,7 +19,7 @@ router = APIRouter()
 templates = Jinja2Templates(directory="templates")
 
 # Rota para página inicial do Prestador
-@router.get("/")
+@router.get("")
 async def home_prestador(request: Request):
     return templates.TemplateResponse("prestador/home.html", {"request": request})
 

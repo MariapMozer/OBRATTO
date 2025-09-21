@@ -19,14 +19,14 @@ templates = Jinja2Templates(directory="templates")
 # ------------ Prestador ----------------
 
 # Rota para visualizar alteração de foto
-@router.get("/perfil/alterar-foto")
+@router.get("/prestador/perfil/alterar-foto")
 @requer_autenticacao(["prestador"])
-async def alterar_foto(request: Request):
-    return templates.TemplateResponse("prestador/perfil/foto/dados.html", {"request": request})
+async def alterar_foto(request: Request, usuario_logado: dict = None):
+    return templates.TemplateResponse("prestador/perfil/foto/dados.html", {"request": request, "usuario": usuario_logado})
 
 # Rota para processar alteração de foto
-@router.post("/perfil/alterar-foto")
-@requer_autenticacao()
+@router.post("/prestador/perfil/alterar-foto")
+@requer_autenticacao("prestador")
 async def alterar_foto(
     request: Request,
     foto: UploadFile = File(...), 
