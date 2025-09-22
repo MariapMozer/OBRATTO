@@ -34,7 +34,9 @@ async def editar_perfil_fornecedor(
     nome: str = Form(...), 
     email: str = Form(...), 
     telefone: str = Form(...), 
-    endereco: str = Form(...), 
+    rua: str = Form(...),
+    numero: str = Form(...),
+    bairro: str = Form(...),
     razao_social: str = Form(...),
     usuario_logado: dict = None):
     fornecedor = fornecedor_repo.obter_fornecedor_por_id(usuario_logado.id)
@@ -43,7 +45,6 @@ async def editar_perfil_fornecedor(
     fornecedor.nome = nome
     fornecedor.email = email
     fornecedor.telefone = telefone
-    fornecedor.endereco = endereco
     fornecedor.razao_social = razao_social
     fornecedor_repo.atualizar_fornecedor(fornecedor)
     mensagem = "Perfil atualizado com sucesso."

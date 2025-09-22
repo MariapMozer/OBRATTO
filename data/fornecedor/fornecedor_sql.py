@@ -23,8 +23,10 @@ SELECT
     u.senha,
     u.cpf_cnpj,
     u.telefone,
+    u.rua,
+    u.numero,
+    u.bairro,
     u.data_cadastro,
-    u.endereco,
     f.razao_social,
     f.selo_confianca,
     u.tipo_usuario
@@ -42,8 +44,10 @@ SELECT
     u.senha,
     u.cpf_cnpj,
     u.telefone,
+    u.rua,
+    u.numero,
+    u.bairro,
     u.data_cadastro,
-    u.endereco,
     f.razao_social,
     f.selo_confianca,
     u.tipo_usuario
@@ -54,8 +58,8 @@ WHERE f.id = ?;
 
 
 OBTER_FORNECEDOR_POR_PAGINA = """
-SELECT u.id, u.nome, u.email, u.senha, u.cpf_cnpj, u.telefone,
-       u.data_cadastro, u.endereco, f.razao_social, f.selo_confianca, u.tipo_usuario
+SELECT u.id, u.nome, u.email, u.senha, u.cpf_cnpj, u.telefone, u.rua, u.numero, u.bairro,
+       u.data_cadastro, f.razao_social, f.selo_confianca, u.tipo_usuario
 FROM usuario u
 JOIN fornecedor f ON f.id = u.id
 ORDER BY f.razao_social
@@ -71,8 +75,10 @@ SELECT
     u.senha,
     u.cpf_cnpj,
     u.telefone,
+    u.rua,
+    u.numero,
+    u.bairro,
     u.data_cadastro,
-    u.endereco,
     f.razao_social,
     f.selo_confianca,
     u.tipo_usuario

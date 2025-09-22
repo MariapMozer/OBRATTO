@@ -43,8 +43,10 @@ def obter_fornecedor() -> List[Fornecedor]:
                 senha=None,
                 cpf_cnpj=None,
                 telefone=None,
+                rua=row["rua"],
+                numero=row["numero"],
+                bairro=row["bairro"],
                 data_cadastro=None,
-                endereco=row["endereco"],
                 razao_social=row["razao_social"],
                 selo_confianca=bool(row["selo_confianca"]) if "selo_confianca" in row.keys() else False,
                 tipo_usuario=row["tipo_usuario"]
@@ -68,8 +70,10 @@ def obter_fornecedor_por_id(fornecedor_id: int) -> Optional[Fornecedor]:
                 senha=row["senha"],
                 cpf_cnpj=row["cpf_cnpj"],
                 telefone=row["telefone"],
+                rua=row["rua"],
+                numero=row["numero"],
+                bairro=row["bairro"],
                 data_cadastro=row["data_cadastro"],
-                endereco=row["endereco"],
                 razao_social=row["razao_social"],
                 selo_confianca=bool(row["selo_confianca"]) if "selo_confianca" in row.keys() else False,
                 tipo_usuario=row["tipo_usuario"]
@@ -89,8 +93,10 @@ def obter_fornecedor_por_pagina(conn, limit: int, offset: int) -> list[Fornecedo
             senha=row["senha"],
             cpf_cnpj=row["cpf_cnpj"],
             telefone=row["telefone"],
+            rua=row["rua"],
+            numero=row["numero"],
+            bairro=row["bairro"],
             data_cadastro=row["data_cadastro"],
-            endereco=row["endereco"],
             razao_social=row["razao_social"],
             selo_confianca=bool(row["selo_confianca"]) if "selo_confianca" in row.keys() else False,
             tipo_usuario=row["tipo_usuario"]
@@ -116,8 +122,10 @@ def obter_fornecedor_por_email(email: str) -> Optional[Fornecedor]:
                 senha=row["senha"],
                 cpf_cnpj=row["cpf_cnpj"],
                 telefone=row["telefone"],
+                rua=row["rua"],
+                numero=row["numero"],
+                bairro=row["bairro"],
                 data_cadastro=data_cadastro,
-                endereco=row["endereco"],
                 razao_social=row["razao_social"],
                 selo_confianca=bool(row["selo_confianca"]) if "selo_confianca" in row.keys() else False,
                 tipo_usuario=row["tipo_usuario"]
@@ -140,8 +148,10 @@ def atualizar_fornecedor(fornecedor: Fornecedor) -> bool:
             fornecedor.senha,
             fornecedor.cpf_cnpj,
             fornecedor.telefone,
+            fornecedor.rua,
+            fornecedor.numero,
+            fornecedor.bairro,
             fornecedor.data_cadastro.isoformat() if isinstance(fornecedor.data_cadastro, datetime) else fornecedor.data_cadastro,
-            fornecedor.endereco,
             fornecedor.id
         ))
 
