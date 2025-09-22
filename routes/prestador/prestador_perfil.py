@@ -50,6 +50,8 @@ async def processar_edicao_perfil_prestador(
     email: str = Form(...),
     telefone: str = Form(...),
     cpf_cnpj: str = Form(...),
+    estado: str = Form(...),
+    cidade: str = Form(...),
     rua: str = Form(...),
     numero: str = Form(...),
     bairro: str = Form(...),

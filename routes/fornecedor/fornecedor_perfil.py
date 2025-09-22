@@ -34,6 +34,8 @@ async def editar_perfil_fornecedor(
     nome: str = Form(...), 
     email: str = Form(...), 
     telefone: str = Form(...), 
+    estado: str = Form(...),
+    cidade: str = Form(...),
     rua: str = Form(...),
     numero: str = Form(...),
     bairro: str = Form(...),

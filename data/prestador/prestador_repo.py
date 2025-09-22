@@ -69,6 +69,8 @@ def obter_prestador_por_pagina(conn, limit: int, offset: int) -> list[Prestador]
             senha=row["senha"],
             cpf_cnpj=row["cpf_cnpj"],
             telefone=row["telefone"],
+            estado=row["estado"],
+            cidade=row["cidade"],
             rua=row["rua"],
             numero=row["numero"],
             bairro=row["bairro"],
