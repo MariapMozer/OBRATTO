@@ -21,7 +21,6 @@ from routes.prestador import prestador_servicos
 from routes.cliente import cliente_perfil
 from routes.cliente import cliente_contratacoes
 from utils.seed import criar_tabelas
-from routes.usuario_autenticado import router as usuario_autenticado_router
 
 
 criar_tabelas()
@@ -63,7 +62,6 @@ app.include_router(prestador_contratacoes.router, prefix="/prestador")
 app.include_router(prestador_pagamento.router, prefix="/prestador" )
 app.include_router(prestador_catalogo.router, prefix="/prestador")
 
-app.include_router(usuario_autenticado_router)
 
 # CLIENTE
 app.include_router(cliente_perfil.router, prefix="/cliente")
