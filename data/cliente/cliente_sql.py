@@ -20,8 +20,10 @@ SELECT
     u.senha,
     u.cpf_cnpj,
     u.telefone,
+    u.rua,
+    u.numero,
+    u.bairro,
     u.data_cadastro,
-    u.endereco,
     u.tipo_usuario,
     c.genero,
     c.data_nascimento
@@ -40,8 +42,10 @@ SELECT
     u.senha,
     u.cpf_cnpj,
     u.telefone,
+    u.rua,
+    u.numero,
+    u.bairro,
     u.data_cadastro,
-    u.endereco,
     u.tipo_usuario,
     c.genero,
     c.data_nascimento,
@@ -53,8 +57,8 @@ JOIN usuario u ON c.id = u.id
 WHERE c.id = ?;
 """
 OBTER_CLIENTE_POR_PAGINA = """
-SELECT u.id, u.nome, u.email, u.senha, u.cpf_cnpj, u.telefone,
-       u.data_cadastro, u.endereco, c.genero, c.data_nascimento, u.tipo_usuario, c.tipo_pessoa,
+SELECT u.id, u.nome, u.email, u.senha, u.cpf_cnpj, u.telefone, u.rua, u.numero, u.bairro,
+       u.data_cadastro, c.genero, c.data_nascimento, u.tipo_usuario, c.tipo_pessoa,
     u.foto,
     u.token_redefinicao,
     u.data_token

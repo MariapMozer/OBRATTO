@@ -43,8 +43,10 @@ async def processar_edicao_perfil_cliente(
     email: str = Form(...),
     senha: str = Form(...),
     telefone: str = Form(...),
+    rua: str = Form(...),
+    numero: str = Form(...),
+    bairro: str = Form(...),
     cpf_cnpj: str = Form(...),
-    endereco: str = Form(...),
     genero: str = Form(...),
     data_nascimento: str = Form(...),
     foto: Optional[UploadFile] = File(None),  # ← arquivo enviado
