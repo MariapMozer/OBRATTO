@@ -21,6 +21,8 @@ SELECT
     u.senha,
     u.cpf_cnpj,
     u.telefone,
+    u.estado,
+    u.cidade,
     u.rua,
     u.numero,
     u.bairro,
@@ -46,6 +48,8 @@ SELECT
     u.senha,
     u.cpf_cnpj,
     u.telefone,
+    u.estado,
+    u.cidade,
     u.rua,
     u.numero,
     u.bairro,
@@ -64,7 +68,7 @@ JOIN usuario u ON p.id = u.id
 WHERE p.id = ?;
 """
 OBTER_PRESTADOR_POR_PAGINA = """
-SELECT u.id, u.nome, u.email, u.senha, u.cpf_cnpj, u.telefone, u.rua, u.numero, u.bairro,
+SELECT u.id, u.nome, u.email, u.senha, u.cpf_cnpj, u.telefone, u.estado, u.cidade,  u.rua, u.numero, u.bairro,
        u.data_cadastro, p.area_atuacao, p.razao_social, p.descricao_servicos, p.selo_confianca, u.tipo_usuario, u.foto,
     u.data_cadastro,
     u.token_redefinicao,
@@ -83,6 +87,8 @@ SELECT
     u.senha,
     u.cpf_cnpj,
     u.telefone,
+    u.estado,
+    u.cidade,
     u.rua,
     u.numero,
     u.bairro,
