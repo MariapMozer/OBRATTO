@@ -11,7 +11,10 @@ class Usuario:
     senha: str
     cpf_cnpj: str
     telefone: str
-    endereco: str
+# Endereço detalhado
+    rua: str
+    numero: str
+    bairro: str
     tipo_usuario: str
     data_cadastro: Optional[str] = None
     foto: str = None

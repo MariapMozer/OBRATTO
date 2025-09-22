@@ -27,11 +27,13 @@ def inserir_usuario(usuario: Usuario) -> Optional[int]:
             usuario.senha,
             usuario.cpf_cnpj,
             usuario.telefone,
+            usuario.rua,
+            usuario.numero,
+            usuario.bairro,
             usuario.data_cadastro,
             usuario.foto,
             usuario.token_redefinicao,
             usuario.data_token,
-            usuario.endereco,
             usuario.tipo_usuario
         ))
         conn.commit()
@@ -50,11 +52,13 @@ def obter_usuario_por_email(email: str) -> Optional[Usuario]:
                 senha=row["senha"],
                 cpf_cnpj=row["cpf_cnpj"],
                 telefone=row["telefone"],
+                rua=row["rua"],
+                numero=row["numero"],
+                bairro=row["bairro"],
                 data_cadastro=row["data_cadastro"],
                 foto=row["foto"],
                 token_redefinicao=row["token_redefinicao"],
                 data_token=row["data_token"],
-                endereco=row["endereco"],
                 tipo_usuario=row["tipo_usuario"]
             )
     return None
@@ -72,11 +76,13 @@ def obter_usuario_por_id(id: int) -> Optional[Usuario]:
                 senha=row["senha"],
                 cpf_cnpj=row["cpf_cnpj"],
                 telefone=row["telefone"],
+                rua=row["rua"],
+                numero=row["numero"],
+                bairro=row["bairro"],
                 data_cadastro=row["data_cadastro"],
                 foto=row["foto"],
                 token_redefinicao=row["token_redefinicao"],
                 data_token=row["data_token"],
-                endereco=row["endereco"],
                 tipo_usuario=row["tipo_usuario"]
             )
     return None
@@ -98,11 +104,13 @@ def obter_usuarios_por_pagina (pg_num: int, pg_size:int) -> List[Usuario]:
                 senha=row["senha"],
                 cpf_cnpj=row["cpf_cnpj"],
                 telefone=row["telefone"],
+                rua=row["rua"],
+                numero=row["numero"],
+                bairro=row["bairro"],
                 data_cadastro=row["data_cadastro"],
                 foto=row["foto"],
                 token_redefinicao=row["token_redefinicao"],
                 data_token=row["data_token"],
-                endereco=row["endereco"],
                 tipo_usuario=row["tipo_usuario"]
             ) for row in rows
         ]
@@ -126,11 +134,13 @@ def obter_todos_por_perfil(tipo_usuario: str) -> List[Usuario]:
                     senha=row["senha"],
                     cpf_cnpj=row["cpf_cnpj"],
                     telefone=row["telefone"],
+                    rua=row["rua"],
+                    numero=row["numero"],
+                    bairro=row["bairro"],
                     data_cadastro=row["data_cadastro"],
                     foto=row["foto"],
                     token_redefinicao=row["token_redefinicao"],
                     data_token=row["data_token"],
-                    endereco=row["endereco"],
                     tipo_usuario=row["tipo_usuario"]
                 ) for row in rows
             ]
@@ -142,7 +152,6 @@ def obter_todos_por_perfil(tipo_usuario: str) -> List[Usuario]:
 
 
 
-
 def atualizar_usuario(usuario: Usuario) -> bool:
     with open_connection() as conn:
         cursor = conn.cursor()
@@ -151,12 +160,13 @@ def atualizar_usuario(usuario: Usuario) -> bool:
             usuario.email,
             usuario.senha,
             usuario.cpf_cnpj,
-            usuario.telefone,
+            usuario.rua,
+            usuario.numero,
+            usuario.bairro,
             usuario.data_cadastro,
             usuario.foto,
             usuario.token_redefinicao,
             usuario.data_token,
-            usuario.endereco,
             usuario.tipo_usuario,
             usuario.id
         ))
