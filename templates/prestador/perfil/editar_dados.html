@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Editar Perfil</title>
+</head>
+<body>
+    <h1>Editar Perfil</h1>
+    <form method="post" action="/prestador/editar/dados">
+        <label>Nome:</label><input type="text" name="nome" value="{{ nome }}"><br>
+        <label>Email:</label><input type="text" name="email" value="{{ email }}"><br>
+        <form method="post" action="/cadastro/prestador">
+        <label>Nome:</label><input type="text" name="nome" value="{{ nome }}"><br>
+        <label>Email:</label><input type="text" name="email" value="{{ email }}"><br>
+        <label>Telefone:</label><input type="text" name="telefone" value="{{ telefone }}"><br>
+        <label>CPF/CNPJ:</label><input type="text" name="cpf_cnpj" value="{{ cpf_cnpj }}"><br>
+        <label>Endereço:</label><input type="text" name="endereco" value="{{ endereco }}"><br>
+        <label>Área de Atuação:</label><input type="text" name="area_atuacao" value="{{ area_atuacao }}"><br>
+        <button type="submit">Salvar</button>
+    </form>
+</body>
+</html>
