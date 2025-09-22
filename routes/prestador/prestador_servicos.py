@@ -8,7 +8,7 @@ from config import templates
 from data.servico import servico_repo
 from data.servico.servico_model import Servico
 from utils.auth_decorator import requer_autenticacao
-from utils.foto_util import obter_foto_principal
+from utils.foto_util import obter_foto_principal, salvar_nova_foto
 router = APIRouter()
 UPLOAD_DIR = "static/uploads"
 
@@ -48,15 +48,6 @@ async def processar_novo_servico(
     nome_prestador: str = Form(...),
     foto: UploadFile = File(None)   # << aqui entra a foto
 ):
-    # trata upload da foto
-    nome_arquivo = None
-    if foto and foto.filename:
-        ext = os.path.splitext(foto.filename)[1]
-        nome_arquivo = f"{uuid.uuid4()}{ext}"
-        caminho = os.path.join(UPLOAD_DIR, nome_arquivo)
-        with open(caminho, "wb") as f:
-            f.write(await foto.read())
-
     servico = Servico(
         id=0,
         id_prestador=id_prestador,
@@ -66,11 +57,18 @@ async def processar_novo_servico(
         valor_base=valor_base,
         nome_prestador=nome_prestador,
         data_cadastro=datetime.now(),
-        foto=nome_arquivo
+        foto=None
     )
 
     servico_id = servico_repo.inserir_servico(servico)
     if servico_id:
+        if foto and foto.filename:
+            try:
+                # Salvar a foto usando a função de utilidade
+                salvar_nova_foto(servico_id, foto.file, como_principal=True)
+            except Exception as e:
+                print(f"Erro ao salvar foto do serviço {servico_id}: {e}")
+                # Tratar erro de upload de foto, mas não impedir o cadastro do serviço
         return RedirectResponse("/meus/servicos", status.HTTP_303_SEE_OTHER)
     else:
         return templates.TemplateResponse(
