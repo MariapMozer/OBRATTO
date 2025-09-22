@@ -12,6 +12,8 @@ class Usuario:
     cpf_cnpj: str
     telefone: str
 # Endereço detalhado
+    estado: str
+    cidade: str
     rua: str
     numero: str
     bairro: str
