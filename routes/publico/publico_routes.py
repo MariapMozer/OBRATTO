@@ -260,6 +260,7 @@ async def processar_login(request: Request, email: str = Form(...), senha: str =
         return templates.TemplateResponse("publico/login_cadastro/login.html", {"request": request, "erro": "Preencha todos os campos."}, status_code=status.HTTP_400_BAD_REQUEST)
 
     usuario = usuario_repo.obter_usuario_por_email(email)
+    print("DEBUG usuario:", usuario)
     if not usuario or not verificar_senha(senha, usuario.senha):
         return templates.TemplateResponse("publico/login_cadastro/login.html", {"request": request, "erro": "Email ou senha inválidos"}, status_code=status.HTTP_401_UNAUTHORIZED)
 

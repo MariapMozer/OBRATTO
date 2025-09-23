@@ -77,7 +77,7 @@ function validarUsuario(usuario) {
 }
 
 function validarFormulario() {
-    const usuario = document.getElementById("usuario");
+    const email = document.getElementById("usuario");
     const senha = document.getElementById("senha");
     let valido = true;
     
@@ -97,7 +97,7 @@ function validarFormulario() {
 async function realizarLogin() {
     const btnLogin = document.querySelector(".btn-login");
     const textoOriginal = btnLogin.innerHTML;
-    const usuario = document.getElementById("usuario").value;
+    const email = document.getElementById("usuario").value;
     const senha = document.getElementById("senha").value;
     const lembrarMe = document.getElementById("lembrarMe").checked;
 
@@ -107,13 +107,14 @@ async function realizarLogin() {
     try {
         // Criando FormData para enviar como formulário tradicional
         const formData = new FormData();
-        formData.append("email", usuario);  // tua rota espera "email"
+        formData.append("email", email);  // tua rota espera "email"
         formData.append("senha", senha);
 
-        const response = await fetch("/entrar", {
+        const response = await fetch("/login", {
             method: "POST",
             body: formData
         });
+
 
         if (response.redirected) {
             // Se login deu certo, o FastAPI redireciona
