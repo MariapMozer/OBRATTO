@@ -80,35 +80,41 @@ cadastroForm.addEventListener('submit', async function(e) {
         alert("Preencha todos os campos obrigatórios!");
         return;
     }
-
-    const formData = new FormData(cadastroForm);
-
-    // Criar o campo 'endereco' concatenando os outros
-    const enderecoCompleto = 
-        formData.get('rua') + ', ' +
-        formData.get('bairro') + ', ' +
-        formData.get('cidade') + ' - ' +
-        formData.get('estado');
-    formData.set('endereco', enderecoCompleto);
-
-    try {
-        const resposta = await fetch('/cadastro/cliente', {
-            method: 'POST',
-            body: formData // envia como FormData
-        });
-
-        if (resposta.redirected) {
-            window.location.href = resposta.url;
-        } else {
-            alert("Erro ao cadastrar!");
-        }
-    } catch (err) {
-        console.error(err);
-        alert("Falha de conexão com o servidor!");
-    }
 });
 
 // Animação de entrada
 window.addEventListener('load', function() {
     document.querySelector('.cadastro-container').classList.add('fade-in-up');
+});
+
+// Máscara para CEP
+document.getElementById('cep').addEventListener('blur', function() {
+    const cep = this.value.replace(/\D/g, ''); // remove caracteres não numéricos
+
+    if (cep.length !== 8) {
+        alert('CEP inválido!');
+        return;
+    }
+
+    fetch(`https://viacep.com.br/ws/${cep}/json/`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.erro) {
+                alert('CEP não encontrado!');
+                return;
+            }
+
+            document.getElementById('logradouro').value = data.logradouro || '';
+            document.getElementById('bairro').value = data.bairro || '';
+            document.getElementById('cidade').value = data.localidade || '';
+            document.getElementById('estado').value = data.uf || '';
+            
+            // Limpa os campos que o ViaCEP não fornece
+            document.getElementById('numero').value = '';
+            document.getElementById('complemento').value = '';
+        })
+        .catch(err => {
+            console.error('Erro ao consultar CEP:', err);
+            alert('Erro ao consultar CEP.');
+        });
 });

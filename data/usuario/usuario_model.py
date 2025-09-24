@@ -12,11 +12,13 @@ class Usuario:
     cpf_cnpj: str
     telefone: str
 # Endereço detalhado
-    estado: str
-    cidade: str
-    rua: str
+    cep: str
+    logradouro: str
     numero: str
+    complemento: str
     bairro: str
+    cidade: str
+    estado: str
     tipo_usuario: str
     data_cadastro: Optional[str] = None
     foto: str = None

@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function() {
     const loginForm = document.getElementById("loginForm");
-    const usuarioInput = document.getElementById("usuario");
+    const emailInput = document.getElementById("email");
     const senhaInput = document.getElementById("senha");
     const toggleSenha = document.getElementById("toggleSenha");
     const lembrarMeCheckbox = document.getElementById("lembrarMe");
@@ -9,21 +9,23 @@ document.addEventListener("DOMContentLoaded", function() {
         document.querySelector(".login-container").classList.add("fade-in-up");
     }, 100);
     
-    toggleSenha.addEventListener("click", function() {
-        const tipo = senhaInput.getAttribute("type") === "password" ? "text" : "password";
-        senhaInput.setAttribute("type", tipo);
-        
-        const icon = this.querySelector("i");
-        if (tipo === "text") {
-            icon.classList.remove("bi-eye-fill");
-            icon.classList.add("bi-eye-slash-fill");
-        } else {
-            icon.classList.remove("bi-eye-slash-fill");
-            icon.classList.add("bi-eye-fill");
-        }
-    });
+   if (toggleSenha) {
+        toggleSenha.addEventListener("click", function() {
+            const tipo = senhaInput.getAttribute("type") === "password" ? "text" : "password";
+            senhaInput.setAttribute("type", tipo);
+
+            const icon = this.querySelector("i");
+            if (tipo === "text") {
+                icon.classList.remove("bi-eye-fill");
+                icon.classList.add("bi-eye-slash-fill");
+            } else {
+                icon.classList.remove("bi-eye-slash-fill");
+                icon.classList.add("bi-eye-fill");
+            }
+        });
+    }
     
-    usuarioInput.addEventListener("input", function() {
+    emailInput.addEventListener("input", function() {
         validarCampo(this);
     });
     
@@ -61,28 +63,27 @@ function validarEmail(email) {
     return regex.test(email);
 }
 
-
-function validarUsuario(usuario) {
-    const valor = usuario.trim();
+function validarUsuario(valor) {
+    const texto = valor.trim();
     
-    if (valor.length < 3) {
+    if (texto.length < 3) {
         return false;
     }
     
-    if (valor.includes("@")) {
-        return validarEmail(valor);
+    if (texto.includes("@")) {
+        return validarEmail(texto);
     }
     
     return true;
 }
 
 function validarFormulario() {
-    const email = document.getElementById("usuario");
+    const email = document.getElementById("email");
     const senha = document.getElementById("senha");
     let valido = true;
     
-    if (!validarCampo(usuario) || !validarUsuario(usuario.value)) {
-        usuario.classList.add("is-invalid");
+    if (!validarCampo(email) || !validarUsuario(email.value)) {
+        email.classList.add("is-invalid");
         valido = false;
     }
     
@@ -97,7 +98,7 @@ function validarFormulario() {
 async function realizarLogin() {
     const btnLogin = document.querySelector(".btn-login");
     const textoOriginal = btnLogin.innerHTML;
-    const email = document.getElementById("usuario").value;
+    const email = document.getElementById("email").value;
     const senha = document.getElementById("senha").value;
     const lembrarMe = document.getElementById("lembrarMe").checked;
 
@@ -107,7 +108,7 @@ async function realizarLogin() {
     try {
         // Criando FormData para enviar como formulário tradicional
         const formData = new FormData();
-        formData.append("email", email);  // tua rota espera "email"
+        formData.append("email", email);  // rota espera "email"
         formData.append("senha", senha);
 
         const response = await fetch("/login", {
@@ -115,10 +116,9 @@ async function realizarLogin() {
             body: formData
         });
 
-
         if (response.redirected) {
             // Se login deu certo, o FastAPI redireciona
-            if (lembrarMe) salvarDados(usuario);
+            if (lembrarMe) salvarDados(email);
             else limparDadosSalvos();
 
             window.location.href = response.url; 
@@ -212,22 +212,22 @@ function mostrarErro(mensagem) {
     }, 3000);
 }
 
-function salvarDados(usuario) {
-    localStorage.setItem("obratto_usuario", usuario);
+function salvarDados(email) {
+    localStorage.setItem("obratto_email", email);
     localStorage.setItem("obratto_lembrar", "true");
 }
 
 function limparDadosSalvos() {
-    localStorage.removeItem("obratto_usuario");
+    localStorage.removeItem("obratto_email");
     localStorage.removeItem("obratto_lembrar");
 }
 
 function carregarDadosSalvos() {
-    const usuarioSalvo = localStorage.getItem("obratto_usuario");
+    const emailSalvo = localStorage.getItem("obratto_email");
     const lembrarSalvo = localStorage.getItem("obratto_lembrar");
     
-    if (usuarioSalvo && lembrarSalvo === "true") {
-        document.getElementById("usuario").value = usuarioSalvo;
+    if (emailSalvo && lembrarSalvo === "true") {
+        document.getElementById("email").value = emailSalvo;
         document.getElementById("lembrarMe").checked = true;
     }
 }
@@ -236,7 +236,7 @@ document.addEventListener("keydown", function(e) {
     if (e.key === "Enter") {
         const activeElement = document.activeElement;
         
-        if (activeElement.id === "usuario") {
+        if (activeElement.id === "email") {
             document.getElementById("senha").focus();
         } else if (activeElement.id === "senha") {
             document.getElementById("loginForm").dispatchEvent(new Event("submit"));
