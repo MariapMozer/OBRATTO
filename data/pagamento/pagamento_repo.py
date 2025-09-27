@@ -165,6 +165,37 @@ class PagamentoRepository:
         except Exception as e:
             print(f"Erro ao obter pagamentos do fornecedor: {e}")
             return []
+        
+    def obter_pagamentos_prestador(self, prestador_id: int) -> List[dict]:
+        """Obtém todos os pagamentos de um prestador"""
+        try:
+            with open_connection() as conexao:
+                cursor = conexao.cursor()
+                cursor.execute(SQL_OBTER_PAGAMENTOS_PRESTADOR, (prestador_id,))
+                rows = cursor.fetchall()
+                
+                pagamentos = []
+                for row in rows:
+                    pagamentos.append({
+                        'id_pagamento': row[0],
+                        'plano_id': row[1],
+                        'prestador_id': row[2],
+                        'mp_payment_id': row[3],
+                        'mp_preference_id': row[4],
+                        'valor': row[5],
+                        'status': row[6],
+                        'metodo_pagamento': row[7],
+                        'data_criacao': row[8],
+                        'data_aprovacao': row[9],
+                        'external_reference': row[10],
+                        'nome_plano': row[11] if len(row) > 11 else None
+                    })
+                
+                return pagamentos
+        except Exception as e:
+            print(f"Erro ao obter pagamentos do prestador: {e}")
+            return []
+
 
     def obter_pagamentos_por_status(self, status: str) -> List[dict]:
         """Obtém pagamentos por status"""
@@ -195,3 +226,27 @@ class PagamentoRepository:
         except Exception as e:
             print(f"Erro ao obter pagamentos por status: {e}")
             return []
+
+    def atualizar_pagamento(self, pagamento: Pagamento) -> bool:
+        """Atualiza um pagamento existente"""
+        try:
+            with open_connection() as conexao:
+                cursor = conexao.cursor()
+                cursor.execute(SQL_ATUALIZAR_PAGAMENTO, (
+                    pagamento.plano_id,
+                    pagamento.prestador_id,
+                    pagamento.mp_payment_id,
+                    pagamento.mp_preference_id,
+                    pagamento.valor,
+                    pagamento.status,
+                    pagamento.metodo_pagamento,
+                    pagamento.data_criacao,
+                    pagamento.data_aprovacao,
+                    pagamento.external_reference,
+                    pagamento.id_pagamento
+                ))
+                conexao.commit()
+                return cursor.rowcount > 0
+        except Exception as e:
+            print(f"Erro ao atualizar pagamento: {e}")
+            return False

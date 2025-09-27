@@ -1,20 +1,27 @@
 from fastapi import APIRouter, Request, Form, Response
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse, JSONResponse
-from data.plano import plano_repo
+from data.plano.plano_repo import PlanoRepository
 from data.inscricaoplano.inscricao_plano_model import InscricaoPlano
-from data.inscricaoplano.inscricao_plano_repo import * 
-from data.inscricaoplano import inscricao_plano_repo
+from data.inscricaoplano.inscricao_plano_repo import InscricaoPlanoRepository
 from data.pagamento.pagamento_model import Pagamento
 from data.pagamento.pagamento_repo import PagamentoRepository
 from data.cartao.cartao_model import CartaoCredito
 from data.cartao.cartao_repo import CartaoRepository
 from utils.mercadopago_config import mp_config
 from utils.auth_decorator import requer_autenticacao
+from services.mercadopago_service import MercadoPagoService
+from services.payment_service import PaymentService
+from datetime import datetime
 
 pagamento_repo = PagamentoRepository()
 cartao_repo = CartaoRepository()
+inscricao_plano_repo = InscricaoPlanoRepository()
+plano_repo = PlanoRepository()
 mercadopago_config = mp_config
+mercadopago_service = MercadoPagoService()
+payment_service = PaymentService()
+
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
 
@@ -22,7 +29,7 @@ templates = Jinja2Templates(directory="templates")
 # ===== ROTAS DE PAGAMENTO =====
 
 @router.get("/formulario")
-@requer_autenticacao(['prestador'])
+@requer_autenticacao(["prestador"])
 async def mostrar_formulario_pagamento(
     request: Request,
     plano_id: int = None,
@@ -32,7 +39,7 @@ async def mostrar_formulario_pagamento(
     prestador_id = usuario_logado.id
     plano = plano_repo.obter_plano_por_id(plano_id)
     cartoes = cartao_repo.obter_cartoes_por_prestador(prestador_id)
-    return templates.TemplateResponse("publico/pagamento/dados_pagamento.html", {
+    return templates.TemplateResponse("publico/pagamento-prestador/dados_pagamento.html", {
         "request": request,
         "plano": plano,
         "id_prestador": prestador_id,
@@ -43,12 +50,12 @@ async def mostrar_formulario_pagamento(
 @router.get("/prestador/pagamento")
 async def exibir_pagamento(request: Request):
     return templates.TemplateResponse(
-        "publico/pagamento/dados_pagamento.html",
+        "publico/pagamento-prestador/dados_pagamento.html",
         {"request": request}
     )
 
 @router.post("/processar_pagamento")
-@requer_autenticacao(['prestador'])
+@requer_autenticacao(["prestador"])
 async def processar_pagamento(
     request: Request,
     tipo_operacao: str = Form(...),
@@ -64,105 +71,71 @@ async def processar_pagamento(
     usuario_logado: dict = None
 ):
     prestador_id = usuario_logado.id
-    plano = plano_repo.obter_plano_por_id(plano_id)
-    if not plano:
-        cartoes = cartao_repo.obter_cartoes_por_prestador(prestador_id)
-        return templates.TemplateResponse("publico/pagamento-prestador/dados_pagamento.html", {
-            "request": request, "mensagem": "Plano não encontrado.", "cartoes": cartoes
-        })
     
-    cartoes = cartao_repo.obter_cartoes_por_prestador(prestador_id)
-    cartao_usado = None
-    
-    if cartao_salvo:
-        try:
-            cartao_usado = cartao_repo.obter_cartao_por_id(int(cartao_salvo))
-            if not cartao_usado or cartao_usado.id_prestador != prestador_id:
-                return templates.TemplateResponse("publico/pagamento-prestador/dados_pagamento.html", {
-                    "request": request, "plano": plano, "id_prestador": prestador_id,
-                    "tipo_operacao": tipo_operacao, "cartoes": cartoes,
-                    "mensagem": "Cartão selecionado não é válido."
-                })
-        except ValueError:
+    new_card_data = None
+    if not cartao_salvo and metodo_pagamento == "cartao":
+        if not numero_cartao or not validade or not cvv or not nome_cartao:
+            cartoes = cartao_repo.obter_cartoes_por_prestador(prestador_id)
+            plano = plano_repo.obter_plano_por_id(plano_id)
             return templates.TemplateResponse("publico/pagamento-prestador/dados_pagamento.html", {
                 "request": request, "plano": plano, "id_prestador": prestador_id,
                 "tipo_operacao": tipo_operacao, "cartoes": cartoes,
-                "mensagem": "Cartão selecionado não é válido."
+                "mensagem": "Todos os campos do cartão são obrigatórios."
+            })
+        new_card_data = {
+            "numero_cartao": numero_cartao,
+            "validade": validade,
+            "cvv": cvv,
+            "nome_cartao": nome_cartao,
+            "salvar_cartao": salvar_cartao
+        }
+
+    result = await payment_service.process_plan_payment(
+        prestador_id=prestador_id,
+        plano_id=plano_id,
+        valor=valor,
+        metodo_pagamento=metodo_pagamento,
+        cartao_salvo_id=int(cartao_salvo) if cartao_salvo else None,
+        new_card_data=new_card_data
+    )
+
+    if result["success"]:
+        if result["status"] == "approved":
+            return templates.TemplateResponse("publico/pagamento-prestador/pagamento_sucesso.html", {
+                "request": request,
+                "plano": plano_repo.obter_plano_por_id(plano_id),
+                "tipo_operacao": tipo_operacao,
+                "metodo_pagamento": metodo_pagamento,
+                "mensagem": f"{tipo_operacao} processada com sucesso! Pagamento via {metodo_pagamento.upper()} aprovado."
+            })
+        elif result["status"] == "pending":
+            return templates.TemplateResponse("publico/pagamento-prestador/pagamento_pendente.html", {
+                "request": request,
+                "plano": plano_repo.obter_plano_por_id(plano_id),
+                "tipo_operacao": tipo_operacao,
+                "metodo_pagamento": metodo_pagamento,
+                "mensagem": f"{tipo_operacao} processada. Pagamento via {metodo_pagamento.upper()} pendente."
+            })
+        else:
+            return templates.TemplateResponse("publico/pagamento-prestador/pagamento_erro.html", {
+                "request": request,
+                "tipo_operacao": tipo_operacao,
+                "mensagem": f"Pagamento via {metodo_pagamento.upper()} {result['status']}."
             })
     else:
-        if metodo_pagamento == "cartao":
-            if not numero_cartao or not validade or not cvv or not nome_cartao:
-                return templates.TemplateResponse("publico/pagamento-prestador/dados_pagamento.html", {
-                    "request": request, "plano": plano, "id_prestador": prestador_id,
-                    "tipo_operacao": tipo_operacao, "cartoes": cartoes,
-                    "mensagem": "Todos os campos do cartão são obrigatórios."
-                })
-            if salvar_cartao == "true":
-                try:
-                    mes_vencimento, ano_vencimento = validade.split('/')
-                    cartao_repo.criar_cartao_from_form(
-                        id_prestador=prestador_id,
-                        numero_cartao=numero_cartao.replace(' ', ''),
-                        nome_titular=nome_cartao,
-                        mes_vencimento=mes_vencimento,
-                        ano_vencimento=ano_vencimento,
-                        apelido=f"Cartão •••• {numero_cartao.replace(' ', '')[-4:]}",
-                        principal=False
-                    )
-                except Exception as e:
-                    print(f"Erro ao salvar cartão: {e}")
-    
-    from datetime import datetime
-    assinatura_ativa = inscricao_plano_repo.obter_assinatura_ativa_por_prestador(prestador_id)
-    if assinatura_ativa:
+        cartoes = cartao_repo.obter_cartoes_por_prestador(prestador_id)
+        plano = plano_repo.obter_plano_por_id(plano_id)
         return templates.TemplateResponse("publico/pagamento-prestador/dados_pagamento.html", {
             "request": request, "plano": plano, "id_prestador": prestador_id,
-            "tipo_operacao": tipo_operacao, "mensagem": "Você já possui uma assinatura ativa."
+            "tipo_operacao": tipo_operacao, "cartoes": cartoes,
+            "mensagem": result["message"]
         })
-    
-    nova_inscricao = InscricaoPlano(
-        id_inscricao_plano=0,
-        id_prestador=None,
-        id_plano=plano_id
-    )
-    inscricao_id = inscricao_plano_repo.inserir_inscricao_plano(nova_inscricao)
-    reference = f"assinatura_plano_{plano_id}_prestador_{prestador_id}"
-    
-    pagamento = Pagamento(
-        id_pagamento=0,
-        plano_id=plano_id,
-        prestador_id=prestador_id,
-        mp_payment_id=f"{metodo_pagamento}_payment_{inscricao_id}_{int(datetime.now().timestamp())}",
-        mp_preference_id=f"{metodo_pagamento}_pref_{inscricao_id}_{int(datetime.now().timestamp())}",
-        valor=valor,
-        status="aprovado",
-        metodo_pagamento=f"{metodo_pagamento}_simulado",
-        data_criacao=datetime.now().isoformat(),
-        data_aprovacao=datetime.now().isoformat(),
-        external_reference=reference
-    )
-    
-    pagamento_inserido = pagamento_repo.inserir_pagamento(pagamento)
-    if pagamento_inserido:
-        return templates.TemplateResponse("publico/pagamento-prestador/pagamento_sucesso.html", {
-            "request": request,
-            "plano": plano,
-            "tipo_operacao": tipo_operacao,
-            "metodo_pagamento": metodo_pagamento,
-            "mensagem": f"{tipo_operacao} processada com sucesso! Pagamento via {metodo_pagamento.upper()} aprovado."
-        })
-    
-    return templates.TemplateResponse("publico/pagamento-prestador/pagamento_erro.html", {
-        "request": request,
-        "tipo_operacao": tipo_operacao,
-        "mensagem": "Acesso permitido apenas para prestadores."
-    })
 
 
 # ===== ROTAS DE CARTÃO =====
 
 @router.get("/cartoes")
-@requer_autenticacao(['prestador'])
+@requer_autenticacao(["prestador"])
 async def listar_cartoes(request: Request, usuario_logado: dict = None):
     prestador_id = usuario_logado.id
     cartoes = cartao_repo.obter_cartoes_por_prestador(prestador_id)
@@ -173,7 +146,7 @@ async def listar_cartoes(request: Request, usuario_logado: dict = None):
     })
 
 @router.get("/cartoes/adicionar")
-@requer_autenticacao(['prestador'])
+@requer_autenticacao(["prestador"])
 async def mostrar_adicionar_cartao(request: Request, usuario_logado: dict = None):
     prestador_id = usuario_logado.id
     return templates.TemplateResponse("publico/pagamento-prestador/adicionar_cartao.html", {
@@ -182,7 +155,7 @@ async def mostrar_adicionar_cartao(request: Request, usuario_logado: dict = None
     })
 
 @router.post("/cartoes/adicionar")
-@requer_autenticacao(['prestador'])
+@requer_autenticacao(["prestador"])
 async def adicionar_cartao(
     request: Request,
     numero_cartao: str = Form(...),
@@ -195,7 +168,7 @@ async def adicionar_cartao(
 ):
     prestador_id = usuario_logado.id
     try:
-        resultado = cartao_repo.criar_cartao_from_form(
+        resultado = payment_service.add_card(
             id_prestador=prestador_id,
             numero_cartao=numero_cartao,
             nome_titular=nome_titular,
@@ -205,7 +178,7 @@ async def adicionar_cartao(
             principal=(principal == "true")
         )
         if resultado:
-            return RedirectResponse(url="/publico/pagamento/cartoes", status_code=303)
+            return RedirectResponse(url="/prestador/pagamento/cartoes", status_code=303)
         else:
             return templates.TemplateResponse("publico/pagamento-prestador/adicionar_cartao.html", {
                 "request": request,
@@ -220,12 +193,12 @@ async def adicionar_cartao(
         })
 
 @router.get("/cartoes/editar/{id_cartao}")
-@requer_autenticacao(['prestador'])
+@requer_autenticacao(["prestador"])
 async def mostrar_editar_cartao(request: Request, id_cartao: int, usuario_logado: dict = None):
     prestador_id = usuario_logado.id
     cartao = cartao_repo.obter_cartao_por_id(id_cartao)
     if not cartao or cartao.id_prestador != prestador_id:
-        return RedirectResponse(url="/publico/pagamento/cartoes", status_code=303)
+        return RedirectResponse(url="/prestador/pagamento/cartoes", status_code=303)
     return templates.TemplateResponse("publico/pagamento-prestador/adicionar_cartao.html", {
         "request": request,
         "cartao": cartao,
@@ -233,7 +206,7 @@ async def mostrar_editar_cartao(request: Request, id_cartao: int, usuario_logado
     })
 
 @router.post("/cartoes/editar/{id_cartao}")
-@requer_autenticacao(['prestador'])
+@requer_autenticacao(["prestador"])
 async def editar_cartao(
     request: Request,
     id_cartao: int,
@@ -244,23 +217,25 @@ async def editar_cartao(
 ):
     prestador_id = usuario_logado.id
     try:
-        cartao = cartao_repo.obter_cartao_por_id(id_cartao)
-        if not cartao or cartao.id_prestador != prestador_id:
-            return RedirectResponse(url="/publico/pagamento/cartoes", status_code=303)
-        cartao.nome_titular = nome_titular.strip().upper()
-        cartao.apelido = apelido.strip()
-        cartao.principal = (principal == "true")
-        resultado = cartao_repo.atualizar_cartao(cartao)
+        resultado = payment_service.update_card(
+            id_cartao=id_cartao,
+            prestador_id=prestador_id,
+            nome_titular=nome_titular,
+            apelido=apelido,
+            principal=(principal == "true")
+        )
         if resultado:
-            return RedirectResponse(url="/publico/pagamento/cartoes", status_code=303)
+            return RedirectResponse(url="/prestador/pagamento/cartoes", status_code=303)
         else:
-            return templates.TemplateResponse("publico/pagamento/adicionar_cartao.html", {
+            cartao = cartao_repo.obter_cartao_por_id(id_cartao)
+            return templates.TemplateResponse("publico/pagamento-prestador/adicionar_cartao.html", {
                 "request": request,
                 "cartao": cartao,
                 "id_prestador": prestador_id,
                 "mensagem": "Erro ao atualizar o cartão. Tente novamente."
             })
     except Exception as e:
+        cartao = cartao_repo.obter_cartao_por_id(id_cartao)
         return templates.TemplateResponse("publico/pagamento-prestador/adicionar_cartao.html", {
             "request": request,
             "cartao": cartao if 'cartao' in locals() else None,
@@ -269,35 +244,34 @@ async def editar_cartao(
         })
 
 @router.get("/cartoes/excluir/{id_cartao}")
-@requer_autenticacao(['prestador'])
+@requer_autenticacao(["prestador"])
 async def mostrar_confirmar_exclusao(request: Request, id_cartao: int, usuario_logado: dict = None):
     prestador_id = usuario_logado.id
     cartao = cartao_repo.obter_cartao_por_id(id_cartao)
     if not cartao or cartao.id_prestador != prestador_id:
-        return RedirectResponse(url="/publico/pagamento/cartoes", status_code=303)
+        return RedirectResponse(url="/prestador/pagamento/cartoes", status_code=303)
     return templates.TemplateResponse("publico/pagamento-prestador/confirmar_exclusao_cartao.html", {
         "request": request,
         "cartao": cartao
     })
 
 @router.post("/cartoes/excluir/{id_cartao}")
-@requer_autenticacao(['prestador'])
+@requer_autenticacao(["prestador"])
 async def excluir_cartao(request: Request, id_cartao: int, usuario_logado: dict = None):
     prestador_id = usuario_logado.id
     try:
-        cartao = cartao_repo.obter_cartao_por_id(id_cartao)
-        if not cartao or cartao.id_prestador != prestador_id:
-            return RedirectResponse(url="/publico/pagamento/cartoes", status_code=303)
-        resultado = cartao_repo.remover_cartao(id_cartao)
+        resultado = payment_service.delete_card(id_cartao, prestador_id)
         if resultado:
-            return RedirectResponse(url="/publico/pagamento/cartoes", status_code=303)
+            return RedirectResponse(url="/prestador/pagamento/cartoes", status_code=303)
         else:
+            cartao = cartao_repo.obter_cartao_por_id(id_cartao)
             return templates.TemplateResponse("publico/pagamento-prestador/confirmar_exclusao_cartao.html", {
                 "request": request,
                 "cartao": cartao,
                 "mensagem": "Erro ao excluir o cartão. Tente novamente."
             })
     except Exception as e:
+        cartao = cartao_repo.obter_cartao_por_id(id_cartao)
         return templates.TemplateResponse("publico/pagamento-prestador/confirmar_exclusao_cartao.html", {
             "request": request,
             "cartao": cartao if 'cartao' in locals() else None,
@@ -305,18 +279,25 @@ async def excluir_cartao(request: Request, id_cartao: int, usuario_logado: dict 
         })
 
 @router.post("/cartoes/definir_principal")
-@requer_autenticacao(['prestador'])
+@requer_autenticacao(["prestador"])
 async def definir_cartao_principal(request: Request, usuario_logado: dict = None):
     form = await request.form()
     id_cartao = form.get("id_cartao")
     prestador_id = usuario_logado.id
 
-    cartao = cartao_repo.obter_cartao_por_id(int(id_cartao))
-    if not cartao or cartao.id_prestador != int(prestador_id):
-        return RedirectResponse(url=f"/publico/pagamento/cartoes?id_prestador={prestador_id}", 
-        status_code=303)
-    cartao_repo.definir_todos_nao_principal(int(prestador_id))
-    cartao.principal = True
-    cartao_repo.atualizar_cartao(cartao)
-    return RedirectResponse(url=f"/publico/pagamento/cartoes?id_prestador={prestador_id}", 
-    status_code=303)
+    resultado = payment_service.set_main_card(int(id_cartao), prestador_id)
+    if resultado:
+        return RedirectResponse(url=f"/prestador/pagamento/cartoes", status_code=303)
+    else:
+        return RedirectResponse(url=f"/prestador/pagamento/cartoes", status_code=303)
+
+# ===== ROTAS DE WEBHOOK =====
+@router.post("/webhooks/mercadopago")
+async def mercadopago_webhook(request: Request):
+    notification_data = await request.json()
+    result = await payment_service.handle_mercadopago_webhook(notification_data)
+    if result["success"]:
+        return JSONResponse(content={"message": result["message"]}, status_code=200)
+    else:
+        return JSONResponse(content={"message": result["message"]}, status_code=400)
+

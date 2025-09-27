@@ -61,22 +61,22 @@ def obter_plano_por_nome(plano_nome: str) -> Optional[Plano]:
             )
         return None  # Corrigido
 
-
-def obter_plano_por_id(plano_id: int) -> Optional[Plano]:
-    with open_connection() as conn:
-        cursor = conn.cursor()
-        cursor.execute(OBTER_PLANO_POR_ID, (plano_id,))
-        row = cursor.fetchone()
-        if row:
-            return Plano(
-                id_plano=row["id_plano"],
-                nome_plano=row["nome_plano"],
-                valor_mensal=row["valor_mensal"],
-                limite_servico=row["limite_servico"],
-                tipo_plano=row["tipo_plano"],
-                descricao=row["descricao"],
-            )
-        return None  # Corrigido
+class PlanoRepository:
+    def obter_plano_por_id(plano_id: int) -> Optional[Plano]:
+        with open_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(OBTER_PLANO_POR_ID, (plano_id,))
+            row = cursor.fetchone()
+            if row:
+                return Plano(
+                    id_plano=row["id_plano"],
+                    nome_plano=row["nome_plano"],
+                    valor_mensal=row["valor_mensal"],
+                    limite_servico=row["limite_servico"],
+                    tipo_plano=row["tipo_plano"],
+                    descricao=row["descricao"],
+                )
+            return None  # Corrigido
 
 
 def obter_plano_por_pagina(pagina: int, tamanho_pagina: int) -> List[Plano]:

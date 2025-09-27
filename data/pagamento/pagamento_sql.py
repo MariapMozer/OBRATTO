@@ -53,10 +53,34 @@ SQL_OBTER_PAGAMENTOS_FORNECEDOR = """
     ORDER BY p.data_criacao DESC
 """
 
+SQL_OBTER_PAGAMENTOS_PRESTADOR = """
+    SELECT p.*, pl.nome_plano 
+    FROM pagamento p
+    LEFT JOIN plano pl ON p.plano_id = pl.id_plano
+    WHERE p.prestador_id = ?
+    ORDER BY p.data_criacao DESC
+"""
+
 SQL_OBTER_PAGAMENTOS_POR_STATUS = """
     SELECT p.*, pl.nome_plano 
     FROM pagamento p
     LEFT JOIN plano pl ON p.plano_id = pl.id_plano
     WHERE p.status = ?
     ORDER BY p.data_criacao DESC
+"""
+
+SQL_ATUALIZAR_PAGAMENTO = """
+    UPDATE pagamento
+    SET
+        plano_id = ?,
+        prestador_id = ?,
+        mp_payment_id = ?,
+        mp_preference_id = ?,
+        valor = ?,
+        status = ?,
+        metodo_pagamento = ?,
+        data_criacao = ?,
+        data_aprovacao = ?,
+        external_reference = ?
+    WHERE id_pagamento = ?
 """
