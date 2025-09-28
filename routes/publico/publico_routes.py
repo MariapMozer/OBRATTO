@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import Optional
-from fastapi import APIRouter, Form, Request, status
+from fastapi import APIRouter, Form, Request, status, UploadFile, File
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from data.cliente import cliente_repo
@@ -194,8 +194,8 @@ async def processar_cadastro_fornecedor(
     senha: str = Form(...),
     confirmar_senha: str = Form(...),
     cpf_cnpj: str = Form(...),
-    razao_social: Optional[str] = Form(None)
-   
+    razao_social: Optional[str] = Form(None),
+    foto: UploadFile = File(None)
 ):
 
     if senha != confirmar_senha:
@@ -210,12 +210,32 @@ async def processar_cadastro_fornecedor(
             {"request": request, "erro": "Email já cadastrado"}
         )
     
+
     # Criar hash da senha
     senha_hash = criar_hash_senha(senha)
-    
 
     # Garante que razao_social nunca seja None ou string vazia
     razao_social_final = razao_social if razao_social and razao_social.strip() else nome
+
+    # Lógica de upload de foto
+    caminho_foto = None
+    if foto and foto.filename:
+        tipos_permitidos = ["image/jpeg", "image/png", "image/jpg"]
+        if foto.content_type not in tipos_permitidos:
+            return templates.TemplateResponse(
+                "publico/fornecedor2/cadastro_fornecedor.html",
+                {"request": request, "erro": "Tipo de arquivo de foto inválido."}
+            )
+        upload_dir = "static/uploads/fornecedores"
+        os.makedirs(upload_dir, exist_ok=True)
+        import secrets
+        extensao = foto.filename.split(".")[-1]
+        nome_arquivo = f"{email}_{secrets.token_hex(8)}.{extensao}"
+        caminho_arquivo = os.path.join(upload_dir, nome_arquivo)
+        conteudo = await foto.read()
+        with open(caminho_arquivo, "wb") as f:
+            f.write(conteudo)
+        caminho_foto = f"/static/uploads/fornecedores/{nome_arquivo}"
 
     fornecedor = Fornecedor(
         id=0,
@@ -230,8 +250,8 @@ async def processar_cadastro_fornecedor(
         numero=numero,
         bairro=bairro,
         tipo_usuario="Fornecedor",
-        data_cadastro=datetime.now(), 
-        foto=None,        
+        data_cadastro=datetime.now(),
+        foto=caminho_foto,
         token_redefinicao=None,
         data_token=None,
         razao_social=razao_social_final,

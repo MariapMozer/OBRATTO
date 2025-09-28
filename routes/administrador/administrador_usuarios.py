@@ -223,3 +223,94 @@ async def aprovar_selo_prestador(request: Request, id: int = Form(...), usuario_
         prestador.selo_confianca = True
         prestador_repo.atualizar_prestador(prestador)
     return RedirectResponse("/admin/verificacao_selo", status_code=303)
+
+
+
+# Rota para exibir formulário de edição do próprio perfil do administrador
+@router.get("/perfil/editar")
+@requer_autenticacao(['administrador'])
+async def get_editar_perfil_administrador(request: Request, usuario_logado: dict = None):
+    adm = administrador_repo.obter_administrador_por_id(usuario_logado['id'])
+    return templates.TemplateResponse("administrador/perfil_editar.html", {"request": request, "administrador": adm})
+
+# Rota para processar edição do próprio perfil do administrador
+@router.post("/perfil/editar")
+@requer_autenticacao(['administrador'])
+async def post_editar_perfil_administrador(
+    request: Request,
+    nome: str = Form(...),
+    email: str = Form(...),
+    senha_atual: str = Form(...),
+    senha_nova: str = Form(None),
+    usuario_logado: dict = None
+):
+    adm = administrador_repo.obter_administrador_por_id(usuario_logado['id'])
+    from utils.security import verificar_senha, criar_hash_senha
+    # Verifica senha atual
+    if not verificar_senha(senha_atual, adm.senha):
+        return templates.TemplateResponse(
+            "administrador/perfil_editar.html",
+            {"request": request, "administrador": adm, "erro": "Senha atual incorreta."}
+        )
+    # Atualiza dados básicos
+    adm.nome = nome
+    adm.email = email
+    # Atualiza senha se fornecida
+    if senha_nova and senha_nova.strip():
+        adm.senha = criar_hash_senha(senha_nova)
+    administrador_repo.atualizar_administrador(adm.id, adm)
+    # Atualiza sessão
+    usuario_logado['nome'] = nome
+    usuario_logado['email'] = email
+    from utils.auth_decorator import criar_sessao
+    criar_sessao(request, usuario_logado)
+    return templates.TemplateResponse(
+        "administrador/perfil_editar.html",
+        {"request": request, "administrador": adm, "sucesso": "Perfil atualizado com sucesso!"}
+    )
+
+# Upload/atualização de foto de perfil do administrador
+@router.post("/perfil/foto")
+@requer_autenticacao(['administrador'])
+async def upload_foto_perfil_administrador(
+    request: Request,
+    foto: UploadFile = File(...),
+    usuario_logado: dict = None
+):
+    import os
+    # Validar tipo de arquivo
+    tipos_permitidos = ["image/jpeg", "image/png", "image/jpg"]
+    if foto.content_type not in tipos_permitidos:
+        return RedirectResponse("/admin/perfil?erro=tipo_invalido", status_code=303)
+
+    # Criar diretório de upload se não existir
+    upload_dir = "static/uploads/administradores"
+    os.makedirs(upload_dir, exist_ok=True)
+
+    # Gerar nome único para o arquivo
+    import secrets
+    extensao = foto.filename.split(".")[-1]
+    nome_arquivo = f"{usuario_logado['id']}_{secrets.token_hex(8)}.{extensao}"
+    caminho_arquivo = os.path.join(upload_dir, nome_arquivo)
+
+    # Salvar arquivo
+    try:
+        conteudo = await foto.read()
+        with open(caminho_arquivo, "wb") as f:
+            f.write(conteudo)
+
+        # Atualizar caminho no banco (usar caminho relativo)
+        caminho_relativo = f"/static/uploads/administradores/{nome_arquivo}"
+        if hasattr(administrador_repo, 'atualizar_foto'):
+            administrador_repo.atualizar_foto(usuario_logado['id'], caminho_relativo)
+
+        # Atualizar sessão (se aplicável)
+        if usuario_logado is not None:
+            usuario_logado['foto'] = caminho_relativo
+            from utils.auth_decorator import criar_sessao
+            criar_sessao(request, usuario_logado)
+
+    except Exception as e:
+        return RedirectResponse("/admin/perfil?erro=upload_falhou", status_code=303)
+
+    return RedirectResponse("/admin/perfil?foto_sucesso=1", status_code=303)

@@ -1,5 +1,6 @@
 
 from asyncio import open_connection
+import os
 from fastapi import APIRouter, Request, Form, UploadFile, File, HTTPException
 from data.usuario.usuario_sql import ATUALIZAR_FOTO
 from utils.auth_decorator import requer_autenticacao
@@ -96,26 +97,51 @@ async def alterar_senha_fornecedor(
 @requer_autenticacao(['fornecedor'])
 async def upload_foto_perfil(
     request: Request,
-    foto: UploadFile = File(...), 
+    foto: UploadFile = File(...),
     usuario_logado: dict = None
-    ):
+):
     fornecedor = fornecedor_repo.obter_fornecedor_por_id(usuario_logado.id)
     if not fornecedor:
         raise HTTPException(status_code=404, detail="Fornecedor não encontrado")
-    # Exemplo simples: salvar arquivo em static/img/fornecedores
-    import os
-    pasta_destino = "static/img/fornecedores"
-    os.makedirs(pasta_destino, exist_ok=True)
-    caminho_arquivo = os.path.join(pasta_destino, f"fornecedor_{usuario_logado.id}.jpg")
-    with open(caminho_arquivo, "wb") as buffer:
-        buffer.write(await foto.read())
-    mensagem = "Foto de perfil atualizada com sucesso."
-    return templates.TemplateResponse(
-        "fornecedor/perfil.html", 
-        {"request": request, 
-         "fornecedor": fornecedor, 
-         "mensagem": mensagem, 
-         "foto_path": caminho_arquivo})
+
+    # Validar tipo de arquivo
+    tipos_permitidos = ["image/jpeg", "image/png", "image/jpg"]
+    if foto.content_type not in tipos_permitidos:
+        from fastapi.responses import RedirectResponse
+        return RedirectResponse("/fornecedor/perfil/?erro=tipo_invalido", status_code=303)
+
+    # Criar diretório de upload se não existir
+    upload_dir = "static/uploads/fornecedores"
+    os.makedirs(upload_dir, exist_ok=True)
+
+    # Gerar nome único para o arquivo
+    import secrets
+    extensao = foto.filename.split(".")[-1]
+    nome_arquivo = f"{usuario_logado.id}_{secrets.token_hex(8)}.{extensao}"
+    caminho_arquivo = os.path.join(upload_dir, nome_arquivo)
+
+    # Salvar arquivo
+    try:
+        conteudo = await foto.read()
+        with open(caminho_arquivo, "wb") as f:
+            f.write(conteudo)
+
+        # Atualizar caminho no banco (usar caminho relativo)
+        caminho_relativo = f"/static/uploads/fornecedores/{nome_arquivo}"
+        atualizar_foto(usuario_logado.id, caminho_relativo)
+
+        # Atualizar sessão (se aplicável)
+        if usuario_logado is not None:
+            usuario_logado['foto'] = caminho_relativo
+            from utils.auth_decorator import criar_sessao
+            criar_sessao(request, usuario_logado)
+
+    except Exception as e:
+        from fastapi.responses import RedirectResponse
+        return RedirectResponse("/fornecedor/perfil/?erro=upload_falhou", status_code=303)
+
+    from fastapi.responses import RedirectResponse
+    return RedirectResponse("/fornecedor/perfil/?foto_sucesso=1", status_code=303)
 
 # 13. Deletar conta do fornecedor
 @router.post("/perfil/excluir")
