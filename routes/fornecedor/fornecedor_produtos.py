@@ -9,7 +9,7 @@ router = APIRouter()
 templates = Jinja2Templates(directory="templates")
 
 
-# Rota home do fornecedor
+## Página inicial do fornecedor, exibe lista de produtos cadastrados
 @router.get("/")
 @requer_autenticacao(['fornecedor'])
 async def home_adm(request: Request):
@@ -63,15 +63,24 @@ async def cadastrar_produto(
     foto: UploadFile = File(...)
 ):
     import os
-    pasta_fotos = "uploads/produtos/"
+    tipos_permitidos = ["image/jpeg", "image/png", "image/jpg"]
+    pasta_fotos = "static/uploads/produtos_fornecedor"
     os.makedirs(pasta_fotos, exist_ok=True)
     caminho_foto = None
-    if foto:
+    if foto and foto.filename:
+        if foto.content_type not in tipos_permitidos:
+            return templates.TemplateResponse(
+                "fornecedor/produtos/cadastrar_produtos.html",
+                {"request": request, "erro": "Tipo de arquivo de foto inválido."}
+            )
+        import secrets
         extensao = foto.filename.split(".")[-1]
-        nome_arquivo = f"{nome.replace(' ', '_')}_{foto.filename}"
-        caminho_foto = os.path.join(pasta_fotos, nome_arquivo)
-        with open(caminho_foto, "wb") as buffer:
-            buffer.write(await foto.read())
+        nome_arquivo = f"{nome.replace(' ', '_')}_{secrets.token_hex(8)}.{extensao}"
+        caminho_arquivo = os.path.join(pasta_fotos, nome_arquivo)
+        conteudo = await foto.read()
+        with open(caminho_arquivo, "wb") as f:
+            f.write(conteudo)
+        caminho_foto = f"/static/uploads/produtos_fornecedor/{nome_arquivo}"
     produto = Produto(
         id=None, 
         nome=nome, 
