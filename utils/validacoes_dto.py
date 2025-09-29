@@ -191,15 +191,18 @@ def validar_nome_pessoa(nome: str, min_chars: int = 2, max_chars: int = 100) -> 
     """
     if not nome or not nome.strip():
         raise ValidacaoError('Nome é obrigatório')
-
-    # Remover espaços extras
-    nome_limpo = ' '.join(nome.split())
-
+    
+    palavras = nome.split()
+    if len(palavras) < 2:
+        raise ValidacaoError(f'Nome deve ter pelo menos nome e sobrenome')
+    
+    nome_limpo = ''.join(nome.split())
     if len(nome_limpo) < min_chars:
         raise ValidacaoError(f'Nome deve ter pelo menos {min_chars} caracteres')
-
+    
     if len(nome_limpo) > max_chars:
         raise ValidacaoError(f'Nome deve ter no máximo {max_chars} caracteres')
+
 
     # Verificar se contém apenas letras, espaços e acentos
     if not re.match(r'^[a-zA-ZÀ-ÿ\s]+$', nome_limpo):
