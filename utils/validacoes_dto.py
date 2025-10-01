@@ -551,8 +551,14 @@ class ValidadorWrapper:
 
 # Validadores mais usados, pré-configurados para facilitar uso
 VALIDADOR_NOME = ValidadorWrapper.criar_validador(validar_nome_pessoa, "Nome")
-VALIDADOR_CPF = ValidadorWrapper.criar_validador_opcional(validar_cpf, "CPF")
-VALIDADOR_TELEFONE = ValidadorWrapper.criar_validador(validar_telefone, "Telefone")
-VALIDADOR_SENHA = ValidadorWrapper.criar_validador(validar_senha, "Senha")
 VALIDADOR_EMAIL = ValidadorWrapper.criar_validador_opcional(lambda v, c: v, "Email")  # Pydantic já valida
-VALIDADOR_DATA_NASCIMENTO = ValidadorWrapper.criar_validador_opcional(validar_data_nascimento, "Data de nascimento", idade_minima=16)
+VALIDADOR_SENHA = ValidadorWrapper.criar_validador(validar_senha, "Senha")
+#VALIDADOR_CPF_CNPJ = ValidadorWrapper.criar_validador(validar_cpf_cnpj, "CPF/CNPJ")
+VALIDADOR_TELEFONE = ValidadorWrapper.criar_validador_opcional(validar_telefone, "Telefone")
+VALIDADOR_CEP = ValidadorWrapper.criar_validador_opcional(lambda v, c: v, "CEP")  # Pode ser validado externamente
+#VALIDADOR_NUMERO = ValidadorWrapper.criar_validador_opcional(validar_numero, "Numero")
+VALIDADOR_COMPLEMENTO = ValidadorWrapper.criar_validador_opcional(validar_texto_opcional, "Complemento", max_chars=100)
+VALIDADOR_BAIRRO = ValidadorWrapper.criar_validador(validar_texto_obrigatorio, "Bairro", min_chars=2, max_chars=100)
+VALIDADOR_CIDADE = ValidadorWrapper.criar_validador(validar_texto_obrigatorio, "Cidade", min_chars=2, max_chars=100)
+VALIDADOR_ESTADO = ValidadorWrapper.criar_validador(validar_estado_brasileiro, "Estado")
+
