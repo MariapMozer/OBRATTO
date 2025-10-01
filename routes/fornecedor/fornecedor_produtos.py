@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request, Form, UploadFile, File
+from fastapi import APIRouter, Request, Form, UploadFile, File, Query
 from utils.auth_decorator import requer_autenticacao
 from fastapi.templating import Jinja2Templates
 
@@ -21,14 +21,31 @@ async def home_adm(request: Request, usuario_logado: dict = None):
 
 @router.get("/buscar")
 @requer_autenticacao(['fornecedor'])
-async def buscar_produto(request: Request, id: int = None, nome: str = None):
+async def buscar_produto(
+    request: Request, 
+    id: str = Query("", description="ID do produto"),
+    nome: str = Query("", description="Nome do produto"),
+    usuario_logado: dict = None
+):
     produtos = []
-    if id is not None:
-        produto = produto_repo.obter_produto_por_id(id)
-        if produto:
+    
+    # Converter ID para int se não estiver vazio
+    produto_id = None
+    if id and id.strip():
+        try:
+            produto_id = int(id)
+        except ValueError:
+            produto_id = None
+    
+    if produto_id is not None:
+        produto = produto_repo.obter_produto_por_id(produto_id)
+        if produto and produto.fornecedor_id == usuario_logado['id']:
             produtos = [produto]
-    elif nome:
-        produtos = produto_repo.obter_produto_por_nome(nome)
+    elif nome and nome.strip():
+        # Buscar apenas produtos do fornecedor logado
+        todos_produtos = produto_repo.obter_produtos_por_fornecedor(usuario_logado['id'], limit=100, offset=0)
+        produtos = [p for p in todos_produtos if nome.lower() in p.nome.lower()]
+    
     return templates.TemplateResponse(
         "fornecedor/produtos/produtos.html", 
         {"request": request, 
@@ -63,52 +80,25 @@ async def cadastrar_produto(
     foto: UploadFile = File(...),
     usuario_logado: dict = None
 ):
-    print(f"DEBUG: Iniciando cadastro de produto")
-    print(f"DEBUG: Nome: {nome}, Preço: {preco}, Quantidade: {quantidade}")
-    print(f"DEBUG: Usuario logado ID: {usuario_logado['id']}")
-    
     import os
     tipos_permitidos = ["image/jpeg", "image/png", "image/jpg", "image/webp", "image/avif"]
     pasta_fotos = "static/uploads/produtos_fornecedor"
     os.makedirs(pasta_fotos, exist_ok=True)
     caminho_foto = None
     if foto and foto.filename:
-        print(f"DEBUG: Processando foto: {foto.filename}")
-        print(f"DEBUG: Content type: {foto.content_type}")
         if foto.content_type not in tipos_permitidos:
-            print(f"DEBUG: Tipo de arquivo inválido: {foto.content_type}")
             return templates.TemplateResponse(
                 "fornecedor/produtos/cadastrar_produtos.html",
                 {"request": request, "erro": "Tipo de arquivo de foto inválido."}
             )
-        print(f"DEBUG: Tipo de arquivo válido, processando...")
         import secrets
         extensao = foto.filename.split(".")[-1]
-        print(f"DEBUG: Extensão extraída: {extensao}")
         nome_arquivo = f"{nome.replace(' ', '_')}_{secrets.token_hex(8)}.{extensao}"
-        print(f"DEBUG: Nome do arquivo: {nome_arquivo}")
         caminho_arquivo = os.path.join(pasta_fotos, nome_arquivo)
-        print(f"DEBUG: Caminho completo: {caminho_arquivo}")
-        
-        try:
-            conteudo = await foto.read()
-            print(f"DEBUG: Conteúdo lido, tamanho: {len(conteudo)} bytes")
-            with open(caminho_arquivo, "wb") as f:
-                f.write(conteudo)
-            print(f"DEBUG: Arquivo salvo com sucesso")
-            caminho_foto = f"/static/uploads/produtos_fornecedor/{nome_arquivo}"
-            print(f"DEBUG: Foto salva em: {caminho_foto}")
-        except Exception as e:
-            print(f"DEBUG: Erro ao salvar foto: {e}")
-            import traceback
-            traceback.print_exc()
-            return templates.TemplateResponse(
-                "fornecedor/produtos/cadastrar_produtos.html",
-                {"request": request, "erro": f"Erro ao salvar foto: {e}"}
-            )
-    
-    print(f"DEBUG: Processamento de foto concluído. Caminho: {caminho_foto}")
-    print(f"DEBUG: Criando objeto Produto...")
+        conteudo = await foto.read()
+        with open(caminho_arquivo, "wb") as f:
+            f.write(conteudo)
+        caminho_foto = f"/static/uploads/produtos_fornecedor/{nome_arquivo}"
     
     produto = Produto(
         id=None, 
@@ -119,30 +109,14 @@ async def cadastrar_produto(
         foto=caminho_foto,
         fornecedor_id=usuario_logado['id']
     )
-    print(f"DEBUG: Produto criado: {produto}")
     
-    try:
-        print(f"DEBUG: Chamando produto_repo.inserir_produto...")
-        produto_repo.inserir_produto(produto)
-        print(f"DEBUG: Produto inserido com sucesso")
-    except Exception as e:
-        print(f"DEBUG: Erro ao inserir produto: {e}")
-        import traceback
-        traceback.print_exc()
-        return templates.TemplateResponse(
-            "fornecedor/produtos/cadastrar_produtos.html",
-            {"request": request, "erro": f"Erro ao cadastrar produto: {e}"}
-        )
-    
-    print(f"DEBUG: Buscando produtos do fornecedor...")
+    produto_repo.inserir_produto(produto)
     produtos = produto_repo.obter_produtos_por_fornecedor(usuario_logado['id'], limit=10, offset=0)
-    print(f"DEBUG: Encontrados {len(produtos)} produtos")
     response = templates.TemplateResponse(
         "fornecedor/produtos/produtos.html", 
         {"request": request, 
          "produtos": produtos, 
          "mensagem": "Produto inserido com sucesso"})
-    print(f"DEBUG: Retornando resposta...")
     return response
 
 @router.get("/atualizar/{id}")

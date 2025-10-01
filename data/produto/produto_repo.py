@@ -14,23 +14,19 @@ def criar_tabela_produto():
         conn.commit()
 
 def inserir_produto(produto: Produto):
-    print(f"DEBUG REPO: Iniciando inserção do produto: {produto}")
     with open_connection() as conn:
         if produto.id is None:
             # Insert without ID (autoincrement)
             sql = "INSERT INTO PRODUTO (nome, descricao, preco, quantidade, em_promocao, desconto, foto, fornecedor_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
             params = (produto.nome, produto.descricao, produto.preco, produto.quantidade, int(produto.em_promocao), produto.desconto, produto.foto, produto.fornecedor_id)
-            print(f"DEBUG REPO: SQL sem ID: {sql}")
-            print(f"DEBUG REPO: Parâmetros: {params}")
             conn.execute(sql, params)
         else:
             # Insert with ID
-            print(f"DEBUG REPO: SQL com ID: {INSERIR_PRODUTO}")
-            params = (produto.id, produto.nome, produto.descricao, produto.preco, produto.quantidade, int(produto.em_promocao), produto.desconto, produto.foto, produto.fornecedor_id)
-            print(f"DEBUG REPO: Parâmetros: {params}")
-            conn.execute(INSERIR_PRODUTO, params)
+            conn.execute(
+                INSERIR_PRODUTO,
+                (produto.id, produto.nome, produto.descricao, produto.preco, produto.quantidade, int(produto.em_promocao), produto.desconto, produto.foto, produto.fornecedor_id)
+            )
         conn.commit()
-        print(f"DEBUG REPO: Produto inserido com sucesso")
 
 def obter_produto_por_id(id: int) -> Optional[Produto]:
     with open_connection() as conn:

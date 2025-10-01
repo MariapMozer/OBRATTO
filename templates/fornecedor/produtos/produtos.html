@@ -190,7 +190,11 @@
                             </div>
                             
                             <div class="product-image">
-                                <i class="bi bi-box-seam product-icon"></i>
+                                {% if produto.foto %}
+                                    <img src="{{ produto.foto }}" alt="{{ produto.nome }}" class="product-img">
+                                {% else %}
+                                    <i class="bi bi-box-seam product-icon"></i>
+                                {% endif %}
                             </div>
                             
                             <div class="product-info">
@@ -287,7 +291,8 @@
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="product-image-large">
-                                    <i class="bi bi-box-seam"></i>
+                                    <img id="modalProductImage" src="" alt="Produto" class="product-img" style="display: none;">
+                                    <i class="bi bi-box-seam" id="modalProductIcon"></i>
                                 </div>
                             </div>
                             <div class="col-md-8">
