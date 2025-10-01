@@ -5,7 +5,7 @@ from utils.validacoes_dto import *
 from enum import Enum
 
 class TipoUsuarioEnum(str, Enum):
-    ADM = "adm"
+    #ADM = "adm"
     PRESTADOR = "prestador"
     CLIENTE = "cliente"
     FORNECEDOR = "fornecedor"
@@ -29,7 +29,6 @@ class CriarUsuarioDTO(BaseDTO):
     bairro: str = Field(..., description="Bairro")
     cidade: str = Field(..., description="Cidade")
     estado: str = Field(..., description="Estado")
-
     tipo_usuario: TipoUsuarioEnum = Field(...)
     foto: Optional[str] = Field(None)
 
@@ -152,6 +151,27 @@ class CriarUsuarioDTO(BaseDTO):
         return validador(v)
 
 
+    @classmethod
+    def criar_exemplo_usuario_json(cls, **overrides) -> dict:
+        """Exemplo de dados para documentação da API"""
+        exemplo = {
+            "nome": "João Silva",
+            "email": "joao.silva@email.com",
+            "senha": "senhaSegura123",
+            "cpf_cnpj": "123.456.789-01",
+            "telefone": "(11) 99999-9999",
+            "cep": "12345-678",
+            "rua": "Rua Exemplo",
+            "numero": "123",    
+            "complemento": "Apto 45",
+            "bairro": "Bairro Exemplo",
+            "cidade": "Cidade Exemplo",
+            "estado": "EX",
+        }
+
+        exemplo.update(overrides)
+        return exemplo
+
 class CriarPrestador(CriarUsuarioDTO):
     area_atuacao: Optional[str] = Field(None)
     razao_social: Optional[str] = Field(None)
@@ -174,6 +194,17 @@ class CriarPrestador(CriarUsuarioDTO):
         return cls.validar_campo_wrapper(validar_texto_opcional, "Descrição dos serviços", max_chars=500)(v)
 
 
+    @classmethod
+    def criar_exemplo_prestador_json(cls, **overrides) -> dict:
+        """Exemplo de dados para documentação da API"""
+        exemplo = {
+            "area_atuacao": "Manutenção",
+            "razao_social": "Prestadora de Serviços Ltda",
+            "descricao_servicos": "Oferecemos serviços de manutenção residencial e comercial.",
+        }
+        exemplo.update(overrides)
+        return exemplo
+
 class CriarCliente(CriarUsuarioDTO):
     genero: Optional[str] = Field(None, description="Gênero do cliente")
     data_nascimento: Optional[date] = Field(None, description="Data de nascimento")
@@ -188,6 +219,15 @@ class CriarCliente(CriarUsuarioDTO):
     def validar_data_nascimento(cls, v: Optional[date]) -> Optional[date]:
         return cls.validar_campo_wrapper(validar_data_nascimento, "Data de nascimento")(v)
 
+    @classmethod
+    def criar_exemplo_cliente_json(cls, **overrides) -> dict:
+        """Exemplo de dados para documentação da API"""
+        exemplo = {
+            "genero": "Feminino",
+            "data_nascimento": "1990-01-01"
+        }
+        exemplo.update(overrides)
+        return exemplo
 
 class CriarFornecedor(CriarUsuarioDTO):
     razao_social: Optional[str] = Field(None, description="Razão Social da empresa")
@@ -199,61 +239,160 @@ class CriarFornecedor(CriarUsuarioDTO):
         return cls.validar_campo_wrapper(validar_texto_opcional, "Razão Social", max_chars=100)(v)
 
 
-
     @classmethod
-    def criar_exemplo_json(cls, **overrides) -> dict:
+    def criar_exemplo_fornecedor_json(cls, **overrides) -> dict:
         """Exemplo de dados para documentação da API"""
         exemplo = {
-            "nome": "João Silva",
-            "email": "joao.silva@email.com",
-            "telefone": "(11) 99999-9999",
-            "cpf": "123.456.789-01"
+            "razao_social": "Fornecedor de Materiais Ltda"
         }
         exemplo.update(overrides)
         return exemplo
-
+    
 
 class AtualizarUsuarioDTO(BaseDTO):
-    """
-    DTO para atualização de dados do usuário.
-    Campos opcionais para atualização parcial.
-    """
 
-    nome: Optional[str] = Field(
-        None,
-        min_length=2,
-        max_length=100,
-        description="Nome completo"
-    )
-    telefone: Optional[str] = Field(
-        None,
-        description="Telefone"
-    )
+    nome: Optional[str] = Field(None, min_length=2, max_length=100, description="Nome completo")
+    email: Optional[EmailStr] = Field(None, description="E-mail do usuário")
+    senha: Optional[str] = Field(None, min_length=6, description="Senha do usuário")
+    cpf_cnpj: Optional[str] = Field(None, description="CPF ou CNPJ do usuário")
+    telefone: Optional[str] = Field(None, min_length=10, description="Telefone")
+    cep: Optional[str] = Field(None, description="CEP")
+    logradouro: Optional[str] = Field(None, description="Logradouro")
+    numero: Optional[str] = Field(None, description="Número")
+    complemento: Optional[str] = Field(None, description="Complemento")
+    bairro: Optional[str] = Field(None, description="Bairro")
+    cidade: Optional[str] = Field(None, description="Cidade")
+    estado: Optional[str] = Field(None, description="Estado")
+    tipo_usuario: Optional[TipoUsuarioEnum] = Field(None, description="Tipo de usuário")
+    foto: Optional[str] = Field(None, description="Foto do usuário")
 
     @field_validator('nome')
     @classmethod
     def validar_nome(cls, v: Optional[str]) -> Optional[str]:
         if not v:
             return v
-        validador = cls.validar_campo_wrapper(
-            lambda valor, campo: validar_texto_obrigatorio(
-                valor, campo, min_chars=2, max_chars=100
-            ),
+        return cls.validar_campo_wrapper(
+            lambda valor, campo: validar_texto_obrigatorio(valor, campo, min_chars=2, max_chars=100),
             "Nome"
-        )
-        return validador(v)
+        )(v)
+
+    @field_validator('email')
+    @classmethod
+    def validar_email(cls, v: Optional[EmailStr]) -> Optional[EmailStr]:
+        if not v:
+            return v
+        return EmailStr(cls.validar_campo_wrapper(
+            lambda valor, campo: validar_texto_obrigatorio(str(valor), campo, min_chars=5, max_chars=100),
+            "E-mail"
+        )(str(v)))
+
+    @field_validator('senha')
+    @classmethod
+    def validar_senha(cls, v: Optional[str]) -> Optional[str]:
+        if not v:
+            return v
+        return cls.validar_campo_wrapper(
+            lambda valor, campo: validar_texto_obrigatorio(valor, campo, min_chars=6),
+            "Senha"
+        )(v)
+
+    @field_validator('cpf_cnpj')
+    @classmethod
+    def validar_documento(cls, v: Optional[str]) -> Optional[str]:
+        if not v:
+            return v
+        tipo = "CPF" if len(v) <= 14 else "CNPJ"
+        return cls.validar_campo_wrapper(validar_cpf_cnpj, tipo)(v)
 
     @field_validator('telefone')
     @classmethod
-    def validar_telefone_campo(cls, v: Optional[str]) -> Optional[str]:
+    def validar_telefone(cls, v: Optional[str]) -> Optional[str]:
         if not v:
             return v
-        validador = cls.validar_campo_wrapper(
-            lambda valor, campo: validar_telefone(valor),
-            "Telefone"
-        )
-        return validador(v)
+        return cls.validar_campo_wrapper(validar_telefone, "Telefone")(v)
 
+    @field_validator('cep')
+    @classmethod
+    def validar_cep(cls, v: Optional[str]) -> Optional[str]:
+        if not v:
+            return v
+        return cls.validar_campo_wrapper(validar_cep, "CEP")(v)
+
+    @field_validator('logradouro')
+    @classmethod
+    def validar_logradouro(cls, v: Optional[str]) -> Optional[str]:
+        if not v:
+            return v
+        return cls.validar_campo_wrapper(validar_texto_obrigatorio, "Logradouro", min_chars=2)(v)
+
+    @field_validator('numero')
+    @classmethod
+    def validar_numero(cls, v: Optional[str]) -> Optional[str]:
+        if not v:
+            return v
+        return cls.validar_campo_wrapper(validar_texto_obrigatorio, "Número", min_chars=1)(v)
+
+    @field_validator('complemento')
+    @classmethod
+    def validar_complemento(cls, v: Optional[str]) -> Optional[str]:
+        if not v:
+            return v
+        return cls.validar_campo_wrapper(validar_texto_opcional, "Complemento", max_chars=100)(v)
+
+    @field_validator('bairro')
+    @classmethod
+    def validar_bairro(cls, v: Optional[str]) -> Optional[str]:
+        if not v:
+            return v
+        return cls.validar_campo_wrapper(validar_texto_obrigatorio, "Bairro", min_chars=2)(v)
+
+    @field_validator('cidade')
+    @classmethod
+    def validar_cidade(cls, v: Optional[str]) -> Optional[str]:
+        if not v:
+            return v
+        return cls.validar_campo_wrapper(validar_texto_obrigatorio, "Cidade", min_chars=2)(v)
+
+    @field_validator('estado')
+    @classmethod
+    def validar_estado(cls, v: Optional[str]) -> Optional[str]:
+        if not v:
+            return v
+        return cls.validar_campo_wrapper(validar_texto_obrigatorio, "Estado", min_chars=2, max_chars=2)(v)
+    
+class AtualizarPrestadorDTO(AtualizarUsuarioDTO):
+
+    area_atuacao: Optional[str] = Field(None, description="Área de atuação")
+    razao_social: Optional[str] = Field(None, description="Razão Social")
+    descricao_servicos: Optional[str] = Field(None, description="Descrição dos serviços")
+    selo_confianca: Optional[bool] = Field(None, description="Selo de confiança")
+
+    @field_validator('area_atuacao')
+    @classmethod
+    def validar_area_atuacao(cls, v: Optional[str]) -> Optional[str]:
+        return cls.validar_campo_wrapper(validar_texto_opcional, "Área de atuação", max_chars=100)(v)
+
+    @field_validator('razao_social')
+    @classmethod
+    def validar_razao_social(cls, v: Optional[str]) -> Optional[str]:
+        return cls.validar_campo_wrapper(validar_texto_opcional, "Razão Social", max_chars=100)(v)
+
+    @field_validator('descricao_servicos')
+    @classmethod
+    def validar_descricao_servicos(cls, v: Optional[str]) -> Optional[str]:
+        return cls.validar_campo_wrapper(validar_texto_opcional, "Descrição dos serviços", max_chars=500)(v)
+    
+
+class AtualizarFornecedorDTO(AtualizarUsuarioDTO):
+
+    razao_social: Optional[str] = Field(None, description="Razão Social da empresa")
+    selo_confianca: Optional[bool] = Field(None, description="Selo de confiança")
+
+    @field_validator('razao_social')
+    @classmethod
+    def validar_razao_social(cls, v: Optional[str]) -> Optional[str]:
+        return cls.validar_campo_wrapper(validar_texto_opcional, "Razão Social", max_chars=100)(v)
+    
 
 # Configurar exemplos JSON nos model_config
 CriarUsuarioDTO.model_config.update({
