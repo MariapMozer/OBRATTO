@@ -1,7 +1,7 @@
 from data.pagamento.pagamento_model import Pagamento
 from data.pagamento.pagamento_repo import PagamentoRepository
 from data.inscricaoplano.inscricao_plano_model import InscricaoPlano
-from data.inscricaoplano.inscricao_plano_repo import InscricaoPlanoRepository
+from data.inscricaoplano import inscricao_plano_repo
 from data.plano.plano_repo import PlanoRepository
 from data.cartao.cartao_repo import CartaoRepository
 from services.mercadopago_service import MercadoPagoService
@@ -10,7 +10,7 @@ from datetime import datetime
 class PaymentService:
     def __init__(self):
         self.pagamento_repo = PagamentoRepository()
-        self.inscricao_plano_repo = InscricaoPlanoRepository()
+        self.inscricao_plano_repo = inscricao_plano_repo
         self.plano_repo = PlanoRepository()
         self.cartao_repo = CartaoRepository()
         self.mercadopago_service = MercadoPagoService()

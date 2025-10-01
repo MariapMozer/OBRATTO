@@ -3,7 +3,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse, JSONResponse
 from data.plano.plano_repo import PlanoRepository
 from data.inscricaoplano.inscricao_plano_model import InscricaoPlano
-from data.inscricaoplano.inscricao_plano_repo import InscricaoPlanoRepository
+#from data.inscricaoplano.inscricao_plano_repo import InscricaoPlanoRepository
 from data.pagamento.pagamento_model import Pagamento
 from data.pagamento.pagamento_repo import PagamentoRepository
 from data.cartao.cartao_model import CartaoCredito
@@ -16,7 +16,7 @@ from datetime import datetime
 
 pagamento_repo = PagamentoRepository()
 cartao_repo = CartaoRepository()
-inscricao_plano_repo = InscricaoPlanoRepository()
+#inscricao_plano_repo = InscricaoPlanoRepository()
 plano_repo = PlanoRepository()
 mercadopago_config = mp_config
 mercadopago_service = MercadoPagoService()
