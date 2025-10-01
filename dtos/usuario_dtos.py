@@ -400,3 +400,21 @@ CriarUsuarioDTO.model_config.update({
         "example": CriarUsuarioDTO.criar_exemplo_json()
     }
 })
+
+CriarPrestador.model_config.update({
+    "json_schema_extra": {
+        "example": CriarPrestador.criar_exemplo_prestador_json()
+    }
+})
+
+CriarCliente.model_config.update({
+    "json_schema_extra": {
+        "example": CriarCliente.criar_exemplo_cliente_json()
+    }
+})
+
+CriarFornecedor.model_config.update({
+    "json_schema_extra": {
+        "example": CriarFornecedor.criar_exemplo_fornecedor_json()
+    }
+})
