@@ -152,6 +152,16 @@ class CriarUsuarioDTO(BaseDTO):
         return validador(v)
 
 
+class CriarPrestador(CriarUsuarioDTO):
+    pass
+
+class CriarCliente(CriarUsuarioDTO):
+    pass
+
+class CriarFornecedor(CriarUsuarioDTO):
+    pass
+
+
     @classmethod
     def criar_exemplo_json(cls, **overrides) -> dict:
         """Exemplo de dados para documentação da API"""
