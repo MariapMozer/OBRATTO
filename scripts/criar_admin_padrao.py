@@ -14,8 +14,6 @@ from data.administrador import administrador_repo
 from data.administrador.administrador_model import Administrador
 from datetime import datetime
 from utils.seed import criar_tabelas
-from scripts.criar_admin_padrao import criar_admin_padrao
-criar_admin_padrao()
 
 
 def criar_admin_padrao():
@@ -30,31 +28,19 @@ def criar_admin_padrao():
             senha=senha_hash,
             cpf_cnpj="00000000000",
             telefone="(00) 00000-0000",
-            cep="00000-000",
-            rua="Sistema",
-            numero="S/N",
-            complemento="",
-            bairro="Sistema",
-            cidade="Sistema",
-            estado="Sistema",
+            endereco="Sistema",
             tipo_usuario="Administrador",
-            data_cadastro=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            foto=None,
-            token_redefinicao=None,
-            data_token=None
+            data_cadastro=datetime.now()
         )
         id_usuario = usuario_repo.inserir_usuario(admin_usuario)
         if id_usuario:
             administrador = Administrador(id=None, id_usuario=id_usuario)
             administrador_repo.inserir_administrador(administrador)
-            print("✅ Admin padrão criado com sucesso!")
-            print("📧 Email: admin@admin.com")
-            print("🔑 Senha: admin123")
-            print("⚠️  IMPORTANTE: Altere a senha após o primeiro login!")
+            print("Admin criado: admin@admin.com / admin123")
         else:
-            print("❌ Erro ao criar usuário administrador.")
+            print("Erro ao criar usuário administrador.")
     else:
-        print("ℹ️  Já existe administrador cadastrado no sistema.")
+        print("Já existe administrador cadastrado.")
 
 
 criar_tabelas()
