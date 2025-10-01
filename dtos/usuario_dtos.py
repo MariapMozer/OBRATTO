@@ -153,13 +153,51 @@ class CriarUsuarioDTO(BaseDTO):
 
 
 class CriarPrestador(CriarUsuarioDTO):
-    pass
+    area_atuacao: Optional[str] = Field(None)
+    razao_social: Optional[str] = Field(None)
+    descricao_servicos: Optional[str] = Field(None)
+    selo_confianca: bool = Field(default=False)
+
+    @field_validator('area_atuacao')
+    @classmethod
+    def validar_area_atuacao(cls, v: Optional[str]) -> Optional[str]:
+        return cls.validar_campo_wrapper(validar_texto_opcional, "Área de atuação", max_chars=100)(v)
+
+    @field_validator('razao_social')
+    @classmethod
+    def validar_razao_social(cls, v: Optional[str]) -> Optional[str]:
+        return cls.validar_campo_wrapper(validar_texto_opcional, "Razão Social", max_chars=100)(v)
+
+    @field_validator('descricao_servicos')
+    @classmethod
+    def validar_descricao_servicos(cls, v: Optional[str]) -> Optional[str]:
+        return cls.validar_campo_wrapper(validar_texto_opcional, "Descrição dos serviços", max_chars=500)(v)
+
 
 class CriarCliente(CriarUsuarioDTO):
-    pass
+    genero: Optional[str] = Field(None, description="Gênero do cliente")
+    data_nascimento: Optional[date] = Field(None, description="Data de nascimento")
+
+    @field_validator('genero')
+    @classmethod
+    def validar_genero(cls, v: Optional[str]) -> Optional[str]:
+        return cls.validar_campo_wrapper(validar_texto_opcional, "Gênero", max_chars=20)(v)
+
+    @field_validator('data_nascimento')
+    @classmethod
+    def validar_data_nascimento(cls, v: Optional[date]) -> Optional[date]:
+        return cls.validar_campo_wrapper(validar_data_nascimento, "Data de nascimento")(v)
+
 
 class CriarFornecedor(CriarUsuarioDTO):
-    pass
+    razao_social: Optional[str] = Field(None, description="Razão Social da empresa")
+    selo_confianca: bool = Field(default=False)
+
+    field_validator('razao_social')
+    @classmethod
+    def validar_razao_social(cls, v: Optional[str]) -> Optional[str]:
+        return cls.validar_campo_wrapper(validar_texto_opcional, "Razão Social", max_chars=100)(v)
+
 
 
     @classmethod
