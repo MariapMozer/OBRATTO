@@ -7,7 +7,7 @@ CRIAR_TABELA_USUARIO = """
     cpf_cnpj TEXT NOT NULL,
     telefone TEXT NOT NULL,
     cep TEXT NOT NULL,
-    logradouro TEXT NOT NULL,
+    rua TEXT NOT NULL,
     numero TEXT NOT NULL,
     complemento TEXT NOT NULL,
     bairro TEXT NOT NULL,
@@ -22,12 +22,12 @@ CRIAR_TABELA_USUARIO = """
 """
 
 INSERIR_USUARIO = """
-INSERT INTO usuario (nome, email, senha, cpf_cnpj, telefone, cep, logradouro, numero, complemento, bairro, cidade, estado, data_cadastro, foto, token_redefinicao, data_token, tipo_usuario) 
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT INTO usuario (nome, email, senha, cpf_cnpj, telefone, cep, rua, numero, complemento, bairro, cidade, estado, data_cadastro, foto, token_redefinicao, data_token, tipo_usuario) 
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 """
 
 OBTER_USUARIO_POR_EMAIL = """
-SELECT ID, nome, email, senha, cpf_cnpj, telefone,  cep, logradouro, numero, complemento, bairro, cidade, estado, data_cadastro, foto, token_redefinicao, data_token, tipo_usuario
+SELECT ID, nome, email, senha, cpf_cnpj, telefone,  cep, rua, numero, complemento, bairro, cidade, estado, data_cadastro, foto, token_redefinicao, data_token, tipo_usuario
 FROM usuario
 WHERE email = ?;
 """
@@ -56,7 +56,7 @@ SET nome = ?,
     cpf_cnpj = ?,
     telefone = ?,
     cep = ?,
-    logradouro = ?,
+    rua = ?,
     numero = ?,
     complemento = ?,
     bairro = ?,

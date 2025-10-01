@@ -13,7 +13,7 @@ class Usuario:
     telefone: str
 # Endereço detalhado
     cep: str
-    logradouro: str
+    rua: str
     numero: str
     complemento: str
     bairro: str

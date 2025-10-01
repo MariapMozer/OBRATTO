@@ -244,10 +244,12 @@ async def processar_cadastro_fornecedor(
         senha=senha_hash,
         cpf_cnpj=cpf_cnpj,
         telefone=telefone,
+        cep="",  # Campo obrigatório adicionado
         estado=estado,
         cidade=cidade,
         rua=rua,
         numero=numero,
+        complemento="",  # Campo obrigatório adicionado
         bairro=bairro,
         tipo_usuario="Fornecedor",
         data_cadastro=datetime.now(),
