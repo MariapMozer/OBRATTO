@@ -6,17 +6,25 @@ banco = "obratto.db"
 conn = sqlite3.connect(banco)
 cursor = conn.cursor()
 
-# Adiciona a coluna estado, se não existir
-cursor.execute("ALTER TABLE usuario ADD COLUMN estado TEXT NOT NULL DEFAULT ''")
-cursor.execute("ALTER TABLE usuario ADD COLUMN cidade TEXT NOT NULL DEFAULT ''")
-cursor.execute("ALTER TABLE usuario ADD COLUMN rua TEXT NOT NULL DEFAULT ''")
-cursor.execute("ALTER TABLE usuario ADD COLUMN numero TEXT NOT NULL DEFAULT ''")
-cursor.execute("ALTER TABLE usuario ADD COLUMN bairro TEXT NOT NULL DEFAULT ''")
+# Lista de colunas para adicionar
+colunas = [
+    ("estado", "TEXT NOT NULL DEFAULT ''"),
+    ("cidade", "TEXT NOT NULL DEFAULT ''"),
+    ("rua", "TEXT NOT NULL DEFAULT ''"),
+    ("numero", "TEXT NOT NULL DEFAULT ''"),
+    ("bairro", "TEXT NOT NULL DEFAULT ''")
+]
+
+for nome_coluna, tipo_coluna in colunas:
+    try:
+        cursor.execute(f"ALTER TABLE usuario ADD COLUMN {nome_coluna} {tipo_coluna}")
+        print(f"Coluna '{nome_coluna}' adicionada com sucesso!")
+    except sqlite3.OperationalError as e:
+        if "duplicate column name" in str(e):
+            print(f"Coluna '{nome_coluna}' já existe.")
+        else:
+            print(f"Erro ao adicionar coluna '{nome_coluna}': {e}")
 
 conn.commit()
 conn.close()
-print("Coluna 'estado' adicionada com sucesso!")
-print("Coluna 'cidade' adicionada com sucesso!")
-print("Coluna 'rua' adicionada com sucesso!")
-print("Coluna 'numero' adicionada com sucesso!")
-print("Coluna 'bairro' adicionada com sucesso!")
+print("Atualização da tabela usuario concluída!")

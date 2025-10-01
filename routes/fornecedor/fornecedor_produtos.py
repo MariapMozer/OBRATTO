@@ -68,7 +68,7 @@ async def cadastrar_produto(
     print(f"DEBUG: Usuario logado ID: {usuario_logado['id']}")
     
     import os
-    tipos_permitidos = ["image/jpeg", "image/png", "image/jpg", "image/webp"]
+    tipos_permitidos = ["image/jpeg", "image/png", "image/jpg", "image/webp", "image/avif"]
     pasta_fotos = "static/uploads/produtos_fornecedor"
     os.makedirs(pasta_fotos, exist_ok=True)
     caminho_foto = None
@@ -145,7 +145,7 @@ async def cadastrar_produto(
     print(f"DEBUG: Retornando resposta...")
     return response
 
-@router.get("/atualizar")
+@router.get("/atualizar/{id}")
 @requer_autenticacao(['fornecedor'])
 async def mostrar_formulario_atualizar_produto(request: Request, id: int, usuario_logado: dict = None):
     produto = produto_repo.obter_produto_por_id(id)
