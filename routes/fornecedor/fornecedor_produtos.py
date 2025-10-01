@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Request, Form, UploadFile, File, Query
 from utils.auth_decorator import requer_autenticacao
 from fastapi.templating import Jinja2Templates
+import os
 
 from data.produto.produto_model import Produto
 from data.produto import produto_repo
@@ -161,11 +162,9 @@ async def atualizar_produto(
     import os
     if foto and foto.filename:
         # Apaga a foto antiga se existir
-        if caminho_foto and os.path.exists(caminho_foto):
-            try:
-                os.remove(caminho_foto)
-            except Exception:
-                pass
+        if caminho_foto:
+            apagar_arquivo_imagem(caminho_foto)
+        
         pasta_fotos = "static/uploads/produtos_fornecedor"
         os.makedirs(pasta_fotos, exist_ok=True)
         import secrets
@@ -199,6 +198,11 @@ async def atualizar_produto(
 async def excluir_produto_get(request: Request, id: int, usuario_logado: dict = None):
     produto = produto_repo.obter_produto_por_id(id)
     if produto and produto.fornecedor_id == usuario_logado['id']:
+        # Apagar a imagem do sistema de arquivos
+        if produto.foto:
+            apagar_arquivo_imagem(produto.foto)
+        
+        # Apagar produto do banco
         produto_repo.deletar_produto(id)
         produtos = produto_repo.obter_produtos_por_fornecedor(usuario_logado['id'], limit=10, offset=0)
         response = templates.TemplateResponse(
@@ -220,6 +224,11 @@ async def excluir_produto_get(request: Request, id: int, usuario_logado: dict = 
 async def excluir_produto(request: Request, id: int, usuario_logado: dict = None):
     produto = produto_repo.obter_produto_por_id(id)
     if produto and produto.fornecedor_id == usuario_logado['id']:
+        # Apagar a imagem do sistema de arquivos
+        if produto.foto:
+            apagar_arquivo_imagem(produto.foto)
+        
+        # Apagar produto do banco
         produto_repo.deletar_produto(id)
         produtos = produto_repo.obter_produtos_por_fornecedor(usuario_logado['id'], limit=10, offset=0)
         response = templates.TemplateResponse(
@@ -252,3 +261,21 @@ async def confi_exclusao_produto(request: Request, id: int,  usuario_logado: dic
             {"request": request, 
              "produtos": produtos,
                "mensagem": "Produto não encontrado ou acesso negado"})
+
+def apagar_arquivo_imagem(caminho_foto: str):
+    """Remove o arquivo de imagem do sistema de arquivos se existir"""
+    if caminho_foto:
+        # Remover a barra inicial para construir o caminho correto
+        if caminho_foto.startswith('/'):
+            caminho_foto = caminho_foto[1:]
+        
+        caminho_completo = os.path.join(os.getcwd(), caminho_foto)
+        
+        try:
+            if os.path.exists(caminho_completo):
+                os.remove(caminho_completo)
+                print(f"Imagem removida: {caminho_completo}")
+            else:
+                print(f"Arquivo não encontrado: {caminho_completo}")
+        except Exception as e:
+            print(f"Erro ao remover imagem {caminho_completo}: {e}")

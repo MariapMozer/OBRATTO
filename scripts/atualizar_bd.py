@@ -1,7 +1,12 @@
 import sqlite3
+import os
 
-# Caminho pro seu banco
-banco = "obratto.db"
+# Obter o diretório do script e ir para o diretório pai
+script_dir = os.path.dirname(os.path.abspath(__file__))
+projeto_dir = os.path.dirname(script_dir)
+
+# Caminho para o banco de dados
+banco = os.path.join(projeto_dir, "obratto.db")
 
 conn = sqlite3.connect(banco)
 cursor = conn.cursor()
