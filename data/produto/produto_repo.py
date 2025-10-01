@@ -14,20 +14,23 @@ def criar_tabela_produto():
         conn.commit()
 
 def inserir_produto(produto: Produto):
+    print(f"DEBUG REPO: Iniciando inserção do produto: {produto}")
     with open_connection() as conn:
         if produto.id is None:
             # Insert without ID (autoincrement)
-            conn.execute(
-                "INSERT INTO PRODUTO (nome, descricao, preco, quantidade, em_promocao, desconto) VALUES (?, ?, ?, ?, ?, ?)",
-                (produto.nome, produto.descricao, produto.preco, produto.quantidade, int(produto.em_promocao), produto.desconto)
-            )
+            sql = "INSERT INTO PRODUTO (nome, descricao, preco, quantidade, em_promocao, desconto, foto, fornecedor_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+            params = (produto.nome, produto.descricao, produto.preco, produto.quantidade, int(produto.em_promocao), produto.desconto, produto.foto, produto.fornecedor_id)
+            print(f"DEBUG REPO: SQL sem ID: {sql}")
+            print(f"DEBUG REPO: Parâmetros: {params}")
+            conn.execute(sql, params)
         else:
             # Insert with ID
-            conn.execute(
-                INSERIR_PRODUTO,
-                (produto.id, produto.nome, produto.descricao, produto.preco, produto.quantidade, int(produto.em_promocao), produto.desconto)
-            )
+            print(f"DEBUG REPO: SQL com ID: {INSERIR_PRODUTO}")
+            params = (produto.id, produto.nome, produto.descricao, produto.preco, produto.quantidade, int(produto.em_promocao), produto.desconto, produto.foto, produto.fornecedor_id)
+            print(f"DEBUG REPO: Parâmetros: {params}")
+            conn.execute(INSERIR_PRODUTO, params)
         conn.commit()
+        print(f"DEBUG REPO: Produto inserido com sucesso")
 
 def obter_produto_por_id(id: int) -> Optional[Produto]:
     with open_connection() as conn:
@@ -36,7 +39,8 @@ def obter_produto_por_id(id: int) -> Optional[Produto]:
         if row:
             return Produto(
                 id=row[0], nome=row[1], descricao=row[2], preco=row[3], quantidade=row[4],
-                em_promocao=bool(row[5]), desconto=row[6]
+                em_promocao=bool(row[5]), desconto=row[6], foto=row[7] if len(row) > 7 else None, 
+                fornecedor_id=row[8] if len(row) > 8 else None
             )
         return None
 
@@ -46,7 +50,8 @@ def obter_produto_por_pagina(limit: int, offset: int) -> List[Produto]:
         return [
             Produto(
                 id=row[0], nome=row[1], descricao=row[2], preco=row[3], quantidade=row[4],
-                em_promocao=bool(row[5]), desconto=row[6]
+                em_promocao=bool(row[5]), desconto=row[6], foto=row[7] if len(row) > 7 else None,
+                fornecedor_id=row[8] if len(row) > 8 else None
             )
             for row in cursor.fetchall()
         ]
@@ -56,7 +61,20 @@ def obter_produto_por_nome(nome: str) -> List[Produto]:
         return [
             Produto(
                 id=row[0], nome=row[1], descricao=row[2], preco=row[3], quantidade=row[4],
-                em_promocao=bool(row[5]), desconto=row[6]
+                em_promocao=bool(row[5]), desconto=row[6], foto=row[7] if len(row) > 7 else None,
+                fornecedor_id=row[8] if len(row) > 8 else None
+            )
+            for row in cursor.fetchall()
+        ]
+
+def obter_produtos_por_fornecedor(fornecedor_id: int, limit: int = 10, offset: int = 0) -> List[Produto]:
+    with open_connection() as conn:
+        cursor = conn.execute("SELECT * FROM PRODUTO WHERE fornecedor_id = ? ORDER BY id LIMIT ? OFFSET ?", (fornecedor_id, limit, offset))
+        return [
+            Produto(
+                id=row[0], nome=row[1], descricao=row[2], preco=row[3], quantidade=row[4],
+                em_promocao=bool(row[5]), desconto=row[6], foto=row[7] if len(row) > 7 else None,
+                fornecedor_id=row[8] if len(row) > 8 else None
             )
             for row in cursor.fetchall()
         ]
@@ -65,7 +83,7 @@ def atualizar_produto(produto: Produto):
     with open_connection() as conn:
         conn.execute(
             ATUALIZAR_PRODUTO,
-            (produto.nome, produto.descricao, produto.preco, produto.quantidade, int(produto.em_promocao), produto.desconto, produto.id)
+            (produto.nome, produto.descricao, produto.preco, produto.quantidade, int(produto.em_promocao), produto.desconto, produto.foto, produto.fornecedor_id, produto.id)
         )
         conn.commit()
 

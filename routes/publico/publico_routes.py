@@ -266,6 +266,9 @@ async def processar_cadastro_fornecedor(
             {"request": request, "erro": "Erro ao cadastrar fornecedor."}
         )
 
+    # Cadastro realizado com sucesso - redirecionar para login
+    return RedirectResponse(url="/login?mensagem=Cadastro realizado com sucesso! Faça seu login.", status_code=303)
+
        
     
    
@@ -274,8 +277,11 @@ async def processar_cadastro_fornecedor(
 #--------------LOGIN/LOGOUT-----------------------------
 
 @router.get("/login")
-async def mostrar_login(request: Request):
-    return templates.TemplateResponse("publico/login_cadastro/login.html", {"request": request})
+async def mostrar_login(request: Request, mensagem: str = None):
+    context = {"request": request}
+    if mensagem:
+        context["sucesso"] = mensagem
+    return templates.TemplateResponse("publico/login_cadastro/login.html", context)
 
 @router.post("/login")
 async def processar_login(request: Request, email: str = Form(...), senha: str = Form(...)):
@@ -288,17 +294,18 @@ async def processar_login(request: Request, email: str = Form(...), senha: str =
         return templates.TemplateResponse("publico/login_cadastro/login.html", {"request": request, "erro": "Email ou senha inválidos"}, status_code=status.HTTP_401_UNAUTHORIZED)
 
     # Cria sessão completa
+    perfil_usuario = getattr(usuario, "perfil", getattr(usuario, "tipo_usuario", "cliente"))
     usuario_dict = {
         "id": usuario.id,
         "nome": usuario.nome,
         "email": usuario.email,
-        "perfil": getattr(usuario, "perfil", getattr(usuario, "tipo_usuario", "cliente")),
+        "perfil": perfil_usuario.lower(),  # Normaliza o perfil para minúsculas
         "foto": getattr(usuario, "foto", None)
     }
     request.session["usuario"] = usuario_dict
 
     # Redireciona conforme perfil
-    perfil = usuario_dict["perfil"].lower()
+    perfil = usuario_dict["perfil"]
     if perfil == "admin" or perfil == "administrador":
         return RedirectResponse("/admin", status_code=status.HTTP_303_SEE_OTHER)
     elif perfil == "fornecedor":

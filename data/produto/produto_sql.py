@@ -6,17 +6,19 @@ CREATE TABLE IF NOT EXISTS PRODUTO (
     preco REAL NOT NULL,
     quantidade INTEGER NOT NULL,
     em_promocao INTEGER DEFAULT 0,
-    desconto REAL DEFAULT 0.0
+    desconto REAL DEFAULT 0.0,
+    foto TEXT,
+    fornecedor_id INTEGER
 );
 """
 
 INSERIR_PRODUTO = """
-INSERT INTO PRODUTO (id, nome, descricao, preco, quantidade, em_promocao, desconto)
-VALUES (?, ?, ?, ?, ?, ?, ?);
+INSERT INTO PRODUTO (id, nome, descricao, preco, quantidade, em_promocao, desconto, foto, fornecedor_id)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
 """
 
 OBTER_PRODUTO = """
-SELECT id, nome, descricao, preco, quantidade, em_promocao, desconto
+SELECT id, nome, descricao, preco, quantidade, em_promocao, desconto, foto, fornecedor_id
 FROM PRODUTO
 WHERE id = ?;
 """
@@ -43,7 +45,9 @@ SET nome = ?,
     preco = ?,
     quantidade = ?,
     em_promocao = ?,
-    desconto = ?
+    desconto = ?,
+    foto = ?,
+    fornecedor_id = ?
 WHERE id = ?;
 """
 

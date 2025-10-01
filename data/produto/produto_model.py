@@ -13,3 +13,4 @@ class Produto:
     foto: Optional[str] = None
     em_promocao: bool = False
     desconto: float = 0.0
+    fornecedor_id: Optional[int] = None

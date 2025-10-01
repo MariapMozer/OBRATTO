@@ -120,8 +120,11 @@ def requer_autenticacao(perfis_autorizados: List[str] = None):
                         detail="Você não tem permissão para acessar este recurso"
                     )
             
-            # Adiciona o usuário aos kwargs para fácil acesso na rota
-            kwargs['usuario_logado'] = usuario
+            # Adiciona o usuário aos kwargs apenas se a função aceita esse parâmetro
+            import inspect
+            sig = inspect.signature(func)
+            if 'usuario_logado' in sig.parameters:
+                kwargs['usuario_logado'] = usuario
             
             # Chama a função original
             if asyncio.iscoroutinefunction(func):

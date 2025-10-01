@@ -12,8 +12,8 @@ templates = Jinja2Templates(directory="templates")
 ## Página inicial do fornecedor, exibe lista de produtos cadastrados
 @router.get("/")
 @requer_autenticacao(['fornecedor'])
-async def home_adm(request: Request):
-    produtos = produto_repo.obter_produto_por_pagina(limit=10, offset=0)
+async def home_adm(request: Request, usuario_logado: dict = None):
+    produtos = produto_repo.obter_produtos_por_fornecedor(usuario_logado['id'], limit=10, offset=0)
     return templates.TemplateResponse(
         "fornecedor/home_fornecedor.html", 
         {"request": request, 
@@ -36,8 +36,8 @@ async def buscar_produto(request: Request, id: int = None, nome: str = None):
 
 @router.get("/listar")
 @requer_autenticacao(['fornecedor'])
-async def listar_produtos(request: Request):
-    produtos = produto_repo.obter_produto_por_pagina(limit=10, offset=0)
+async def listar_produtos(request: Request, usuario_logado: dict = None):
+    produtos = produto_repo.obter_produtos_por_fornecedor(usuario_logado['id'], limit=10, offset=0)
     response = templates.TemplateResponse(
         "fornecedor/produtos/produtos.html", 
         {"request": request, 
@@ -60,42 +60,89 @@ async def cadastrar_produto(
     descricao: str = Form(...),
     preco: float = Form(...),
     quantidade: int = Form(...),
-    foto: UploadFile = File(...)
+    foto: UploadFile = File(...),
+    usuario_logado: dict = None
 ):
+    print(f"DEBUG: Iniciando cadastro de produto")
+    print(f"DEBUG: Nome: {nome}, Preço: {preco}, Quantidade: {quantidade}")
+    print(f"DEBUG: Usuario logado ID: {usuario_logado['id']}")
+    
     import os
-    tipos_permitidos = ["image/jpeg", "image/png", "image/jpg"]
+    tipos_permitidos = ["image/jpeg", "image/png", "image/jpg", "image/webp"]
     pasta_fotos = "static/uploads/produtos_fornecedor"
     os.makedirs(pasta_fotos, exist_ok=True)
     caminho_foto = None
     if foto and foto.filename:
+        print(f"DEBUG: Processando foto: {foto.filename}")
+        print(f"DEBUG: Content type: {foto.content_type}")
         if foto.content_type not in tipos_permitidos:
+            print(f"DEBUG: Tipo de arquivo inválido: {foto.content_type}")
             return templates.TemplateResponse(
                 "fornecedor/produtos/cadastrar_produtos.html",
                 {"request": request, "erro": "Tipo de arquivo de foto inválido."}
             )
+        print(f"DEBUG: Tipo de arquivo válido, processando...")
         import secrets
         extensao = foto.filename.split(".")[-1]
+        print(f"DEBUG: Extensão extraída: {extensao}")
         nome_arquivo = f"{nome.replace(' ', '_')}_{secrets.token_hex(8)}.{extensao}"
+        print(f"DEBUG: Nome do arquivo: {nome_arquivo}")
         caminho_arquivo = os.path.join(pasta_fotos, nome_arquivo)
-        conteudo = await foto.read()
-        with open(caminho_arquivo, "wb") as f:
-            f.write(conteudo)
-        caminho_foto = f"/static/uploads/produtos_fornecedor/{nome_arquivo}"
+        print(f"DEBUG: Caminho completo: {caminho_arquivo}")
+        
+        try:
+            conteudo = await foto.read()
+            print(f"DEBUG: Conteúdo lido, tamanho: {len(conteudo)} bytes")
+            with open(caminho_arquivo, "wb") as f:
+                f.write(conteudo)
+            print(f"DEBUG: Arquivo salvo com sucesso")
+            caminho_foto = f"/static/uploads/produtos_fornecedor/{nome_arquivo}"
+            print(f"DEBUG: Foto salva em: {caminho_foto}")
+        except Exception as e:
+            print(f"DEBUG: Erro ao salvar foto: {e}")
+            import traceback
+            traceback.print_exc()
+            return templates.TemplateResponse(
+                "fornecedor/produtos/cadastrar_produtos.html",
+                {"request": request, "erro": f"Erro ao salvar foto: {e}"}
+            )
+    
+    print(f"DEBUG: Processamento de foto concluído. Caminho: {caminho_foto}")
+    print(f"DEBUG: Criando objeto Produto...")
+    
     produto = Produto(
         id=None, 
         nome=nome, 
         descricao=descricao, 
         preco=preco, 
         quantidade=quantidade, 
-        foto=caminho_foto
+        foto=caminho_foto,
+        fornecedor_id=usuario_logado['id']
     )
-    produto_repo.inserir_produto(produto)
-    produtos = produto_repo.obter_produto_por_pagina(limit=10, offset=0)
+    print(f"DEBUG: Produto criado: {produto}")
+    
+    try:
+        print(f"DEBUG: Chamando produto_repo.inserir_produto...")
+        produto_repo.inserir_produto(produto)
+        print(f"DEBUG: Produto inserido com sucesso")
+    except Exception as e:
+        print(f"DEBUG: Erro ao inserir produto: {e}")
+        import traceback
+        traceback.print_exc()
+        return templates.TemplateResponse(
+            "fornecedor/produtos/cadastrar_produtos.html",
+            {"request": request, "erro": f"Erro ao cadastrar produto: {e}"}
+        )
+    
+    print(f"DEBUG: Buscando produtos do fornecedor...")
+    produtos = produto_repo.obter_produtos_por_fornecedor(usuario_logado['id'], limit=10, offset=0)
+    print(f"DEBUG: Encontrados {len(produtos)} produtos")
     response = templates.TemplateResponse(
         "fornecedor/produtos/produtos.html", 
         {"request": request, 
          "produtos": produtos, 
          "mensagem": "Produto inserido com sucesso"})
+    print(f"DEBUG: Retornando resposta...")
     return response
 
 @router.get("/atualizar")
@@ -108,7 +155,7 @@ async def mostrar_formulario_atualizar_produto(request: Request, id: int, usuari
             {"request": request, 
              "produto": produto})
     else:
-        produtos = produto_repo.obter_produto_por_pagina(limit=10, offset=0)
+        produtos = produto_repo.obter_produtos_por_fornecedor(usuario_logado['id'], limit=10, offset=0)
         response = templates.TemplateResponse(
             "fornecedor/produtos/produtos.html", 
             {"request": request, 
@@ -130,7 +177,7 @@ async def atualizar_produto(
 ):
     produto = produto_repo.obter_produto_por_id(id)
     if not produto or produto.fornecedor_id != usuario_logado['id']:
-        produtos = produto_repo.obter_produto_por_pagina(limit=10, offset=0)
+        produtos = produto_repo.obter_produtos_por_fornecedor(usuario_logado['id'], limit=10, offset=0)
         return templates.TemplateResponse(
             "fornecedor/produtos/produtos.html", 
             {"request": request, 
@@ -145,22 +192,27 @@ async def atualizar_produto(
                 os.remove(caminho_foto)
             except Exception:
                 pass
-        pasta_fotos = "uploads/produtos/"
+        pasta_fotos = "static/uploads/produtos_fornecedor"
         os.makedirs(pasta_fotos, exist_ok=True)
-        nome_arquivo = f"{nome.replace(' ', '_')}_{foto.filename}"
-        caminho_foto = os.path.join(pasta_fotos, nome_arquivo)
-        with open(caminho_foto, "wb") as buffer:
-            buffer.write(await foto.read())
+        import secrets
+        extensao = foto.filename.split(".")[-1]
+        nome_arquivo = f"{nome.replace(' ', '_')}_{secrets.token_hex(8)}.{extensao}"
+        caminho_arquivo = os.path.join(pasta_fotos, nome_arquivo)
+        conteudo = await foto.read()
+        with open(caminho_arquivo, "wb") as f:
+            f.write(conteudo)
+        caminho_foto = f"/static/uploads/produtos_fornecedor/{nome_arquivo}"
     produto_atualizado = Produto(
         id=id,
         nome=nome,
         descricao=descricao,
         preco=preco,
         quantidade=quantidade,
-        foto=caminho_foto
+        foto=caminho_foto,
+        fornecedor_id=usuario_logado['id']
     )
     produto_repo.atualizar_produto(produto_atualizado)
-    produtos = produto_repo.obter_produto_por_pagina(limit=10, offset=0)
+    produtos = produto_repo.obter_produtos_por_fornecedor(usuario_logado['id'], limit=10, offset=0)
     response = templates.TemplateResponse(
         "fornecedor/produtos/produtos.html", 
         {"request": request, 
@@ -174,14 +226,14 @@ async def excluir_produto_get(request: Request, id: int, usuario_logado: dict = 
     produto = produto_repo.obter_produto_por_id(id)
     if produto and produto.fornecedor_id == usuario_logado['id']:
         produto_repo.deletar_produto(id)
-        produtos = produto_repo.obter_produto_por_pagina(limit=10, offset=0)
+        produtos = produto_repo.obter_produtos_por_fornecedor(usuario_logado['id'], limit=10, offset=0)
         response = templates.TemplateResponse(
             "fornecedor/produtos/produtos.html", 
             {"request": request, 
             "produtos": produtos, 
             "mensagem": "Produto excluído com sucesso"})
     else:
-        produtos = produto_repo.obter_produto_por_pagina(limit=10, offset=0)
+        produtos = produto_repo.obter_produtos_por_fornecedor(usuario_logado['id'], limit=10, offset=0)
         response = templates.TemplateResponse(
             "fornecedor/produtos/produtos.html", 
             {"request": request, 
@@ -195,14 +247,14 @@ async def excluir_produto(request: Request, id: int, usuario_logado: dict = None
     produto = produto_repo.obter_produto_por_id(id)
     if produto and produto.fornecedor_id == usuario_logado['id']:
         produto_repo.deletar_produto(id)
-        produtos = produto_repo.obter_produto_por_pagina(limit=10, offset=0)
+        produtos = produto_repo.obter_produtos_por_fornecedor(usuario_logado['id'], limit=10, offset=0)
         response = templates.TemplateResponse(
             "fornecedor/produtos/produtos.html", 
             {"request": request, 
             "produtos": produtos, 
             "mensagem": "Produto excluído com sucesso"})
     else:
-        produtos = produto_repo.obter_produto_por_pagina(limit=10, offset=0)
+        produtos = produto_repo.obter_produtos_por_fornecedor(usuario_logado['id'], limit=10, offset=0)
         response = templates.TemplateResponse(
             "fornecedor/produtos/produtos.html", 
             {"request": request, 
@@ -220,7 +272,7 @@ async def confi_exclusao_produto(request: Request, id: int,  usuario_logado: dic
             {"request": request, 
              "produto": produto})
     else:
-        produtos = produto_repo.obter_produto_por_pagina(limit=10, offset=0)
+        produtos = produto_repo.obter_produtos_por_fornecedor(usuario_logado['id'], limit=10, offset=0)
         return templates.TemplateResponse(
             "fornecedor/produtos/produtos.html", 
             {"request": request, 
