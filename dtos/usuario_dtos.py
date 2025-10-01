@@ -66,12 +66,12 @@ class CriarUsuarioDTO(BaseDTO):
     def validar_documento(cls, v: str) -> str:
         if len(v) <= 14:
             validador = cls.validar_campo_wrapper(
-            lambda valor, campo: validar_cpf(valor),
+            lambda valor, campo: validar_cpf_cnpj(valor),
             "CPF"
         )
         else:
             validador = cls.validar_campo_wrapper(
-            lambda valor, campo: validar_cnpj(valor),
+            lambda valor, campo: validar_cpf_cnpj(valor),
             "CNPJ"
         )
         return validador(v)
@@ -85,14 +85,15 @@ class CriarUsuarioDTO(BaseDTO):
     )
         return validador(v)
 
-    # @field_validator('cep')
-    # @classmethod
-    # def validar_cep_campo(cls, v: str) -> str:
-    #     validador = cls.validar_campo_wrapper(
-    #     lambda valor, campo: validar_cep(valor),
-    #     "CEP"
-    # )
-    #     return validador(v)
+
+    @field_validator('cep')
+    @classmethod
+    def validar_cep_campo(cls, v: str) -> str:
+        validador = cls.validar_campo_wrapper(
+        lambda valor, campo: validar_cep(valor),
+        "CEP"
+    )
+        return validador(v)
 
     @field_validator('logradouro')
     @classmethod
