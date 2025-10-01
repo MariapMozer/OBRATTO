@@ -39,13 +39,14 @@ class PaymentService:
             if new_card_data.get("salvar_cartao") == "true":
                 try:
                     mes_vencimento, ano_vencimento = new_card_data["validade"].split("/")
+                    numero_cartao = new_card_data["numero_cartao"].replace(" ", "")
                     self.cartao_repo.criar_cartao_from_form(
                         id_prestador=prestador_id,
-                        numero_cartao=new_card_data["numero_cartao"].replace(" ", ""),
+                        numero_cartao=numero_cartao,
                         nome_titular=new_card_data["nome_cartao"],
                         mes_vencimento=mes_vencimento,
                         ano_vencimento=ano_vencimento,
-                        apelido=f"Cartão •••• {new_card_data["numero_cartao"].replace(" ", "")[-4:]}",
+                        apelido=f"Cartão •••• {numero_cartao[-4:]}",
                         principal=False
                     )
                 except Exception as e:

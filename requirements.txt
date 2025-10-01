@@ -5,6 +5,7 @@ Babel
 python-multipart
 itsdangerous
 mercadopago
+Pillow
 
 
 
