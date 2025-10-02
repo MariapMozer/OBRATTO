@@ -7,7 +7,7 @@ from datetime import date
 from .base_dto import BaseDTO
 from .usuario_dto import AtualizarUsuarioDTO, CriarUsuarioDTO
 
-class CriarPrestador(CriarUsuarioDTO):
+class CriarPrestadorDTO(CriarUsuarioDTO):
     area_atuacao: Optional[str] = Field(None)
     razao_social: Optional[str] = Field(None)
     descricao_servicos: Optional[str] = Field(None)
@@ -63,8 +63,8 @@ class AtualizarPrestadorDTO(AtualizarUsuarioDTO):
         return cls.validar_campo_wrapper(validar_texto_opcional, "Descrição dos serviços", max_chars=500)(v)
 
     
-CriarPrestador.model_config.update({
+CriarPrestadorDTO.model_config.update({
     "json_schema_extra": {
-        "example": CriarPrestador.criar_exemplo_prestador_json()
+        "example": CriarPrestadorDTO.criar_exemplo_prestador_json()
     }
 })

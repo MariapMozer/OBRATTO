@@ -7,7 +7,7 @@ from datetime import date
 from .base_dto import BaseDTO
 from .usuario_dto import AtualizarUsuarioDTO, CriarUsuarioDTO
 
-class CriarCliente(CriarUsuarioDTO):
+class CriarClienteDTO(CriarUsuarioDTO):
     genero: Optional[str] = Field(None, description="Gênero do cliente")
     data_nascimento: Optional[date] = Field(None, description="Data de nascimento")
 
@@ -46,8 +46,8 @@ class AtualizarClienteDTO(AtualizarUsuarioDTO):
     def validar_data_nascimento(cls, v: Optional[date]) -> Optional[date]:
         return cls.validar_campo_wrapper(validar_data_nascimento, "Data de nascimento")(v)
     
-CriarCliente.model_config.update({
+CriarClienteDTO.model_config.update({
     "json_schema_extra": {
-        "example": CriarCliente.criar_exemplo_cliente_json()
+        "example": CriarClienteDTO.criar_exemplo_cliente_json()
     }
 })
