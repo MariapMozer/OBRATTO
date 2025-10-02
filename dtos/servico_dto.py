@@ -1,3 +1,4 @@
+from datetime import datetime
 from pydantic import Field, field_validator
 from typing import Optional
 from .base_dto import BaseDTO
@@ -5,10 +6,14 @@ from utils.validacoes_dto import validar_texto_opcional
 
 
 class CriarServicoDTO(BaseDTO):
+    id_servico: int = Field(..., description="ID do serviço")
+    id_prestador: int = Field(..., description="ID do prestador que oferece o serviço")
     titulo: str = Field(..., min_length=3, max_length=100)
     descricao: str = Field(..., min_length=10, max_length=500)
     categoria: str = Field(..., min_length=3, max_length=50)
     valor_base: float = Field(..., gt=0)
+    nome_prestador: Optional[str] = Field(None, description="Nome do prestador")
+
 
     @field_validator('titulo')
     @classmethod
