@@ -4,8 +4,6 @@ from .base_dto import BaseDTO
 from utils.validacoes_dto import *
 from enum import Enum
 from datetime import date
-from .base_dto import BaseDTO
-from .usuario_dto import CriarUsuarioDTO, CriarPrestador, CriarCliente, CriarFornecedor
 
 
 class TipoUsuarioEnum(str, Enum):
@@ -23,7 +21,7 @@ class CriarUsuarioDTO(BaseDTO):
 
     nome: str = Field(..., min_length=2, max_length=100)
     email: EmailStr = Field(...)
-    senha: str = Field(..., min_length=6, description="Senha do usuário")
+    senha: str = Field(..., min_length=8, description="Senha do usuário")
     cpf_cnpj: str = Field(..., description="CPF ou CNPJ do usuário")
     telefone: str = Field(..., min_length=10)
     cep: str = Field(..., description="CEP")
@@ -59,7 +57,7 @@ class CriarUsuarioDTO(BaseDTO):
     @classmethod
     def validar_senha(cls, v: str) -> str:
         validador = cls.validar_campo_wrapper(
-        lambda valor, campo: validar_texto_obrigatorio(valor, campo, min_chars=6),
+        lambda valor, campo: validar_texto_obrigatorio(valor, campo, min_chars=8),
         "Senha"
     )
         return validador(v)
@@ -182,7 +180,7 @@ class AtualizarUsuarioDTO(BaseDTO):
 
     nome: Optional[str] = Field(None, min_length=2, max_length=100, description="Nome completo")
     email: Optional[EmailStr] = Field(None, description="E-mail do usuário")
-    senha: Optional[str] = Field(None, min_length=6, description="Senha do usuário")
+    senha: Optional[str] = Field(None, min_length=8, description="Senha do usuário")
     cpf_cnpj: Optional[str] = Field(None, description="CPF ou CNPJ do usuário")
     telefone: Optional[str] = Field(None, min_length=10, description="Telefone")
     cep: Optional[str] = Field(None, description="CEP")
@@ -221,7 +219,7 @@ class AtualizarUsuarioDTO(BaseDTO):
         if not v:
             return v
         return cls.validar_campo_wrapper(
-            lambda valor, campo: validar_texto_obrigatorio(valor, campo, min_chars=6),
+            lambda valor, campo: validar_texto_obrigatorio(valor, campo, min_chars=8),
             "Senha"
         )(v)
 
@@ -297,5 +295,3 @@ CriarUsuarioDTO.model_config.update({
         "example": CriarUsuarioDTO.criar_exemplo_usuario_json()
     }
 })
-
-

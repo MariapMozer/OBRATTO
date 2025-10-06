@@ -7,11 +7,11 @@ from datetime import date
 from .base_dto import BaseDTO
 from .usuario_dto import AtualizarUsuarioDTO, CriarUsuarioDTO
 
-class CriarFornecedor(CriarUsuarioDTO):
+class CriarFornecedorDTO(CriarUsuarioDTO):
     razao_social: Optional[str] = Field(None, description="Razão Social da empresa")
     selo_confianca: bool = Field(default=False)
 
-    field_validator('razao_social')
+    @field_validator('razao_social')
     @classmethod
     def validar_razao_social(cls, v: Optional[str]) -> Optional[str]:
         return cls.validar_campo_wrapper(validar_texto_opcional, "Razão Social", max_chars=100)(v)
@@ -36,8 +36,8 @@ class AtualizarFornecedorDTO(AtualizarUsuarioDTO):
     def validar_razao_social(cls, v: Optional[str]) -> Optional[str]:
         return cls.validar_campo_wrapper(validar_texto_opcional, "Razão Social", max_chars=100)(v)
     
-CriarFornecedor.model_config.update({
+CriarFornecedorDTO.model_config.update({
     "json_schema_extra": {
-        "example": CriarFornecedor.criar_exemplo_fornecedor_json()
+        "example": CriarFornecedorDTO.criar_exemplo_fornecedor_json()
     }
 })

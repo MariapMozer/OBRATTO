@@ -1,19 +1,30 @@
 # Base
 from .base_dto import BaseDTO
 
-# DTOs de criação
-from .usuario_dtos import (
+# DTOs de Usuário
+from .usuario_dto import (
     CriarUsuarioDTO,
-    CriarPrestador,
-    CriarCliente,
-    CriarFornecedor
+    AtualizarUsuarioDTO
 )
 
-# DTOs de atualização
-from .usuario_dtos import (
-    AtualizarUsuarioDTO,
-    AtualizarPrestadorDTO,
-    AtualizarClienteDTO,
+# DTOs de Autenticação
+from .login_dto import LoginDTO
+
+# DTOs de Cliente
+from .cliente_dto import (
+    CriarClienteDTO,
+    AtualizarClienteDTO
+)
+
+# DTOs de Prestador  
+from .prestador_dto import (
+    CriarPrestadorDTO,
+    AtualizarPrestadorDTO
+)
+
+# DTOs de Fornecedor
+from .fornecedor_dto import (
+    CriarFornecedorDTO,
     AtualizarFornecedorDTO
 )
 
@@ -21,15 +32,20 @@ __all__ = [
     # Base
     'BaseDTO',
 
-    # Criação
+    # Usuário
     'CriarUsuarioDTO',
-    'CriarPrestador',
-    'CriarCliente',
-    'CriarFornecedor',
-
-    # Atualização
     'AtualizarUsuarioDTO',
-    'AtualizarPrestadorDTO',
+    'LoginDTO',
+
+    # Cliente
+    'CriarClienteDTO',
     'AtualizarClienteDTO',
+
+    # Prestador
+    'CriarPrestadorDTO',
+    'AtualizarPrestadorDTO',
+
+    # Fornecedor
+    'CriarFornecedorDTO',
     'AtualizarFornecedorDTO',
 ]
