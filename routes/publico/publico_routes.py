@@ -1,8 +1,10 @@
 from datetime import datetime
 from typing import Optional
+from venv import logger
 from fastapi import APIRouter, Form, Request, status, UploadFile, File
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
+from pydantic_core import ValidationError
 from data.cliente import cliente_repo
 from data.cliente.cliente_model import Cliente
 from data.fornecedor import fornecedor_repo
@@ -14,6 +16,7 @@ from data.usuario import usuario_repo
 from data.usuario.usuario_model import Usuario
 from data.mensagem.mensagem_model import Mensagem
 from data.mensagem import mensagem_repo
+from dtos.login_dto import LoginDTO
 from utils.auth_decorator import obter_usuario_logado
 # from utils.security import verificar_autenticacao
 import os
@@ -284,39 +287,77 @@ async def mostrar_login(request: Request, mensagem: str = None):
     return templates.TemplateResponse("publico/login_cadastro/login.html", context)
 
 @router.post("/login")
-async def processar_login(request: Request, email: str = Form(...), senha: str = Form(...)):
-    if not email or not senha:
-        return templates.TemplateResponse("publico/login_cadastro/login.html", {"request": request, "erro": "Preencha todos os campos."}, status_code=status.HTTP_400_BAD_REQUEST)
+async def processar_login(
+    request: Request,
+    email: str = Form(), 
+    senha: str = Form()):
 
-    usuario = usuario_repo.obter_usuario_por_email(email)
-    print("DEBUG usuario:", usuario)
-    if not usuario or not verificar_senha(senha, usuario.senha):
-        return templates.TemplateResponse("publico/login_cadastro/login.html", {"request": request, "erro": "Email ou senha inválidos"}, status_code=status.HTTP_401_UNAUTHORIZED)
+    dados_formulario = {"email": email}
+    try:
+        login_dto = LoginDTO(email=email, senha=senha)
 
-    # Cria sessão completa
-    perfil_usuario = getattr(usuario, "perfil", getattr(usuario, "tipo_usuario", "cliente"))
-    usuario_dict = {
-        "id": usuario.id,
-        "nome": usuario.nome,
-        "email": usuario.email,
-        "perfil": perfil_usuario.lower(),  # Normaliza o perfil para minúsculas
-        "foto": getattr(usuario, "foto", None)
-    }
-    request.session["usuario"] = usuario_dict
+        if not email or not senha:
+            return templates.TemplateResponse("publico/login_cadastro/login.html", 
+                {"request": request, "erro": "Preencha todos os campos."}, 
+                status_code=status.HTTP_400_BAD_REQUEST)
 
-    # Redireciona conforme perfil
-    perfil = usuario_dict["perfil"]
-    if perfil == "admin" or perfil == "administrador":
-        return RedirectResponse("/admin", status_code=status.HTTP_303_SEE_OTHER)
-    elif perfil == "fornecedor":
-        return RedirectResponse("/fornecedor", status_code=status.HTTP_303_SEE_OTHER)
-    elif perfil == "cliente":
-        return RedirectResponse("/cliente", status_code=status.HTTP_303_SEE_OTHER)
-    elif perfil == "prestador":
-        return RedirectResponse("/prestador", status_code=status.HTTP_303_SEE_OTHER)
-    else:
-        return RedirectResponse("/", status_code=status.HTTP_303_SEE_OTHER)
-    
+        usuario = usuario_repo.obter_usuario_por_email(login_dto.email)
+        print("DEBUG usuario:", usuario)
+        if not usuario or not verificar_senha(login_dto.senha, usuario.senha):
+            return templates.TemplateResponse("publico/login_cadastro/login.html", 
+                {"request": request, "erro": "Email ou senha inválidos"}, status_code=status.HTTP_401_UNAUTHORIZED)
+
+        # Cria sessão completa
+        perfil_usuario = getattr(usuario, "perfil", getattr(usuario, "tipo_usuario", "cliente"))
+        usuario_dict = {
+            "id": usuario.id,
+            "nome": usuario.nome,
+            "email": usuario.email,
+            "perfil": perfil_usuario.lower(),  # Normaliza o perfil para minúsculas
+            "foto": getattr(usuario, "foto", None)
+        }
+        request.session["usuario"] = usuario_dict
+
+        # Redireciona conforme perfil
+        perfil = usuario_dict["perfil"]
+        if perfil == "admin" or perfil == "administrador":
+            return RedirectResponse("/admin", status_code=status.HTTP_303_SEE_OTHER)
+        elif perfil == "fornecedor":
+            return RedirectResponse("/fornecedor", status_code=status.HTTP_303_SEE_OTHER)
+        elif perfil == "cliente":
+            return RedirectResponse("/cliente", status_code=status.HTTP_303_SEE_OTHER)
+        elif perfil == "prestador":
+            return RedirectResponse("/prestador", status_code=status.HTTP_303_SEE_OTHER)
+        else:
+            return RedirectResponse("/", status_code=status.HTTP_303_SEE_OTHER)
+        
+    except ValidationError as e:
+        # Extrair mensagens de erro do Pydantic
+        erros = []
+        for erro in e.errors():
+            campo = erro['loc'][0] if erro['loc'] else 'campo'
+            mensagem = erro['msg']
+            erros.append(f"{campo.capitalize()}: {mensagem}")
+
+        erro_msg = " | ".join(erros)
+        logger.warning(f"Erro de validação no cadastro: {erro_msg}")
+
+        # Retornar template com dados preservados e erro
+        return templates.TemplateResponse("publico/login_cadastro/login.html", {
+            "request": request,
+            "erro": erro_msg,
+            "dados": dados_formulario  # Preservar dados digitados
+        })
+
+    except Exception as e:
+        logger.error(f"Erro ao processar cadastro: {e}")
+
+        return templates.TemplateResponse("publico/login_cadastro/login.html", {
+            "request": request,
+            "erro": "Erro ao processar cadastro. Tente novamente.",
+            "dados": dados_formulario
+        })
+        
 
 @router.get("/logout")
 async def logout(request: Request):
