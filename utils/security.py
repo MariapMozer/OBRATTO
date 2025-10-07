@@ -24,7 +24,7 @@ def criar_hash_senha(senha: str) -> str:
         Bcrypt tem limite de 72 bytes. Senhas mais longas são truncadas automaticamente.
     """
     # Bcrypt tem limite de 72 bytes - truncar se necessário
-    senha_truncada = senha.encode('utf-8')[:72].decode('utf-8', errors='ignore')
+    senha_truncada = senha.encode('utf-8')[:400].decode('utf-8', errors='ignore')
     return pwd_context.hash(senha_truncada)
 
 
