@@ -1,3 +1,4 @@
+import os
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from fastapi.staticfiles import StaticFiles
@@ -34,6 +35,16 @@ app = FastAPI(
 app.mount("/static", StaticFiles(directory="static"), name="static")
 app.add_middleware(SessionMiddleware, secret_key="sua_chave_secreta")
 
+
+# Configurar middleware de sessão
+SECRET_KEY = os.getenv("SECRET_KEY", "sua-chave-secreta-aqui")
+app.add_middleware(
+    SessionMiddleware,
+    secret_key=SECRET_KEY,
+    max_age=3600,  # 1 hora
+    same_site="lax",
+    https_only=False  # True em produção com HTTPS
+)
 
 # PÚBLICO
 app.include_router(publico_routes.router)
