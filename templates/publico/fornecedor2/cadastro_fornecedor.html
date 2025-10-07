@@ -77,7 +77,9 @@
                         <div class="form-group">
                             <label for="nomeCompleto" class="form-label">Nome Completo *</label>
                             <input type="text" class="form-control" id="nome" name="nome"
-                                placeholder="Digite seu nome completo" required>
+                                placeholder="Digite seu nome completo" 
+                                value="{{ dados.nome if dados else '' }}"
+                                required>
                             <div class="invalid-feedback">
                                 Por favor, digite seu nome completo.
                             </div>
@@ -87,7 +89,9 @@
                         <div class="form-group">
                             <label for="razaoSocial" class="form-label">Razão Social *</label>
                             <input type="text" class="form-control" id="razao_social" name="razao_social"
-                                placeholder="Digite sua razão social" required>
+                                placeholder="Digite sua razão social" 
+                                value="{{ dados.razao_social if dados else '' }}"
+                                required>
                             <div class="invalid-feedback">
                                 Por favor, digite um nome.
                             </div>
@@ -98,7 +102,9 @@
                             <div class="form-group">
                                 <label for="documento" class="form-label">CPF ou CNPJ *</label>
                                 <input type="text" class="form-control" id="cpf_cnpj" name="cpf_cnpj"
-                                    placeholder="Digite seu CPF ou CNPJ" required>
+                                    placeholder="Digite seu CPF ou CNPJ" 
+                                    value="{{ dados.cpf_cnpj if dados else '' }}"
+                                    required>
                                 <div class="invalid-feedback">
                                     Por favor, digite um CPF ou CNPJ válido.
                                 </div>
@@ -108,7 +114,9 @@
                             <div class="form-group">
                                 <label for="telefone" class="form-label">Telefone *</label>
                                 <input type="tel" class="form-control" id="telefone" name="telefone"
-                                    placeholder="(00) 00000-0000" maxlength="15" required>
+                                    placeholder="(00) 00000-0000" maxlength="15" 
+                                    value="{{ dados.telefone if dados else '' }}"
+                                    required>
                                 <div class="invalid-feedback">
                                     Por favor, digite um telefone válido.
                                 </div>
@@ -134,61 +142,73 @@
                         </h3>
 
 
-                        <!-- Linha 1: Estado e CEP-->
+                        <!-- Linha 1: Estado e Cidade-->
                         <div class="form-row two-cols">
                             <div class="form-group">
                                 <label for="estado" class="form-label">Estado *</label>
                                 <select class="form-select" id="estado" name="estado" required>
                                     <option value="">Selecione o estado</option>
-                                    <option value="AC">Acre</option>
-                                    <option value="AL">Alagoas</option>
-                                    <option value="AP">Amapá</option>
-                                    <option value="AM">Amazonas</option>
-                                    <option value="BA">Bahia</option>
-                                    <option value="CE">Ceará</option>
-                                    <option value="DF">Distrito Federal</option>
-                                    <option value="ES">Espírito Santo</option>
-                                    <option value="GO">Goiás</option>
-                                    <option value="MA">Maranhão</option>
-                                    <option value="MT">Mato Grosso</option>
-                                    <option value="MS">Mato Grosso do Sul</option>
-                                    <option value="MG">Minas Gerais</option>
-                                    <option value="PA">Pará</option>
-                                    <option value="PB">Paraíba</option>
-                                    <option value="PR">Paraná</option>
-                                    <option value="PE">Pernambuco</option>
-                                    <option value="PI">Piauí</option>
-                                    <option value="RJ">Rio de Janeiro</option>
-                                    <option value="RN">Rio Grande do Norte</option>
-                                    <option value="RS">Rio Grande do Sul</option>
-                                    <option value="RO">Rondônia</option>
-                                    <option value="RR">Roraima</option>
-                                    <option value="SC">Santa Catarina</option>
-                                    <option value="SP">São Paulo</option>
-                                    <option value="SE">Sergipe</option>
-                                    <option value="TO">Tocantins</option>
+                                    <option value="AC" {% if dados and dados.estado == 'AC' %}selected{% endif %}>Acre</option>
+                                    <option value="AL" {% if dados and dados.estado == 'AL' %}selected{% endif %}>Alagoas</option>
+                                    <option value="AP" {% if dados and dados.estado == 'AP' %}selected{% endif %}>Amapá</option>
+                                    <option value="AM" {% if dados and dados.estado == 'AM' %}selected{% endif %}>Amazonas</option>
+                                    <option value="BA" {% if dados and dados.estado == 'BA' %}selected{% endif %}>Bahia</option>
+                                    <option value="CE" {% if dados and dados.estado == 'CE' %}selected{% endif %}>Ceará</option>
+                                    <option value="DF" {% if dados and dados.estado == 'DF' %}selected{% endif %}>Distrito Federal</option>
+                                    <option value="ES" {% if dados and dados.estado == 'ES' %}selected{% endif %}>Espírito Santo</option>
+                                    <option value="GO" {% if dados and dados.estado == 'GO' %}selected{% endif %}>Goiás</option>
+                                    <option value="MA" {% if dados and dados.estado == 'MA' %}selected{% endif %}>Maranhão</option>
+                                    <option value="MT" {% if dados and dados.estado == 'MT' %}selected{% endif %}>Mato Grosso</option>
+                                    <option value="MS" {% if dados and dados.estado == 'MS' %}selected{% endif %}>Mato Grosso do Sul</option>
+                                    <option value="MG" {% if dados and dados.estado == 'MG' %}selected{% endif %}>Minas Gerais</option>
+                                    <option value="PA" {% if dados and dados.estado == 'PA' %}selected{% endif %}>Pará</option>
+                                    <option value="PB" {% if dados and dados.estado == 'PB' %}selected{% endif %}>Paraíba</option>
+                                    <option value="PR" {% if dados and dados.estado == 'PR' %}selected{% endif %}>Paraná</option>
+                                    <option value="PE" {% if dados and dados.estado == 'PE' %}selected{% endif %}>Pernambuco</option>
+                                    <option value="PI" {% if dados and dados.estado == 'PI' %}selected{% endif %}>Piauí</option>
+                                    <option value="RJ" {% if dados and dados.estado == 'RJ' %}selected{% endif %}>Rio de Janeiro</option>
+                                    <option value="RN" {% if dados and dados.estado == 'RN' %}selected{% endif %}>Rio Grande do Norte</option>
+                                    <option value="RS" {% if dados and dados.estado == 'RS' %}selected{% endif %}>Rio Grande do Sul</option>
+                                    <option value="RO" {% if dados and dados.estado == 'RO' %}selected{% endif %}>Rondônia</option>
+                                    <option value="RR" {% if dados and dados.estado == 'RR' %}selected{% endif %}>Roraima</option>
+                                    <option value="SC" {% if dados and dados.estado == 'SC' %}selected{% endif %}>Santa Catarina</option>
+                                    <option value="SP" {% if dados and dados.estado == 'SP' %}selected{% endif %}>São Paulo</option>
+                                    <option value="SE" {% if dados and dados.estado == 'SE' %}selected{% endif %}>Sergipe</option>
+                                    <option value="TO" {% if dados and dados.estado == 'TO' %}selected{% endif %}>Tocantins</option>
                                 </select>
                                 <div class="invalid-feedback">
                                     Por favor, selecione um estado.
                                 </div>
                             </div>
 
-
                             <div class="form-group">
-                                <label for="cep" class="form-label">CEP *</label>
-                                <input type="text" class="form-control" id="cep" name="cep" placeholder="Digite seu CEP"
+                                <label for="cidade" class="form-label">Cidade *</label>
+                                <input type="text" class="form-control" id="cidade" name="cidade"
+                                    placeholder="Digite sua cidade" 
+                                    value="{{ dados.cidade if dados else '' }}"
                                     required>
                                 <div class="invalid-feedback">
-                                    Por favor, digite seu CEP.
+                                    Por favor, digite sua cidade.
                                 </div>
                             </div>
                         </div>
 
+                        <!-- Linha 2: CEP -->
+                        <div class="form-group">
+                            <label for="cep" class="form-label">CEP *</label>
+                            <input type="text" class="form-control" id="cep" name="cep" placeholder="Digite seu CEP"
+                                value="{{ dados.cep if dados else '' }}"
+                                required>
+                            <div class="invalid-feedback">
+                                Por favor, digite seu CEP.
+                            </div>
+                        </div>
 
-                        <!-- Linha 2: Rua -->
+                        <!-- Linha 3: Rua -->
                         <div class="form-group">
                             <label for="rua" class="form-label">Rua </label>
-                            <input type="text" class="form-control" id="rua" name="rua" placeholder="Digite sua rua">
+                            <input type="text" class="form-control" id="rua" name="rua" placeholder="Digite sua rua"
+                                value="{{ dados.rua if dados else '' }}">
                         </div>
 
 
@@ -196,7 +216,9 @@
                         <div class="form-group">
                             <label for="bairro" class="form-label">Bairro *</label>
                             <input type="text" class="form-control" id="bairro" name="bairro"
-                                placeholder="Digite seu bairro" required>
+                                placeholder="Digite seu bairro" 
+                                value="{{ dados.bairro if dados else '' }}"
+                                required>
                             <div class="invalid-feedback">
                                 Por favor, digite seu bairro.
                             </div>
@@ -208,14 +230,17 @@
                             <div class="form-group">
                                 <label for="numero" class="form-label">Número </label>
                                 <input type="text" class="form-control" id="numero" name="numero"
-                                    placeholder="Digite o número">
+                                    placeholder="Digite o número"
+                                    value="{{ dados.numero if dados else '' }}">
                             </div>
 
 
                             <div class="form-group">
                                 <label for="complemento" class="form-label">Complemento *</label>
                                 <input type="text" class="form-control" id="complemento" name="complemento"
-                                    placeholder="Digite o complemento" required>
+                                    placeholder="Digite o complemento" 
+                                    value="{{ dados.complemento if dados else '' }}"
+                                    required>
                                 <div class="invalid-feedback">
                                     Por favor, digite o complemento.
                                 </div>
@@ -243,7 +268,9 @@
                         <div class="form-group">
                             <label for="email" class="form-label">E-mail *</label>
                             <input type="email" class="form-control" id="email" name="email"
-                                placeholder="Digite seu e-mail" required>
+                                placeholder="Digite seu e-mail" 
+                                value="{{ dados.email if dados else '' }}"
+                                required>
                             <div class="invalid-feedback">
                                 Por favor, digite um e-mail válido.
                             </div>
@@ -303,9 +330,55 @@
             </div>
         </div>
     </main>
+    
     {% block scripts %}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/static/js/cadastro_fornecedor.js"></script>
+    
+    <!-- Sistema de Toasts para exibição de erros -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        {% if erro %}
+        // Exibir mensagem de erro
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'alert alert-danger alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3';
+        alertDiv.style.zIndex = '9999';
+        alertDiv.style.minWidth = '300px';
+        alertDiv.innerHTML = `
+            <strong><i class="bi bi-exclamation-triangle-fill"></i> Erro!</strong><br>
+            {{ erro|e }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+        document.body.appendChild(alertDiv);
+        
+        // Auto-remover após 8 segundos
+        setTimeout(() => {
+            alertDiv.classList.remove('show');
+            setTimeout(() => alertDiv.remove(), 150);
+        }, 8000);
+        {% endif %}
+        
+        {% if sucesso %}
+        // Exibir mensagem de sucesso
+        const successDiv = document.createElement('div');
+        successDiv.className = 'alert alert-success alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3';
+        successDiv.style.zIndex = '9999';
+        successDiv.style.minWidth = '300px';
+        successDiv.innerHTML = `
+            <strong><i class="bi bi-check-circle-fill"></i> Sucesso!</strong><br>
+            {{ sucesso|e }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+        document.body.appendChild(successDiv);
+        
+        // Auto-remover após 5 segundos
+        setTimeout(() => {
+            successDiv.classList.remove('show');
+            setTimeout(() => successDiv.remove(), 150);
+        }, 5000);
+        {% endif %}
+    });
+    </script>
     {% endblock %}
 </body>
 

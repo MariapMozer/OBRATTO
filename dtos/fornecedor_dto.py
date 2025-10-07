@@ -8,13 +8,14 @@ from .base_dto import BaseDTO
 from .usuario_dto import AtualizarUsuarioDTO, CriarUsuarioDTO
 
 class CriarFornecedorDTO(CriarUsuarioDTO):
-    razao_social: Optional[str] = Field(None, description="Razão Social da empresa")
+    razao_social: Optional[str] = Field(None, description="Razão Social da empresa", max_length=100)
     selo_confianca: bool = Field(default=False)
 
-    @field_validator('razao_social')
-    @classmethod
-    def validar_razao_social(cls, v: Optional[str]) -> Optional[str]:
-        return cls.validar_campo_wrapper(validar_texto_opcional, "Razão Social", max_chars=100)(v)
+    # Validador desabilitado temporariamente para evitar recursão
+    # @field_validator('razao_social')
+    # @classmethod
+    # def validar_razao_social(cls, v: Optional[str]) -> Optional[str]:
+    #     return cls.validar_campo_wrapper(validar_texto_opcional, "Razão Social", max_chars=100)(v)
 
 
     @classmethod

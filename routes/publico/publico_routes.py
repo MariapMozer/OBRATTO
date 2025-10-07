@@ -1,10 +1,10 @@
 from datetime import datetime
 from typing import Optional
-from venv import logger
+import logging
 from fastapi import APIRouter, Form, Request, status, UploadFile, File
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
-from pydantic_core import ValidationError
+from pydantic import ValidationError
 from data.cliente import cliente_repo
 from data.cliente.cliente_model import Cliente
 from data.fornecedor import fornecedor_repo
@@ -17,12 +17,16 @@ from data.usuario.usuario_model import Usuario
 from data.mensagem.mensagem_model import Mensagem
 from data.mensagem import mensagem_repo
 from dtos.login_dto import LoginDTO
+from dtos.fornecedor_dto import CriarFornecedorDTO
 from utils.auth_decorator import obter_usuario_logado
 # from utils.security import verificar_autenticacao
 import os
 import uuid
 
 from utils.security import criar_hash_senha, gerar_token_redefinicao, verificar_senha
+
+# Configurar logger
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
@@ -182,7 +186,6 @@ async def exibir_cadastro_fornecedor(request: Request):
     return templates.TemplateResponse("publico/fornecedor2/cadastro_fornecedor.html", {"request": request})
 
 # Cadastro de fornecedor (POST)
-
 @router.post("/cadastro/fornecedor")
 async def processar_cadastro_fornecedor(
     request: Request,
@@ -198,79 +201,172 @@ async def processar_cadastro_fornecedor(
     confirmar_senha: str = Form(...),
     cpf_cnpj: str = Form(...),
     razao_social: Optional[str] = Form(None),
+    complemento: Optional[str] = Form(None),
+    cep: Optional[str] = Form(None),
     foto: UploadFile = File(None)
 ):
+    # Preservar dados do formulário (exceto senhas por segurança)
+    dados_formulario = {
+        "nome": nome,
+        "email": email,
+        "telefone": telefone,
+        "estado": estado,
+        "cidade": cidade,
+        "rua": rua,
+        "numero": numero,
+        "bairro": bairro,
+        "cpf_cnpj": cpf_cnpj,
+        "razao_social": razao_social,
+        "complemento": complemento,
+        "cep": cep
+    }
 
-    if senha != confirmar_senha:
-        return templates.TemplateResponse(
-            "publico/fornecedor2/cadastro_fornecedor.html",
-            {"request": request, "erro": "As senhas não coincidem."}
+    try:
+        # Validar dados com Pydantic DTO
+        fornecedor_dto = CriarFornecedorDTO(
+            nome=nome,
+            email=email,
+            telefone=telefone,
+            estado=estado,
+            cidade=cidade,
+            rua=rua,
+            numero=numero,
+            bairro=bairro,
+            senha=senha,
+            cpf_cnpj=cpf_cnpj,
+            razao_social=razao_social,
+            complemento=complemento or "",
+            cep=cep or "",
+            tipo_usuario="fornecedor"
         )
-    # Verificar se email já existe
-    if fornecedor_repo.obter_fornecedor_por_email(email):
-        return templates.TemplateResponse(
-            "publico/fornecedor2/cadastro_fornecedor.html",
-            {"request": request, "erro": "Email já cadastrado"}
-        )
-    
 
-    # Criar hash da senha
-    senha_hash = criar_hash_senha(senha)
-
-    # Garante que razao_social nunca seja None ou string vazia
-    razao_social_final = razao_social if razao_social and razao_social.strip() else nome
-
-    # Lógica de upload de foto
-    caminho_foto = None
-    if foto and foto.filename:
-        tipos_permitidos = ["image/jpeg", "image/png", "image/jpg"]
-        if foto.content_type not in tipos_permitidos:
+        # Verificar se senhas coincidem (validação adicional)
+        if senha != confirmar_senha:
             return templates.TemplateResponse(
                 "publico/fornecedor2/cadastro_fornecedor.html",
-                {"request": request, "erro": "Tipo de arquivo de foto inválido."}
+                {
+                    "request": request, 
+                    "erro": "As senhas não coincidem.",
+                    "dados": dados_formulario
+                }
             )
-        upload_dir = "static/uploads/fornecedores"
-        os.makedirs(upload_dir, exist_ok=True)
-        import secrets
-        extensao = foto.filename.split(".")[-1]
-        nome_arquivo = f"{email}_{secrets.token_hex(8)}.{extensao}"
-        caminho_arquivo = os.path.join(upload_dir, nome_arquivo)
-        conteudo = await foto.read()
-        with open(caminho_arquivo, "wb") as f:
-            f.write(conteudo)
-        caminho_foto = f"/static/uploads/fornecedores/{nome_arquivo}"
 
-    fornecedor = Fornecedor(
-        id=0,
-        nome=nome,
-        email=email,
-        senha=senha_hash,
-        cpf_cnpj=cpf_cnpj,
-        telefone=telefone,
-        cep="",  # Campo obrigatório adicionado
-        estado=estado,
-        cidade=cidade,
-        rua=rua,
-        numero=numero,
-        complemento="",  # Campo obrigatório adicionado
-        bairro=bairro,
-        tipo_usuario="Fornecedor",
-        data_cadastro=datetime.now(),
-        foto=caminho_foto,
-        token_redefinicao=None,
-        data_token=None,
-        razao_social=razao_social_final,
-    )
+        # Verificar se email já existe
+        if fornecedor_repo.obter_fornecedor_por_email(email):
+            return templates.TemplateResponse(
+                "publico/fornecedor2/cadastro_fornecedor.html",
+                {
+                    "request": request, 
+                    "erro": "Email já cadastrado. Tente fazer login ou use outro email.",
+                    "dados": dados_formulario
+                }
+            )
 
-    fornecedor_id = fornecedor_repo.inserir_fornecedor(fornecedor)
-    if not fornecedor_id:
-        return templates.TemplateResponse(
-            "publico/fornecedor2/cadastro_fornecedor.html",
-            {"request": request, "erro": "Erro ao cadastrar fornecedor."}
+        # Criar hash da senha
+        senha_hash = criar_hash_senha(senha)
+
+        # Garante que razao_social nunca seja None ou string vazia
+        razao_social_final = razao_social if razao_social and razao_social.strip() else nome
+
+        # Lógica de upload de foto
+        caminho_foto = None
+        if foto and foto.filename:
+            tipos_permitidos = ["image/jpeg", "image/png", "image/jpg"]
+            if foto.content_type not in tipos_permitidos:
+                return templates.TemplateResponse(
+                    "publico/fornecedor2/cadastro_fornecedor.html",
+                    {
+                        "request": request, 
+                        "erro": "Tipo de arquivo de foto inválido. Use apenas JPG, JPEG ou PNG.",
+                        "dados": dados_formulario
+                    }
+                )
+            upload_dir = "static/uploads/fornecedores"
+            os.makedirs(upload_dir, exist_ok=True)
+            import secrets
+            extensao = foto.filename.split(".")[-1]
+            nome_arquivo = f"{email}_{secrets.token_hex(8)}.{extensao}"
+            caminho_arquivo = os.path.join(upload_dir, nome_arquivo)
+            conteudo = await foto.read()
+            with open(caminho_arquivo, "wb") as f:
+                f.write(conteudo)
+            caminho_foto = f"/static/uploads/fornecedores/{nome_arquivo}"
+
+        # Criar objeto Fornecedor
+        fornecedor = Fornecedor(
+            id=0,
+            nome=nome,
+            email=email,
+            senha=senha_hash,
+            cpf_cnpj=cpf_cnpj,
+            telefone=telefone,
+            cep=cep or "",
+            estado=estado,
+            cidade=cidade,
+            rua=rua,
+            numero=numero,
+            complemento=complemento or "",
+            bairro=bairro,
+            tipo_usuario="Fornecedor",
+            data_cadastro=datetime.now(),
+            foto=caminho_foto,
+            token_redefinicao=None,
+            data_token=None,
+            razao_social=razao_social_final,
         )
 
-    # Cadastro realizado com sucesso - redirecionar para login
-    return RedirectResponse(url="/login?mensagem=Cadastro realizado com sucesso! Faça seu login.", status_code=303)
+        # Inserir no banco de dados
+        fornecedor_id = fornecedor_repo.inserir_fornecedor(fornecedor)
+        if not fornecedor_id:
+            return templates.TemplateResponse(
+                "publico/fornecedor2/cadastro_fornecedor.html",
+                {
+                    "request": request, 
+                    "erro": "Erro ao cadastrar fornecedor. Tente novamente.",
+                    "dados": dados_formulario
+                }
+            )
+
+        # Cadastro realizado com sucesso - redirecionar para login
+        logger.info(f"Fornecedor cadastrado com sucesso: {email}")
+        return RedirectResponse(
+            url="/login?mensagem=Cadastro realizado com sucesso! Faça seu login.", 
+            status_code=status.HTTP_303_SEE_OTHER
+        )
+
+    except ValidationError as e:
+        # Extrair mensagens de erro do Pydantic
+        erros = []
+        for erro in e.errors():
+            campo = erro['loc'][0] if erro['loc'] else 'campo'
+            mensagem = erro['msg']
+            erros.append(f"{campo.capitalize()}: {mensagem}")
+
+        erro_msg = " | ".join(erros)
+        logger.warning(f"Erro de validação no cadastro de fornecedor: {erro_msg}")
+
+        # Retornar template com dados preservados e erro
+        return templates.TemplateResponse(
+            "publico/fornecedor2/cadastro_fornecedor.html",
+            {
+                "request": request,
+                "erro": erro_msg,
+                "dados": dados_formulario  # Preservar dados digitados
+            }
+        )
+
+    except Exception as e:
+        logger.error(f"Erro ao processar cadastro de fornecedor: {e}")
+
+        return templates.TemplateResponse(
+            "publico/fornecedor2/cadastro_fornecedor.html",
+            {
+                "request": request,
+                "erro": "Erro ao processar cadastro. Tente novamente.",
+                "dados": dados_formulario
+            }
+        )
+
 
        
     

@@ -19,8 +19,13 @@ def criar_hash_senha(senha: str) -> str:
     
     Returns:
         Hash da senha
+    
+    Note:
+        Bcrypt tem limite de 72 bytes. Senhas mais longas são truncadas automaticamente.
     """
-    return pwd_context.hash(senha)
+    # Bcrypt tem limite de 72 bytes - truncar se necessário
+    senha_truncada = senha.encode('utf-8')[:72].decode('utf-8', errors='ignore')
+    return pwd_context.hash(senha_truncada)
 
 
 def verificar_senha(senha_plana: str, senha_hash: str) -> bool:
@@ -33,9 +38,14 @@ def verificar_senha(senha_plana: str, senha_hash: str) -> bool:
     
     Returns:
         True se a senha está correta, False caso contrário
+    
+    Note:
+        Bcrypt tem limite de 72 bytes. Senhas mais longas são truncadas automaticamente.
     """
     try:
-        return pwd_context.verify(senha_plana, senha_hash)
+        # Bcrypt tem limite de 72 bytes - truncar se necessário (igual ao criar_hash_senha)
+        senha_truncada = senha_plana.encode('utf-8')[:72].decode('utf-8', errors='ignore')
+        return pwd_context.verify(senha_truncada, senha_hash)
     except:
         return False
 

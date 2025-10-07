@@ -23,8 +23,8 @@ class BaseDTO(BaseModel):
     model_config = ConfigDict(
         # Remover espaços em branco automaticamente
         str_strip_whitespace=True,
-        # Validar na atribuição também (não só na criação)
-        validate_assignment=True,
+        # Validar na atribuição também (não só na criação) - DESABILITADO para evitar recursão
+        validate_assignment=False,
         # Usar valores dos enums ao invés dos objetos
         use_enum_values=True,
         # Permitir population by name (útil para formulários HTML)

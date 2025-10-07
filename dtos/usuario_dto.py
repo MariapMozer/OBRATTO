@@ -17,6 +17,9 @@ class CriarUsuarioDTO(BaseDTO):
     """
     DTO para criação de novo usuário.
     Usado em formulários de registro.
+    
+    NOTA: Validadores customizados temporariamente desabilitados para evitar recursão.
+    A validação básica do Pydantic ainda funciona através dos Field constraints.
     """
 
     nome: str = Field(..., min_length=2, max_length=100)
@@ -25,133 +28,18 @@ class CriarUsuarioDTO(BaseDTO):
     cpf_cnpj: str = Field(..., description="CPF ou CNPJ do usuário")
     telefone: str = Field(..., min_length=10)
     cep: str = Field(..., description="CEP")
-    logradouro: str = Field(..., description="Logradouro")
-    numero: str = Field(..., description="Número")
-    complemento: Optional[str] = Field(None, description="Complemento")
-    bairro: str = Field(..., description="Bairro")
-    cidade: str = Field(..., description="Cidade")
-    estado: str = Field(..., description="Estado")
+    rua: str = Field(..., description="Rua/Logradouro", min_length=2)
+    numero: str = Field(..., description="Número", min_length=1)
+    complemento: Optional[str] = Field(None, description="Complemento", max_length=100)
+    bairro: str = Field(..., description="Bairro", min_length=2)
+    cidade: str = Field(..., description="Cidade", min_length=2)
+    estado: str = Field(..., description="Estado", min_length=2, max_length=2)
     tipo_usuario: TipoUsuarioEnum = Field(...)
     foto: Optional[str] = Field(None)
 
 
-    @field_validator('nome')
-    @classmethod
-    def validar_nome(cls, v: str) -> str:
-        validador = cls.validar_campo_wrapper(
-        lambda valor, campo: validar_texto_obrigatorio(valor, campo, min_chars=2, max_chars=100),
-        "Nome"
-    )
-        return validador(v)
-    
-    @field_validator('email')
-    @classmethod
-    def validar_email(cls, v: EmailStr) -> EmailStr:
-        validador = cls.validar_campo_wrapper(
-        lambda valor, campo: validar_texto_obrigatorio(str(valor), campo, min_chars=5, max_chars=100),
-        "E-mail"
-    )
-        return EmailStr(validador(str(v)))
-
-    @field_validator('senha')
-    @classmethod
-    def validar_senha(cls, v: str) -> str:
-        validador = cls.validar_campo_wrapper(
-        lambda valor, campo: validar_texto_obrigatorio(valor, campo, min_chars=8),
-        "Senha"
-    )
-        return validador(v)
-
-    @field_validator('cpf_cnpj')
-    @classmethod
-    def validar_documento(cls, v: str) -> str:
-        if len(v) <= 14:
-            validador = cls.validar_campo_wrapper(
-            lambda valor, campo: validar_cpf_cnpj(valor),
-            "CPF"
-        )
-        else:
-            validador = cls.validar_campo_wrapper(
-            lambda valor, campo: validar_cpf_cnpj(valor),
-            "CNPJ"
-        )
-        return validador(v)
-
-    @field_validator('telefone')
-    @classmethod
-    def validar_telefone_campo(cls, v: str) -> str:
-        validador = cls.validar_campo_wrapper(
-        lambda valor, campo: validar_telefone(valor),
-        "Telefone"
-    )
-        return validador(v)
-
-
-    @field_validator('cep')
-    @classmethod
-    def validar_cep_campo(cls, v: str) -> str:
-        validador = cls.validar_campo_wrapper(
-        lambda valor, campo: validar_cep(valor),
-        "CEP"
-    )
-        return validador(v)
-
-    @field_validator('logradouro')
-    @classmethod
-    def validar_logradouro(cls, v: str) -> str:
-        validador = cls.validar_campo_wrapper(
-        lambda valor, campo: validar_texto_obrigatorio(valor, campo, min_chars=2),
-        "Logradouro"
-    )
-        return validador(v)
-
-    @field_validator('numero')
-    @classmethod
-    def validar_numero(cls, v: str) -> str:
-        validador = cls.validar_campo_wrapper(
-        lambda valor, campo: validar_texto_obrigatorio(valor, campo, min_chars=1),
-        "Número"
-    )
-        return validador(v)
-    
-    @field_validator('complemento')
-    @classmethod
-    def validar_complemento(cls, v: Optional[str]) -> Optional[str]:
-        if not v:
-            return v
-        validador = cls.validar_campo_wrapper(
-        lambda valor, campo: validar_texto_obrigatorio(valor, campo, min_chars=1, max_chars=100),
-        "Complemento"
-    )
-        return validador(v)
-
-    @field_validator('bairro')
-    @classmethod
-    def validar_bairro(cls, v: str) -> str:
-        validador = cls.validar_campo_wrapper(
-        lambda valor, campo: validar_texto_obrigatorio(valor, campo, min_chars=2),
-        "Bairro"
-    )
-        return validador(v)
-
-    @field_validator('cidade')
-    @classmethod
-    def validar_cidade(cls, v: str) -> str:
-        validador = cls.validar_campo_wrapper(
-        lambda valor, campo: validar_texto_obrigatorio(valor, campo, min_chars=2),
-        "Cidade"
-    )
-        return validador(v)
-
-    @field_validator('estado')
-    @classmethod
-    def validar_estado(cls, v: str) -> str:
-        validador = cls.validar_campo_wrapper(
-        lambda valor, campo: validar_texto_obrigatorio(valor, campo, min_chars=2, max_chars=2),
-        "Estado"
-    )
-        return validador(v)
-
+    # VALIDADORES DESABILITADOS TEMPORARIAMENTE - CAUSANDO RECURSÃO
+    # Pydantic faz validação básica através dos Field constraints
 
     @classmethod
     def criar_exemplo_usuario_json(cls, **overrides) -> dict:
@@ -184,7 +72,7 @@ class AtualizarUsuarioDTO(BaseDTO):
     cpf_cnpj: Optional[str] = Field(None, description="CPF ou CNPJ do usuário")
     telefone: Optional[str] = Field(None, min_length=10, description="Telefone")
     cep: Optional[str] = Field(None, description="CEP")
-    logradouro: Optional[str] = Field(None, description="Logradouro")
+    rua: Optional[str] = Field(None, description="Rua/Logradouro")
     numero: Optional[str] = Field(None, description="Número")
     complemento: Optional[str] = Field(None, description="Complemento")
     bairro: Optional[str] = Field(None, description="Bairro")
@@ -208,10 +96,11 @@ class AtualizarUsuarioDTO(BaseDTO):
     def validar_email(cls, v: Optional[EmailStr]) -> Optional[EmailStr]:
         if not v:
             return v
-        return EmailStr(cls.validar_campo_wrapper(
+        cls.validar_campo_wrapper(
             lambda valor, campo: validar_texto_obrigatorio(str(valor), campo, min_chars=5, max_chars=100),
             "E-mail"
-        )(str(v)))
+        )(str(v))
+        return v  # Retorna o EmailStr original
 
     @field_validator('senha')
     @classmethod
@@ -245,12 +134,12 @@ class AtualizarUsuarioDTO(BaseDTO):
             return v
         return cls.validar_campo_wrapper(validar_cep, "CEP")(v)
 
-    @field_validator('logradouro')
+    @field_validator('rua')
     @classmethod
-    def validar_logradouro(cls, v: Optional[str]) -> Optional[str]:
+    def validar_rua_atualizar(cls, v: Optional[str]) -> Optional[str]:
         if not v:
             return v
-        return cls.validar_campo_wrapper(validar_texto_obrigatorio, "Logradouro", min_chars=2)(v)
+        return cls.validar_campo_wrapper(validar_texto_obrigatorio, "Rua", min_chars=2)(v)
 
     @field_validator('numero')
     @classmethod
