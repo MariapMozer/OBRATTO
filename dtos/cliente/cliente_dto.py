@@ -14,7 +14,10 @@ class CriarClienteDTO(CriarUsuarioDTO):
     @field_validator('genero')
     @classmethod
     def validar_genero(cls, v: Optional[str]) -> Optional[str]:
-        return cls.validar_campo_wrapper(validar_texto_opcional, "Gênero", max_chars=20)(v)
+        return cls.validar_campo_wrapper(
+            lambda valor, campo: validar_texto_opcional(valor, max_chars=20),
+            "Gênero"
+        )(v)
 
     @field_validator('data_nascimento')
     @classmethod
@@ -39,7 +42,10 @@ class AtualizarClienteDTO(AtualizarUsuarioDTO):
     @field_validator('genero')
     @classmethod
     def validar_genero(cls, v: Optional[str]) -> Optional[str]:
-        return cls.validar_campo_wrapper(validar_texto_opcional, "Gênero", max_chars=20)(v)
+        return cls.validar_campo_wrapper(
+            lambda valor, campo: validar_texto_opcional(valor, max_chars=20),
+            "Gênero"
+        )(v)
 
     @field_validator('data_nascimento')
     @classmethod

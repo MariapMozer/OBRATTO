@@ -4,7 +4,6 @@ from ..base_dto import BaseDTO
 from utils.validacoes_dto import *
 from enum import Enum
 from datetime import date
-from ..base_dto import BaseDTO
 from ..usuario.usuario_dto import AtualizarUsuarioDTO, CriarUsuarioDTO
 
 class CriarPrestadorDTO(CriarUsuarioDTO):
@@ -16,17 +15,26 @@ class CriarPrestadorDTO(CriarUsuarioDTO):
     @field_validator('area_atuacao')
     @classmethod
     def validar_area_atuacao(cls, v: Optional[str]) -> Optional[str]:
-        return cls.validar_campo_wrapper(validar_texto_opcional, "Área de atuação", max_chars=100)(v)
+        return cls.validar_campo_wrapper(
+            lambda valor, campo: validar_texto_opcional(valor, max_chars=100),
+            "Área de atuação"
+        )(v)
 
     @field_validator('razao_social')
     @classmethod
     def validar_razao_social(cls, v: Optional[str]) -> Optional[str]:
-        return cls.validar_campo_wrapper(validar_texto_opcional, "Razão Social", max_chars=100)(v)
+        return cls.validar_campo_wrapper(
+            lambda valor, campo: validar_texto_opcional(valor, max_chars=100),
+            "Razão Social"
+        )(v)
 
     @field_validator('descricao_servicos')
     @classmethod
     def validar_descricao_servicos(cls, v: Optional[str]) -> Optional[str]:
-        return cls.validar_campo_wrapper(validar_texto_opcional, "Descrição dos serviços", max_chars=500)(v)
+        return cls.validar_campo_wrapper(
+            lambda valor, campo: validar_texto_opcional(valor, max_chars=500),
+            "Descrição dos serviços"
+        )(v)
 
 
     @classmethod
@@ -50,17 +58,26 @@ class AtualizarPrestadorDTO(AtualizarUsuarioDTO):
     @field_validator('area_atuacao')
     @classmethod
     def validar_area_atuacao(cls, v: Optional[str]) -> Optional[str]:
-        return cls.validar_campo_wrapper(validar_texto_opcional, "Área de atuação", max_chars=100)(v)
+        return cls.validar_campo_wrapper(
+            lambda valor, campo: validar_texto_opcional(valor, max_chars=100),
+            "Área de atuação"
+        )(v)
 
     @field_validator('razao_social')
     @classmethod
     def validar_razao_social(cls, v: Optional[str]) -> Optional[str]:
-        return cls.validar_campo_wrapper(validar_texto_opcional, "Razão Social", max_chars=100)(v)
+        return cls.validar_campo_wrapper(
+            lambda valor, campo: validar_texto_opcional(valor, max_chars=100),
+            "Razão Social"
+        )(v)
 
     @field_validator('descricao_servicos')
     @classmethod
     def validar_descricao_servicos(cls, v: Optional[str]) -> Optional[str]:
-        return cls.validar_campo_wrapper(validar_texto_opcional, "Descrição dos serviços", max_chars=500)(v)
+        return cls.validar_campo_wrapper(
+            lambda valor, campo: validar_texto_opcional(valor, max_chars=500),
+            "Descrição dos serviços"
+        )(v)
 
     
 CriarPrestadorDTO.model_config.update({
