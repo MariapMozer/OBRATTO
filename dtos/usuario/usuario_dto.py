@@ -1,6 +1,6 @@
 from pydantic import EmailStr, Field, field_validator, model_validator
 from typing import Optional
-from .base_dto import BaseDTO
+from ..base_dto import BaseDTO
 from utils.validacoes_dto import *
 from enum import Enum
 from datetime import date

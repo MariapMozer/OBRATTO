@@ -17,10 +17,10 @@ from data.usuario import usuario_repo
 from data.usuario.usuario_model import Usuario
 from data.mensagem.mensagem_model import Mensagem
 from data.mensagem import mensagem_repo
-from dtos.cliente_dto import CriarClienteDTO
-from dtos.login_dto import LoginDTO
-from dtos.fornecedor_dto import CriarFornecedorDTO
-from dtos.prestador_dto import CriarPrestadorDTO
+from dtos.cliente.cliente_dto import CriarClienteDTO
+from dtos.usuario.login_dto import LoginDTO
+from dtos.fornecedor.fornecedor_dto import CriarFornecedorDTO
+from dtos.prestador.prestador_dto import CriarPrestadorDTO
 from utils.auth_decorator import obter_usuario_logado
 # from utils.security import verificar_autenticacao
 import os

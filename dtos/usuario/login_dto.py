@@ -1,5 +1,5 @@
 from pydantic import EmailStr, Field, field_validator
-from .base_dto import BaseDTO
+from ..base_dto import BaseDTO
 from utils.validacoes_dto import validar_texto_obrigatorio
 
 
