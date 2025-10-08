@@ -1,38 +1,45 @@
-<!-- Sistema automático de exibição de toasts
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Mensagem de sucesso
     {% if sucesso %}
-    window.showSuccess(`{{ sucesso|e }}`);
+    window.showSuccess({{ sucesso|tojson }});
     {% endif %}
 
     // Mensagem de erro
     {% if erro %}
-    window.showError(`{{ erro|e }}`);
+    window.showError({{ erro|tojson }});
     {% endif %}
 
     // Mensagem de aviso
     {% if warning %}
-    window.showWarning(`{{ warning|e }}`);
+    window.showWarning({{ warning|tojson }});
     {% endif %}
 
     // Mensagem de informação
     {% if info %}
-    window.showInfo(`{{ info|e }}`);
+    window.showInfo({{ info|tojson }});
     {% endif %}
 
     // Múltiplas mensagens (array)
     {% if messages %}
     {% for message in messages %}
-    window.showToast(`{{ message.text|e }}`, `{{ message.type|default("info") }}`, {{ message.duration|default(5000) }});
+    window.showToast(
+        {{ message.text|tojson }},
+        {{ (message.type or "info")|tojson }},
+        {{ message.duration or 5000 }}
+    );
     {% endfor %}
     {% endif %}
 
     // Mensagens flash (de redirects)
     {% if flash_messages %}
     {% for flash_message in flash_messages %}
-    window.showToast(`{{ flash_message.text|e }}`, `{{ flash_message.type|default("info") }}`, {{ flash_message.duration|default(5000) }});
+    window.showToast(
+        {{ flash_message.text|tojson }},
+        {{ (flash_message.type or "info")|tojson }},
+        {{ flash_message.duration or 5000 }}
+    );
     {% endfor %}
     {% endif %}
 });
-</script> -->
+</script>
