@@ -368,8 +368,8 @@ async def processar_cadastro_fornecedor(
     }
 
     try:
-        # Log: valor bruto recebido para diagnóstico (promovido para INFO para aparecer nos logs)
-        logger.info(f"[DEBUG] raw cpf_cnpj recebido (form): {repr(cpf_cnpj)}")
+        # Log: valor bruto recebido para diagnóstico (usar INFO para garantir visibilidade nos logs)
+        logger.info(f"[DEBUG-INFO] raw cpf_cnpj recebido (form): {repr(cpf_cnpj)}")
 
         # Validar dados com Pydantic DTO
         fornecedor_dto = CriarFornecedorDTO(
@@ -391,8 +391,8 @@ async def processar_cadastro_fornecedor(
             foto=None
         )
 
-        # Log: valor depois da validação (limpo) — útil para checar transformação
-        logger.info(f"[DEBUG] fornecedor_dto.cpf_cnpj (após validação): {repr(getattr(fornecedor_dto, 'cpf_cnpj', None))}")
+        # Log: valor depois da validação (limpo) — usar INFO para visibilidade
+        logger.info(f"[DEBUG-INFO] fornecedor_dto.cpf_cnpj (após validação): {repr(getattr(fornecedor_dto, 'cpf_cnpj', None))}")
 
         # Verificar se todos os campos obrigatórios foram preenchidos (usar valores validados pelo DTO)
         if not fornecedor_dto.nome or not fornecedor_dto.email or not fornecedor_dto.senha or not fornecedor_dto.confirmar_senha or not fornecedor_dto.cpf_cnpj:
@@ -502,10 +502,8 @@ async def processar_cadastro_fornecedor(
         # Extrair mensagens de erro do Pydantic
         erros = []
         campos_erro = {}
-    # Log completo para debug
-        logger.debug(f"[DEBUG] ValidationError.errors(): {e.errors()}")
-    # Também logar o valor bruto recebido para facilitar diagnóstico em logs padrão
-        logger.info(f"[DEBUG] raw cpf_cnpj no momento do erro (form): {repr(cpf_cnpj)}")
+        # Log completo para debug (usar WARNING para visibilidade)
+        logger.warning(f"[DEBUG-WARN] ValidationError.errors(): {e.errors()}")
         for erro in e.errors():
             # loc pode ser ('field',) ou ('field', 0, ...); pegamos o primeiro elemento
             campo = erro.get('loc')[0] if erro.get('loc') else 'campo'
