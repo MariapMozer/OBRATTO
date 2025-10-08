@@ -104,13 +104,19 @@ class AtualizarUsuarioDTO(BaseDTO):
 
     @field_validator('senha')
     @classmethod
-    def validar_senha(cls, v: Optional[str]) -> Optional[str]:
-        if not v:
-            return v
-        return cls.validar_campo_wrapper(
-            lambda valor, campo: validar_texto_obrigatorio(valor, campo, min_chars=8),
-            "Senha"
-        )(v)
+    def validar_senha_forte(cls, v):
+        if len(v) < 8:
+            raise ValueError('Senha deve ter no mínimo 8 caracteres')
+        if not any(c.isdigit() for c in v):
+            raise ValueError('Senha deve conter pelo menos um número')
+        return v
+
+    @field_validator('confirmar_senha')
+    @classmethod
+    def senhas_devem_coincidir(cls, v, info):
+        if 'senha' in info.data and v != info.data['senha']:
+            raise ValueError('As senhas não coincidem')
+        return v
 
     @field_validator('cpf_cnpj')
     @classmethod
