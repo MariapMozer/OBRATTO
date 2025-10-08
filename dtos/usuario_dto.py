@@ -24,6 +24,7 @@ class CriarUsuarioDTO(BaseDTO):
 
     nome: str = Field(..., min_length=2, max_length=100)
     email: EmailStr = Field(...)
+    confirmar_senha: Optional[str] = Field(None, description="Confirmação da nova senha")
     senha: str = Field(..., min_length=8, description="Senha do usuário")
     cpf_cnpj: str = Field(..., description="CPF ou CNPJ do usuário")
     telefone: str = Field(..., min_length=10)
@@ -69,6 +70,7 @@ class AtualizarUsuarioDTO(BaseDTO):
     nome: Optional[str] = Field(None, min_length=2, max_length=100, description="Nome completo")
     email: Optional[EmailStr] = Field(None, description="E-mail do usuário")
     senha: Optional[str] = Field(None, min_length=8, description="Senha do usuário")
+    confirmar_senha: Optional[str] = Field(None, description="Confirmação da nova senha")
     cpf_cnpj: Optional[str] = Field(None, description="CPF ou CNPJ do usuário")
     telefone: Optional[str] = Field(None, min_length=10, description="Telefone")
     cep: Optional[str] = Field(None, description="CEP")

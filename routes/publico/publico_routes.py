@@ -1,4 +1,5 @@
 from datetime import datetime
+from math import e
 from typing import Optional
 import logging
 from fastapi import APIRouter, Form, Request, status, UploadFile, File
@@ -18,11 +19,13 @@ from data.mensagem.mensagem_model import Mensagem
 from data.mensagem import mensagem_repo
 from dtos.login_dto import LoginDTO
 from dtos.fornecedor_dto import CriarFornecedorDTO
+from dtos.prestador_dto import CriarPrestadorDTO
 from utils.auth_decorator import obter_usuario_logado
 # from utils.security import verificar_autenticacao
 import os
 import uuid
 
+from utils.flash_messages import informar_sucesso
 from utils.security import criar_hash_senha, gerar_token_redefinicao, verificar_senha
 
 # Configurar logger
@@ -46,7 +49,7 @@ async def mostrar_escolha_cadastro(request: Request):
 # Cadastro do prestador
 @router.get("/cadastro/prestador")
 async def exibir_cadastro_prestador(request: Request):
-    return templates.TemplateResponse("publico/prestador/prestador_cadastro.html", {"request": request})
+    return templates.TemplateResponse("publico/prestador/prestador_cadastro.html", {"request": request, "dados": None})
 
 # Rota para processar o formulário de cadastro
 @router.post("/cadastro/prestador")
@@ -67,48 +70,120 @@ async def processar_cadastro_prestador(
     razao_social: Optional[str] = Form(None),
     descricao_servicos: Optional[str] = Form(None)
 ):
+    # Criar dicionário com dados do formulário (para preservar)
+    dados_formulario = {
+        "nome": nome,
+        "email": email,
+        "telefone": telefone,
+        "estado": estado,
+        "cidade": cidade,
+        "rua": rua,
+        "numero": numero,
+        "bairro": bairro,
+        "cpf_cnpj": cpf_cnpj,
+        "area_atuacao": area_atuacao,
+        "razao_social": razao_social,
+        "descricao_servicos": descricao_servicos
+    }
 
-    if senha != confirmar_senha:
-        return templates.TemplateResponse(
-            "publico/prestador/prestador_cadastro.html",
-            {"request": request, "erro": "As senhas não coincidem."}
+    try:
+        # Validar dados com Pydantic
+        dados_dto = CriarPrestadorDTO(
+            nome=nome,
+            email=email,
+            telefone=telefone,
+            estado=estado,
+            cidade=cidade,
+            rua=rua,
+            numero=numero,
+            bairro=bairro,
+            senha=senha,
+            confirmar_senha=confirmar_senha,
+            cpf_cnpj=cpf_cnpj,
+            area_atuacao=area_atuacao,
+            razao_social=razao_social,
+            descricao_servicos=descricao_servicos
         )
-    # Verificar se email já existe
-    if prestador_repo.obter_prestador_por_email(email):
-        return templates.TemplateResponse(
-            "publico/prestador/prestador_cadastro.html",
-            {"request": request, "erro": "Email já cadastrado"}
+
+        # Verificar se email já existe APÓS a validação do DTO
+        if prestador_repo.obter_prestador_por_email(dados_dto.email):
+            return templates.TemplateResponse(
+                "publico/prestador/prestador_cadastro.html",
+                {
+                    "request": request,
+                    "erro": "Email já cadastrado",
+                    "dados": dados_formulario
+                }
+            )
+
+        # Criar hash da senha
+        senha_hash = criar_hash_senha(dados_dto.senha)
+
+        # Criar objeto Prestador
+        prestador = Prestador(
+            id=0, # O ID será gerado pelo banco de dados
+            nome=dados_dto.nome,
+            email=dados_dto.email,
+            senha=senha_hash,
+            cpf_cnpj=dados_dto.cpf_cnpj,
+            telefone=dados_dto.telefone,
+            estado=dados_dto.estado,
+            cidade=dados_dto.cidade,
+            rua=dados_dto.rua,
+            numero=dados_dto.numero,
+            bairro=dados_dto.bairro,
+            tipo_usuario="Prestador",
+            data_cadastro=datetime.now(),
+            foto=None, # Assumindo que não há upload de foto para prestador neste momento
+            token_redefinicao=None,
+            data_token=None,
+            area_atuacao=dados_dto.area_atuacao,
+            razao_social=dados_dto.razao_social,
+            descricao_servicos=dados_dto.descricao_servicos
         )
-    
-    # Criar hash da senha
-    senha_hash = criar_hash_senha(senha)
-    
-    prestador = Prestador(
-        id=0,
-        nome=nome,
-        email=email,
-        senha=senha_hash,
-        cpf_cnpj=cpf_cnpj,
-        telefone=telefone,
-        estado=estado,
-        cidade=cidade,
-        rua=rua,
-        numero=numero,
-        bairro=bairro,
-        tipo_usuario="Prestador",
-        data_cadastro=datetime.now(), 
-        foto=None,        
-        token_redefinicao=None,
-        data_token=None,
-        area_atuacao=area_atuacao,
-        razao_social=razao_social,
-        descricao_servicos=descricao_servicos
-    )
-    prestador_id = prestador_repo.inserir_prestador(prestador)
-    if prestador_id:
-        return RedirectResponse("/login", status.HTTP_303_SEE_OTHER)
-    else:
-        return RedirectResponse("/cadastro/prestador")
+
+        # Inserir no banco de dados
+        prestador_id = prestador_repo.inserir_prestador(prestador)
+        if not prestador_id:
+            return templates.TemplateResponse(
+                "publico/prestador/prestador_cadastro.html",
+                {
+                    "request": request,
+                    "erro": "Erro ao cadastrar prestador. Tente novamente.",
+                    "dados": dados_formulario
+                }
+            )
+
+        # Sucesso - Redirecionar com mensagem flash
+        informar_sucesso(request, f"Cadastro de prestador realizado com sucesso! Bem-vindo(a), {nome}!")
+        return RedirectResponse("/login", status_code=status.HTTP_303_SEE_OTHER)
+
+    except ValidationError as e:
+        # Extrair mensagens de erro do Pydantic
+        erros = []
+        for erro in e.errors():
+            campo = erro["loc"][0] if erro["loc"] else "campo"
+            mensagem = erro["msg"]
+            erros.append(f"{campo.capitalize()}: {mensagem}")
+
+        erro_msg = " | ".join(erros)
+        # logger.warning(f"Erro de validação no cadastro de prestador: {erro_msg}")
+
+        # Retornar template com dados preservados e erro
+        return templates.TemplateResponse("publico/prestador/prestador_cadastro.html", {
+            "request": request,
+            "erro": erro_msg,
+            "dados": dados_formulario  # Preservar dados digitados
+        })
+
+    except Exception as e:
+        # logger.error(f"Erro ao processar cadastro de prestador: {e}")
+
+        return templates.TemplateResponse("publico/prestador/prestador_cadastro.html", {
+            "request": request,
+            "erro": "Erro ao processar cadastro. Tente novamente.",
+            "dados": dados_formulario
+        })
 
 
 # Rota para cadastro de cliente
