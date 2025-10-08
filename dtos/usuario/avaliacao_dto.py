@@ -22,17 +22,26 @@ class CriarAvaliacaoDTO(BaseDTO):
     @field_validator('descricao')
     @classmethod
     def validar_descricao(cls, v: Optional[str]) -> Optional[str]:
-        return cls.validar_campo_wrapper(validar_texto_opcional, "Descrição da avaliação", max_chars=500)(v)
+        return cls.validar_campo_wrapper(
+            lambda valor, campo: validar_texto_opcional(valor, max_chars=500),
+            "Descrição da avaliação"
+        )(v)
 
     @field_validator('nome_avaliador')
     @classmethod
     def validar_nome_avaliador(cls, v: Optional[str]) -> Optional[str]:
-        return cls.validar_campo_wrapper(validar_texto_opcional, "Nome do avaliador", max_chars=100)(v)
+        return cls.validar_campo_wrapper(
+            lambda valor, campo: validar_texto_opcional(valor, max_chars=100),
+            "Nome do avaliador"
+        )(v)
     
     @field_validator('nome_avaliado')
     @classmethod
     def validar_nome_avaliado(cls, v: Optional[str]) -> Optional[str]:
-        return cls.validar_campo_wrapper(validar_texto_opcional, "Nome do avaliado", max_chars=100)(v)
+        return cls.validar_campo_wrapper(
+            lambda valor, campo: validar_texto_opcional(valor, max_chars=100),
+            "Nome do avaliado"
+        )(v)
 
     @classmethod
     def criar_exemplo_avaliacao_json(cls, **overrides) -> dict:
@@ -64,17 +73,26 @@ class AtualizarAvaliacaoDTO(BaseDTO):
     @field_validator('descricao')
     @classmethod
     def validar_descricao(cls, v: Optional[str]) -> Optional[str]:
-        return cls.validar_campo_wrapper(validar_texto_opcional, "Descrição da avaliação", max_chars=500)(v)
+        return cls.validar_campo_wrapper(
+            lambda valor, campo: validar_texto_opcional(valor, max_chars=500),
+            "Descrição da avaliação"
+        )(v)
 
     @field_validator('nome_avaliador')
     @classmethod
     def validar_nome_avaliador(cls, v: Optional[str]) -> Optional[str]:
-        return cls.validar_campo_wrapper(validar_texto_opcional, "Nome do avaliador", max_chars=100)(v)
+        return cls.validar_campo_wrapper(
+            lambda valor, campo: validar_texto_opcional(valor, max_chars=100),
+            "Nome do avaliador"
+        )(v)
     
     @field_validator('nome_avaliado')
     @classmethod
     def validar_nome_avaliado(cls, v: Optional[str]) -> Optional[str]:
-        return cls.validar_campo_wrapper(validar_texto_opcional, "Nome do avaliado", max_chars=100)(v)
+        return cls.validar_campo_wrapper(
+            lambda valor, campo: validar_texto_opcional(valor, max_chars=100),
+            "Nome do avaliado"
+        )(v)
 
 
 # Configuração de exemplo para Swagger

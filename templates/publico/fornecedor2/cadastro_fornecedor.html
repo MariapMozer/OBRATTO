@@ -76,50 +76,62 @@
 
                         <div class="form-group">
                             <label for="nomeCompleto" class="form-label">Nome Completo *</label>
-                            <input type="text" class="form-control" id="nome" name="nome"
+                            <input type="text" class="form-control {% if campos_erro and campos_erro.get('nome') %}is-invalid{% endif %}" id="nome" name="nome"
                                 placeholder="Digite seu nome completo" 
                                 value="{{ dados.nome if dados else '' }}"
                                 required>
                             <div class="invalid-feedback">
                                 Por favor, digite seu nome completo.
                             </div>
+                            {% if campos_erro and campos_erro.get('nome') %}
+                            <div class="invalid-feedback d-block">{{ campos_erro.get('nome')[0] }}</div>
+                            {% endif %}
                         </div>
 
 
                         <div class="form-group">
                             <label for="razaoSocial" class="form-label">Razão Social *</label>
-                            <input type="text" class="form-control" id="razao_social" name="razao_social"
+                            <input type="text" class="form-control {% if campos_erro and campos_erro.get('razao_social') %}is-invalid{% endif %}" id="razao_social" name="razao_social"
                                 placeholder="Digite sua razão social" 
                                 value="{{ dados.razao_social if dados else '' }}"
                                 required>
                             <div class="invalid-feedback">
                                 Por favor, digite um nome.
                             </div>
+                            {% if campos_erro and campos_erro.get('razao_social') %}
+                            <div class="invalid-feedback d-block">{{ campos_erro.get('razao_social')[0] }}</div>
+                            {% endif %}
                         </div>
 
 
                         <div class="form-row two-cols">
                             <div class="form-group">
                                 <label for="documento" class="form-label">CPF ou CNPJ *</label>
-                                <input type="text" class="form-control" id="cpf_cnpj" name="cpf_cnpj"
+                                <input type="text" class="form-control {% if campos_erro and campos_erro.get('cpf_cnpj') %}is-invalid{% endif %}" id="cpf_cnpj" name="cpf_cnpj"
                                     placeholder="Digite seu CPF ou CNPJ" 
                                     value="{{ dados.cpf_cnpj if dados else '' }}"
                                     required>
                                 <div class="invalid-feedback">
                                     Por favor, digite um CPF ou CNPJ válido.
                                 </div>
+                                {% if campos_erro and campos_erro.get('cpf_cnpj') %}
+                                <div class="invalid-feedback d-block">{{ campos_erro.get('cpf_cnpj')[0] }}</div>
+                                {% endif %}
                             </div>
 
 
                             <div class="form-group">
                                 <label for="telefone" class="form-label">Telefone *</label>
-                                <input type="tel" class="form-control" id="telefone" name="telefone"
+                                <input type="tel" class="form-control {% if campos_erro and campos_erro.get('telefone') %}is-invalid{% endif %}" id="telefone" name="telefone"
                                     placeholder="(00) 00000-0000" maxlength="15" 
                                     value="{{ dados.telefone if dados else '' }}"
                                     required>
                                 <div class="invalid-feedback">
                                     Por favor, digite um telefone válido.
                                 </div>
+                                {% if campos_erro and campos_erro.get('telefone') %}
+                                <div class="invalid-feedback d-block">{{ campos_erro.get('telefone')[0] }}</div>
+                                {% endif %}
                             </div>
                         </div>
 
@@ -146,7 +158,7 @@
                         <div class="form-row two-cols">
                             <div class="form-group">
                                 <label for="estado" class="form-label">Estado *</label>
-                                <select class="form-select" id="estado" name="estado" required>
+                                <select class="form-select {% if campos_erro and campos_erro.get('estado') %}is-invalid{% endif %}" id="estado" name="estado" required>
                                     <option value="">Selecione o estado</option>
                                     <option value="AC" {% if dados and dados.estado == 'AC' %}selected{% endif %}>Acre</option>
                                     <option value="AL" {% if dados and dados.estado == 'AL' %}selected{% endif %}>Alagoas</option>
@@ -179,6 +191,9 @@
                                 <div class="invalid-feedback">
                                     Por favor, selecione um estado.
                                 </div>
+                                {% if campos_erro and campos_erro.get('estado') %}
+                                <div class="invalid-feedback d-block">{{ campos_erro.get('estado')[0] }}</div>
+                                {% endif %}
                             </div>
 
                             <div class="form-group">
@@ -190,6 +205,9 @@
                                 <div class="invalid-feedback">
                                     Por favor, digite seu CEP.
                                 </div>
+                                {% if campos_erro and campos_erro.get('cidade') %}
+                                <div class="invalid-feedback d-block">{{ campos_erro.get('cidade')[0] }}</div>
+                                {% endif %}
                             </div>
                         </div>
 
@@ -202,26 +220,35 @@
                             <div class="invalid-feedback">
                                 Por favor, digite sua cidade.
                             </div>
+                            {% if campos_erro and campos_erro.get('cep') %}
+                            <div class="invalid-feedback d-block">{{ campos_erro.get('cep')[0] }}</div>
+                            {% endif %}
                         </div>
 
                         <!-- Linha 3: Rua -->
                         <div class="form-group">
                             <label for="rua" class="form-label">Rua </label>
-                            <input type="text" class="form-control" id="rua" name="rua" placeholder="Digite sua rua"
+                            <input type="text" class="form-control {% if campos_erro and campos_erro.get('rua') %}is-invalid{% endif %}" id="rua" name="rua" placeholder="Digite sua rua"
                                 value="{{ dados.rua if dados else '' }}">
+                            {% if campos_erro and campos_erro.get('rua') %}
+                            <div class="invalid-feedback d-block">{{ campos_erro.get('rua')[0] }}</div>
+                            {% endif %}
                         </div>
 
 
                         <!-- Linha 3: Bairro -->
                         <div class="form-group">
                             <label for="bairro" class="form-label">Bairro *</label>
-                            <input type="text" class="form-control" id="bairro" name="bairro"
+                            <input type="text" class="form-control {% if campos_erro and campos_erro.get('bairro') %}is-invalid{% endif %}" id="bairro" name="bairro"
                                 placeholder="Digite seu bairro" 
                                 value="{{ dados.bairro if dados else '' }}"
                                 required>
                             <div class="invalid-feedback">
                                 Por favor, digite seu bairro.
                             </div>
+                            {% if campos_erro and campos_erro.get('bairro') %}
+                            <div class="invalid-feedback d-block">{{ campos_erro.get('bairro')[0] }}</div>
+                            {% endif %}
                         </div>
 
 
@@ -229,21 +256,27 @@
                         <div class="form-row two-cols">
                             <div class="form-group">
                                 <label for="numero" class="form-label">Número </label>
-                                <input type="text" class="form-control" id="numero" name="numero"
+                                <input type="text" class="form-control {% if campos_erro and campos_erro.get('numero') %}is-invalid{% endif %}" id="numero" name="numero"
                                     placeholder="Digite o número"
                                     value="{{ dados.numero if dados else '' }}">
+                                {% if campos_erro and campos_erro.get('numero') %}
+                                <div class="invalid-feedback d-block">{{ campos_erro.get('numero')[0] }}</div>
+                                {% endif %}
                             </div>
 
 
                             <div class="form-group">
                                 <label for="complemento" class="form-label">Complemento *</label>
-                                <input type="text" class="form-control" id="complemento" name="complemento"
+                                <input type="text" class="form-control {% if campos_erro and campos_erro.get('complemento') %}is-invalid{% endif %}" id="complemento" name="complemento"
                                     placeholder="Digite o complemento" 
                                     value="{{ dados.complemento if dados else '' }}"
                                     required>
                                 <div class="invalid-feedback">
                                     Por favor, digite o complemento.
                                 </div>
+                                {% if campos_erro and campos_erro.get('complemento') %}
+                                <div class="invalid-feedback d-block">{{ campos_erro.get('complemento')[0] }}</div>
+                                {% endif %}
                             </div>
                         </div>
 
@@ -267,39 +300,48 @@
 
                         <div class="form-group">
                             <label for="email" class="form-label">E-mail *</label>
-                            <input type="email" class="form-control" id="email" name="email"
+                            <input type="email" class="form-control {% if campos_erro and campos_erro.get('email') %}is-invalid{% endif %}" id="email" name="email"
                                 placeholder="Digite seu e-mail" 
                                 value="{{ dados.email if dados else '' }}"
                                 required>
                             <div class="invalid-feedback">
                                 Por favor, digite um e-mail válido.
                             </div>
+                            {% if campos_erro and campos_erro.get('email') %}
+                            <div class="invalid-feedback d-block">{{ campos_erro.get('email')[0] }}</div>
+                            {% endif %}
                         </div>
 
 
                         <div class="form-group">
                             <label for="senha" class="form-label">Senha *</label>
-                            <input type="password" class="form-control" id="senha" name="senha"
+                            <input type="password" class="form-control {% if campos_erro and campos_erro.get('senha') %}is-invalid{% endif %}" id="senha" name="senha"
                                 placeholder="Digite sua senha" minlength="8" required>
                             <div class="invalid-feedback">
                                 A senha deve ter pelo menos 8 caracteres.
                             </div>
+                            {% if campos_erro and campos_erro.get('senha') %}
+                            <div class="invalid-feedback d-block">{{ campos_erro.get('senha')[0] }}</div>
+                            {% endif %}
                             <small class="text-muted">A senha deve ter pelo menos 8 caracteres.</small>
                         </div>
 
 
                         <div class="form-group">
                             <label for="confirmarSenha" class="form-label">Confirmar Senha *</label>
-                            <input type="password" class="form-control" id="confirmar_senha" name="confirmar_senha"
+                            <input type="password" class="form-control {% if campos_erro and campos_erro.get('confirmar_senha') %}is-invalid{% endif %}" id="confirmar_senha" name="confirmar_senha"
                                 placeholder="Confirme sua senha" minlength="8" required>
                             <div class="invalid-feedback">
                                 As senhas não coincidem.
                             </div>
+                            {% if campos_erro and campos_erro.get('confirmar_senha') %}
+                            <div class="invalid-feedback d-block">{{ campos_erro.get('confirmar_senha')[0] }}</div>
+                            {% endif %}
                         </div>
 
 
                         <div class="form-check mb-3">
-                            <input class="form-check-input" type="checkbox" id="termos" name="termos" required>
+                            <input class="form-check-input {% if campos_erro and campos_erro.get('termos') %}is-invalid{% endif %}" type="checkbox" id="termos" name="termos" required>
                             <label class="form-check-label" for="termos">
                                 Eu concordo com os <a href="#" class="text-primary-custom">Termos de Uso</a> e
                                 <a href="#" class="text-primary-custom">Política de Privacidade</a> *
@@ -307,6 +349,9 @@
                             <div class="invalid-feedback">
                                 Você deve concordar com os termos para continuar.
                             </div>
+                            {% if campos_erro and campos_erro.get('termos') %}
+                            <div class="invalid-feedback d-block">{{ campos_erro.get('termos')[0] }}</div>
+                            {% endif %}
                         </div>
 
 
@@ -332,53 +377,83 @@
     </main>
     
     {% block scripts %}
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/static/js/cadastro_fornecedor.js"></script>
-    
-    <!-- Sistema de Toasts para exibição de erros -->
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        {% if erro %}
-        // Exibir mensagem de erro
-        const alertDiv = document.createElement('div');
-        alertDiv.className = 'alert alert-danger alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3';
-        alertDiv.style.zIndex = '9999';
-        alertDiv.style.minWidth = '300px';
-        alertDiv.innerHTML = `
-            <strong><i class="bi bi-exclamation-triangle-fill"></i> Erro!</strong><br>
-            {{ erro|e }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        `;
-        document.body.appendChild(alertDiv);
-        
-        // Auto-remover após 8 segundos
-        setTimeout(() => {
-            alertDiv.classList.remove('show');
-            setTimeout(() => alertDiv.remove(), 150);
-        }, 8000);
-        {% endif %}
-        
-        {% if sucesso %}
-        // Exibir mensagem de sucesso
-        const successDiv = document.createElement('div');
-        successDiv.className = 'alert alert-success alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3';
-        successDiv.style.zIndex = '9999';
-        successDiv.style.minWidth = '300px';
-        successDiv.innerHTML = `
-            <strong><i class="bi bi-check-circle-fill"></i> Sucesso!</strong><br>
-            {{ sucesso|e }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        `;
-        document.body.appendChild(successDiv);
-        
-        // Auto-remover após 5 segundos
-        setTimeout(() => {
-            successDiv.classList.remove('show');
-            setTimeout(() => successDiv.remove(), 150);
-        }, 5000);
-        {% endif %}
-    });
-    </script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="/static/js/cadastro_fornecedor.js"></script>
+
+        {# Injetamos os dados do servidor em JSON para evitar usar diretivas Jinja dentro do JS #}
+        <script id="fornecedor-server-data" type="application/json">
+            {{ {
+                'erro': erro if erro is defined else None,
+                'erros_list': erros_list if erros_list is defined else [],
+                'sucesso': sucesso if sucesso is defined else None,
+                'campos_erro': campos_erro if campos_erro is defined else {}
+            } | tojson }}
+        </script>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Ler dados fornecidos pelo servidor via script[type="application/json"]
+                const dataEl = document.getElementById('fornecedor-server-data');
+                let serverData = {};
+                try {
+                    serverData = JSON.parse(dataEl.textContent || '{}');
+                } catch (e) {
+                    // parsing error - nada a fazer
+                    serverData = {};
+                }
+
+                // Função auxiliar para criar e mostrar um toast/alert
+                function showToast(message, type = 'danger', timeout = 8000) {
+                    const el = document.createElement('div');
+                    el.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3`;
+                    el.style.zIndex = '9999';
+                    el.style.minWidth = '300px';
+                    el.innerHTML = `\n                        <strong>${type === 'success' ? '<i class="bi bi-check-circle-fill"></i> Sucesso!' : '<i class="bi bi-exclamation-triangle-fill"></i> Erro'}</strong><br>\n                        ${message}\n                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>`;
+                    document.body.appendChild(el);
+                    setTimeout(() => { el.classList.remove('show'); setTimeout(() => el.remove(), 150); }, timeout);
+                }
+
+                // Mostrar erro geral
+                if (serverData.erro) {
+                    showToast(serverData.erro, 'danger', 8000);
+                }
+
+                // Mostrar lista de erros (se houver)
+                if (Array.isArray(serverData.erros_list) && serverData.erros_list.length) {
+                    serverData.erros_list.forEach(msg => showToast(msg, 'danger', 8000));
+                }
+
+                // Mostrar sucesso
+                if (serverData.sucesso) {
+                    showToast(serverData.sucesso, 'success', 5000);
+                }
+
+                // (Opcional) focar/abrir a seção do formulário que contém o primeiro erro de campo
+                try {
+                    const campos = serverData.campos_erro || {};
+                    const camposKeys = Object.keys(campos);
+                    if (camposKeys.length) {
+                        // mapear campos para seções (ajuste conforme nomes de campos)
+                        const mapaSecao = {
+                            'nome': 1, 'razao_social': 1, 'cpf_cnpj': 1, 'telefone': 1,
+                            'estado': 2, 'cidade': 2, 'cep': 2, 'rua': 2, 'bairro': 2, 'numero': 2, 'complemento': 2,
+                            'email': 3, 'senha': 3, 'confirmar_senha': 3, 'termos': 3
+                        };
+                        const primeira = camposKeys[0];
+                        const secao = mapaSecao[primeira] || 1;
+                        // esconder todas as seções e mostrar a desejada
+                        document.querySelectorAll('.form-section').forEach(s => s.classList.add('d-none'));
+                        const el = document.getElementById(`secao${secao}`);
+                        if (el) el.classList.remove('d-none');
+                        // rolar até o formulário
+                        const formTop = document.querySelector('.cadastro-form-container');
+                        if (formTop) formTop.scrollIntoView({ behavior: 'smooth' });
+                    }
+                } catch (e) {
+                    // silencioso
+                }
+            });
+        </script>
     {% endblock %}
 </body>
 

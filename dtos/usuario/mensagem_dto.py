@@ -22,12 +22,18 @@ class CriarMensagemDTO(BaseDTO):
     @field_validator("nome_remetente")
     @classmethod
     def validar_nome_remetente(cls, v: Optional[str]) -> Optional[str]:
-        return cls.validar_campo_wrapper(validar_texto_opcional, "Nome do remetente", max_chars=150)(v)
+        return cls.validar_campo_wrapper(
+            lambda valor, campo: validar_texto_opcional(valor, max_chars=150),
+            "Nome do remetente"
+        )(v)
 
     @field_validator("nome_destinatario")
     @classmethod
     def validar_nome_destinatario(cls, v: Optional[str]) -> Optional[str]:
-        return cls.validar_campo_wrapper(validar_texto_opcional, "Nome do destinatário", max_chars=150)(v)
+        return cls.validar_campo_wrapper(
+            lambda valor, campo: validar_texto_opcional(valor, max_chars=150),
+            "Nome do destinatário"
+        )(v)
 
     # 🔹 Exemplo para documentação
     @classmethod
@@ -54,17 +60,26 @@ class AtualizarMensagemDTO(BaseDTO):
     @field_validator("conteudo")
     @classmethod
     def validar_conteudo(cls, v: Optional[str]) -> Optional[str]:
-        return cls.validar_campo_wrapper(validar_texto_opcional, "Conteúdo", max_chars=1000)(v)
+        return cls.validar_campo_wrapper(
+            lambda valor, campo: validar_texto_opcional(valor, max_chars=1000),
+            "Conteúdo"
+        )(v)
 
     @field_validator("nome_remetente")
     @classmethod
     def validar_nome_remetente(cls, v: Optional[str]) -> Optional[str]:
-        return cls.validar_campo_wrapper(validar_texto_opcional, "Nome do remetente", max_chars=150)(v)
+        return cls.validar_campo_wrapper(
+            lambda valor, campo: validar_texto_opcional(valor, max_chars=150),
+            "Nome do remetente"
+        )(v)
 
     @field_validator("nome_destinatario")
     @classmethod
     def validar_nome_destinatario(cls, v: Optional[str]) -> Optional[str]:
-        return cls.validar_campo_wrapper(validar_texto_opcional, "Nome do destinatário", max_chars=150)(v)
+        return cls.validar_campo_wrapper(
+            lambda valor, campo: validar_texto_opcional(valor, max_chars=150),
+            "Nome do destinatário"
+        )(v)
 
 
 # 🔹 Configura JSON Schema extra

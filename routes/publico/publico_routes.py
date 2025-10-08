@@ -380,6 +380,9 @@ async def processar_cadastro_fornecedor(
     }
 
     try:
+        # Log: valor bruto recebido para diagnóstico (usar INFO para garantir visibilidade nos logs)
+        logger.info(f"[DEBUG-INFO] raw cpf_cnpj recebido (form): {repr(cpf_cnpj)}")
+
         # Validar dados com Pydantic DTO
         fornecedor_dto = CriarFornecedorDTO(
             nome=nome,
@@ -391,40 +394,55 @@ async def processar_cadastro_fornecedor(
             numero=numero,
             bairro=bairro,
             senha=senha,
+            confirmar_senha=confirmar_senha,
             cpf_cnpj=cpf_cnpj,
             razao_social=razao_social,
             complemento=complemento or "",
             cep=cep or "",
-            tipo_usuario="fornecedor"
+            tipo_usuario="fornecedor",
+            foto=None
         )
 
-        # Verificar se senhas coincidem (validação adicional)
-        if senha != confirmar_senha:
+        # Log: valor depois da validação (limpo) — usar INFO para visibilidade
+        logger.info(f"[DEBUG-INFO] fornecedor_dto.cpf_cnpj (após validação): {repr(getattr(fornecedor_dto, 'cpf_cnpj', None))}")
+
+        # Verificar se todos os campos obrigatórios foram preenchidos (usar valores validados pelo DTO)
+        if not fornecedor_dto.nome or not fornecedor_dto.email or not fornecedor_dto.senha or not fornecedor_dto.confirmar_senha or not fornecedor_dto.cpf_cnpj:
+            return templates.TemplateResponse(
+                "publico/fornecedor2/cadastro_fornecedor.html",
+                {"request": request, "erro": "Preencha todos os campos.", "dados": dados_formulario},
+                status_code=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Verificar se senhas coincidem (usar valores do DTO)
+        if fornecedor_dto.senha != fornecedor_dto.confirmar_senha:
             return templates.TemplateResponse(
                 "publico/fornecedor2/cadastro_fornecedor.html",
                 {
-                    "request": request, 
+                    "request": request,
                     "erro": "As senhas não coincidem.",
                     "dados": dados_formulario
-                }
+                },
+                status_code=status.HTTP_400_BAD_REQUEST
             )
 
-        # Verificar se email já existe
-        if fornecedor_repo.obter_fornecedor_por_email(email):
+        # Verificar se email já existe (usar email validado pelo DTO)
+        if fornecedor_repo.obter_fornecedor_por_email(fornecedor_dto.email):
             return templates.TemplateResponse(
                 "publico/fornecedor2/cadastro_fornecedor.html",
                 {
-                    "request": request, 
+                    "request": request,
                     "erro": "Email já cadastrado. Tente fazer login ou use outro email.",
                     "dados": dados_formulario
-                }
+                },
+                status_code=status.HTTP_400_BAD_REQUEST
             )
 
-        # Criar hash da senha
-        senha_hash = criar_hash_senha(senha)
+        # Criar hash da senha (usar senha validada)
+        senha_hash = criar_hash_senha(fornecedor_dto.senha)
 
-        # Garante que razao_social nunca seja None ou string vazia
-        razao_social_final = razao_social if razao_social and razao_social.strip() else nome
+        # Garante que razao_social nunca seja None ou string vazia (usar DTO)
+        razao_social_final = fornecedor_dto.razao_social if getattr(fornecedor_dto, 'razao_social', None) and fornecedor_dto.razao_social.strip() else fornecedor_dto.nome
 
         # Lógica de upload de foto
         caminho_foto = None
@@ -443,7 +461,7 @@ async def processar_cadastro_fornecedor(
             os.makedirs(upload_dir, exist_ok=True)
             import secrets
             extensao = foto.filename.split(".")[-1]
-            nome_arquivo = f"{email}_{secrets.token_hex(8)}.{extensao}"
+            nome_arquivo = f"{fornecedor_dto.email}_{secrets.token_hex(8)}.{extensao}"
             caminho_arquivo = os.path.join(upload_dir, nome_arquivo)
             conteudo = await foto.read()
             with open(caminho_arquivo, "wb") as f:
@@ -453,18 +471,18 @@ async def processar_cadastro_fornecedor(
         # Criar objeto Fornecedor
         fornecedor = Fornecedor(
             id=0,
-            nome=nome,
-            email=email,
+            nome=fornecedor_dto.nome,
+            email=fornecedor_dto.email,
             senha=senha_hash,
-            cpf_cnpj=cpf_cnpj,
-            telefone=telefone,
-            cep=cep or "",
-            estado=estado,
-            cidade=cidade,
-            rua=rua,
-            numero=numero,
-            complemento=complemento or "",
-            bairro=bairro,
+            cpf_cnpj=fornecedor_dto.cpf_cnpj,
+            telefone=fornecedor_dto.telefone,
+            cep=getattr(fornecedor_dto, 'cep', '') or "",
+            estado=fornecedor_dto.estado,
+            cidade=fornecedor_dto.cidade,
+            rua=fornecedor_dto.rua,
+            numero=fornecedor_dto.numero,
+            complemento=getattr(fornecedor_dto, 'complemento', None) or "",
+            bairro=fornecedor_dto.bairro,
             tipo_usuario="Fornecedor",
             data_cadastro=datetime.now(),
             foto=caminho_foto,
@@ -486,7 +504,7 @@ async def processar_cadastro_fornecedor(
             )
 
         # Cadastro realizado com sucesso - redirecionar para login
-        logger.info(f"Fornecedor cadastrado com sucesso: {email}")
+        logger.info(f"Fornecedor cadastrado com sucesso: {fornecedor_dto.email}")
         return RedirectResponse(
             url="/login?mensagem=Cadastro realizado com sucesso! Faça seu login.", 
             status_code=status.HTTP_303_SEE_OTHER
@@ -495,20 +513,29 @@ async def processar_cadastro_fornecedor(
     except ValidationError as e:
         # Extrair mensagens de erro do Pydantic
         erros = []
+        campos_erro = {}
+        # Log completo para debug (usar WARNING para visibilidade)
+        logger.warning(f"[DEBUG-WARN] ValidationError.errors(): {e.errors()}")
         for erro in e.errors():
-            campo = erro['loc'][0] if erro['loc'] else 'campo'
-            mensagem = erro['msg']
-            erros.append(f"{campo.capitalize()}: {mensagem}")
+            # loc pode ser ('field',) ou ('field', 0, ...); pegamos o primeiro elemento
+            campo = erro.get('loc')[0] if erro.get('loc') else 'campo'
+            mensagem = erro.get('msg')
+            texto = f"{campo.capitalize()}: {mensagem}"
+            erros.append(texto)
+            # acumular por campo
+            campos_erro.setdefault(campo, []).append(mensagem)
 
         erro_msg = " | ".join(erros)
         logger.warning(f"Erro de validação no cadastro de fornecedor: {erro_msg}")
 
-        # Retornar template com dados preservados e erro
+        # Retornar template com dados preservados e detalhes por campo
         return templates.TemplateResponse(
             "publico/fornecedor2/cadastro_fornecedor.html",
             {
                 "request": request,
                 "erro": erro_msg,
+                "erros_list": erros,
+                "campos_erro": campos_erro,
                 "dados": dados_formulario  # Preservar dados digitados
             }
         )
@@ -574,7 +601,7 @@ async def processar_login(
         # Redireciona conforme perfil
         perfil = usuario_dict["perfil"]
         if perfil == "admin" or perfil == "administrador":
-            return RedirectResponse("/admin", status_code=status.HTTP_303_SEE_OTHER)
+            return RedirectResponse("/administrador/home", status_code=status.HTTP_303_SEE_OTHER)
         elif perfil == "fornecedor":
             return RedirectResponse("/fornecedor", status_code=status.HTTP_303_SEE_OTHER)
         elif perfil == "cliente":
