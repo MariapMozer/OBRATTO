@@ -24,5 +24,21 @@ class LoginDTO(BaseDTO):
             raise ValueError("A senha deve ter pelo menos 6 caracteres.")
         return v.strip()
 
+# DTO para login de Cliente
+class LoginClienteDTO(LoginDTO):
+    """DTO para login de Cliente"""
+    pass
+
+
+# DTO para login de Prestador
+class LoginPrestadorDTO(LoginDTO):
+    """DTO para login de Prestador"""
+    pass
+
+
+# DTO para login de Fornecedor
+class LoginFornecedorDTO(LoginDTO):
+    """DTO para login de Fornecedor"""
+    pass
 
 
