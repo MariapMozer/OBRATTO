@@ -1,9 +1,10 @@
-from pydantic import EmailStr, Field, field_validator
+from pydantic import EmailStr, Field, field_validator, model_validator
 from typing import Optional
 from .base_dto import BaseDTO
 from utils.validacoes_dto import *
 from enum import Enum
 from datetime import date
+import re
 
 
 class TipoUsuarioEnum(str, Enum):
@@ -17,9 +18,6 @@ class CriarUsuarioDTO(BaseDTO):
     """
     DTO para criação de novo usuário.
     Usado em formulários de registro.
-    
-    NOTA: Validadores customizados temporariamente desabilitados para evitar recursão.
-    A validação básica do Pydantic ainda funciona através dos Field constraints.
     """
 
     nome: str = Field(..., min_length=2, max_length=100)
@@ -38,9 +36,100 @@ class CriarUsuarioDTO(BaseDTO):
     tipo_usuario: TipoUsuarioEnum = Field(...)
     foto: Optional[str] = Field(None)
 
+    # Funções locais para validar CPF e CNPJ (dígitos verificadores)
+    @staticmethod
+    def _calcular_digito_cpf(digs: str) -> int:
+        soma = sum(int(digs[i]) * (len(digs) + 1 - i) for i in range(len(digs)))
+        resto = soma % 11
+        return 0 if resto < 2 else 11 - resto
 
-    # VALIDADORES DESABILITADOS TEMPORARIAMENTE - CAUSANDO RECURSÃO
-    # Pydantic faz validação básica através dos Field constraints
+    @staticmethod
+    def validar_cpf(num: str) -> str:
+        num = re.sub(r'[^0-9]', '', num or '')
+        if len(num) != 11:
+            raise ValueError('CPF deve conter 11 dígitos')
+        # impedir CPFs com todos os dígitos iguais
+        if num == num[0] * 11:
+            raise ValueError('CPF inválido')
+        dig1 = CriarUsuarioDTO._calcular_digito_cpf(num[:9])
+        dig2 = CriarUsuarioDTO._calcular_digito_cpf(num[:9] + str(dig1))
+        if int(num[9]) != dig1 or int(num[10]) != dig2:
+            raise ValueError('CPF inválido')
+        return num
+
+    @staticmethod
+    def validar_cnpj(num: str) -> str:
+        num = re.sub(r'[^0-9]', '', num or '')
+        if len(num) != 14:
+            raise ValueError('CNPJ deve conter 14 dígitos')
+        # cálculo dos dígitos verificadores
+        def calc(digs, pesos):
+            s = sum(int(digs[i]) * pesos[i] for i in range(len(digs)))
+            r = s % 11
+            return '0' if r < 2 else str(11 - r)
+
+        pesos1 = [5,4,3,2,9,8,7,6,5,4,3,2]
+        pesos2 = [6] + pesos1
+        d1 = calc(num[:12], pesos1)
+        d2 = calc(num[:12] + d1, pesos2)
+        if num[12] != d1 or num[13] != d2:
+            raise ValueError('CNPJ inválido')
+        return num
+
+    @classmethod
+    def validar_cpf_cnpj_local(cls, valor: str) -> str:
+        if not valor:
+            raise ValueError('CPF/CNPJ é obrigatório')
+        cleaned = re.sub(r'[^0-9]', '', valor)
+        if len(cleaned) == 11:
+            return cls.validar_cpf(cleaned)
+        if len(cleaned) == 14:
+            return cls.validar_cnpj(cleaned)
+        raise ValueError('CPF deve ter 11 dígitos ou CNPJ 14 dígitos')
+
+    # Delegar validações para os validadores centralizados definidos em utils/validacoes_dto.py
+    @field_validator('nome')
+    @classmethod
+    def validar_nome_criar(cls, v: str) -> str:
+        # validar_texto_obrigatorio espera (texto, campo, min_chars, max_chars)
+        return validar_texto_obrigatorio(v, "Nome", min_chars=2, max_chars=100)
+
+    @field_validator('senha')
+    @classmethod
+    def validar_senha_criar(cls, v: str) -> str:
+        # usar validar_senha do utils
+        return validar_senha(v, min_chars=8, obrigatorio=True)
+
+    # Validar senhas no nível do modelo para garantir ambos os campos disponíveis
+    @model_validator(mode='after')
+    def verificar_senhas(cls, model):
+        if not getattr(model, 'senha', None):
+            raise ValueError('Senha é obrigatória')
+        if not getattr(model, 'confirmar_senha', None):
+            raise ValueError('Confirmação de senha é obrigatória')
+        validar_senhas_coincidem(model.senha, model.confirmar_senha)
+        return model
+
+    @field_validator('cpf_cnpj')
+    @classmethod
+    def validar_cpf_cnpj_criar(cls, v: str) -> str:
+        return cls.validar_cpf_cnpj_local(v)
+
+    @field_validator('telefone')
+    @classmethod
+    def validar_telefone_criar(cls, v: str) -> str:
+        return validar_telefone(v)
+
+    @field_validator('cep')
+    @classmethod
+    def validar_cep_criar(cls, v: str) -> str:
+        return validar_cep(v)
+
+    @field_validator('estado')
+    @classmethod
+    def validar_estado_criar(cls, v: str) -> str:
+        return validar_estado_brasileiro(v)
+
 
     @classmethod
     def criar_exemplo_usuario_json(cls, **overrides) -> dict:
@@ -49,7 +138,8 @@ class CriarUsuarioDTO(BaseDTO):
             "nome": "João Silva",
             "email": "joao.silva@email.com",
             "senha": "senhaSegura123",
-            "cpf_cnpj": "123.456.789-01",
+            "confirmar_senha": "senhaSegura123",
+            "cpf_cnpj": "111.444.777-35",
             "telefone": "(11) 99999-9999",
             "cep": "12345-678",
             "rua": "Rua Exemplo",
@@ -57,7 +147,8 @@ class CriarUsuarioDTO(BaseDTO):
             "complemento": "Apto 45",
             "bairro": "Bairro Exemplo",
             "cidade": "Cidade Exemplo",
-            "estado": "EX",
+            "estado": "SP",
+            "tipo_usuario": "cliente",
         }
 
         exemplo.update(overrides)
@@ -107,6 +198,8 @@ class AtualizarUsuarioDTO(BaseDTO):
     @field_validator('senha')
     @classmethod
     def validar_senha_forte(cls, v):
+        if v is None:
+            return v
         if len(v) < 8:
             raise ValueError('Senha deve ter no mínimo 8 caracteres')
         if not any(c.isdigit() for c in v):
@@ -116,7 +209,10 @@ class AtualizarUsuarioDTO(BaseDTO):
     @field_validator('confirmar_senha')
     @classmethod
     def senhas_devem_coincidir(cls, v, info):
-        if 'senha' in info.data and v != info.data['senha']:
+        # Se nenhuma senha foi informada, aceitar None
+        if v is None:
+            return v
+        if 'senha' in info.data and info.data.get('senha') is not None and v != info.data['senha']:
             raise ValueError('As senhas não coincidem')
         return v
 
@@ -125,8 +221,11 @@ class AtualizarUsuarioDTO(BaseDTO):
     def validar_documento(cls, v: Optional[str]) -> Optional[str]:
         if not v:
             return v
-        tipo = "CPF" if len(v) <= 14 else "CNPJ"
-        return cls.validar_campo_wrapper(validar_cpf_cnpj, tipo)(v)
+        # Usar a validação local completa (CPF/CNPJ) implementada em CriarUsuarioDTO
+        try:
+            return CriarUsuarioDTO.validar_cpf_cnpj_local(v)
+        except ValueError as e:
+            raise ValueError(str(e))
 
     @field_validator('telefone')
     @classmethod

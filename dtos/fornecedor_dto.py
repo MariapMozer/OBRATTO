@@ -45,3 +45,9 @@ CriarFornecedorDTO.model_config.update({
         "example": CriarFornecedorDTO.criar_exemplo_fornecedor_json()
     }
 })
+
+class ProdutoDTO(BaseDTO):
+    pass
+
+class PromocaoDTO(BaseDTO):
+    pass
