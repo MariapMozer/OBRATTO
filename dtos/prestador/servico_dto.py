@@ -1,7 +1,7 @@
 from datetime import datetime
 from pydantic import Field, field_validator
 from typing import Optional
-from .base_dto import BaseDTO
+from ..base_dto import BaseDTO
 from utils.validacoes_dto import validar_texto_opcional
 
 
@@ -18,17 +18,26 @@ class CriarServicoDTO(BaseDTO):
     @field_validator('titulo')
     @classmethod
     def validar_titulo(cls, v: Optional[str]) -> Optional[str]:
-        return cls.validar_campo_wrapper(validar_texto_opcional, "Título", max_chars=100)(v)
+        return cls.validar_campo_wrapper(
+            lambda valor, campo: validar_texto_opcional(valor, max_chars=100),
+            "Título"
+        )(v)
     
     @field_validator('descricao')
     @classmethod
     def validar_descricao(cls, v: Optional[str]) -> Optional[str]:
-        return cls.validar_campo_wrapper(validar_texto_opcional, "Descrição do serviço", max_chars=500)(v)
+        return cls.validar_campo_wrapper(
+            lambda valor, campo: validar_texto_opcional(valor, max_chars=500),
+            "Descrição do serviço"
+        )(v)
 
     @field_validator('categoria')
     @classmethod
     def validar_categoria(cls, v: Optional[str]) -> Optional[str]:
-        return cls.validar_campo_wrapper(validar_texto_opcional, "Categoria", max_chars=50)(v)
+        return cls.validar_campo_wrapper(
+            lambda valor, campo: validar_texto_opcional(valor, max_chars=50),
+            "Categoria"
+        )(v)
     
     @field_validator('valor_base')
     @classmethod
@@ -58,17 +67,26 @@ class AtualizarServicoDTO(BaseDTO):
     @field_validator('titulo')
     @classmethod
     def validar_titulo(cls, v: Optional[str]) -> Optional[str]:
-        return cls.validar_campo_wrapper(validar_texto_opcional, "Título", max_chars=100)(v)
+        return cls.validar_campo_wrapper(
+            lambda valor, campo: validar_texto_opcional(valor, max_chars=100),
+            "Título"
+        )(v)
     
     @field_validator('descricao')
     @classmethod
     def validar_descricao(cls, v: Optional[str]) -> Optional[str]:
-        return cls.validar_campo_wrapper(validar_texto_opcional, "Descrição do serviço", max_chars=1500)(v)
+        return cls.validar_campo_wrapper(
+            lambda valor, campo: validar_texto_opcional(valor, max_chars=1500),
+            "Descrição do serviço"
+        )(v)
 
     @field_validator('categoria')
     @classmethod
     def validar_categoria(cls, v: Optional[str]) -> Optional[str]:
-        return cls.validar_campo_wrapper(validar_texto_opcional, "Categoria", max_chars=50)(v)
+        return cls.validar_campo_wrapper(
+            lambda valor, campo: validar_texto_opcional(valor, max_chars=50),
+            "Categoria"
+        )(v)
     
     @field_validator('valor_base')
     @classmethod

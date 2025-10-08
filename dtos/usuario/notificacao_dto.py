@@ -1,7 +1,7 @@
 from pydantic import Field, field_validator
 from typing import Optional, Literal
 from datetime import datetime
-from .base_dto import BaseDTO
+from ..base_dto import BaseDTO
 from utils.validacoes_dto import validar_texto_opcional, validar_texto
 
 
@@ -55,7 +55,10 @@ class AtualizarNotificacaoDTO(BaseDTO):
     def validar_mensagem(cls, v: Optional[str]) -> Optional[str]:
         if v is None:
             return v
-        return cls.validar_campo_wrapper(validar_texto_opcional, "Mensagem", max_chars=500)(v)
+        return cls.validar_campo_wrapper(
+            lambda valor, campo: validar_texto_opcional(valor, max_chars=500),
+            "Mensagem"
+        )(v)
 
     @field_validator("data_hora")
     @classmethod

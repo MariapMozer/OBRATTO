@@ -1,15 +1,33 @@
 
-from fastapi import APIRouter, Request, Form, Depends, File, UploadFile
+from fastapi import APIRouter, Request, Form, Depends, File, UploadFile, status
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse
+from pydantic import ValidationError
+from datetime import datetime
+import logging
+
 from data.administrador import administrador_repo
+from data.administrador.administrador_model import Administrador
 from data.fornecedor import fornecedor_repo
 from data.prestador import prestador_repo
+from data.usuario import usuario_repo
+from data.usuario.usuario_model import Usuario
+from dtos.Administrador.administrador_dto import CriarAdministradorDTO, AtualizarAdministradorDTO
 from utils.auth_decorator import requer_autenticacao
+from utils.security import criar_hash_senha
+
+# Configurar logger
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
 administrador_usuarios = APIRouter()
+
+
+@router.get("/home")
+@requer_autenticacao(['administrador'])
+async def get_home_adm(request: Request, usuario_logado: dict = None):
+    return templates.TemplateResponse("administrador/home_adm.html", {"request": request})
 
 # Rota para exibir o formulário de cadastro do administrador
 @router.get("/cadastro")
@@ -25,21 +43,179 @@ async def cadastrar_administrador(
     nome: str = Form(...),
     email: str = Form(...),
     senha: str = Form(...),
+    confirmar_senha: str = Form(...),
+    cpf_cnpj: str = Form(...),
+    telefone: str = Form(...),
+    cep: str = Form(...),
+    estado: str = Form(...),
+    cidade: str = Form(...),
+    rua: str = Form(...),
+    numero: str = Form(...),
+    bairro: str = Form(...),
+    complemento: str = Form(""),
     usuario_logado: dict = None
 ):
-    novo_adm = {
+    logger.info(f"Iniciando cadastro de administrador. Email: {email}")
+    
+    # Preservar dados do formulário (exceto senhas por segurança)
+    dados_formulario = {
         "nome": nome,
         "email": email,
-        "senha": senha 
+        "cpf_cnpj": cpf_cnpj,
+        "telefone": telefone,
+        "cep": cep,
+        "estado": estado,
+        "cidade": cidade,
+        "rua": rua,
+        "numero": numero,
+        "bairro": bairro,
+        "complemento": complemento
     }
-    administrador_repo.criar_administrador(novo_adm)
-    return templates.TemplateResponse("administrador/moderar_adm/cadastrar_adm.html", {"request": request})
 
+    try:
+        # Validar dados com Pydantic DTO
+        admin_dto = CriarAdministradorDTO(
+            nome=nome,
+            email=email,
+            senha=senha,
+            confirmar_senha=confirmar_senha,
+            cpf_cnpj=cpf_cnpj,
+            telefone=telefone,
+            cep=cep,
+            estado=estado,
+            cidade=cidade,
+            rua=rua,
+            numero=numero,
+            bairro=bairro,
+            complemento=complemento or "",
+            tipo_usuario="administrador",
+            foto=None
+        )
 
-@router.get("/home")
-@requer_autenticacao(['administrador'])
-async def get_home_adm(request: Request, usuario_logado: dict = None):
-    return templates.TemplateResponse("administrador/home_adm.html", {"request": request})
+        # Verificar se email já existe
+        usuario_existente = usuario_repo.obter_usuario_por_email(admin_dto.email)
+        logger.info(f"Verificação de email: {admin_dto.email} - Existente: {usuario_existente is not None}")
+        
+        if usuario_existente:
+            logger.warning(f"Email já cadastrado: {admin_dto.email}")
+            return templates.TemplateResponse(
+                "administrador/moderar_adm/cadastrar_adm.html",
+                {
+                    "request": request,
+                    "erro": "Email já cadastrado no sistema.",
+                    "dados": dados_formulario
+                },
+                status_code=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Criar hash da senha (usar senha validada)
+        senha_hash = criar_hash_senha(admin_dto.senha)
+
+        # Criar objeto Usuario
+        usuario = Usuario(
+            id=None,
+            nome=admin_dto.nome,
+            email=admin_dto.email,
+            senha=senha_hash,
+            cpf_cnpj=admin_dto.cpf_cnpj,
+            telefone=admin_dto.telefone,
+            cep=admin_dto.cep,
+            rua=admin_dto.rua,
+            numero=admin_dto.numero,
+            complemento=admin_dto.complemento or "",
+            bairro=admin_dto.bairro,
+            cidade=admin_dto.cidade,
+            estado=admin_dto.estado,
+            tipo_usuario="Administrador",
+            data_cadastro=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            foto=None,
+            token_redefinicao=None,
+            data_token=None
+        )
+
+        # Inserir usuário no banco
+        id_usuario = usuario_repo.inserir_usuario(usuario)
+        logger.info(f"Usuário criado com ID: {id_usuario}, tipo_usuario: {usuario.tipo_usuario}")
+        
+        if not id_usuario:
+            return templates.TemplateResponse(
+                "administrador/moderar_adm/cadastrar_adm.html",
+                {
+                    "request": request,
+                    "erro": "Erro ao criar usuário. Tente novamente.",
+                    "dados": dados_formulario
+                }
+            )
+
+        # Criar registro na tabela administrador
+        administrador = Administrador(id=None, id_usuario=id_usuario)
+        admin_id = administrador_repo.inserir_administrador(administrador)
+
+        if not admin_id:
+            # Se falhar, remover usuário criado (rollback manual)
+            usuario_repo.excluir_usuario(id_usuario)
+            return templates.TemplateResponse(
+                "administrador/moderar_adm/cadastrar_adm.html",
+                {
+                    "request": request,
+                    "erro": "Erro ao criar administrador. Tente novamente.",
+                    "dados": dados_formulario
+                }
+            )
+
+        # Sucesso - Registrar log
+        logger.info(f"Novo administrador criado: {admin_dto.email} por {usuario_logado.get('email', 'desconhecido')}")
+
+        # Redirecionar com mensagem de sucesso
+        return templates.TemplateResponse(
+            "administrador/moderar_adm/cadastrar_adm.html",
+            {
+                "request": request,
+                "sucesso": f"Administrador {admin_dto.nome} cadastrado com sucesso!",
+                "dados": None  # Limpar formulário
+            }
+        )
+
+    except ValidationError as e:
+        # Extrair mensagens de erro do Pydantic
+        erros = []
+        campos_erro = {}
+        
+        for erro in e.errors():
+            campo = erro.get('loc')[0] if erro.get('loc') else 'campo'
+            mensagem = erro.get('msg')
+            texto = f"{campo.capitalize()}: {mensagem}"
+            erros.append(texto)
+            campos_erro.setdefault(campo, []).append(mensagem)
+
+        erro_msg = " | ".join(erros)
+        logger.warning(f"Erro de validação no cadastro de administrador: {erro_msg}")
+
+        # Retornar template com dados preservados e erros
+        return templates.TemplateResponse(
+            "administrador/moderar_adm/cadastrar_adm.html",
+            {
+                "request": request,
+                "erro": erro_msg,
+                "erros_list": erros,
+                "campos_erro": campos_erro,
+                "dados": dados_formulario
+            }
+        )
+
+    except Exception as e:
+        import traceback
+        logger.error(f"Erro ao processar cadastro de administrador: {e}")
+        logger.error(f"Traceback: {traceback.format_exc()}")
+
+        return templates.TemplateResponse(
+            "administrador/moderar_adm/cadastrar_adm.html",
+            {
+                "request": request,
+                "erro": "Erro ao processar cadastro. Tente novamente.",
+                "dados": dados_formulario
+            }
+        )
 
 
 @router.get("/lista")
@@ -212,7 +388,7 @@ async def aprovar_selo_fornecedor(request: Request, id: int = Form(...), usuario
     if fornecedor:
         fornecedor.selo_confianca = True
         fornecedor_repo.atualizar_fornecedor(fornecedor)
-    return RedirectResponse("/admin/verificacao_selo", status_code=303)
+    return RedirectResponse("/administrador/verificacao_selo", status_code=303)
 
 # Aprovar selo de confiança para prestador
 @router.post("/aprovar_selo_prestador")
@@ -222,7 +398,7 @@ async def aprovar_selo_prestador(request: Request, id: int = Form(...), usuario_
     if prestador:
         prestador.selo_confianca = True
         prestador_repo.atualizar_prestador(prestador)
-    return RedirectResponse("/admin/verificacao_selo", status_code=303)
+    return RedirectResponse("/administrador/verificacao_selo", status_code=303)
 
 
 
@@ -281,7 +457,7 @@ async def upload_foto_perfil_administrador(
     # Validar tipo de arquivo
     tipos_permitidos = ["image/jpeg", "image/png", "image/jpg"]
     if foto.content_type not in tipos_permitidos:
-        return RedirectResponse("/admin/perfil?erro=tipo_invalido", status_code=303)
+        return RedirectResponse("/administrador/perfil?erro=tipo_invalido", status_code=303)
 
     # Criar diretório de upload se não existir
     upload_dir = "static/uploads/administradores"
@@ -311,6 +487,6 @@ async def upload_foto_perfil_administrador(
             criar_sessao(request, usuario_logado)
 
     except Exception as e:
-        return RedirectResponse("/admin/perfil?erro=upload_falhou", status_code=303)
+        return RedirectResponse("/administrador/perfil?erro=upload_falhou", status_code=303)
 
-    return RedirectResponse("/admin/perfil?foto_sucesso=1", status_code=303)
+    return RedirectResponse("/administrador/perfil?foto_sucesso=1", status_code=303)

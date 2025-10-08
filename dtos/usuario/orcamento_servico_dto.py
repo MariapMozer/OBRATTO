@@ -1,7 +1,7 @@
 from pydantic import Field, field_validator
 from typing import Optional
 from datetime import date
-from .base_dto import BaseDTO
+from ..base_dto import BaseDTO
 from utils.validacoes_dto import validar_texto_opcional
 
 
@@ -28,12 +28,18 @@ class CriarOrcamentoServicoDTO(BaseDTO):
     @field_validator("descricao")
     @classmethod
     def validar_descricao(cls, v: str) -> str:
-        return cls.validar_campo_wrapper(validar_texto_opcional, "Descrição do serviço", max_chars=500)(v)
+        return cls.validar_campo_wrapper(
+            lambda valor, campo: validar_texto_opcional(valor, max_chars=500),
+            "Descrição do serviço"
+        )(v)
 
     @field_validator("titulo_servico")
     @classmethod
     def validar_titulo_servico(cls, v: str) -> str:
-        return cls.validar_campo_wrapper(validar_texto_opcional, "Título do serviço", max_chars=100)(v)
+        return cls.validar_campo_wrapper(
+            lambda valor, campo: validar_texto_opcional(valor, max_chars=100),
+            "Título do serviço"
+        )(v)
 
     @field_validator("prazo_entrega")
     @classmethod
@@ -45,7 +51,10 @@ class CriarOrcamentoServicoDTO(BaseDTO):
     @field_validator("status")
     @classmethod
     def validar_status(cls, v: Optional[str]) -> Optional[str]:
-        return cls.validar_campo_wrapper(validar_texto_opcional, "Status do orçamento", max_chars=50)(v)
+        return cls.validar_campo_wrapper(
+            lambda valor, campo: validar_texto_opcional(valor, max_chars=50),
+            "Status do orçamento"
+        )(v)
 
     # 🔹 Exemplo para documentação
     @classmethod
@@ -86,27 +95,42 @@ class AtualizarOrcamentoServicoDTO(BaseDTO):
     @field_validator("descricao")
     @classmethod
     def validar_descricao(cls, v: Optional[str]) -> Optional[str]:
-        return cls.validar_campo_wrapper(validar_texto_opcional, "Descrição do serviço", max_chars=500)(v)
+        return cls.validar_campo_wrapper(
+            lambda valor, campo: validar_texto_opcional(valor, max_chars=500),
+            "Descrição do serviço"
+        )(v)
 
     @field_validator("titulo_servico")
     @classmethod
     def validar_titulo_servico(cls, v: Optional[str]) -> Optional[str]:
-        return cls.validar_campo_wrapper(validar_texto_opcional, "Título do serviço", max_chars=100)(v)
+        return cls.validar_campo_wrapper(
+            lambda valor, campo: validar_texto_opcional(valor, max_chars=100),
+            "Título do serviço"
+        )(v)
 
     @field_validator("status")
     @classmethod
     def validar_status(cls, v: Optional[str]) -> Optional[str]:
-        return cls.validar_campo_wrapper(validar_texto_opcional, "Status do orçamento", max_chars=50)(v)
+        return cls.validar_campo_wrapper(
+            lambda valor, campo: validar_texto_opcional(valor, max_chars=50),
+            "Status do orçamento"
+        )(v)
 
     @field_validator("nome_prestador")
     @classmethod
     def validar_nome_prestador(cls, v: Optional[str]) -> Optional[str]:
-        return cls.validar_campo_wrapper(validar_texto_opcional, "Nome do prestador", max_chars=150)(v)
+        return cls.validar_campo_wrapper(
+            lambda valor, campo: validar_texto_opcional(valor, max_chars=150),
+            "Nome do prestador"
+        )(v)
 
     @field_validator("nome_cliente")
     @classmethod
     def validar_nome_cliente(cls, v: Optional[str]) -> Optional[str]:
-        return cls.validar_campo_wrapper(validar_texto_opcional, "Nome do cliente", max_chars=150)(v)
+        return cls.validar_campo_wrapper(
+            lambda valor, campo: validar_texto_opcional(valor, max_chars=150),
+            "Nome do cliente"
+        )(v)
 
     @field_validator("prazo_entrega")
     @classmethod

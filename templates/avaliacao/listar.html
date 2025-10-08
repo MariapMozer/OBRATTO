@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Lista de Avaliações</h2>
+<table>
+  <tr>
+    <th>ID</th>
+    <th>Avaliador</th>
+    <th>Avaliado</th>
+    <th>Nota</th>
+    <th>Descrição</th>
+    <th>Data</th>
+    <th>Ações</th>
+  </tr>
+  {% for a in avaliacoes %}
+  <tr>
+    <td>{{ a.id_avaliacao }}</td>
+    <td>{{ a.nome_avaliador }}</td>
+    <td>{{ a.nome_avaliado }}</td>
+    <td>{{ a.nota }}</td>
+    <td>{{ a.descricao }}</td>
+    <td>{{ a.data_avaliacao.strftime("%d/%m/%Y %H:%M") }}</td>
+    <td>
+      <a href="/avaliacao/{{ a.id_avaliacao }}">Ver</a> |
+      <a href="/avaliacao/editar/{{ a.id_avaliacao }}">Editar</a> |
+      <form method="post" action="/avaliacao/excluir/{{ a.id_avaliacao }}" style="display:inline;">
+        <button type="submit" onclick="return confirm('Excluir avaliação?')">Excluir</button>
+      </form>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}
