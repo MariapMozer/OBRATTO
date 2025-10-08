@@ -1,7 +1,7 @@
 from datetime import datetime
 from pydantic import Field, field_validator
 from typing import Optional
-from .base_dto import BaseDTO
+from ..base_dto import BaseDTO
 from utils.validacoes_dto import validar_texto_opcional
 
 

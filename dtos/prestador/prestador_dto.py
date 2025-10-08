@@ -1,11 +1,11 @@
 from pydantic import EmailStr, Field, field_validator
 from typing import Optional
-from .base_dto import BaseDTO
+from ..base_dto import BaseDTO
 from utils.validacoes_dto import *
 from enum import Enum
 from datetime import date
-from .base_dto import BaseDTO
-from .usuario_dto import AtualizarUsuarioDTO, CriarUsuarioDTO
+from ..base_dto import BaseDTO
+from ..usuario.usuario_dto import AtualizarUsuarioDTO, CriarUsuarioDTO
 
 class CriarPrestadorDTO(CriarUsuarioDTO):
     area_atuacao: Optional[str] = Field(None)

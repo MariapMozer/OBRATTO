@@ -12,14 +12,14 @@ from data.orcamento.orcamento_model import Orcamento
 from data.orcamentoservico.orcamento_servico_model import OrcamentoServico
 from data.notificacao.notificacao_model import Notificacao
 
-from dtos.usuario_dto import UsuarioDTO
-from dtos.cliente_dto import  CriarClienteDTO, AtualizarClienteDTO
-from dtos.prestador_dto import CriarPrestadorDTO, AtualizarPrestadorDTO
-from dtos.servico_dto import CriarServicoDTO, AtualizarServicoDTO
-from dtos.avaliacao_dto import CriarAvaliacaoDTO, AtualizarAvaliacaoDTO
-from dtos.mensagem_dto import CriarMensagemDTO, AtualizarMensagemDTO
-from dtos.orcamento_servico_dto import  CriarOrcamentoServicoDTO, AtualizarOrcamentoServicoDTO
-from dtos.notificacao_dto import CriarNotificacaoDTO, AtualizarNotificacaoDTO
+from dtos.usuario.usuario_dto import UsuarioDTO
+from dtos.cliente.cliente_dto import  CriarClienteDTO, AtualizarClienteDTO
+from dtos.prestador.prestador_dto import CriarPrestadorDTO, AtualizarPrestadorDTO
+from dtos.prestador.servico_dto import CriarServicoDTO, AtualizarServicoDTO
+from dtos.usuario.avaliacao_dto import CriarAvaliacaoDTO, AtualizarAvaliacaoDTO
+from dtos.usuario.mensagem_dto import CriarMensagemDTO, AtualizarMensagemDTO
+from dtos.usuario.orcamento_servico_dto import  CriarOrcamentoServicoDTO, AtualizarOrcamentoServicoDTO
+from dtos.usuario.notificacao_dto import CriarNotificacaoDTO, AtualizarNotificacaoDTO
 
 # Exemplo de uso para Cliente
 def exemplo_cliente_dto_pydantic():
