@@ -8,7 +8,7 @@ import re
 
 
 class TipoUsuarioEnum(str, Enum):
-    #ADM = "adm"
+    ADMINISTRADOR = "administrador"
     PRESTADOR = "prestador"
     CLIENTE = "cliente"
     FORNECEDOR = "fornecedor"

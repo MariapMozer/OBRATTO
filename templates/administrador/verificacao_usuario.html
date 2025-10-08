@@ -20,7 +20,7 @@
             <td>{{ f.email }}</td>
             <td>{{ f.razao_social }}</td>
             <td>
-                <form method="post" action="/admin/aprovar_selo_fornecedor" style="display:inline;">
+                <form method="post" action="/administrador/aprovar_selo_fornecedor" style="display:inline;">
                     <input type="hidden" name="id" value="{{ f.id }}">
                     <button type="submit" class="btn btn-success btn-sm">Aprovar Selo</button>
                 </form>
@@ -51,7 +51,7 @@
             <td>{{ p.email }}</td>
             <td>{{ p.area_atuacao }}</td>
             <td>
-                <form method="post" action="/admin/aprovar_selo_prestador" style="display:inline;">
+                <form method="post" action="/administrador/aprovar_selo_prestador" style="display:inline;">
                     <input type="hidden" name="id" value="{{ p.id }}">
                     <button type="submit" class="btn btn-success btn-sm">Aprovar Selo</button>
                 </form>

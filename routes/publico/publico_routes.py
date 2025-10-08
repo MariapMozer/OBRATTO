@@ -590,7 +590,7 @@ async def processar_login(
         # Redireciona conforme perfil
         perfil = usuario_dict["perfil"]
         if perfil == "admin" or perfil == "administrador":
-            return RedirectResponse("/admin", status_code=status.HTTP_303_SEE_OTHER)
+            return RedirectResponse("/administrador/home", status_code=status.HTTP_303_SEE_OTHER)
         elif perfil == "fornecedor":
             return RedirectResponse("/fornecedor", status_code=status.HTTP_303_SEE_OTHER)
         elif perfil == "cliente":
