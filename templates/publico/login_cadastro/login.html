@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,16 +9,18 @@
     <link rel="stylesheet" href="/static/css/login.css">
     <title>Obratto :: Login</title>
 </head>
+
 <body class="d-flex flex-column min-vh-100">
-   <main class="login-main">
+    <main class="login-main">
         <div class="login-container fade-in-up">
             <!-- Lado esquerdo - Informações -->
             <div class="login-info">
                 <div class="login-info-content">
                     <img src="/static/img/logo_branca.png" alt="Obratto Logo" class="login-logo">
                     <h2>Bem-vindo de volta!</h2>
-                    <p>Acesse sua conta e continue aproveitando todos os recursos da nossa plataforma de construção civil.</p>
-                    
+                    <p>Acesse sua conta e continue aproveitando todos os recursos da nossa plataforma de construção
+                        civil.</p>
+
                     <ul class="login-benefits">
                         <li>
                             <i class="bi bi-check-circle-fill"></i>
@@ -48,18 +51,27 @@
 
                 <!-- Formulário de Login -->
                 <form id="loginForm" method="post" action="/login" novalidate>
+                    {% if erros and "GERAL" in erros.keys(): %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ erros["GERAL"] }}
+                    </div>
+                    {% endif %}
                     <div class="form-group">
                         <label for="usuario" class="form-label">Nome de usuário ou E-mail *</label>
                         <div class="input-group">
                             <span class="input-group-icon">
                                 <i class="bi bi-person-fill"></i>
                             </span>
-                            <input type="text" class="form-control" id="email" name="email" 
-                                   placeholder="Digite seu e-mail" required>
+                            <input type="text"
+                                class="form-control {% if erros and 'EMAIL' in erros.keys() %}is-invalid{% endif %}"
+                                id="email" name="email" placeholder="Digite seu e-mail" required
+                                value="{{ dados.email if dados and dados.email }}">
                         </div>
+                        {% if erros and 'EMAIL' in erros.keys() %}
                         <div class="invalid-feedback">
-                            Por favor, digite seu nome de usuário ou e-mail.
+                            {{ erros['EMAIL'] }}
                         </div>
+                        {% endif %}
                     </div>
 
                     <div class="form-group">
@@ -68,15 +80,17 @@
                             <span class="input-group-icon">
                                 <i class="bi bi-lock-fill"></i>
                             </span>
-                            <input type="password" class="form-control" id="senha" name="senha" 
-                                   placeholder="Digite sua senha" required>
+                            <input type="password" class="form-control {% if erros and 'SENHA' in erros.keys() %}is-invalid{% endif %}" id="senha" name="senha"
+                                placeholder="Digite sua senha" required>
                             <button type="button" class="input-group-toggle" id="toggleSenha">
                                 <i class="bi bi-eye-fill"></i>
                             </button>
                         </div>
+                        {% if erros and 'SENHA' in erros.keys() %}
                         <div class="invalid-feedback">
-                            Por favor, digite sua senha.
+                            {{ erros['SENHA'] }}
                         </div>
+                        {% endif %}
                     </div>
 
                     <!-- Opções adicionais -->
@@ -99,7 +113,8 @@
 
                 <!-- Link para cadastro -->
                 <div class="text-center mt-4">
-                    <p class="mb-0 small">Não tem uma conta? <a href="/escolha_cadastro" class="text-primary-custom fw-bold">Cadastre-se</a></p>
+                    <p class="mb-0 small">Não tem uma conta? <a href="/escolha_cadastro"
+                            class="text-primary-custom fw-bold">Cadastre-se</a></p>
                 </div>
             </div>
         </div>
@@ -108,5 +123,5 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/static/js/login.js?v=2"></script>
 </body>
-</html>
 
+</html>

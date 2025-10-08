@@ -182,25 +182,25 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="cidade" class="form-label">Cidade *</label>
-                                <input type="text" class="form-control" id="cidade" name="cidade"
-                                    placeholder="Digite sua cidade" 
-                                    value="{{ dados.cidade if dados else '' }}"
+                                <label for="cep" class="form-label">CEP *</label>
+                                <input type="text" class="form-control" id="cep" name="cep"
+                                    placeholder="Digite seu CEP" maxlength="9"
+                                    value="{{ dados.cep if dados else '' }}"
                                     required>
                                 <div class="invalid-feedback">
-                                    Por favor, digite sua cidade.
+                                    Por favor, digite seu CEP.
                                 </div>
                             </div>
                         </div>
 
                         <!-- Linha 2: CEP -->
                         <div class="form-group">
-                            <label for="cep" class="form-label">CEP *</label>
-                            <input type="text" class="form-control" id="cep" name="cep" placeholder="Digite seu CEP"
-                                value="{{ dados.cep if dados else '' }}"
+                            <label for="cidade" class="form-label">Cidade *</label>
+                            <input type="text" class="form-control" id="cidade" name="cidade" placeholder="Digite sua cidade"
+                                value="{{ dados.cidade if dados else '' }}"
                                 required>
                             <div class="invalid-feedback">
-                                Por favor, digite seu CEP.
+                                Por favor, digite sua cidade.
                             </div>
                         </div>
 
