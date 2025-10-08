@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", function() {
+    console.log("login.js loaded (v2)");
     const loginForm = document.getElementById("loginForm");
     const emailInput = document.getElementById("email");
     const senhaInput = document.getElementById("senha");
@@ -113,8 +114,37 @@ async function realizarLogin() {
 
         const response = await fetch("/login", {
             method: "POST",
-            body: formData
+            body: formData,
+            // important: include credentials so the session cookie set by FastAPI is stored
+            credentials: 'same-origin',
+            // prefer receiving the final redirected URL
+            redirect: 'follow',
+            // mark as AJAX so backend may return JSON with redirect target
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            }
         });
+
+        // Debug logs: status and redirected info
+        console.log("Login fetch response: status=", response.status, "ok=", response.ok, "redirected=", response.redirected);
+        try {
+            console.log("Response headers (set-cookie present?):", response.headers.get('set-cookie'));
+        } catch (e) {
+            console.log("Unable to read set-cookie from response headers in JS (browser blocks it).", e);
+        }
+
+        // Se o backend retornou JSON (fluxo AJAX), usa o campo redirect
+        const contentType = response.headers.get('content-type') || '';
+        if (contentType.indexOf('application/json') !== -1) {
+            const data = await response.json().catch(() => null);
+            if (data && data.success && data.redirect) {
+                if (lembrarMe) salvarDados(email);
+                else limparDadosSalvos();
+                window.location.href = data.redirect;
+                return;
+            }
+        }
 
         if (response.redirected) {
             // Se login deu certo, o FastAPI redireciona
@@ -122,6 +152,7 @@ async function realizarLogin() {
             else limparDadosSalvos();
 
             window.location.href = response.url; 
+            return;
         } else {
             // Se não houve redirect, provavelmente veio a página de login com erro
             mostrarErro("Usuário ou senha inválidos.");

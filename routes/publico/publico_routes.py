@@ -426,7 +426,7 @@ async def processar_login(
             return RedirectResponse("/prestador", status_code=status.HTTP_303_SEE_OTHER)
         else:
             return RedirectResponse("/", status_code=status.HTTP_303_SEE_OTHER)
-        
+            
     except ValidationError as e:
         # Extrair mensagens de erro do Pydantic
         erros = []
@@ -453,6 +453,7 @@ async def processar_login(
             "erro": "Erro ao processar cadastro. Tente novamente.",
             "dados": dados_formulario
         })
+    
         
 
 @router.get("/logout")
