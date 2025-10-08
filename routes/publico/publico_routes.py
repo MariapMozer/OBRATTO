@@ -17,6 +17,7 @@ from data.usuario import usuario_repo
 from data.usuario.usuario_model import Usuario
 from data.mensagem.mensagem_model import Mensagem
 from data.mensagem import mensagem_repo
+from dtos.cliente_dto import CriarClienteDTO
 from dtos.login_dto import LoginDTO
 from dtos.fornecedor_dto import CriarFornecedorDTO
 from dtos.prestador_dto import CriarPrestadorDTO
@@ -189,7 +190,7 @@ async def processar_cadastro_prestador(
 # Rota para cadastro de cliente
 @router.get("/cadastro/cliente")
 async def get_page(request: Request):
-    return templates.TemplateResponse("publico/login_cadastro/cadastro.html", {"request": request})
+    return templates.TemplateResponse("publico/login_cadastro/cadastro.html", {"request": request, "dados": None})
 
 
 # Rota para processar o formulário de cadastro
@@ -211,48 +212,118 @@ async def post_cadastro(
     genero: str = Form(...),
     data_nascimento: str = Form(...)):
 
+    # Criar dicionário com dados do formulário (para preservar)
+    dados_formulario = {
+        "nome": nome,
+        "email": email,
+        "cpf_cnpj": cpf_cnpj,
+        "telefone": telefone,
+        "estado": estado,
+        "cidade": cidade,
+        "rua": rua,
+        "numero": numero,
+        "bairro": bairro,
+        "genero": genero,
+        "data_nascimento": data_nascimento
+    }
 
-    if senha != confirmar_senha:
-        return templates.TemplateResponse(
-            "publico/cliente/cadastro_cliente.html",
-            {"request": request, "erro": "As senhas não coincidem."}
-        )
-    # Verificar se email já existe
-    if cliente_repo.obter_cliente_por_email(email):
-        return templates.TemplateResponse(
-            "publico/cliente/cadastro_cliente.html",
-            {"request": request, "erro": "Email já cadastrado"}
+    try:
+        # Validar dados com Pydantic
+        dados_dto = CriarClienteDTO(
+            nome=nome,
+            email=email,
+            telefone=telefone,
+            estado=estado,
+            cidade=cidade,
+            rua=rua,
+            numero=numero,
+            bairro=bairro,
+            senha=senha,
+            confirmar_senha=confirmar_senha,
+            cpf_cnpj=cpf_cnpj,
+            genero=genero,
+            data_nascimento=data_nascimento
         )
 
-    # Criar hash da senha
-    senha_hash = criar_hash_senha(senha)
+        # Verificar se email já existe APÓS a validação do DTO
+        if cliente_repo.obter_cliente_por_email(dados_dto.email):
+            return templates.TemplateResponse(
+                "publico/cliente/cliente_cadastro.html",
+                {
+                    "request": request,
+                    "erro": "Email já cadastrado",
+                    "dados": dados_formulario
+                }
+            )
+
+        # Criar hash da senha
+        senha_hash = criar_hash_senha(dados_dto.senha)
     
-    cliente = Cliente(
-        id=0,
-        nome=nome,
-        email=email,
-        senha=senha_hash,
-        cpf_cnpj=cpf_cnpj,
-        telefone=telefone,
-        estado=estado,
-        cidade=cidade,
-        rua=rua,
-        numero=numero,
-        bairro=bairro,
-        tipo_usuario="Cliente",
-        data_cadastro=None, 
-        foto=foto,
-        token_redefinicao=None,
-        data_token=None,
-        genero=genero,
-        data_nascimento=data_nascimento
-    )
+        # Criar objeto Cliente
+        cliente = Cliente(
+            id=0,
+            nome=nome,
+            email=email,
+            senha=senha_hash,
+            cpf_cnpj=cpf_cnpj,
+            telefone=telefone,
+            estado=estado,
+            cidade=cidade,
+            rua=rua,
+            numero=numero,
+            bairro=bairro,
+            tipo_usuario="Cliente",
+            data_cadastro=None, 
+            foto=foto,
+            token_redefinicao=None,
+            data_token=None,
+            genero=genero,
+            data_nascimento=data_nascimento
+        )
 
-    cliente_id = cliente_repo.inserir_cliente(cliente)
-    if cliente_id:
-        return RedirectResponse("/login", status.HTTP_303_SEE_OTHER)
-    else:
-        return RedirectResponse("/cadastro/cliente")
+        # Inserir no banco de dados
+        cliente_id = cliente_repo.inserir_cliente(cliente)
+        if not cliente_id:
+            return templates.TemplateResponse(
+                "publico/cliente/cliente_cadastro.html",
+                {
+                    "request": request,
+                    "erro": "Erro ao cadastrar cliente. Tente novamente.",
+                    "dados": dados_formulario
+                }
+            )
+
+        # Sucesso - Redirecionar com mensagem flash
+        informar_sucesso(request, f"Cadastro de cliente realizado com sucesso! Bem-vindo(a), {nome}!")
+        return RedirectResponse("/login", status_code=status.HTTP_303_SEE_OTHER)
+
+    except ValidationError as e:
+        # Extrair mensagens de erro do Pydantic
+        erros = []
+        for erro in e.errors():
+            campo = erro["loc"][0] if erro["loc"] else "campo"
+            mensagem = erro["msg"]
+            erros.append(f"{campo.capitalize()}: {mensagem}")
+
+        erro_msg = " | ".join(erros)
+        # logger.warning(f"Erro de validação no cadastro de prestador: {erro_msg}")
+
+        # Retornar template com dados preservados e erro
+        return templates.TemplateResponse("publico/cliente/cliente_cadastro.html", {
+            "request": request,
+            "erro": erro_msg,
+            "dados": dados_formulario  # Preservar dados digitados
+        })
+
+    except Exception as e:
+        # logger.error(f"Erro ao processar cadastro de prestador: {e}")
+
+        return templates.TemplateResponse("publico/cliente/cliente_cadastro.html", {
+            "request": request,
+            "erro": "Erro ao processar cadastro. Tente novamente.",
+            "dados": dados_formulario
+        })
+
 
 
 # Rota para cadastro de fornecedor
