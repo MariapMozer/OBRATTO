@@ -108,6 +108,7 @@
                                 <input type="text" class="form-control {% if campos_erro and campos_erro.get('cpf_cnpj') %}is-invalid{% endif %}" id="cpf_cnpj" name="cpf_cnpj"
                                     placeholder="Digite seu CPF ou CNPJ" 
                                     value="{{ dados.cpf_cnpj if dados else '' }}"
+                                    maxlength="18"
                                     required>
                                 <div class="invalid-feedback">
                                     Por favor, digite um CPF ou CNPJ válido.
