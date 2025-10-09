@@ -35,12 +35,12 @@ document.addEventListener("DOMContentLoaded", function() {
     });
     
     loginForm.addEventListener("submit", function(e) {
-        e.preventDefault();
-        
-        if (validarFormulario()) {
-            realizarLogin();
+        if (!validarFormulario()) {
+            e.preventDefault(); // impede envio apenas se inválido
         }
     });
+
+
     
     carregarDadosSalvos();
 });
