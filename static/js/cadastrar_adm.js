@@ -521,3 +521,65 @@ window.AdminFormUtils = {
     }
 };
 
+document.addEventListener('DOMContentLoaded', function() {
+    // Ler dados fornecidos pelo servidor via script[type="application/json"]
+    const dataEl = document.getElementById('fornecedor-server-data');
+    let serverData = {};
+    try {
+        serverData = JSON.parse(dataEl.textContent || '{}');
+    } catch (e) {
+        // parsing error - nada a fazer
+        serverData = {};
+    }
+
+    // Função auxiliar para criar e mostrar um toast/alert
+    function showToast(message, type = 'danger', timeout = 8000) {
+        const el = document.createElement('div');
+        el.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3`;
+        el.style.zIndex = '9999';
+        el.style.minWidth = '300px';
+        el.innerHTML = `\n                        <strong>${type === 'success' ? '<i class="bi bi-check-circle-fill"></i> Sucesso!' : '<i class="bi bi-exclamation-triangle-fill"></i> Erro'}</strong><br>\n                        ${message}\n                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>`;
+        document.body.appendChild(el);
+        setTimeout(() => { el.classList.remove('show'); setTimeout(() => el.remove(), 150); }, timeout);
+    }
+
+    // Mostrar erro geral
+    if (serverData.erro) {
+        showToast(serverData.erro, 'danger', 8000);
+    }
+
+    // Mostrar lista de erros (se houver)
+    if (Array.isArray(serverData.erros_list) && serverData.erros_list.length) {
+        serverData.erros_list.forEach(msg => showToast(msg, 'danger', 8000));
+    }
+
+    // Mostrar sucesso
+    if (serverData.sucesso) {
+        showToast(serverData.sucesso, 'success', 5000);
+    }
+
+    // (Opcional) focar/abrir a seção do formulário que contém o primeiro erro de campo
+    try {
+        const campos = serverData.campos_erro || {};
+        const camposKeys = Object.keys(campos);
+        if (camposKeys.length) {
+            // mapear campos para seções (ajuste conforme nomes de campos)
+            const mapaSecao = {
+                'nome': 1, 'razao_social': 1, 'cpf_cnpj': 1, 'telefone': 1,
+                'estado': 2, 'cidade': 2, 'cep': 2, 'rua': 2, 'bairro': 2, 'numero': 2, 'complemento': 2,
+                'email': 3, 'senha': 3, 'confirmar_senha': 3, 'termos': 3
+            };
+            const primeira = camposKeys[0];
+            const secao = mapaSecao[primeira] || 1;
+            // esconder todas as seções e mostrar a desejada
+            document.querySelectorAll('.form-section').forEach(s => s.classList.add('d-none'));
+            const el = document.getElementById(`secao${secao}`);
+            if (el) el.classList.remove('d-none');
+            // rolar até o formulário
+            const formTop = document.querySelector('.cadastro-form-container');
+            if (formTop) formTop.scrollIntoView({ behavior: 'smooth' });
+        }
+    } catch (e) {
+        // silencioso
+    }
+});

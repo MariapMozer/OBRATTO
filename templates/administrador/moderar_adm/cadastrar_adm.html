@@ -45,18 +45,32 @@
                     </div>
 
                     <form id="adminForm" method="POST" action="/administrador/cadastro">
+                        {% if erros and "GERAL" in erros.keys(): %}
+                        <div class="alert alert-danger" role="alert">
+                            {{ erros["GERAL"] }}
+                        </div>
+                        {% endif %}
                         <!-- Informações Pessoais -->
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="nome" name="nome" placeholder="Nome completo" required>
+                                    <input type="text" class="form-control {% if campos_erro and campos_erro.get('nome') %}is-invalid{% endif %}" id="nome" name="nome" 
+                                    placeholder="Nome completo" 
+                                    value="{{ dados.nome if dados else '' }}" 
+                                    required>
                                     <label for="nome">Nome Completo *</label>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-floating">
-                                    <input type="email" class="form-control" id="email" name="email" placeholder="E-mail" required>
+                                    <input type="email" class="form-control {% if campos_erro and campos_erro.get('nome') %}is-invalid{% endif %}" id="email" name="email" placeholder="E-mail" required>
                                     <label for="email">E-mail *</label>
+                                    <div class="invalid-feedback">
+                                        Por favor, digite um nome completo.
+                                    </div>
+                                    {% if campos_erro and campos_erro.get('nome') %}
+                                    <div class="invalid-feedback d-block">{{ campos_erro.get('nome')[0] }}</div>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -64,14 +78,33 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-floating">
-                                    <input type="tel" class="form-control" id="telefone" name="telefone" placeholder="Telefone" required>
                                     <label for="telefone">Telefone *</label>
+                                    <input type="tel" class="form-control {% if campos_erro and campos_erro.get('telefone') %}is-invalid{% endif %}" id="telefone" name="telefone"
+                                    placeholder="(00) 00000-0000" maxlength="15" 
+                                    value="{{ dados.telefone if dados else '' }}"
+                                    required>
+                                    <div class="invalid-feedback">
+                                        Por favor, digite um telefone válido.
+                                    </div>
+                                    {% if campos_erro and campos_erro.get('telefone') %}
+                                    <div class="invalid-feedback d-block">{{ campos_erro.get('telefone')[0] }}</div>
+                                    {% endif %}
                                 </div>
                             </div>
+
                             <div class="col-md-6">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="cpf_cnpj" name="cpf_cnpj" placeholder="CPF" required>
                                     <label for="cpf_cnpj">CPF *</label>
+                                    <input type="text" class="form-control {% if campos_erro and campos_erro.get('cpf_cnpj') %}is-invalid{% endif %}" id="cpf_cnpj" name="cpf_cnpj"
+                                    placeholder="Digite seu CPF ou CNPJ" 
+                                    value="{{ dados.cpf_cnpj if dados else '' }}"
+                                    required>
+                                    <div class="invalid-feedback">
+                                        Por favor, digite um CPF ou CNPJ válido.
+                                    </div>
+                                    {% if campos_erro and campos_erro.get('cpf_cnpj') %}
+                                    <div class="invalid-feedback d-block">{{ campos_erro.get('cpf_cnpj')[0] }}</div>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -80,8 +113,15 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-floating">
-                                    <input type="password" class="form-control" id="senha" name="senha" placeholder="Senha" required>
+                                    <input type="password" class="form-control {% if campos_erro and campos_erro.get('senha') %}is-invalid{% endif %}" id="senha" name="senha"
+                                placeholder="Digite sua senha" minlength="8" required>
                                     <label for="senha">Senha *</label>
+                                    <div class="invalid-feedback">
+                                        A senha deve ter pelo menos 8 caracteres.
+                                    </div>
+                                    {% if campos_erro and campos_erro.get('senha') %}
+                                    <div class="invalid-feedback d-block">{{ campos_erro.get('senha')[0] }}</div>
+                                    {% endif %}
                                 </div>
                                 <div class="password-strength">
                                     <div class="strength-bar">
@@ -92,8 +132,15 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-floating">
-                                    <input type="password" class="form-control" id="confirmar_senha" name="confirmar_senha" placeholder="Confirmar senha" required>
                                     <label for="confirmar_senha">Confirmar Senha *</label>
+                                    <input type="password" class="form-control {% if campos_erro and campos_erro.get('confirmar_senha') %}is-invalid{% endif %}" id="confirmar_senha" name="confirmar_senha"
+                                        placeholder="Confirme sua senha" minlength="8" required>
+                                    <div class="invalid-feedback">
+                                        As senhas não coincidem.
+                                    </div>
+                                    {% if campos_erro and campos_erro.get('confirmar_senha') %}
+                                    <div class="invalid-feedback d-block">{{ campos_erro.get('confirmar_senha')[0] }}</div>
+                                    {% endif %}
                                 </div>
                                 <small class="form-text" id="passwordMatch"></small>
                             </div>
@@ -103,20 +150,72 @@
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="cep" name="cep" placeholder="CEP" required>
                                     <label for="cep">CEP *</label>
+                                    <input type="text" class="form-control" id="cep" name="cep"
+                                        placeholder="Digite seu CEP" maxlength="9"
+                                        value="{{ dados.cep if dados else '' }}"
+                                        required>
+                                    <div class="invalid-feedback">
+                                        Por favor, digite seu CEP.
+                                    </div>
+                                    {% if campos_erro and campos_erro.get('cidade') %}
+                                    <div class="invalid-feedback d-block">{{ campos_erro.get('cidade')[0] }}</div>
+                                    {% endif %}
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="estado" name="estado" placeholder="Estado" required>
                                     <label for="estado">Estado *</label>
+                                    <select class="form-select {% if campos_erro and campos_erro.get('estado') %}is-invalid{% endif %}" id="estado" name="estado" required>
+                                        <option value="">Selecione o estado</option>
+                                        <option value="AC" {% if dados and dados.estado == 'AC' %}selected{% endif %}>Acre</option>
+                                        <option value="AL" {% if dados and dados.estado == 'AL' %}selected{% endif %}>Alagoas</option>
+                                        <option value="AP" {% if dados and dados.estado == 'AP' %}selected{% endif %}>Amapá</option>
+                                        <option value="AM" {% if dados and dados.estado == 'AM' %}selected{% endif %}>Amazonas</option>
+                                        <option value="BA" {% if dados and dados.estado == 'BA' %}selected{% endif %}>Bahia</option>
+                                        <option value="CE" {% if dados and dados.estado == 'CE' %}selected{% endif %}>Ceará</option>
+                                        <option value="DF" {% if dados and dados.estado == 'DF' %}selected{% endif %}>Distrito Federal</option>
+                                        <option value="ES" {% if dados and dados.estado == 'ES' %}selected{% endif %}>Espírito Santo</option>
+                                        <option value="GO" {% if dados and dados.estado == 'GO' %}selected{% endif %}>Goiás</option>
+                                        <option value="MA" {% if dados and dados.estado == 'MA' %}selected{% endif %}>Maranhão</option>
+                                        <option value="MT" {% if dados and dados.estado == 'MT' %}selected{% endif %}>Mato Grosso</option>
+                                        <option value="MS" {% if dados and dados.estado == 'MS' %}selected{% endif %}>Mato Grosso do Sul</option>
+                                        <option value="MG" {% if dados and dados.estado == 'MG' %}selected{% endif %}>Minas Gerais</option>
+                                        <option value="PA" {% if dados and dados.estado == 'PA' %}selected{% endif %}>Pará</option>
+                                        <option value="PB" {% if dados and dados.estado == 'PB' %}selected{% endif %}>Paraíba</option>
+                                        <option value="PR" {% if dados and dados.estado == 'PR' %}selected{% endif %}>Paraná</option>
+                                        <option value="PE" {% if dados and dados.estado == 'PE' %}selected{% endif %}>Pernambuco</option>
+                                        <option value="PI" {% if dados and dados.estado == 'PI' %}selected{% endif %}>Piauí</option>
+                                        <option value="RJ" {% if dados and dados.estado == 'RJ' %}selected{% endif %}>Rio de Janeiro</option>
+                                        <option value="RN" {% if dados and dados.estado == 'RN' %}selected{% endif %}>Rio Grande do Norte</option>
+                                        <option value="RS" {% if dados and dados.estado == 'RS' %}selected{% endif %}>Rio Grande do Sul</option>
+                                        <option value="RO" {% if dados and dados.estado == 'RO' %}selected{% endif %}>Rondônia</option>
+                                        <option value="RR" {% if dados and dados.estado == 'RR' %}selected{% endif %}>Roraima</option>
+                                        <option value="SC" {% if dados and dados.estado == 'SC' %}selected{% endif %}>Santa Catarina</option>
+                                        <option value="SP" {% if dados and dados.estado == 'SP' %}selected{% endif %}>São Paulo</option>
+                                        <option value="SE" {% if dados and dados.estado == 'SE' %}selected{% endif %}>Sergipe</option>
+                                        <option value="TO" {% if dados and dados.estado == 'TO' %}selected{% endif %}>Tocantins</option>
+                                    </select>
+                                    <div class="invalid-feedback">
+                                        Por favor, digite um estado.
+                                    </div>
+                                    {% if campos_erro and campos_erro.get('estado') %}
+                                    <div class="invalid-feedback d-block">{{ campos_erro.get('estado')[0] }}</div>
+                                    {% endif %}
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="cidade" name="cidade" placeholder="Cidade" required>
                                     <label for="cidade">Cidade *</label>
+                                    <input type="text" class="form-control" id="cidade" name="cidade" placeholder="Digite sua cidade"
+                                        value="{{ dados.cidade if dados else '' }}"
+                                        required>
+                                    <div class="invalid-feedback">
+                                        Por favor, digite sua cidade.
+                                    </div>
+                                    {% if campos_erro and campos_erro.get('cep') %}
+                                    <div class="invalid-feedback d-block">{{ campos_erro.get('cep')[0] }}</div>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -124,20 +223,38 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="rua" name="rua" placeholder="Rua" required>
                                     <label for="rua">Rua *</label>
+                                    <input type="text" class="form-control {% if campos_erro and campos_erro.get('rua') %}is-invalid{% endif %}" id="rua" name="rua" placeholder="Digite sua rua"
+                                        value="{{ dados.rua if dados else '' }}">
+                                    {% if campos_erro and campos_erro.get('rua') %}
+                                    <div class="invalid-feedback d-block">{{ campos_erro.get('rua')[0] }}</div>
+                                    {% endif %}
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="numero" name="numero" placeholder="Número" required>
                                     <label for="numero">Número *</label>
+                                    <input type="text" class="form-control {% if campos_erro and campos_erro.get('numero') %}is-invalid{% endif %}" id="numero" name="numero"
+                                        placeholder="Digite o número"
+                                        value="{{ dados.numero if dados else '' }}">
+                                    {% if campos_erro and campos_erro.get('numero') %}
+                                    <div class="invalid-feedback d-block">{{ campos_erro.get('numero')[0] }}</div>
+                                    {% endif %}
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="bairro" name="bairro" placeholder="Bairro" required>
                                     <label for="bairro">Bairro *</label>
+                                    <input type="text" class="form-control {% if campos_erro and campos_erro.get('bairro') %}is-invalid{% endif %}" id="bairro" name="bairro"
+                                        placeholder="Digite seu bairro" 
+                                        value="{{ dados.bairro if dados else '' }}"
+                                        required>
+                                    <div class="invalid-feedback">
+                                        Por favor, digite seu bairro.
+                                    </div>
+                                    {% if campos_erro and campos_erro.get('bairro') %}
+                                    <div class="invalid-feedback d-block">{{ campos_erro.get('bairro')[0] }}</div>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -145,8 +262,17 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="complemento" name="complemento" placeholder="Complemento">
                                     <label for="complemento">Complemento</label>
+                                    <input type="text" class="form-control {% if campos_erro and campos_erro.get('complemento') %}is-invalid{% endif %}" id="complemento" name="complemento"
+                                        placeholder="Digite o complemento" 
+                                        value="{{ dados.complemento if dados else '' }}"
+                                        required>
+                                    <div class="invalid-feedback">
+                                        Por favor, digite o complemento.
+                                    </div>
+                                    {% if campos_erro and campos_erro.get('complemento') %}
+                                    <div class="invalid-feedback d-block">{{ campos_erro.get('complemento')[0] }}</div>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -166,7 +292,20 @@
         </div>
     </div>
 </div>
+{% block scripts %}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/cadastrar_adm.js"></script>
 
+    {# Injetamos os dados do servidor em JSON para evitar usar diretivas Jinja dentro do JS #}
+    <script id="fornecedor-server-data" type="application/json">
+        {{ {
+            'erro': erro if erro is defined else None,
+            'erros_list': erros_list if erros_list is defined else [],
+            'sucesso': sucesso if sucesso is defined else None,
+            'campos_erro': campos_erro if campos_erro is defined else {}
+        } | tojson }}
+    </script>
+{% endblock %}
 {% endblock %}
 
 
