@@ -51,13 +51,43 @@ function validarSecao(secao) {
     return valido;
 }
 
+// máscara para CPF
 
+document.getElementById('cpf').addEventListener('input', function (e) {
+    console.log('e.target.value',);
+    let value = e.target.value
+    if (!value) return;
+    if (value.length > 14) value = value.slice(0, 14);
+    value = value.replace(/\D/g, '');
+    value = value.replace(/(\d{3})(\d)/, '$1.$2');
+    value = value.replace(/(\d{3})(\d)/, '$1.$2');
+    value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+    e.target.value = value;
 
+    if (value.length >= 14) {
+        console.log('e.target.value', e.target.value);
+
+        fetch(`/api/verifica_cadastro_cliente/${e.target.value.replace('.', '').replace('.', '').replace('-', '')}`, {
+            method: 'GET'
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.erro) {
+                    alert('CPF já existe!');
+                    return;
+                }
+            })
+            .catch(err => {
+                console.error('Erro ao consultar CPF:', JSON.stringify(err));
+                alert('Erro ao consultar CPF.');
+            });
+    }
+})
 
 // Máscara para telefone
 
 
-document.getElementById('telefone').addEventListener('input', function(e) {
+document.getElementById('telefone').addEventListener('input', function (e) {
     let value = e.target.value.replace(/\D/g, '');
     value = value.replace(/(\d{2})(\d)/, '($1) $2');
     value = value.replace(/(\d{5})(\d)/, '$1-$2');
@@ -70,7 +100,7 @@ document.getElementById('telefone').addEventListener('input', function(e) {
 // Validação de confirmação de senha
 
 
-document.getElementById('confirmarSenha').addEventListener('input', function(e) {
+document.getElementById('confirmarSenha').addEventListener('input', function (e) {
     const senha = document.getElementById('senha').value;
     const confirmarSenha = e.target.value;
 
@@ -89,7 +119,7 @@ document.getElementById('confirmarSenha').addEventListener('input', function(e) 
 // Preenchimento automático de endereço pelo CEP
 
 
-document.getElementById('cep').addEventListener('blur', function() {
+document.getElementById('cep').addEventListener('blur', function () {
     const cep = this.value.replace(/\D/g, '');
 
 
@@ -127,7 +157,7 @@ document.getElementById('cep').addEventListener('blur', function() {
 // Submissão do formulário
 
 
-document.getElementById('cadastroForm').addEventListener('submit', function(e) {
+document.getElementById('cadastroForm').addEventListener('submit', function (e) {
     e.preventDefault();
 
 
@@ -156,6 +186,6 @@ document.getElementById('cadastroForm').addEventListener('submit', function(e) {
 
 
 // animação de entrada
-window.addEventListener('load', function() {
+window.addEventListener('load', function () {
     document.querySelector('.cadastro-container').classList.add('fade-in-up');
 });

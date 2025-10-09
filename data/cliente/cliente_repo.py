@@ -85,6 +85,34 @@ def obter_cliente_por_id(cliente_id: int) -> Optional[Cliente]:
                 data_token=row["data_token"]
             )
         return None
+
+def obter_cliente_por_cpf_cnpj(cliente_cpf: str) -> Optional[Cliente]:
+    with open_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute(OBTER_CLIENTE_POR_CPF, (cliente_cpf,))
+        row = cursor.fetchone()
+        if row:
+            return Cliente(
+                id=row["id"],
+                nome=row["nome"],
+                email=row["email"],
+                senha=row["senha"],
+                cpf_cnpj=row["cpf_cnpj"],
+                telefone=row["telefone"],
+                estado=row["estado"],
+                cidade=row["cidade"],
+                rua=row["rua"],
+                numero=row["numero"],
+                bairro=row["bairro"],
+                data_cadastro=datetime.fromisoformat(row["data_cadastro"]),
+                genero=row["genero"],
+                data_nascimento=date.fromisoformat(row["data_nascimento"]),
+                tipo_usuario=row["tipo_usuario"],
+                foto=row["foto"],
+                token_redefinicao=row["token_redefinicao"],
+                data_token=row["data_token"]
+            )
+        return None
     
 def obter_cliente_por_pagina(conn, limit: int, offset: int) -> list[Cliente]:
     conn.row_factory = sqlite3.Row 

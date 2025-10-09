@@ -190,7 +190,7 @@ async def processar_cadastro_prestador(
 # Rota para cadastro de cliente
 @router.get("/cadastro/cliente")
 async def get_page(request: Request):
-    return templates.TemplateResponse("publico/login_cadastro/cadastro.html", {"request": request, "dados": None})
+    return templates.TemplateResponse("publico/cliente/cadastro_cliente.html", {"request": request, "dados": None})
 
 
 # Rota para processar o formulário de cadastro
@@ -324,6 +324,18 @@ async def post_cadastro(
             "dados": dados_formulario
         })
 
+@router.get("/api/verifica_cadastro_cliente/{cpf_cnpj}")
+async def verifica_cadastro_cliente(cpf_cnpj: str):
+    cliente = cliente_repo.obter_cliente_por_cpf_cnpj(cpf_cnpj)
+    if cliente:
+        # return {"existe": True, "mensagem": "CPF/CNPJ já cadastrado."
+        mensagem="CPF/CNPJ já cadastrado."
+        return templates.TemplateResponse("publico/cliente/cliente_cadastro.html", {
+            "erro": mensagem,
+        }) 
+   
+    
+   
 
 
 # Rota para cadastro de fornecedor
@@ -542,8 +554,7 @@ async def processar_cadastro_fornecedor(
 
 
        
-    
-   
+
 #---------------------------------------------------------------------
 
 #--------------LOGIN/LOGOUT-----------------------------
@@ -563,18 +574,17 @@ async def processar_login(
 
     dados_formulario = {"email": email}
     try:
-        login_dto = LoginDTO(email=email, senha=senha)
-
-        if not email or not senha:
-            return templates.TemplateResponse("publico/login_cadastro/login.html", 
-                {"request": request, "erro": "Preencha todos os campos."}, 
-                status_code=status.HTTP_400_BAD_REQUEST)
+        login_dto = LoginDTO(email=email, senha=senha)        
 
         usuario = usuario_repo.obter_usuario_por_email(login_dto.email)
-        print("DEBUG usuario:", usuario)
+        
         if not usuario or not verificar_senha(login_dto.senha, usuario.senha):
             return templates.TemplateResponse("publico/login_cadastro/login.html", 
-                {"request": request, "erro": "Email ou senha inválidos"}, status_code=status.HTTP_401_UNAUTHORIZED)
+                {
+                    "request": request, 
+                    "erros": {"GERAL": "Credenciais inválidas. Tente novamente."}, 
+                    "dados": dados_formulario
+                })
 
         # Cria sessão completa
         perfil_usuario = getattr(usuario, "perfil", getattr(usuario, "tipo_usuario", "cliente"))
@@ -602,19 +612,16 @@ async def processar_login(
             
     except ValidationError as e:
         # Extrair mensagens de erro do Pydantic
-        erros = []
+        erros = {}
         for erro in e.errors():
             campo = erro['loc'][0] if erro['loc'] else 'campo'
             mensagem = erro['msg']
-            erros.append(f"{campo.capitalize()}: {mensagem}")
-
-        erro_msg = " | ".join(erros)
-        logger.warning(f"Erro de validação no cadastro: {erro_msg}")
+            erros[campo.upper(0)] = mensagem
 
         # Retornar template com dados preservados e erro
         return templates.TemplateResponse("publico/login_cadastro/login.html", {
             "request": request,
-            "erro": erro_msg,
+            "erros": erros,
             "dados": dados_formulario  # Preservar dados digitados
         })
 
@@ -623,7 +630,7 @@ async def processar_login(
 
         return templates.TemplateResponse("publico/login_cadastro/login.html", {
             "request": request,
-            "erro": "Erro ao processar cadastro. Tente novamente.",
+            "erros": {"GERAL": "Erro ao processar login. Tente novamente."},
             "dados": dados_formulario
         })
     

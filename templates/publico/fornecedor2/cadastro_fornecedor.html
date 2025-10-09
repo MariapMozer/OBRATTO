@@ -197,13 +197,13 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="cidade" class="form-label">Cidade *</label>
-                                <input type="text" class="form-control {% if campos_erro and campos_erro.get('cidade') %}is-invalid{% endif %}" id="cidade" name="cidade"
-                                    placeholder="Digite sua cidade" 
-                                    value="{{ dados.cidade if dados else '' }}"
+                                <label for="cep" class="form-label">CEP *</label>
+                                <input type="text" class="form-control" id="cep" name="cep"
+                                    placeholder="Digite seu CEP" maxlength="9"
+                                    value="{{ dados.cep if dados else '' }}"
                                     required>
                                 <div class="invalid-feedback">
-                                    Por favor, digite sua cidade.
+                                    Por favor, digite seu CEP.
                                 </div>
                                 {% if campos_erro and campos_erro.get('cidade') %}
                                 <div class="invalid-feedback d-block">{{ campos_erro.get('cidade')[0] }}</div>
@@ -213,12 +213,12 @@
 
                         <!-- Linha 2: CEP -->
                         <div class="form-group">
-                            <label for="cep" class="form-label">CEP *</label>
-                            <input type="text" class="form-control {% if campos_erro and campos_erro.get('cep') %}is-invalid{% endif %}" id="cep" name="cep" placeholder="Digite seu CEP"
-                                value="{{ dados.cep if dados else '' }}"
+                            <label for="cidade" class="form-label">Cidade *</label>
+                            <input type="text" class="form-control" id="cidade" name="cidade" placeholder="Digite sua cidade"
+                                value="{{ dados.cidade if dados else '' }}"
                                 required>
                             <div class="invalid-feedback">
-                                Por favor, digite seu CEP.
+                                Por favor, digite sua cidade.
                             </div>
                             {% if campos_erro and campos_erro.get('cep') %}
                             <div class="invalid-feedback d-block">{{ campos_erro.get('cep')[0] }}</div>
