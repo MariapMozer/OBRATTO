@@ -86,228 +86,276 @@
                     <div class="form-row two-cols">
                         <div class="form-group">
                             <label for="dataNascimento" class="form-label">Data de Nascimento *</label>
-                            <input type="text" class="form-control {% if erros and 'DATA DE NASCIMENTO' in erros.keys() %}is-invalid{% endif %}" id="dataNascimento" name="data_nascimento"
-                                placeholder="Data de nascimento" required
+                            <input type="text"
+                                class="form-control {% if erros and 'DATA DE NASCIMENTO' in erros.keys() %}is-invalid{% endif %}"
+                                id="dataNascimento" name="data_nascimento" placeholder="Data de nascimento" required
                                 value="{{ dados.dataNascimento if dados and dados.dataNascimento }}">
                         </div>
-                    {% if erros and 'DATA DE NASCIMENTO' in erros.keys() %}
-                    <div class="invalid-feedback">
-                        {{ erros['DATA DE NASCIMENTO'] }}
-                    </div>
-                    {% endif %}
-                    </div>
-
-                        <div class="form-group">
-                            <label for="genero" class="form-label">Gênero *</label>
-                            <select class="form-select" id="genero" name="genero" required>
-                                <option value="">Selecione seu gênero</option>
-                                <option value="masculino">Masculino</option>
-                                <option value="feminino">Feminino</option>
-                                <option value="outro">Outro</option>
-                                <option value="nao-informar">Prefiro não informar</option>
-                            </select>
-
+                        {% if erros and 'DATA DE NASCIMENTO' in erros.keys() %}
+                        <div class="invalid-feedback">
+                            {{ erros['DATA DE NASCIMENTO'] }}
                         </div>
+                        {% endif %}
                     </div>
 
-                    <div class="form-row two-cols">
-                        <div class="form-group">
-                            <label for="cpf" class="form-label">CPF *</label>
-                            <input type="text" class="form-control{% if erros and 'CPF' in erros.keys() %}is-invalid{% endif %}" id="cpf" name="cpf_cnpj"
-                                placeholder="000.000.000-00" maxlength="14" required
-                                value="{{ dados.cpf if dados and dados.cpf }}">
-                        </div>
-                        {% if erros and 'CPF' in erros.keys() %}
-                    <div class="invalid-feedback">
-                        {{ erros['CPF'] }}
-                    </div>
-                    {% endif %}
-
-                        <div class="form-group">
-                            <label for="telefone" class="form-label">Telefone *</label>
-                            <input type="tel" class="form-control" id="telefone" name="telefone"
-                                placeholder="(00) 00000-0000" maxlength="15" required>
-                            <div class="invalid-feedback">
-                                Por favor, digite um telefone válido.
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="d-flex justify-content-end mt-3">
-                        <button type="button" class="btn-cadastrar" onclick="proximaSecao(1)">
-                            Próximo <i class="bi bi-arrow-right ms-1"></i>
-                        </button>
-                    </div>
-            </div>
-
-            <!-- Seção 2: Endereço -->
-            <div class="form-section d-none" id="secao2">
-                <h3 class="section-title">
-                    <i class="bi bi-geo-alt-fill"></i>
-                    Endereço
-                </h3>
-
-
-                <!-- Linha 1: Estado e CEP-->
-                <div class="form-row two-cols">
                     <div class="form-group">
-                        <label for="estado" class="form-label">Estado *</label>
-                        <select class="form-select" id="estado" name="estado" required>
-                            <option value="">Selecione o estado</option>
-                            <option value="AC">Acre</option>
-                            <option value="AL">Alagoas</option>
-                            <option value="AP">Amapá</option>
-                            <option value="AM">Amazonas</option>
-                            <option value="BA">Bahia</option>
-                            <option value="CE">Ceará</option>
-                            <option value="DF">Distrito Federal</option>
-                            <option value="ES">Espírito Santo</option>
-                            <option value="GO">Goiás</option>
-                            <option value="MA">Maranhão</option>
-                            <option value="MT">Mato Grosso</option>
-                            <option value="MS">Mato Grosso do Sul</option>
-                            <option value="MG">Minas Gerais</option>
-                            <option value="PA">Pará</option>
-                            <option value="PB">Paraíba</option>
-                            <option value="PR">Paraná</option>
-                            <option value="PE">Pernambuco</option>
-                            <option value="PI">Piauí</option>
-                            <option value="RJ">Rio de Janeiro</option>
-                            <option value="RN">Rio Grande do Norte</option>
-                            <option value="RS">Rio Grande do Sul</option>
-                            <option value="RO">Rondônia</option>
-                            <option value="RR">Roraima</option>
-                            <option value="SC">Santa Catarina</option>
-                            <option value="SP">São Paulo</option>
-                            <option value="SE">Sergipe</option>
-                            <option value="TO">Tocantins</option>
+                        <label for="genero" class="form-label">Gênero *</label>
+                        <select class="form-select {% if erros and 'GENERO' in erros.keys() %}is-invalid{% endif %}"
+                            id="genero" name="genero" required>
+                            <option value="">Selecione seu gênero</option>
+                            <option value="masculino">Masculino</option>
+                            <option value="feminino">Feminino</option>
+                            <option value="outro">Outro</option>
+                            <option value="nao-informar">Prefiro não informar</option>
                         </select>
+                        {% if erros and 'GENERO' in erros.keys() %}
                         <div class="invalid-feedback">
-                            Por favor, selecione um estado.
+                            {{ erros['GENERO'] }}
                         </div>
+                        {% endif %}
                     </div>
+            </div>
 
-
-                    <div class="form-group">
-                        <label for="cep" class="form-label">CEP *</label>
-                        <input type="text" class="form-control" id="cep" name="cep" placeholder="Digite seu CEP"
-                            required>
-                        <div class="invalid-feedback">
-                            Por favor, digite seu CEP.
-                        </div>
-                    </div>
-                </div>
-
-
-                <!-- Linha 2: Rua -->
+            <div class="form-row two-cols">
                 <div class="form-group">
-                    <label for="rua" class="form-label">Rua </label>
-                    <input type="text" class="form-control" id="rua" name="rua" placeholder="Digite sua rua">
+                    <label for="cpf" class="form-label">CPF *</label>
+                    <input type="text" class="form-control{% if erros and 'CPF' in erros.keys() %}is-invalid{% endif %}"
+                        id="cpf" name="cpf_cnpj" placeholder="000.000.000-00" maxlength="14" required
+                        value="{{ dados.cpf if dados and dados.cpf }}">
                 </div>
+                {% if erros and 'CPF' in erros.keys() %}
+                <div class="invalid-feedback">
+                    {{ erros['CPF'] }}
+                </div>
+                {% endif %}
 
-
-                <!-- Linha 3: Bairro -->
                 <div class="form-group">
-                    <label for="bairro" class="form-label">Bairro *</label>
-                    <input type="text" class="form-control" id="bairro" name="bairro" placeholder="Digite seu bairro"
-                        required>
+                    <label for="telefone" class="form-label">Telefone *</label>
+                    <input type="tel"
+                        class="form-control {% if erros and 'TELEFONE' in erros.keys() %}is-invalid{% endif %}"
+                        id="telefone" name="telefone" placeholder="(00) 00000-0000" maxlength="15" required
+                        value="{{ dados.telefone if dados and dados.telefone }}">
+                    {% if erros and 'TELEFONE' in erros.keys() %}
                     <div class="invalid-feedback">
-                        Por favor, digite seu bairro.
+                        {{ erros['TELEFONE'] }}
                     </div>
-                </div>
-
-
-                <!-- Linha 4: Número e Complemento  -->
-                <div class="form-row two-cols">
-                    <div class="form-group">
-                        <label for="numero" class="form-label">Número </label>
-                        <input type="text" class="form-control" id="numero" name="numero" placeholder="Digite o número">
-                    </div>
-
-
-                    <div class="form-group">
-                        <label for="complemento" class="form-label">Complemento *</label>
-                        <input type="text" class="form-control" id="complemento" name="complemento"
-                            placeholder="Digite o complemento" required>
-                        <div class="invalid-feedback">
-                            Por favor, digite o complemento.
-                        </div>
-                    </div>
-                </div>
-
-
-                <div class="d-flex justify-content-between mt-3">
-                    <button type="button" class="btn-voltar" onclick="voltarSecao(2)">
-                        <i class="bi bi-arrow-left me-1"></i> Voltar
-                    </button>
-                    <button type="button" class="btn-cadastrar" onclick="proximaSecao(2)">
-                        Próximo <i class="bi bi-arrow-right ms-1"></i>
-                    </button>
+                    {% endif %}
                 </div>
             </div>
 
-            <!-- Seção 3: Acesso -->
-            <div class="form-section d-none" id="secao3">
-                <h3 class="section-title">
-                    <i class="bi bi-shield-lock-fill"></i>
-                    Dados de Acesso
-                </h3>
+            <div class="d-flex justify-content-end mt-3">
+                <button type="button" class="btn-cadastrar" onclick="proximaSecao(1)">
+                    Próximo <i class="bi bi-arrow-right ms-1"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Seção 2: Endereço -->
+        <div class="form-section d-none" id="secao2">
+            <h3 class="section-title">
+                <i class="bi bi-geo-alt-fill"></i>
+                Endereço
+            </h3>
+
+
+            <!-- Linha 1: Estado e CEP-->
+            <div class="form-row two-cols">
+                <div class="form-group">
+                    <label for="estado" class="form-label">Estado *</label>
+                    <select class="form-select {% if erros and 'ESTADO' in erros.keys() %}is-invalid{% endif %}"
+                        id="estado" name="estado" required>
+                        <option value="">Selecione o estado</option>
+                        <option value="AC">Acre</option>
+                        <option value="AL">Alagoas</option>
+                        <option value="AP">Amapá</option>
+                        <option value="AM">Amazonas</option>
+                        <option value="BA">Bahia</option>
+                        <option value="CE">Ceará</option>
+                        <option value="DF">Distrito Federal</option>
+                        <option value="ES">Espírito Santo</option>
+                        <option value="GO">Goiás</option>
+                        <option value="MA">Maranhão</option>
+                        <option value="MT">Mato Grosso</option>
+                        <option value="MS">Mato Grosso do Sul</option>
+                        <option value="MG">Minas Gerais</option>
+                        <option value="PA">Pará</option>
+                        <option value="PB">Paraíba</option>
+                        <option value="PR">Paraná</option>
+                        <option value="PE">Pernambuco</option>
+                        <option value="PI">Piauí</option>
+                        <option value="RJ">Rio de Janeiro</option>
+                        <option value="RN">Rio Grande do Norte</option>
+                        <option value="RS">Rio Grande do Sul</option>
+                        <option value="RO">Rondônia</option>
+                        <option value="RR">Roraima</option>
+                        <option value="SC">Santa Catarina</option>
+                        <option value="SP">São Paulo</option>
+                        <option value="SE">Sergipe</option>
+                        <option value="TO">Tocantins</option>
+                    </select>
+                    {% if erros and 'ESTADO' in erros.keys() %}
+                    <div class="invalid-feedback">
+                        {{ erros['ESTADO'] }}
+                    </div>
+                    {% endif %}
+                </div>
+
 
                 <div class="form-group">
-                    <label for="email" class="form-label">E-mail *</label>
-                    <input type="email" class="form-control" id="email" name="email" placeholder="Digite seu e-mail"
-                        required>
+                    <label for="cep" class="form-label">CEP *</label>
+                    <input type="text"
+                        class="form-control {% if erros and 'CEP' in erros.keys() %}is-invalid{% endif %}" id="cep"
+                        name="cep" placeholder="Digite seu CEP" required value="{{ dados.cep if dados and dados.cep }}">
+                    {% if erros and 'CEP' in erros.keys() %}
                     <div class="invalid-feedback">
-                        Por favor, digite um e-mail válido.
+                        {{ erros['CEP'] }}
                     </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="senha" class="form-label">Senha *</label>
-                    <input type="password" class="form-control" id="senha" name="senha" placeholder="Digite sua senha"
-                        minlength="8" required>
-                    <div class="invalid-feedback">
-                        A senha deve ter pelo menos 8 caracteres.
-                    </div>
-                    <small class="text-muted">A senha deve ter pelo menos 8 caracteres.</small>
-                </div>
-
-                <div class="form-group">
-                    <label for="confirmarSenha" class="form-label">Confirmar Senha *</label>
-                    <input type="password" class="form-control" id="confirmarSenha" name="confirmar_senha"
-                        placeholder="Confirme sua senha" minlength="8" required>
-                    <div class="invalid-feedback">
-                        As senhas não coincidem.
-                    </div>
-                </div>
-
-                <div class="form-check mb-3">
-                    <input class="form-check-input" type="checkbox" id="termos" name="termos" required>
-                    <label class="form-check-label" for="termos">
-                        Eu concordo com os <a href="#" class="text-primary-custom">Termos de Uso</a> e
-                        <a href="#" class="text-primary-custom">Política de Privacidade</a> *
-                    </label>
-                    <div class="invalid-feedback">
-                        Você deve concordar com os termos para continuar.
-                    </div>
-                </div>
-
-                <div class="d-flex justify-content-between mt-3">
-                    <button type="button" class="btn-voltar" onclick="voltarSecao(3)">
-                        <i class="bi bi-arrow-left me-1"></i> Voltar
-                    </button>
-                    <button type="submit" class="btn-cadastrar">
-                        <i class="bi bi-check-circle me-1"></i> Criar Conta
-                    </button>
+                    {% endif %}
                 </div>
             </div>
-            </form>
 
-            <!-- Link para login -->
-            <div class="text-center mt-3">
-                <p class="mb-0 small">Já tem uma conta? <a href="/entrar" class="text-primary-custom fw-bold">Faça
-                        login</a></p>
+
+            <!-- Linha 2: Rua -->
+            <div class="form-group">
+                <label for="rua" class="form-label">Rua </label>
+                <input type="text" class="form-control {% if erros and 'RUA' in erros.keys() %}is-invalid{% endif %}"
+                    id="rua" name="rua" placeholder="Digite sua rua" value="{{ dados.rua if dados and dados.rua }}">
+                {% if erros and 'RUA' in erros.keys() %}
+                <div class="invalid-feedback">
+                    {{ erros['RUA'] }}
+                </div>
+                {% endif %}
             </div>
+
+
+            <!-- Linha 3: Bairro -->
+            <div class="form-group">
+                <label for="bairro" class="form-label">Bairro *</label>
+                <input type="text"
+                    class="form-control  {% if erros and 'BAIRRO' in erros.keys() %}is-invalid{% endif %}" id="bairro"
+                    name="bairro" placeholder="Digite seu bairro" required
+                    value="{{ dados.bairro if dados and dados.bairro }}">
+                {% if erros and 'BAIRRO' in erros.keys() %}
+                <div class="invalid-feedback">
+                    {{ erros['BAIRRO'] }}
+                </div>
+                {% endif %}
+
+            </div>
+
+
+            <!-- Linha 4: Número e Complemento  -->
+            <div class="form-row two-cols">
+                <div class="form-group">
+                    <label for="numero" class="form-label">Número </label>
+                    <input type="text"
+                        class="form-control {% if erros and 'NUMERO' in erros.keys() %}is-invalid{% endif %}"
+                        id="numero" name="numero" placeholder="Digite o número"
+                        value="{{ dados.numero if dados and dados.numero }}">
+                    {% if erros and 'NUMERO' in erros.keys() %}
+                    <div class="invalid-feedback">
+                        {{ erros['NUMERO'] }}
+                    </div>
+                    {% endif %}
+                </div>
+
+
+                <div class="form-group">
+                    <label for="complemento" class="form-label">Complemento *</label>
+                    <input type="text"
+                        class="form-control {% if erros and 'COMPLEMENTO' in erros.keys() %}is-invalid{% endif %}"
+                        id="complemento" name="complemento" placeholder="Digite o complemento" required
+                        value="{{ dados.complemento if dados and dados.complemento }}">
+                    {% if erros and 'COMPLEMENTO' in erros.keys() %}
+                    <div class="invalid-feedback">
+                        {{ erros['COMPLEMENTO'] }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+
+            <div class="d-flex justify-content-between mt-3">
+                <button type="button" class="btn-voltar" onclick="voltarSecao(2)">
+                    <i class="bi bi-arrow-left me-1"></i> Voltar
+                </button>
+                <button type="button" class="btn-cadastrar" onclick="proximaSecao(2)">
+                    Próximo <i class="bi bi-arrow-right ms-1"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Seção 3: Acesso -->
+        <div class="form-section d-none" id="secao3">
+            <h3 class="section-title">
+                <i class="bi bi-shield-lock-fill"></i>
+                Dados de Acesso
+            </h3>
+
+            <div class="form-group">
+                <label for="email" class="form-label">E-mail *</label>
+                <input type="email" class="form-control {% if erros and 'EMAIL' in erros.keys() %}is-invalid{% endif %}"
+                    id="email" name="email" placeholder="Digite seu e-mail" required
+                    value="{{ dados.email if dados and dados.email }}">
+                {% if erros and 'EMAIL' in erros.keys() %}
+                <div class="invalid-feedback">
+                    {{ erros['EMAIL'] }}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="senha" class="form-label">Senha *</label>
+                <input type="password"
+                    class="form-control {% if erros and 'SENHA' in erros.keys() %}is-invalid{% endif %}" id="senha"
+                    name="senha" placeholder="Digite sua senha" minlength="8" required>
+                {% if erros and 'SENHA' in erros.keys() %}
+                <div class="invalid-feedback">
+                    {{ erros['SENHA'] }}
+                </div>
+                {% endif %}
+                <small class="text-muted">A senha deve ter pelo menos 8 caracteres.</small>
+            </div>
+
+            <div class="form-group">
+                <label for="confirmarSenha" class="form-label">Confirmar Senha *</label>
+                <input type="password"
+                    class="form-control {% if erros and 'CONFIRMAR SENHA' in erros.keys() %}is-invalid{% endif %}"
+                    id="confirmarSenha" name="confirmar_senha" placeholder="Confirme sua senha" minlength="8" required>
+                {% if erros and 'CONFIRMAR SENHA' in erros.keys() %}
+                <div class="invalid-feedback">
+                    {{ erros['CONFIRMAR SENHA'] }}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" id="termos" name="termos" required>
+                <label class="form-check-label" for="termos">
+                    Eu concordo com os <a href="#" class="text-primary-custom">Termos de Uso</a> e
+                    <a href="#" class="text-primary-custom">Política de Privacidade</a> *
+                </label>
+                <div class="invalid-feedback">
+                    Você deve concordar com os termos para continuar.
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between mt-3">
+                <button type="button" class="btn-voltar" onclick="voltarSecao(3)">
+                    <i class="bi bi-arrow-left me-1"></i> Voltar
+                </button>
+                <button type="submit" class="btn-cadastrar">
+                    <i class="bi bi-check-circle me-1"></i> Criar Conta
+                </button>
+            </div>
+        </div>
+        </form>
+
+        <!-- Link para login -->
+        <div class="text-center mt-3">
+            <p class="mb-0 small">Já tem uma conta? <a href="/entrar" class="text-primary-custom fw-bold">Faça
+                    login</a></p>
+        </div>
         </div>
         </div>
     </main>
