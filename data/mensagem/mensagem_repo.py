@@ -29,7 +29,7 @@ def inserir_mensagem(mensagem):
         return cursor.lastrowid
 
 
-def obter_mensagem() -> List[Mensagem]:
+def obter_mensagem(usuario_id) -> List[Mensagem]:
     with open_connection() as conn:
         cursor = conn.cursor()
         cursor.execute(OBTER_MENSAGEM)

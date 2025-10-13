@@ -19,7 +19,7 @@ templates = Jinja2Templates(directory="templates")
 @router.get("/perfil")
 @requer_autenticacao(['fornecedor'])
 async def visualizar_perfil_fornecedor(request: Request, usuario_logado: dict = None):
-    fornecedor = fornecedor_repo.obter_fornecedor_por_id(usuario_logado.id)
+    fornecedor = fornecedor_repo.obter_fornecedor_por_id(usuario_logado["id"])
     if not fornecedor:
         raise HTTPException(status_code=404, detail="Fornecedor não encontrado")
     return templates.TemplateResponse(
@@ -162,7 +162,7 @@ async def deletar_conta_fornecedor(request: Request, usuario_logado: dict = None
 @router.get("/conta")
 @requer_autenticacao(['fornecedor'])
 async def visualizar_conta(request: Request, usuario_logado: dict = None):
-    fornecedor = fornecedor_repo.obter_fornecedor_por_id(usuario_logado.id)
+    fornecedor = fornecedor_repo.obter_fornecedor_por_id(usuario_logado["id"])
     return templates.TemplateResponse(
         "fornecedor/conta.html", 
         {"request": request, 
@@ -172,13 +172,11 @@ async def visualizar_conta(request: Request, usuario_logado: dict = None):
 @router.get("/avaliacoes")
 @requer_autenticacao(['fornecedor'])
 async def visualizar_avaliacoes_recebidas(request: Request, usuario_logado: dict = None):
-    avaliacoes = avaliacao_repo.obter_avaliacoes_por_fornecedor(usuario_logado.id)
+    avaliacoes = avaliacao_repo.obter_avaliacao_por_id(usuario_logado["id"])
     return templates.TemplateResponse(
         "fornecedor/avaliacoes_recebidas.html",
         {"request": request, "avaliacoes": avaliacoes}
     )
-
-
 
 # atualizar foto de perfil
 

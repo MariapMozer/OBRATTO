@@ -707,31 +707,32 @@ async def exibir_perfil_publico(request: Request):
 
 
 # ROTAS PRINCIPAIS 
-@router.get("/mensagens")
-async def exibir_caixa_mensagens(request: Request):
-    """Exibe a caixa de mensagens principal do usuário"""
-    usuario = obter_usuario_logado(request)
-    if not usuario:
-        return RedirectResponse("/login", status_code=status.HTTP_303_SEE_OTHER)
+
+# @router.get("/mensagens")
+# async def exibir_caixa_mensagens(request: Request):
+#     """Exibe a caixa de mensagens principal do usuário"""
+#     usuario = obter_usuario_logado(request)
+#     if not usuario:
+#         return RedirectResponse("/login", status_code=status.HTTP_303_SEE_OTHER)
     
-    # Obter todas as mensagens do usuário (enviadas e recebidas)
-    todas_mensagens = mensagem_repo.obter_mensagem()
+#     # Obter todas as mensagens do usuário (enviadas e recebidas)
+#     todas_mensagens = mensagem_repo.obter_mensagem()
     
-    # Filtrar mensagens do usuário atual
-    mensagens_usuario = [
-        msg for msg in todas_mensagens 
-        if msg.id_remetente == usuario["id"] or msg.id_destinatario == usuario["id"]
-    ]
+#     # Filtrar mensagens do usuário atual
+#     mensagens_usuario = [
+#         msg for msg in todas_mensagens 
+#         if msg.id_remetente == usuario["id"] or msg.id_destinatario == usuario["id"]
+#     ]
     
-    # Organizar conversas por contato
-    conversas = organizar_conversas_por_contato(mensagens_usuario, usuario["id"])
+#     # Organizar conversas por contato
+#     conversas = organizar_conversas_por_contato(mensagens_usuario, usuario["id"])
     
-    return templates.TemplateResponse("publico/mensagens/mensagens.html", {
-        "request": request,
-        "usuario": usuario,
-        "conversas": conversas,
-        "mensagens": mensagens_usuario
-    })
+#     return templates.TemplateResponse("publico/mensagens/mensagens.html", {
+#         "request": request,
+#         "usuario": usuario,
+#         "conversas": conversas,
+#         "mensagens": mensagens_usuario
+#     })
 
 @router.get("/mensagens/conversa/{contato_id}")
 async def exibir_conversa(request: Request, contato_id: int):
