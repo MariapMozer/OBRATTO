@@ -4,41 +4,32 @@ from utils.validacoes_dto import validar_texto_obrigatorio
 
 
 class LoginDTO(BaseDTO):
-    email: str
-    senha: str
-
-    @field_validator('email')
-    def validar_email(cls, v: str) -> str:
-        if not v or not v.strip():
-            raise ValueError("O campo E-mail é obrigatório.")
-        try:
-            EmailStr.validate(v)
-        except ValueError:
-            raise ValueError("Endereço de e-mail em formato inválido.")
+    
+    email: EmailStr = Field(..., description="E-mail do usuário")
+    senha: str = Field(..., min_length=8, description="Senha do usuário")
 
     @field_validator('senha')
+    @classmethod
     def validar_senha(cls, v: str) -> str:
-        if not v or not v.strip():
-            raise ValueError("O campo Senha é obrigatório.")
-        if len(v.strip()) < 6:
-            raise ValueError("A senha deve ter pelo menos 6 caracteres.")
-        return v.strip()
+        validador = cls.validar_campo_wrapper(
+            lambda valor, campo: validar_texto_obrigatorio(valor, campo, min_chars=8),
+            "Senha"
+        )
+        return validador(v)
 
-# DTO para login de Cliente
-class LoginClienteDTO(LoginDTO):
-    """DTO para login de Cliente"""
-    pass
-
-
-# DTO para login de Prestador
-class LoginPrestadorDTO(LoginDTO):
-    """DTO para login de Prestador"""
-    pass
+    @classmethod
+    def criar_exemplo_login_json(cls, **overrides) -> dict:
+        exemplo = {
+            "email": "joao.silva@email.com",
+            "senha": "senhaSegura123"
+        }
+        exemplo.update(overrides)
+        return exemplo
 
 
-# DTO para login de Fornecedor
-class LoginFornecedorDTO(LoginDTO):
-    """DTO para login de Fornecedor"""
-    pass
-
-
+# Configurar exemplos JSON nos model_config
+LoginDTO.model_config.update({
+    "json_schema_extra": {
+        "example": LoginDTO.criar_exemplo_login_json()
+    }
+})
