@@ -235,6 +235,19 @@
 
                         <!-- Linha 2: Rua -->
                         <div class="form-group">
+                            <label for="cidade" class="form-label">Cidade </label>
+                            <input type="text"
+                                class="form-control {% if erros and 'CIDADE' in erros.keys() %}is-invalid{% endif %}"
+                                id="cidade" name="cidade" placeholder="Digite sua cidade"
+                                value="{{ dados.rua if dados and dados.rua }}">
+                            {% if erros and 'CIDADE' in erros.keys() %}
+                            <div class="invalid-feedback">
+                                {{ erros['CIDADE'] }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group">
                             <label for="rua" class="form-label">Rua </label>
                             <input type="text"
                                 class="form-control {% if erros and 'RUA' in erros.keys() %}is-invalid{% endif %}"
