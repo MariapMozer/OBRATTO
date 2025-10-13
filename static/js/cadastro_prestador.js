@@ -127,32 +127,14 @@ document.getElementById('cep').addEventListener('blur', function() {
 
 // Submissão do formulário
 
-
 document.getElementById('cadastroForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-
-
     if (!validarSecao(3)) {
+        e.preventDefault();
         alert('Preencha todos os campos obrigatórios!');
         return;
     }
 
-
-    // Montar endereço completo antes de enviar
-    const estado = document.getElementById('estado').value;
-    const cidade = document.getElementById('cidade').value;
-    const bairro = document.getElementById('bairro').value;
-    const rua = document.getElementById('rua').value;
-    const numero = document.getElementById('numero').value;
-    const complemento = document.getElementById('complemento').value;
-
-
-    const enderecoCompleto = `${rua}, ${numero} ${complemento ? '- ' + complemento : ''}, ${bairro}, ${cidade} - ${estado}`;
-    document.getElementById('endereco').value = enderecoCompleto;
-
-
-    // Aqui você pode adicionar a lógica para enviar os dados via AJAX ou form submit
-    alert('Cadastro realizado com sucesso!');
+    // o formulário será enviado normalmente (rota definida no atributo "action" do form)
 });
 
 

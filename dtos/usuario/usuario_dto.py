@@ -20,21 +20,20 @@ class CriarUsuarioDTO(BaseDTO):
     Usado em formulários de registro.
     """
 
-    nome: str = Field(..., min_length=2, max_length=100)
-    email: EmailStr = Field(...)
-    confirmar_senha: Optional[str] = Field(None, description="Confirmação da nova senha")
-    senha: str = Field(..., min_length=8, description="Senha do usuário")
-    cpf_cnpj: str = Field(..., description="CPF ou CNPJ do usuário")
-    telefone: str = Field(..., min_length=10)
-    cep: str = Field(..., description="CEP")
-    rua: str = Field(..., description="Rua/Logradouro", min_length=2)
-    numero: str = Field(..., description="Número", min_length=1)
-    complemento: Optional[str] = Field(None, description="Complemento", max_length=100)
-    bairro: str = Field(..., description="Bairro", min_length=2)
-    cidade: str = Field(..., description="Cidade", min_length=2)
-    estado: str = Field(..., description="Estado", min_length=2, max_length=2)
-    tipo_usuario: TipoUsuarioEnum = Field(...)
-    foto: Optional[str] = Field(None)
+    nome: str
+    email: str
+    confirmar_senha: str
+    senha: str
+    cpf_cnpj: str
+    telefone: str
+    cep: str
+    rua: str 
+    numero: str
+    complemento: Optional[str]
+    bairro: str
+    cidade: str
+    estado: str
+    tipo_usuario: str
 
     # Funções locais para validar CPF e CNPJ (dígitos verificadores)
     @staticmethod

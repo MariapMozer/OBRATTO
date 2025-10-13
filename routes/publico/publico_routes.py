@@ -56,32 +56,35 @@ async def exibir_cadastro_prestador(request: Request):
 @router.post("/cadastro/prestador")
 async def processar_cadastro_prestador(
     request: Request,
-    nome: str = Form(...),
+    nomeCompleto: str = Form(...),
     email: str = Form(...),
     telefone: str = Form(...),
     estado: str = Form(...),
     cidade: str = Form(...),
     rua: str = Form(...),
     numero: str = Form(...),
+    complemento: str = Form(),
     bairro: str = Form(...),
     senha: str = Form(...),
-    confirmar_senha: str = Form(...),
-    cpf_cnpj: str = Form(...),
+    cep: str = Form(...),
+    confirmarSenha: str = Form(...),
+    documento: str = Form(...),
     area_atuacao: str = Form(...),
     razao_social: Optional[str] = Form(None),
     descricao_servicos: Optional[str] = Form(None)
 ):
     # Criar dicionário com dados do formulário (para preservar)
     dados_formulario = {
-        "nome": nome,
+        "nome": nomeCompleto,
         "email": email,
         "telefone": telefone,
         "estado": estado,
         "cidade": cidade,
         "rua": rua,
         "numero": numero,
+        "complemento": complemento,
         "bairro": bairro,
-        "cpf_cnpj": cpf_cnpj,
+        "cpf_cnpj": documento,
         "area_atuacao": area_atuacao,
         "razao_social": razao_social,
         "descricao_servicos": descricao_servicos
@@ -90,20 +93,24 @@ async def processar_cadastro_prestador(
     try:
         # Validar dados com Pydantic
         dados_dto = CriarPrestadorDTO(
-            nome=nome,
+            nome=nomeCompleto,
             email=email,
             telefone=telefone,
             estado=estado,
             cidade=cidade,
             rua=rua,
             numero=numero,
+            complemento=complemento,
             bairro=bairro,
+            cep=cep,
             senha=senha,
-            confirmar_senha=confirmar_senha,
-            cpf_cnpj=cpf_cnpj,
+            confirmar_senha=confirmarSenha,
+            cpf_cnpj=documento,
             area_atuacao=area_atuacao,
             razao_social=razao_social,
-            descricao_servicos=descricao_servicos
+            descricao_servicos=descricao_servicos,
+            tipo_usuario="prestador"
+
         )
 
         # Verificar se email já existe APÓS a validação do DTO
@@ -132,8 +139,9 @@ async def processar_cadastro_prestador(
             cidade=dados_dto.cidade,
             rua=dados_dto.rua,
             numero=dados_dto.numero,
+            complemento=dados_dto.complemento,
             bairro=dados_dto.bairro,
-            tipo_usuario="Prestador",
+            tipo_usuario=dados_dto.tipo_usuario,
             data_cadastro=datetime.now(),
             foto=None, # Assumindo que não há upload de foto para prestador neste momento
             token_redefinicao=None,
@@ -156,7 +164,7 @@ async def processar_cadastro_prestador(
             )
 
         # Sucesso - Redirecionar com mensagem flash
-        informar_sucesso(request, f"Cadastro de prestador realizado com sucesso! Bem-vindo(a), {nome}!")
+        informar_sucesso(request, f"Cadastro de prestador realizado com sucesso! Bem-vindo(a), {nomeCompleto}!")
         return RedirectResponse("/login", status_code=status.HTTP_303_SEE_OTHER)
 
     except ValidationError as e:
