@@ -11,9 +11,9 @@ templates = Jinja2Templates(directory="templates")
 @router.get("/recebidas")
 @requer_autenticacao(['fornecedor'])
 async def listar_mensagens_recebidas(request: Request, usuario_logado: dict = None):
-    mensagens = mensagem_repo.obter_mensagens_recebidas(usuario_logado.id)
+    mensagens = mensagem_repo.obter_mensagem(usuario_logado["id"])
     return templates.TemplateResponse(
-        "fornecedor/mensagens_recebidas.html",
+        "fornecedor/mensagens/mensagens_recebidas.html",
         {"request": request, "mensagens": mensagens}
     )
 
