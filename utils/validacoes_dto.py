@@ -95,19 +95,7 @@ def validar_telefone(telefone: str) -> str:
 
 
 def validar_data_nascimento(data_str: Optional[str], idade_minima: int = 16) -> Optional[str]:
-    """
-    Valida data de nascimento
-
-    Args:
-        data_str: Data no formato YYYY-MM-DD
-        idade_minima: Idade mínima permitida (padrão: 16 anos)
-
-    Returns:
-        Data validada ou None se vazia
-
-    Raises:
-        ValidacaoError: Se data for inválida
-    """
+   
     if not data_str:
         return None
 
@@ -345,10 +333,16 @@ def validar_cep(cep: Optional[str]) -> Optional[str]:
     Raises:
         ValidacaoError: Se CEP for inválido
     """
-    if not cep:
+    # Aceitar None ou string vazia
+    if cep is None:
         return None
 
-    cep_limpo = re.sub(r'[^0-9]', '', cep)
+    # Aceitar números também (ex: 12345678) convertendo para str
+    cep_str = str(cep).strip()
+    if cep_str == '':
+        return None
+
+    cep_limpo = re.sub(r'[^0-9]', '', cep_str)
 
     if len(cep_limpo) != 8:
         raise ValidacaoError('CEP deve conter exatamente 8 dígitos')
@@ -500,7 +494,7 @@ VALIDADOR_EMAIL = ValidadorWrapper.criar_validador_opcional(lambda v, c: v, "Ema
 VALIDADOR_SENHA = ValidadorWrapper.criar_validador(validar_senha, "Senha")
 VALIDADOR_CPF_CNPJ = ValidadorWrapper.criar_validador(validar_cpf_cnpj, "CPF/CNPJ")
 VALIDADOR_TELEFONE = ValidadorWrapper.criar_validador_opcional(validar_telefone, "Telefone")
-VALIDADOR_CEP = ValidadorWrapper.criar_validador_opcional(lambda v, c: v, "CEP")  # Pode ser validado externamente
+VALIDADOR_CEP = ValidadorWrapper.criar_validador_opcional(validar_cep, "CEP")
 VALIDADOR_NUMERO = ValidadorWrapper.criar_validador_opcional(validar_numero, "Numero")
 VALIDADOR_COMPLEMENTO = ValidadorWrapper.criar_validador_opcional(validar_texto_opcional, "Complemento", max_chars=100)
 VALIDADOR_BAIRRO = ValidadorWrapper.criar_validador(validar_texto_obrigatorio, "Bairro", min_chars=2, max_chars=100)
