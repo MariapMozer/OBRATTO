@@ -8,17 +8,31 @@ class LoginDTO(BaseDTO):
     email: EmailStr = Field(..., description="E-mail do usuário")
     senha: str = Field(..., min_length=8, description="Senha do usuário")
 
-    @field_validator('senha')
-    @classmethod
-    def validar_senha(cls, v: str) -> str:
-        validador = cls.validar_campo_wrapper(
-            lambda valor, campo: validar_texto_obrigatorio(valor, campo, min_chars=8),
-            "Senha"
-        )
-        return validador(v)
 
+    @field_validator("email")
     @classmethod
-    def criar_exemplo_login_json(cls, **overrides) -> dict:
+    def validar_email(cls, email):
+        if not email:
+           raise ValueError("O campo email é obrigatório.")
+        if '@' not in email or '.' not in email:
+           raise ValueError("O campo email deve ser um email válido.")
+        return email
+   
+# Mudança no código de senha para torná-lo mais específico e direto, sem depender de funções externas. 
+
+    @field_validator("senha")
+    @classmethod
+    def validar_senha(cls, senha):
+       if not senha:
+           raise ValueError("O campo senha é obrigatório.")
+       if len(senha) < 8:
+           raise ValueError("O campo senha deve ter pelo menos 8 caracteres.")
+       return senha
+
+
+# MUdança de classmethod para staticmethod, pois não utiliza a classe diretamente e nem precisa acessar atributos da classe.
+    @staticmethod
+    def criar_exemplo_login_json(**overrides) -> dict:
         exemplo = {
             "email": "joao.silva@email.com",
             "senha": "senhaSegura123"
