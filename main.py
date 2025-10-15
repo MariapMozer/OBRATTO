@@ -1,5 +1,6 @@
 import os
 from fastapi import FastAPI
+from fastapi.responses import RedirectResponse
 from contextlib import asynccontextmanager
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
@@ -45,7 +46,14 @@ app.add_middleware(
 )
 
 # PÚBLICO
-app.include_router(publico_routes.router)
+# Public routes are mounted under '/publico' to match templates and tests
+app.include_router(publico_routes.router, prefix="/publico")
+
+
+# Backwards-compatible redirect for legacy links that point to top-level paths
+@app.get("/escolha_cadastro")
+async def redirect_escolha_cadastro():
+    return RedirectResponse(url="/publico/escolha_cadastro", status_code=303)
 
 # FORNECEDOR
 app.include_router(fornecedor_promocoes.router, prefix="/fornecedor/promocao")
