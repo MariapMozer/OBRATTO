@@ -179,7 +179,73 @@ class CriarUsuarioDTO(BaseDTO):
         )
         return validador(v)
     
+    @field_validator('rua')
+    @classmethod
+    def validar_rua(cls, v: str) -> str:
+        validador = cls.validar_campo_wrapper(
+            lambda valor, campo: validar_texto_obrigatorio(
+                valor, campo, min_chars=5, max_chars=100
+            ),
+            "Rua"
+        )
+        return validador(v)
     
+    @field_validator('numero')
+    @classmethod
+    def validar_numero(cls, v: str) -> str:
+        validador = cls.validar_campo_wrapper(
+            lambda valor, campo: validar_texto_obrigatorio(
+                valor, campo, min_chars=1, max_chars=10
+            ),
+            "Número"
+        )
+        return validador(v)
+    
+    @field_validator('complemento')
+    @classmethod
+    def validar_complemento(cls, v: str) -> str:
+        validador = cls.validar_campo_wrapper(
+            lambda valor, campo: validar_texto_opcional(
+                valor, campo, max_chars=100
+            ),
+            "Complemento"
+        )
+        return validador(v)
+    
+    @field_validator('bairro')
+    @classmethod
+    def validar_bairro(cls, v: str) -> str:
+        validador = cls.validar_campo_wrapper(
+            lambda valor, campo: validar_texto_obrigatorio(
+                valor, campo, min_chars=2, max_chars=100
+            ),
+            "Bairro"
+        )
+        return validador(v)
+    
+    @field_validator('cidade')
+    @classmethod
+    def validar_cidade(cls, v: str) -> str:
+        validador = cls.validar_campo_wrapper(
+            lambda valor, campo: validar_texto_obrigatorio(
+                valor, campo, min_chars=2, max_chars=100
+            ),
+            "Cidade"
+        )
+        return validador(v)
+
+    @field_validator('estado')
+    @classmethod
+    def validar_estado(cls, v: str) -> str:
+        validador = cls.validar_campo_wrapper(
+            lambda valor, campo: validar_texto_obrigatorio(
+                valor, campo, min_chars=2, max_chars=100
+            ),
+            "Estado"
+        )
+        return validador(v)
+    
+
 
     @classmethod
     def criar_exemplo_usuario_json(cls, **overrides) -> dict:
@@ -189,16 +255,16 @@ class CriarUsuarioDTO(BaseDTO):
             "email": "joao.silva@email.com",
             "senha": "senhaSegura123",
             "confirmar_senha": "senhaSegura123",
-            "cpf_cnpj": "111.444.777-35",
-            "telefone": "(11) 99999-9999",
-            "cep": "12345-678",
+            "cpf_cnpj": "11144477735",
+            "telefone": "11999999999",
+            "cep": "12345678",
             "rua": "Rua Exemplo",
             "numero": "123",    
             "complemento": "Apto 45",
             "bairro": "Bairro Exemplo",
             "cidade": "Cidade Exemplo",
             "estado": "SP",
-            "tipo_usuario": "cliente",
+            "tipo_usuario": TipoUsuarioEnum.CLIENTE.value,
         }
 
         exemplo.update(overrides)
