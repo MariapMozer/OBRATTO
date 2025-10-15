@@ -6,7 +6,7 @@ from utils.validacoes_dto import validar_texto_obrigatorio
 class LoginDTO(BaseDTO):
     
     email: EmailStr = Field(..., description="E-mail do usuário")
-    senha: str = Field(..., min_length=8, description="Senha do usuário")
+    senha: str = Field(...,description="Senha do usuário")
 
 
     @field_validator("email")
@@ -20,15 +20,22 @@ class LoginDTO(BaseDTO):
    
 # Mudança no código de senha para torná-lo mais específico e direto, sem depender de funções externas. 
 
+    # @field_validator("senha")
+    # @classmethod
+    # def validar_senha(cls, senha):
+    #    if not senha:
+    #        raise ValueError("O campo senha é obrigatório.")
+    #    if len(senha) < 8:
+    #        raise ValueError("O campo senha deve ter pelo menos 8 caracteres.")
+    #    return senha
+
+
     @field_validator("senha")
     @classmethod
     def validar_senha(cls, senha):
-       if not senha:
-           raise ValueError("O campo senha é obrigatório.")
-       if len(senha) < 8:
-           raise ValueError("O campo senha deve ter pelo menos 8 caracteres.")
-       return senha
-
+        if not senha or not senha.strip():
+            raise ValueError("O campo senha é obrigatório.")
+        return senha
 
 # MUdança de classmethod para staticmethod, pois não utiliza a classe diretamente e nem precisa acessar atributos da classe.
     @staticmethod
