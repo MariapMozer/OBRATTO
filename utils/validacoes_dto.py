@@ -350,7 +350,7 @@ def validar_cep(cep: Optional[str]) -> Optional[str]:
     return cep_limpo
 
 
-def validar_senha(senha: Optional[str], min_chars: int = 6, max_chars: int = 128, obrigatorio: bool = True) -> Optional[str]:
+def validar_senha(senha: Optional[str], min_chars: int = 8, max_chars: int = 128, obrigatorio: bool = True) -> Optional[str]:
     if not senha:
         if obrigatorio:
             raise ValidacaoError('Senha é obrigatória')
