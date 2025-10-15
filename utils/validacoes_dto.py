@@ -33,10 +33,45 @@ def validar_cpf_cnpj(valor: Optional[str], campo: str = "CPF/CNPJ") -> Optional[
 
     documento = re.sub(r'[^0-9]', '', valor)
 
+    # helpers locais
+    def _calcular_digito_cpf(digs: str) -> int:
+        soma = sum(int(digs[i]) * (len(digs) + 1 - i) for i in range(len(digs)))
+        resto = soma % 11
+        return 0 if resto < 2 else 11 - resto
+
+    def _validar_cpf(num: str) -> str:
+        if len(num) != 11:
+            raise ValidacaoError(f"{campo} deve conter 11 dígitos para CPF")
+        # impedir CPFs com todos os dígitos iguais
+        if num == num[0] * 11:
+            raise ValidacaoError(f'{campo} inválido')
+        dig1 = _calcular_digito_cpf(num[:9])
+        dig2 = _calcular_digito_cpf(num[:9] + str(dig1))
+        if int(num[9]) != dig1 or int(num[10]) != dig2:
+            raise ValidacaoError(f'{campo} inválido')
+        return num
+
+    def _validar_cnpj(num: str) -> str:
+        if len(num) != 14:
+            raise ValidacaoError(f"{campo} deve conter 14 dígitos para CNPJ")
+
+        def calc(digs, pesos):
+            s = sum(int(digs[i]) * pesos[i] for i in range(len(digs)))
+            r = s % 11
+            return '0' if r < 2 else str(11 - r)
+
+        pesos1 = [5,4,3,2,9,8,7,6,5,4,3,2]
+        pesos2 = [6] + pesos1
+        d1 = calc(num[:12], pesos1)
+        d2 = calc(num[:12] + d1, pesos2)
+        if num[12] != d1 or num[13] != d2:
+            raise ValidacaoError(f'{campo} inválido')
+        return num
+
     if len(documento) == 11:
-        return validar_cpf_cnpj(documento)
+        return _validar_cpf(documento)
     elif len(documento) == 14:
-        return validar_cpf_cnpj(documento)
+        return _validar_cnpj(documento)
     else:
         raise ValidacaoError(f"{campo} deve conter 11 dígitos (CPF) ou 14 dígitos (CNPJ)")
 
