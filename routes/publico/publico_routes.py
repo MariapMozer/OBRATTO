@@ -399,6 +399,9 @@ async def processar_cadastro_fornecedor(
             foto=None
         )
 
+        if senha != confirmar_senha:
+            raise ValueError("As senhas não coincidem.")
+
         # Log: valor depois da validação (limpo) — usar INFO para visibilidade
         logger.info(f"[DEBUG-INFO] fornecedor_dto.cpf_cnpj (após validação): {repr(getattr(fornecedor_dto, 'cpf_cnpj', None))}")
 

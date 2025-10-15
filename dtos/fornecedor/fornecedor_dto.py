@@ -21,15 +21,6 @@ class CriarFornecedorDTO(CriarUsuarioDTO):
             "Razão Social"
         )(v)
 
-    @classmethod
-    def criar_exemplo_fornecedor_json(cls, **overrides) -> dict:
-        """Exemplo de dados para documentação da API"""
-        exemplo = {
-            "razao_social": "Fornecedor de Materiais Ltda",
-            "selo_confianca": False
-        }
-        exemplo.update(overrides)
-        return exemplo
     
 class AtualizarFornecedorDTO(AtualizarUsuarioDTO):
 
@@ -45,12 +36,6 @@ class AtualizarFornecedorDTO(AtualizarUsuarioDTO):
             lambda valor, campo: validar_texto_opcional(valor, max_chars=100),
             "Razão Social"
         )(v)
-    
-CriarFornecedorDTO.model_config.update({
-    "json_schema_extra": {
-        "example": CriarFornecedorDTO.criar_exemplo_fornecedor_json()
-    }
-})
 
 class ProdutoDTO(BaseDTO):
     pass

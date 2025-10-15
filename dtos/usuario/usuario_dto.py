@@ -29,65 +29,19 @@ class TipoUsuarioEnum(str, Enum):
 
 class CriarUsuarioDTO(BaseDTO):
 
-    nome: str = Field(
-        ...,
-        min_length=2,
-        max_length=100,
-        description ="Nome completo do usuário"
-    )
-    email: EmailStr = Field(
-        ...,
-        description ="Email do usuário"
-    )
-    confirmar_senha: str = Field(
-        ...,
-        min_length=8,
-        max_length=100,
-        description ="Confirmação da senha do usuário"
-    )
-    senha: str = Field(
-        ...,
-        min_length=8,
-        max_length=100,
-        description ="Senha do usuário"
-    )
-    cpf_cnpj: str = Field(
-        ...,
-        description ="CPF ou CNPJ do usuário"
-    )
-    telefone: str = Field(
-        ...,
-        min_length=10,
-        description ="Telefone com DDD"
-    )
-    cep: str = Field(
-        ...,
-        description ="CEP do usuário"
-    )
-    rua: str = Field(
-        ...,
-        description ="Rua do usuário"
-    )
-    numero: str = Field(
-        ...,
-        description ="Número da residência do usuário"
-    )
-    complemento: Optional[str] = Field(
-        None,
-        description ="Complemento do endereço do usuário"
-    )
-    bairro: str = Field(
-        ...,
-        description ="Bairro do usuário"
-    )
-    cidade: str = Field(
-        ...,
-        description ="Cidade do usuário"
-    )
-    estado: str = Field(
-        ...,
-        description ="Estado do usuário"
-    )
+    nome: str
+    email: str
+    confirmar_senha: str
+    senha: str
+    cpf_cnpj: str
+    telefone: str
+    cep: str
+    rua: str
+    numero: str
+    complemento: Optional[str]
+    bairro: str
+    cidade: str
+    estado: str
     tipo_usuario: TipoUsuarioEnum
 
    
@@ -111,15 +65,15 @@ class CriarUsuarioDTO(BaseDTO):
         )
         return validador(v)
 
-    @field_validator('confirmar_senha')
-    @classmethod
-    def validar_confirmar_senha(cls, v, info):
-        validador = cls.validar_campo_wrapper(
-            lambda valor, campo: validar_senhas_coincidem(
-                info.data.get('senha'), valor),
-            "Confirmar Senha"
-        )
-        return validador(v)
+    # @field_validator('confirmar_senha', mode='after')
+    # @classmethod
+    # def validar_confirmar_senha(cls, v, info):
+    #     validador = cls.validar_campo_wrapper(
+    #         lambda valor, campo: validar_senhas_coincidem(
+    #             info.data.get('senha'), valor),
+    #         "Confirmar Senha"
+    #     )
+    #     return validador(v)
 
     @field_validator('cpf_cnpj')
     @classmethod
@@ -244,31 +198,6 @@ class CriarUsuarioDTO(BaseDTO):
             "Estado"
         )
         return validador(v)
-    
-
-
-    @classmethod
-    def criar_exemplo_usuario_json(cls, **overrides) -> dict:
-        """Exemplo de dados para documentação da API"""
-        exemplo = {
-            "nome": "João Silva",
-            "email": "joao.silva@email.com",
-            "senha": "senhaSegura123",
-            "confirmar_senha": "senhaSegura123",
-            "cpf_cnpj": "11144477735",
-            "telefone": "11999999999",
-            "cep": "12345678",
-            "rua": "Rua Exemplo",
-            "numero": "123",    
-            "complemento": "Apto 45",
-            "bairro": "Bairro Exemplo",
-            "cidade": "Cidade Exemplo",
-            "estado": "SP",
-            "tipo_usuario": TipoUsuarioEnum.CLIENTE.value,
-        }
-
-        exemplo.update(overrides)
-        return exemplo
 
 
 
@@ -399,11 +328,3 @@ class AtualizarUsuarioDTO(BaseDTO):
             return v
         return cls.validar_campo_wrapper(validar_texto_obrigatorio, "Estado", min_chars=2, max_chars=2)(v)
     
-
-
-# Configurar exemplos JSON nos model_config
-CriarUsuarioDTO.model_config.update({
-    "json_schema_extra": {
-        "example": CriarUsuarioDTO.criar_exemplo_usuario_json()
-    }
-})

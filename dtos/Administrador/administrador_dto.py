@@ -6,16 +6,7 @@ from utils.validacoes_dto import *
 
 
 class CriarAdministradorDTO(CriarUsuarioDTO):
-  
-    @classmethod
-    def criar_exemplo_json(cls, **overrides) -> dict:
-      
-        # Usar exemplo de usuário base com tipo administrador
-        exemplo = CriarUsuarioDTO.criar_exemplo_usuario_json(
-            tipo_usuario="administrador"
-        )
-        exemplo.update(overrides)
-        return exemplo
+    pass
 
 
 class AtualizarAdministradorDTO(AtualizarUsuarioDTO):
