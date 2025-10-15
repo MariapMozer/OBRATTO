@@ -116,7 +116,7 @@ class CriarUsuarioDTO(BaseDTO):
     def validar_confirmar_senha(cls, v, info):
         validador = cls.validar_campo_wrapper(
             lambda valor, campo: validar_senhas_coincidem(
-                valor, info.data.get('senha'), campo),
+                info.data.get('senha'), valor),
             "Confirmar Senha"
         )
         return validador(v)
@@ -152,7 +152,7 @@ class CriarUsuarioDTO(BaseDTO):
     @classmethod
     def validar_estado_criar(cls, v: str) -> str:
         validador = cls.validar_campo_wrapper(
-            lambda valor: validar_estado_brasileiro(valor),
+            lambda valor, campo: validar_estado_brasileiro(valor),
             "Estado"
         )
         return validador(v)
@@ -206,7 +206,7 @@ class CriarUsuarioDTO(BaseDTO):
     def validar_complemento(cls, v: str) -> str:
         validador = cls.validar_campo_wrapper(
             lambda valor, campo: validar_texto_opcional(
-                valor, campo, max_chars=100
+                valor, max_chars=100
             ),
             "Complemento"
         )
