@@ -90,57 +90,6 @@ class CriarUsuarioDTO(BaseDTO):
     )
     tipo_usuario: TipoUsuarioEnum
 
-    # Funções locais para validar CPF e CNPJ (dígitos verificadores)
-    @staticmethod
-    def _calcular_digito_cpf(digs: str) -> int:
-        soma = sum(int(digs[i]) * (len(digs) + 1 - i) for i in range(len(digs)))
-        resto = soma % 11
-        return 0 if resto < 2 else 11 - resto
-
-    @staticmethod
-    def validar_cpf(num: str) -> str:
-        num = re.sub(r'[^0-9]', '', num or '')
-        if len(num) != 11:
-            raise ValueError('CPF deve conter 11 dígitos')
-        # impedir CPFs com todos os dígitos iguais
-        if num == num[0] * 11:
-            raise ValueError('CPF inválido')
-        dig1 = CriarUsuarioDTO._calcular_digito_cpf(num[:9])
-        dig2 = CriarUsuarioDTO._calcular_digito_cpf(num[:9] + str(dig1))
-        if int(num[9]) != dig1 or int(num[10]) != dig2:
-            raise ValueError('CPF inválido')
-        return num
-
-    @staticmethod
-    def validar_cnpj(num: str) -> str:
-        num = re.sub(r'[^0-9]', '', num or '')
-        if len(num) != 14:
-            raise ValueError('CNPJ deve conter 14 dígitos')
-        # cálculo dos dígitos verificadores
-        def calc(digs, pesos):
-            s = sum(int(digs[i]) * pesos[i] for i in range(len(digs)))
-            r = s % 11
-            return '0' if r < 2 else str(11 - r)
-
-        pesos1 = [5,4,3,2,9,8,7,6,5,4,3,2]
-        pesos2 = [6] + pesos1
-        d1 = calc(num[:12], pesos1)
-        d2 = calc(num[:12] + d1, pesos2)
-        if num[12] != d1 or num[13] != d2:
-            raise ValueError('CNPJ inválido')
-        return num
-
-    @classmethod
-    def validar_cpf_cnpj_local(cls, valor: str) -> str:
-        if not valor:
-            raise ValueError('CPF/CNPJ é obrigatório')
-        cleaned = re.sub(r'[^0-9]', '', valor)
-        if len(cleaned) == 11:
-            return cls.validar_cpf(cleaned)
-        if len(cleaned) == 14:
-            return cls.validar_cnpj(cleaned)
-        raise ValueError('CPF deve ter 11 dígitos ou CNPJ 14 dígitos')
-
    
     @field_validator('nome')
     @classmethod
@@ -175,7 +124,11 @@ class CriarUsuarioDTO(BaseDTO):
     @field_validator('cpf_cnpj')
     @classmethod
     def validar_cpf_cnpj_criar(cls, v: str) -> str:
-        return cls.validar_cpf_cnpj_local(v)
+        validador = cls.validar_campo_wrapper(
+            lambda valor, campo: validar_cpf_cnpj(valor),
+            "CPF/CNPJ"
+        )
+        return validador(v)
 
     @field_validator('telefone') 
     @classmethod
@@ -198,7 +151,11 @@ class CriarUsuarioDTO(BaseDTO):
     @field_validator('estado')
     @classmethod
     def validar_estado_criar(cls, v: str) -> str:
-        return validar_estado_brasileiro(v)
+        validador = cls.validar_campo_wrapper(
+            lambda valor: validar_estado_brasileiro(valor),
+            "Estado"
+        )
+        return validador(v)
 
     @field_validator('tipo_usuario', mode='before')
     @classmethod
@@ -211,6 +168,18 @@ class CriarUsuarioDTO(BaseDTO):
         except ValueError:
             raise
 
+    @field_validator('email')
+    @classmethod
+    def validar_email(cls, v: str) -> str:
+        validador = cls.validar_campo_wrapper(
+            lambda valor, campo: validar_texto_obrigatorio(
+                valor, campo, min_chars=5, max_chars=100
+                ),
+            "E-mail"
+        )
+        return validador(v)
+    
+    
 
     @classmethod
     def criar_exemplo_usuario_json(cls, **overrides) -> dict:
@@ -302,9 +271,9 @@ class AtualizarUsuarioDTO(BaseDTO):
     def validar_documento(cls, v: Optional[str]) -> Optional[str]:
         if not v:
             return v
-        # Usar a validação local completa (CPF/CNPJ) implementada em CriarUsuarioDTO
+        # Usar o validador centralizado em utils/validacoes_dto
         try:
-            return CriarUsuarioDTO.validar_cpf_cnpj_local(v)
+            return cls.validar_campo_wrapper(validar_cpf_cnpj, "CPF/CNPJ")(v)
         except ValueError as e:
             raise ValueError(str(e))
 
