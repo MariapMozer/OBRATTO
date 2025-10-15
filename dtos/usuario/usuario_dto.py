@@ -13,27 +13,82 @@ class TipoUsuarioEnum(str, Enum):
     CLIENTE = "cliente"
     FORNECEDOR = "fornecedor"
 
+# Conversão
+    @classmethod
+    def from_string(cls, value):
+        if isinstance(value, cls):
+            return value
+        if not isinstance(value, str):
+            raise ValueError('Tipo de usuário inválido')
+        value_clean = value.strip().lower()
+        try:
+            return cls(value_clean)
+        except ValueError:
+            raise ValueError('Tipo de usuário inválido')
+
 
 class CriarUsuarioDTO(BaseDTO):
-    """
-    DTO para criação de novo usuário.
-    Usado em formulários de registro.
-    """
 
-    nome: str
-    email: str
-    confirmar_senha: str
-    senha: str
-    cpf_cnpj: str
-    telefone: str
-    cep: str
-    rua: str 
-    numero: str
-    complemento: Optional[str]
-    bairro: str
-    cidade: str
-    estado: str
-    tipo_usuario: str
+    nome: str = Field(
+        ...,
+        min_length=2,
+        max_length=100,
+        description ="Nome completo do usuário"
+    )
+    email: EmailStr = Field(
+        ...,
+        description ="Email do usuário"
+    )
+    confirmar_senha: str = Field(
+        ...,
+        min_length=8,
+        max_length=100,
+        description ="Confirmação da senha do usuário"
+    )
+    senha: str = Field(
+        ...,
+        min_length=8,
+        max_length=100,
+        description ="Senha do usuário"
+    )
+    cpf_cnpj: str = Field(
+        ...,
+        description ="CPF ou CNPJ do usuário"
+    )
+    telefone: str = Field(
+        ...,
+        min_length=10,
+        description ="Telefone com DDD"
+    )
+    cep: str = Field(
+        ...,
+        description ="CEP do usuário"
+    )
+    rua: str = Field(
+        ...,
+        description ="Rua do usuário"
+    )
+    numero: str = Field(
+        ...,
+        description ="Número da residência do usuário"
+    )
+    complemento: Optional[str] = Field(
+        None,
+        description ="Complemento do endereço do usuário"
+    )
+    bairro: str = Field(
+        ...,
+        description ="Bairro do usuário"
+    )
+    cidade: str = Field(
+        ...,
+        description ="Cidade do usuário"
+    )
+    estado: str = Field(
+        ...,
+        description ="Estado do usuário"
+    )
+    tipo_usuario: TipoUsuarioEnum
 
     # Funções locais para validar CPF e CNPJ (dígitos verificadores)
     @staticmethod
@@ -86,48 +141,75 @@ class CriarUsuarioDTO(BaseDTO):
             return cls.validar_cnpj(cleaned)
         raise ValueError('CPF deve ter 11 dígitos ou CNPJ 14 dígitos')
 
-    # Delegar validações para os validadores centralizados definidos em utils/validacoes_dto.py
+   
     @field_validator('nome')
     @classmethod
-    def validar_nome_criar(cls, v: str) -> str:
-        # validar_texto_obrigatorio espera (texto, campo, min_chars, max_chars)
-        return validar_texto_obrigatorio(v, "Nome", min_chars=2, max_chars=100)
+    def validar_nome(cls, v: str) -> str:
+        validador = cls.validar_campo_wrapper(
+            lambda valor, campo: validar_texto_obrigatorio(
+                valor, campo, min_chars=2, max_chars=100),
+            "Nome"
+        )
+        return validador(v)
 
     @field_validator('senha')
     @classmethod
-    def validar_senha_criar(cls, v: str) -> str:
-        # usar validar_senha do utils
-        return validar_senha(v, min_chars=8, obrigatorio=True)
+    def validar_senha(cls, v: str) -> str:
+        validador = cls.validar_campo_wrapper(
+            lambda valor, campo: validar_senha(
+                valor, min_chars=8, obrigatorio=True),
+            "Senha"
+        )
+        return validador(v)
 
-    # Validar senhas no nível do modelo para garantir ambos os campos disponíveis
-    @model_validator(mode='after')
-    def verificar_senhas(cls, model):
-        if not getattr(model, 'senha', None):
-            raise ValueError('Senha é obrigatória')
-        if not getattr(model, 'confirmar_senha', None):
-            raise ValueError('Confirmação de senha é obrigatória')
-        validar_senhas_coincidem(model.senha, model.confirmar_senha)
-        return model
+    @field_validator('confirmar_senha')
+    @classmethod
+    def validar_confirmar_senha(cls, v, info):
+        validador = cls.validar_campo_wrapper(
+            lambda valor, campo: validar_senhas_coincidem(
+                valor, info.data.get('senha'), campo),
+            "Confirmar Senha"
+        )
+        return validador(v)
 
     @field_validator('cpf_cnpj')
     @classmethod
     def validar_cpf_cnpj_criar(cls, v: str) -> str:
         return cls.validar_cpf_cnpj_local(v)
 
-    @field_validator('telefone')
+    @field_validator('telefone') 
     @classmethod
     def validar_telefone_criar(cls, v: str) -> str:
-        return validar_telefone(v)
+        validador = cls.validar_campo_wrapper(
+           lambda valor, campo: validar_telefone(valor),
+              "Telefone"
+        )
+        return validador(v)
 
     @field_validator('cep')
     @classmethod
     def validar_cep_criar(cls, v: str) -> str:
-        return validar_cep(v)
+        validador = cls.validar_campo_wrapper(
+            lambda valor, campo: validar_cep(valor),
+            "CEP"
+        )
+        return validador(v)
 
     @field_validator('estado')
     @classmethod
     def validar_estado_criar(cls, v: str) -> str:
         return validar_estado_brasileiro(v)
+
+    @field_validator('tipo_usuario', mode='before')
+    @classmethod
+    def validar_tipo_usuario_criar(cls, value):
+        
+        if value is None:
+            raise ValueError('Tipo de usuário é obrigatório')
+        try:
+            return TipoUsuarioEnum.from_string(value)
+        except ValueError:
+            raise
 
 
     @classmethod

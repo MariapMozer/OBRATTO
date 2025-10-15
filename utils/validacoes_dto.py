@@ -42,18 +42,6 @@ def validar_cpf_cnpj(valor: Optional[str], campo: str = "CPF/CNPJ") -> Optional[
 
 
 def validar_telefone(telefone: str) -> str:
-    """
-    Valida telefone brasileiro (DDD + número)
-
-    Args:
-        telefone: Telefone a ser validado (pode conter máscaras)
-
-    Returns:
-        Telefone limpo (apenas números)
-
-    Raises:
-        ValidacaoError: Se telefone for inválido
-    """
     if not telefone:
         raise ValidacaoError('Telefone é obrigatório')
 
@@ -154,21 +142,6 @@ def validar_nome_pessoa(nome: str, min_chars: int = 2, max_chars: int = 100) -> 
 
 
 def validar_texto_obrigatorio(texto: str, campo: str, min_chars: int = 1, max_chars: int = 1000) -> str:
-    """
-    Valida texto obrigatório com limites de caracteres
-
-    Args:
-        texto: Texto a ser validado
-        campo: Nome do campo (para mensagens de erro)
-        min_chars: Número mínimo de caracteres
-        max_chars: Número máximo de caracteres
-
-    Returns:
-        Texto limpo (espaços extras removidos)
-
-    Raises:
-        ValidacaoError: Se texto for inválido
-    """
     if not texto or not texto.strip():
         raise ValidacaoError(f'{campo} é obrigatório')
 
@@ -348,23 +321,7 @@ def validar_cep(cep: Optional[str]) -> Optional[str]:
     return cep_limpo
 
 
-def validar_senha(senha: Optional[str], min_chars: int = 6, max_chars: int = 128,
-                  obrigatorio: bool = True) -> Optional[str]:
-    """
-    Valida senha
-
-    Args:
-        senha: Senha a ser validada
-        min_chars: Número mínimo de caracteres
-        max_chars: Número máximo de caracteres
-        obrigatorio: Se a senha é obrigatória
-
-    Returns:
-        Senha validada ou None se opcional e vazia
-
-    Raises:
-        ValidacaoError: Se senha for inválida
-    """
+def validar_senha(senha: Optional[str], min_chars: int = 6, max_chars: int = 128, obrigatorio: bool = True) -> Optional[str]:
     if not senha:
         if obrigatorio:
             raise ValidacaoError('Senha é obrigatória')
@@ -379,25 +336,12 @@ def validar_senha(senha: Optional[str], min_chars: int = 6, max_chars: int = 128
     return senha
 
 
-
 def validar_senhas_coincidem(senha: str, confirmar_senha: str) -> str:
-    """
-    Valida se duas senhas coincidem
-
-    Args:
-        senha: Senha principal
-        confirmar_senha: Confirmação da senha
-
-    Returns:
-        Senha confirmada
-
-    Raises:
-        ValidacaoError: Se senhas não coincidirem
-    """
     if senha != confirmar_senha:
         raise ValidacaoError('As senhas não coincidem')
 
     return confirmar_senha
+
 
 
 def converter_checkbox_para_bool(valor: Any) -> bool:
