@@ -368,9 +368,14 @@ def validar_senha(senha: Optional[str], min_chars: int = 8, max_chars: int = 128
 def validar_senhas_coincidem(senha: str, confirmar_senha: str) -> str:
     if senha != confirmar_senha:
         raise ValidacaoError('As senhas não coincidem')
-
     return confirmar_senha
 
+
+# Validador de senha específico para login
+def validar_senha_login(senha: str) -> str:
+    if not senha or not senha.strip():
+        raise ValidacaoError("Senha é obrigatória")
+    return senha
 
 
 def converter_checkbox_para_bool(valor: Any) -> bool:
@@ -492,6 +497,7 @@ class ValidadorWrapper:
 VALIDADOR_NOME = ValidadorWrapper.criar_validador(validar_nome_pessoa, "Nome")
 VALIDADOR_EMAIL = ValidadorWrapper.criar_validador_opcional(lambda v, c: v, "Email")  # Pydantic já valida
 VALIDADOR_SENHA = ValidadorWrapper.criar_validador(validar_senha, "Senha")
+VALIDADOR_SENHA_LOGIN = ValidadorWrapper.criar_validador(validar_senha_login, "Senha")
 VALIDADOR_CPF_CNPJ = ValidadorWrapper.criar_validador(validar_cpf_cnpj, "CPF/CNPJ")
 VALIDADOR_TELEFONE = ValidadorWrapper.criar_validador_opcional(validar_telefone, "Telefone")
 VALIDADOR_CEP = ValidadorWrapper.criar_validador_opcional(validar_cep, "CEP")
