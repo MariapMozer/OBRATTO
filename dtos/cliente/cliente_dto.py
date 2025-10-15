@@ -5,10 +5,9 @@ from ..base_dto import BaseDTO
 
 
 class CriarClienteDTO(BaseDTO):
-    genero: Optional[str] = Field(None, description="Gênero do cliente")
+    genero: Optional[str] = Field(None, description="Gênero do cliente", max_length=20)
     data_nascimento: Optional[date] = Field(None, description="Data de nascimento")
 
-    # Validadores explícitos
     @field_validator("genero")
     @classmethod
     def validar_genero(cls, v: Optional[str]) -> Optional[str]:
@@ -19,7 +18,6 @@ class CriarClienteDTO(BaseDTO):
     @field_validator("data_nascimento")
     @classmethod
     def validar_data_nascimento(cls, v: Optional[date]) -> Optional[date]:
-        # Aqui você pode adicionar validações extras, ex: não aceitar datas futuras
         if v is not None and v > date.today():
             raise ValueError("Data de nascimento não pode ser no futuro.")
         return v
@@ -35,7 +33,7 @@ class CriarClienteDTO(BaseDTO):
 
 
 class AtualizarClienteDTO(BaseDTO):
-    genero: Optional[str] = Field(None, description="Gênero do cliente")
+    genero: Optional[str] = Field(None, description="Gênero do cliente", max_length=20)
     data_nascimento: Optional[date] = Field(None, description="Data de nascimento")
 
     @field_validator("genero")
@@ -58,8 +56,14 @@ class AtualizarClienteDTO(BaseDTO):
             "genero": "Masculino",
             "data_nascimento": "1985-05-20"
         }
+        exemplo.update(overrides)
+        return exemplo
+
 
 # Configurar exemplos JSON para documentação
 CriarClienteDTO.model_config.update({
     "json_schema_extra": {"example": CriarClienteDTO.criar_exemplo_json()}
+})
+AtualizarClienteDTO.model_config.update({
+    "json_schema_extra": {"example": AtualizarClienteDTO.criar_exemplo_json()}
 })
