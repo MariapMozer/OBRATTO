@@ -3,6 +3,9 @@ from typing import Optional, List
 from data.usuario.usuario_model import Usuario
 from data.usuario.usuario_sql import *
 from utils.db import open_connection
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def criar_tabela_usuario() -> bool:
@@ -41,7 +44,88 @@ def inserir_usuario(usuario: Usuario) -> Optional[int]:
             usuario.tipo_usuario
         ))
         conn.commit()
-        return cursor.lastrowid
+        new_id = cursor.lastrowid
+        # Após inserir na tabela usuario, garantir existência do registro na tabela específica
+        try:
+            _criar_registro_tipo_padrao(conn, usuario, new_id)
+        except Exception as e:
+            # Não falhar a criação do usuário se a criação do registro de tipo falhar; apenas logar
+            logger.exception(f"Falha ao criar registro de tipo para usuario id={new_id}: {e}")
+        return new_id
+
+
+def _criar_registro_tipo_padrao(conn, usuario: Usuario, usuario_id: int) -> None:
+    """
+    Cria um registro padrão nas tabelas de tipo (fornecedor, prestador, cliente, administrador)
+    quando possível. Usa valores padrão para campos obrigatórios quando necessário.
+
+    Observação: usamos INSERT OR IGNORE para não duplicar registros caso já existam.
+    """
+    tipo = (getattr(usuario, 'tipo_usuario', '') or '').lower()
+    cur = conn.cursor()
+    # Fornecedor
+    if tipo == 'fornecedor':
+        # razao_social recebe o nome do usuário como fallback
+        razao = usuario.nome or ''
+        cur.execute("INSERT OR IGNORE INTO fornecedor (id, razao_social, selo_confianca) VALUES (?, ?, ?)", (usuario_id, razao, 0))
+    # Prestador
+    elif tipo == 'prestador':
+        # area_atuacao é NOT NULL na tabela; usar valor padrão vazio
+        area = ''
+        razao = usuario.nome or ''
+        descricao = ''
+        cur.execute("INSERT OR IGNORE INTO prestador (id, area_atuacao, razao_social, descricao_servicos, selo_confianca) VALUES (?, ?, ?, ?, ?)", (usuario_id, area, razao, descricao, 0))
+    # Cliente
+    elif tipo == 'cliente':
+        # genero and data_nascimento são NOT NULL; inserir placeholders
+        genero = 'N/D'
+        data_nasc = '1970-01-01'
+        cur.execute("INSERT OR IGNORE INTO cliente (id, genero, data_nascimento) VALUES (?, ?, ?)", (usuario_id, genero, data_nasc))
+    # Administrador
+    elif tipo == 'administrador' or tipo == 'admin':
+        cur.execute("INSERT OR IGNORE INTO administrador (id_usuario) VALUES (?)", (usuario_id,))
+    conn.commit()
+
+
+def backfill_registros_tipo():
+    """
+    Percorre todos os usuários e garante um registro correspondente na tabela de tipo.
+    Use este método para popular as tabelas de tipo para usuários já existentes.
+    """
+    with open_connection() as conn:
+        cur = conn.cursor()
+        cur.execute("SELECT id, nome, tipo_usuario, foto FROM usuario")
+        rows = cur.fetchall()
+        count = 0
+        for r in rows:
+            uid = r['id'] if isinstance(r, dict) else r[0]
+            tipo = (r['tipo_usuario'] if isinstance(r, dict) else r[2]) or ''
+            usuario_obj = Usuario(
+                id=uid,
+                nome=(r['nome'] if isinstance(r, dict) else r[1]),
+                email=None,
+                senha=None,
+                cpf_cnpj=None,
+                telefone=None,
+                cep=None,
+                rua=None,
+                numero=None,
+                complemento=None,
+                bairro=None,
+                cidade=None,
+                estado=None,
+                data_cadastro=None,
+                foto=None,
+                token_redefinicao=None,
+                data_token=None,
+                tipo_usuario=tipo
+            )
+            try:
+                _criar_registro_tipo_padrao(conn, usuario_obj, uid)
+                count += 1
+            except Exception:
+                logger.exception(f"Erro ao backfill usuario id={uid}")
+        logger.info(f"Backfill finalizado: processados={len(rows)}, insercoes_tentadas={count}")
 
 def obter_usuario_por_email(email: str) -> Optional[Usuario]:
     with open_connection() as conn:
