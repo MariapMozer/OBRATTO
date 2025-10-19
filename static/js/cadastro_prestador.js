@@ -53,9 +53,11 @@ function validarSecao(secao) {
 
 // máscara para CPF
 
-document.getElementById('cpf').addEventListener('input', function (e) {
-    console.log('e.target.value',);
-    let value = e.target.value
+const cpfEl = document.getElementById('cpf');
+if (cpfEl) {
+    cpfEl.addEventListener('input', function (e) {
+        console.log('e.target.value', e.target.value);
+        let value = e.target.value
     if (!value) return;
     if (value.length > 14) value = value.slice(0, 14);
     value = value.replace(/\D/g, '');
@@ -82,17 +84,21 @@ document.getElementById('cpf').addEventListener('input', function (e) {
                 alert('Erro ao consultar CPF.');
             });
     }
-})
+    })
+}
 
 // Máscara para telefone
 
 
-document.getElementById('telefone').addEventListener('input', function (e) {
-    let value = e.target.value.replace(/\D/g, '');
-    value = value.replace(/(\d{2})(\d)/, '($1) $2');
-    value = value.replace(/(\d{5})(\d)/, '$1-$2');
-    e.target.value = value;
-});
+const telefoneEl = document.getElementById('telefone');
+if (telefoneEl) {
+    telefoneEl.addEventListener('input', function (e) {
+        let value = e.target.value.replace(/\D/g, '');
+        value = value.replace(/(\d{2})(\d)/, '($1) $2');
+        value = value.replace(/(\d{5})(\d)/, '$1-$2');
+        e.target.value = value;
+    });
+}
 
 
 
@@ -100,18 +106,22 @@ document.getElementById('telefone').addEventListener('input', function (e) {
 // Validação de confirmação de senha
 
 
-document.getElementById('confirmarSenha').addEventListener('input', function (e) {
-    const senha = document.getElementById('senha').value;
-    const confirmarSenha = e.target.value;
+const confirmarSenhaEl = document.getElementById('confirmarSenha');
+if (confirmarSenhaEl) {
+    confirmarSenhaEl.addEventListener('input', function (e) {
+        const senhaEl = document.getElementById('senha');
+        const senha = senhaEl ? senhaEl.value : '';
+        const confirmarSenha = e.target.value;
 
-
-    if (senha !== confirmarSenha) {
-        e.target.classList.add('is-invalid');
-    } else {
-        e.target.classList.remove('is-invalid');
-        e.target.classList.add('is-valid');
-    }
-});
+        if (senha !== confirmarSenha) {
+            e.target.classList.add('is-invalid');
+            e.target.classList.remove('is-valid');
+        } else {
+            e.target.classList.remove('is-invalid');
+            e.target.classList.add('is-valid');
+        }
+    });
+}
 
 
 
@@ -119,60 +129,62 @@ document.getElementById('confirmarSenha').addEventListener('input', function (e)
 // Preenchimento automático de endereço pelo CEP
 
 
-document.getElementById('cep').addEventListener('blur', function () {
-    const cep = this.value.replace(/\D/g, '');
+const cepEl = document.getElementById('cep');
+if (cepEl) {
+    cepEl.addEventListener('blur', function () {
+        const cep = this.value.replace(/\D/g, '');
 
+        if (cep.length !== 8) {
+            alert('CEP inválido!');
+            return;
+        }
 
-    if (cep.length !== 8) {
-        alert('CEP inválido!');
-        return;
-    }
+        fetch(`https://viacep.com.br/ws/${cep}/json/`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.erro) {
+                    alert('CEP não encontrado!');
+                    const ruaEl = document.getElementById('rua');
+                    const bairroEl = document.getElementById('bairro');
+                    if (ruaEl) ruaEl.value = '';
+                    if (bairroEl) bairroEl.value = '';
+                    return;
+                }
 
-
-    fetch(`https://viacep.com.br/ws/${cep}/json/`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.erro) {
-                alert('CEP não encontrado!');
-                document.getElementById('rua').value = '';
-                document.getElementById('bairro').value = '';
-                return;
-            }
-
-
-            document.getElementById('rua').value = data.logradouro || '';
-            document.getElementById('bairro').value = data.bairro || '';
-            document.getElementById('cidade').value = data.localidade || '';
-            document.getElementById('estado').value = data.uf || '';
-        })
-        .catch(err => {
-            console.error('Erro ao consultar CEP:', err);
-            alert('Erro ao consultar CEP.');
-        });
-});
+                const ruaEl = document.getElementById('rua');
+                const bairroEl = document.getElementById('bairro');
+                const cidadeEl = document.getElementById('cidade');
+                const estadoEl = document.getElementById('estado');
+                if (ruaEl) ruaEl.value = data.logradouro || '';
+                if (bairroEl) bairroEl.value = data.bairro || '';
+                if (cidadeEl) cidadeEl.value = data.localidade || '';
+                if (estadoEl) estadoEl.value = data.uf || '';
+            })
+            .catch(err => {
+                console.error('Erro ao consultar CEP:', err);
+                alert('Erro ao consultar CEP.');
+            });
+    });
+}
 
 
 
 
 // Submissão do formulário
 
-<<<<<<< HEAD
-document.getElementById('cadastroForm').addEventListener('submit', function(e) {
-=======
-
-document.getElementById('cadastroForm').addEventListener('submit', function (e) {
-    e.preventDefault();
-
-
->>>>>>> f79f98939b6e8ac17354a36ea34b4fcf04d626ed
-    if (!validarSecao(3)) {
+const cadastroFormEl = document.getElementById('cadastroForm');
+if (cadastroFormEl) {
+    cadastroFormEl.addEventListener('submit', function (e) {
+        // prevenir submissão padrão e validar antes
         e.preventDefault();
-        alert('Preencha todos os campos obrigatórios!');
-        return;
-    }
-
-    // o formulário será enviado normalmente (rota definida no atributo "action" do form)
-});
+        if (!validarSecao(3)) {
+            alert('Preencha todos os campos obrigatórios!');
+            return;
+        }
+        // se tudo OK, submete o formulário
+        this.submit();
+    });
+}
 
 
 // animação de entrada
