@@ -105,8 +105,8 @@ async def processar_pagamento(
         plano_id=plano_id,
         valor=valor,
         metodo_pagamento=metodo_pagamento,
-        cartao_salvo_id=int(cartao_salvo) if cartao_salvo else None,
-        new_card_data=new_card_data,
+        card_token=None,  # TODO: Implementar tokenização de cartão no frontend
+        user_email=usuario_logado.get("email"),
     )
 
     if result["success"]:

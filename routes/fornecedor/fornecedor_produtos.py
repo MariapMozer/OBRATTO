@@ -101,7 +101,7 @@ async def cadastrar_produto(
     try:
         # Validar com DTO
         dto = CriarProdutoDTO(
-            nome=nome, descricao=descricao, preco=preco, quantidade=quantidade
+            nome=nome, descricao=descricao, preco=preco, quantidade=quantidade, foto=None
         )
 
         # Upload de foto

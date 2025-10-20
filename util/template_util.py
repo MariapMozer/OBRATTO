@@ -5,7 +5,7 @@ Centraliza a criação e configuração de templates.
 
 from fastapi.templating import Jinja2Templates
 from jinja2 import Environment, FileSystemLoader
-from typing import Optional
+from typing import Optional, Any
 import os
 from util.flash_messages import get_flashed_messages
 
@@ -81,7 +81,7 @@ def criar_templates_multi(directories: list[str], **kwargs) -> Jinja2Templates:
             raise ValueError(f"Diretório de templates não encontrado: {directory}")
 
     # Configurações padrão
-    config = {
+    config: dict[str, Any] = {
         "autoescape": True,
         "auto_reload": True,
     }

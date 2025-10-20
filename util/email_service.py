@@ -11,6 +11,7 @@ from util.logger_config import logger
 # Tentar importar resend (pode não estar instalado)
 try:
     import resend
+    from resend.emails._emails import Emails
 
     RESEND_DISPONIVEL = True
 except ImportError:
@@ -91,7 +92,7 @@ class EmailService:
             )
             return False
 
-        params = {
+        params: Emails.SendParams = {
             "from": f"{self.from_name} <{self.from_email}>",
             "to": [para_email],
             "subject": assunto,

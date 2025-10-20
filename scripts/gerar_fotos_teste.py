@@ -15,6 +15,7 @@ Uso: python scripts/gerar_fotos_teste.py
 import os
 import sys
 from pathlib import Path
+from typing import Union
 
 # Adicionar o diretório pai ao sys.path para imports
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -23,6 +24,7 @@ sys.path.insert(0, projeto_dir)
 
 try:
     from PIL import Image, ImageDraw, ImageFont
+    from PIL.ImageFont import FreeTypeFont, ImageFont as ImageFontBase
 except ImportError:
     print("❌ Pillow não está instalado!")
     print("   Execute: pip install Pillow")
@@ -113,6 +115,7 @@ def gerar_avatar(nome: str, cor_hex: str, caminho_saida: Path):
     iniciais = obter_iniciais(nome)
 
     # Tentar carregar fonte, usar padrão se não conseguir
+    fonte: Union[FreeTypeFont, ImageFontBase]
     try:
         # Tamanho da fonte proporcional ao tamanho da imagem
         tamanho_fonte = TAMANHO_AVATAR[0] // 3
@@ -151,6 +154,7 @@ def gerar_foto_produto(nome_produto: str, cor_hex: str, caminho_saida: Path):
     draw = ImageDraw.Draw(img)
 
     # Tentar carregar fonte
+    fonte: Union[FreeTypeFont, ImageFontBase]
     try:
         fonte = ImageFont.truetype("/System/Library/Fonts/Helvetica.ttc", 40)
     except:

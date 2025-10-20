@@ -19,7 +19,7 @@ Use apenas em ambiente de desenvolvimento/teste.
 import sys
 import os
 from datetime import datetime, date
-from typing import Optional
+from typing import Optional, TypedDict
 
 # Adicionar o diretório pai ao sys.path para imports
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -42,6 +42,35 @@ from data.produto import produto_repo
 from data.produto.produto_model import Produto
 from data.plano import plano_repo
 from data.plano.plano_model import Plano
+
+# ==============================================================================
+# TYPE DEFINITIONS
+# ==============================================================================
+
+class ClienteData(TypedDict):
+    """Tipo para dados de cliente"""
+    nome: str
+    email: str
+    cpf_cnpj: str
+    telefone: str
+    genero: str
+    data_nascimento: date
+    cidade: str
+
+class ProdutoData(TypedDict):
+    """Tipo para dados de produto"""
+    nome: str
+    descricao: str
+    preco: float
+    quantidade: int
+
+class PlanoData(TypedDict):
+    """Tipo para dados de plano"""
+    nome: str
+    descricao: str
+    valor_mensal: float
+    limite_servico: int
+    tipo_plano: str
 
 # ==============================================================================
 # CONFIGURAÇÕES
@@ -226,7 +255,7 @@ def criar_clientes():
     """
     print_header("CRIANDO CLIENTES")
 
-    clientes = [
+    clientes: list[ClienteData] = [
         {
             "nome": "Maria Silva",
             "email": "maria.silva@teste.com",
@@ -276,7 +305,8 @@ def criar_clientes():
 
     for cliente_data in clientes:
         # Verifica se já existe
-        usuario_existente = usuario_repo.obter_usuario_por_email(cliente_data["email"])
+        email: str = cliente_data["email"]
+        usuario_existente = usuario_repo.obter_usuario_por_email(email)
         if usuario_existente:
             print_info(f"Cliente já existe: {cliente_data['email']}")
             continue
@@ -531,7 +561,7 @@ def criar_produtos():
     print_header("CRIANDO PRODUTOS")
 
     # Produtos por fornecedor
-    produtos_por_fornecedor = {
+    produtos_por_fornecedor: dict[str, list[ProdutoData]] = {
         "contato@casadastintas.com": [
             {"nome": "Tinta Acrílica Branca 18L", "descricao": "Tinta acrílica premium para interiores e exteriores", "preco": 189.90, "quantidade": 50},
             {"nome": "Tinta Látex Amarela 3.6L", "descricao": "Tinta látex lavável para paredes internas", "preco": 45.90, "quantidade": 100},
@@ -605,7 +635,7 @@ def criar_planos():
     """
     print_header("CRIANDO PLANOS")
 
-    planos = [
+    planos: list[PlanoData] = [
         {
             "nome": "Básico",
             "descricao": "Plano ideal para quem está começando",
