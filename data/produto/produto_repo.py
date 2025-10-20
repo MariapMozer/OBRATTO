@@ -2,7 +2,7 @@ from datetime import datetime
 import sqlite3
 from typing import Optional, List
 from data.produto.produto_model import Produto
-from data.produto.produto_sql import (CRIAR_TABELA_PRODUTO, INSERIR_PRODUTO, OBTER_PRODUTO, OBTER_PRODUTO_POR_ID, ATUALIZAR_PRODUTO, DELETAR_PRODUTO, OBTER_PRODUTO_POR_PAGINA)
+from data.produto.produto_sql import (CRIAR_TABELA_PRODUTO, INSERIR_PRODUTO, INSERIR_PRODUTO_SEM_ID, OBTER_PRODUTO, OBTER_PRODUTO_POR_ID, OBTER_PRODUTO_POR_NOME, OBTER_PRODUTOS_POR_FORNECEDOR, ATUALIZAR_PRODUTO, DELETAR_PRODUTO, OBTER_PRODUTO_POR_PAGINA)
 from utils.db import open_connection
 
 
@@ -17,9 +17,8 @@ def inserir_produto(produto: Produto):
     with open_connection() as conn:
         if produto.id is None:
             # Insert without ID (autoincrement)
-            sql = "INSERT INTO PRODUTO (nome, descricao, preco, quantidade, em_promocao, desconto, foto, fornecedor_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
             params = (produto.nome, produto.descricao, produto.preco, produto.quantidade, int(produto.em_promocao), produto.desconto, produto.foto, produto.fornecedor_id)
-            conn.execute(sql, params)
+            conn.execute(INSERIR_PRODUTO_SEM_ID, params)
         else:
             # Insert with ID
             conn.execute(
@@ -53,7 +52,7 @@ def obter_produto_por_pagina(limit: int, offset: int) -> List[Produto]:
         ]
 def obter_produto_por_nome(nome: str) -> List[Produto]:
     with open_connection() as conn:
-        cursor = conn.execute("SELECT * FROM PRODUTO WHERE nome LIKE ?", (f"%{nome}%",))
+        cursor = conn.execute(OBTER_PRODUTO_POR_NOME, (f"%{nome}%",))
         return [
             Produto(
                 id=row[0], nome=row[1], descricao=row[2], preco=row[3], quantidade=row[4],
@@ -65,7 +64,7 @@ def obter_produto_por_nome(nome: str) -> List[Produto]:
 
 def obter_produtos_por_fornecedor(fornecedor_id: int, limit: int = 10, offset: int = 0) -> List[Produto]:
     with open_connection() as conn:
-        cursor = conn.execute("SELECT * FROM PRODUTO WHERE fornecedor_id = ? ORDER BY id LIMIT ? OFFSET ?", (fornecedor_id, limit, offset))
+        cursor = conn.execute(OBTER_PRODUTOS_POR_FORNECEDOR, (fornecedor_id, limit, offset))
         return [
             Produto(
                 id=row[0], nome=row[1], descricao=row[2], preco=row[3], quantidade=row[4],

@@ -17,6 +17,11 @@ INSERT INTO PRODUTO (id, nome, descricao, preco, quantidade, em_promocao, descon
 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
 """
 
+INSERIR_PRODUTO_SEM_ID = """
+INSERT INTO PRODUTO (nome, descricao, preco, quantidade, em_promocao, desconto, foto, fornecedor_id)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+"""
+
 OBTER_PRODUTO = """
 SELECT id, nome, descricao, preco, quantidade, em_promocao, desconto, foto, fornecedor_id
 FROM PRODUTO
@@ -49,6 +54,13 @@ SET nome = ?,
     foto = ?,
     fornecedor_id = ?
 WHERE id = ?;
+"""
+
+OBTER_PRODUTOS_POR_FORNECEDOR = """
+SELECT * FROM PRODUTO
+WHERE fornecedor_id = ?
+ORDER BY id
+LIMIT ? OFFSET ?;
 """
 
 DELETAR_PRODUTO = """

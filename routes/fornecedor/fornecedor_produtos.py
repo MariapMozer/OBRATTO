@@ -1,14 +1,18 @@
 from typing import Optional
-from fastapi import APIRouter, Request, Form, UploadFile, File, Query
+from fastapi import APIRouter, Request, Form, UploadFile, File, Query, status
+from fastapi.responses import RedirectResponse
+from pydantic import ValidationError
 from utils.auth_decorator import requer_autenticacao
-from fastapi.templating import Jinja2Templates
+from utils.template_util import criar_templates
+from utils.flash_messages import informar_sucesso, informar_erro
 import os
 
 from data.produto.produto_model import Produto
 from data.produto import produto_repo
+from dtos.produto.produto_dto import CriarProdutoDTO, AlterarProdutoDTO
 
 router = APIRouter()
-templates = Jinja2Templates(directory="templates")
+templates = criar_templates("templates")
 
 
 ## Página inicial do fornecedor, exibe lista de produtos cadastrados
@@ -86,44 +90,70 @@ async def cadastrar_produto(
     usuario_logado: Optional[dict] = None
 ):
     assert usuario_logado is not None
-    import os
-    tipos_permitidos = ["image/jpeg", "image/png", "image/jpg", "image/webp", "image/avif"]
-    pasta_fotos = "static/uploads/produtos_fornecedor"
-    os.makedirs(pasta_fotos, exist_ok=True)
-    caminho_foto = None
-    if foto and foto.filename:
-        if foto.content_type not in tipos_permitidos:
-            return templates.TemplateResponse(
-                "fornecedor/produtos/cadastrar_produtos.html",
-                {"request": request, "erro": "Tipo de arquivo de foto inválido."}
-            )
+
+    try:
+        # Validar com DTO
+        dto = CriarProdutoDTO(
+            nome=nome,
+            descricao=descricao,
+            preco=preco,
+            quantidade=quantidade
+        )
+
+        # Upload de foto
         import secrets
-        extensao = foto.filename.split(".")[-1]
-        nome_arquivo = f"{nome.replace(' ', '_')}_{secrets.token_hex(8)}.{extensao}"
-        caminho_arquivo = os.path.join(pasta_fotos, nome_arquivo)
-        conteudo = await foto.read()
-        with open(caminho_arquivo, "wb") as f:
-            f.write(conteudo)
-        caminho_foto = f"/static/uploads/produtos_fornecedor/{nome_arquivo}"
+        tipos_permitidos = ["image/jpeg", "image/png", "image/jpg", "image/webp", "image/avif"]
+        pasta_fotos = "static/uploads/produtos_fornecedor"
+        os.makedirs(pasta_fotos, exist_ok=True)
+        caminho_foto = None
 
-    produto = Produto(
-        id=None,
-        nome=nome,
-        descricao=descricao,
-        preco=preco,
-        quantidade=quantidade,
-        foto=caminho_foto,
-        fornecedor_id=usuario_logado['id']
-    )
+        if foto and foto.filename:
+            if foto.content_type not in tipos_permitidos:
+                informar_erro(request, "Tipo de arquivo de foto inválido. Use JPG, PNG ou WEBP.")
+                return templates.TemplateResponse(
+                    "fornecedor/produtos/cadastrar_produtos.html",
+                    {"request": request, "dados": {"nome": nome, "descricao": descricao}}
+                )
 
-    produto_repo.inserir_produto(produto)
-    produtos = produto_repo.obter_produtos_por_fornecedor(usuario_logado['id'], limit=10, offset=0)
-    response = templates.TemplateResponse(
-        "fornecedor/produtos/produtos.html", 
-        {"request": request, 
-         "produtos": produtos, 
-         "mensagem": "Produto inserido com sucesso"})
-    return response
+            extensao = foto.filename.split(".")[-1]
+            nome_arquivo = f"{dto.nome.replace(' ', '_')}_{secrets.token_hex(8)}.{extensao}"
+            caminho_arquivo = os.path.join(pasta_fotos, nome_arquivo)
+            conteudo = await foto.read()
+            with open(caminho_arquivo, "wb") as f:
+                f.write(conteudo)
+            caminho_foto = f"/static/uploads/produtos_fornecedor/{nome_arquivo}"
+
+        # Criar produto
+        produto = Produto(
+            id=None,
+            nome=dto.nome,
+            descricao=dto.descricao,
+            preco=dto.preco,
+            quantidade=dto.quantidade,
+            foto=caminho_foto,
+            fornecedor_id=usuario_logado['id']
+        )
+
+        # Inserir no banco
+        produto_repo.inserir_produto(produto)
+
+        # Flash message e redirect
+        informar_sucesso(request, f"Produto '{dto.nome}' cadastrado com sucesso!")
+        return RedirectResponse("/fornecedor/produtos/listar", status_code=status.HTTP_303_SEE_OTHER)
+
+    except ValidationError as e:
+        erros = [erro['msg'] for erro in e.errors()]
+        informar_erro(request, " | ".join(erros))
+        return templates.TemplateResponse(
+            "fornecedor/produtos/cadastrar_produtos.html",
+            {"request": request, "dados": {"nome": nome, "descricao": descricao}}
+        )
+    except Exception as e:
+        informar_erro(request, f"Erro ao cadastrar produto: {str(e)}")
+        return templates.TemplateResponse(
+            "fornecedor/produtos/cadastrar_produtos.html",
+            {"request": request, "dados": {"nome": nome, "descricao": descricao}}
+        )
 
 @router.get("/atualizar/{id}")
 @requer_autenticacao(['fornecedor'])
@@ -209,23 +239,16 @@ async def excluir_produto_get(request: Request, id: int, usuario_logado: Optiona
         # Apagar a imagem do sistema de arquivos
         if produto.foto:
             apagar_arquivo_imagem(produto.foto)
-        
+
         # Apagar produto do banco
         produto_repo.deletar_produto(id)
-        produtos = produto_repo.obter_produtos_por_fornecedor(usuario_logado['id'], limit=10, offset=0)
-        response = templates.TemplateResponse(
-            "fornecedor/produtos/produtos.html", 
-            {"request": request, 
-            "produtos": produtos, 
-            "mensagem": "Produto excluído com sucesso"})
+
+        # Flash message e redirect
+        informar_sucesso(request, f"Produto '{produto.nome}' excluído com sucesso!")
+        return RedirectResponse("/fornecedor/produtos/listar", status_code=status.HTTP_303_SEE_OTHER)
     else:
-        produtos = produto_repo.obter_produtos_por_fornecedor(usuario_logado['id'], limit=10, offset=0)
-        response = templates.TemplateResponse(
-            "fornecedor/produtos/produtos.html", 
-            {"request": request, 
-             "produtos": produtos, 
-             "mensagem": "Produto não encontrado ou acesso negado"})
-    return response
+        informar_erro(request, "Produto não encontrado ou acesso negado")
+        return RedirectResponse("/fornecedor/produtos/listar", status_code=status.HTTP_303_SEE_OTHER)
 
 @router.post("/excluir/{id}")
 @requer_autenticacao(['fornecedor'])
@@ -236,23 +259,16 @@ async def excluir_produto(request: Request, id: int, usuario_logado: Optional[di
         # Apagar a imagem do sistema de arquivos
         if produto.foto:
             apagar_arquivo_imagem(produto.foto)
-        
+
         # Apagar produto do banco
         produto_repo.deletar_produto(id)
-        produtos = produto_repo.obter_produtos_por_fornecedor(usuario_logado['id'], limit=10, offset=0)
-        response = templates.TemplateResponse(
-            "fornecedor/produtos/produtos.html", 
-            {"request": request, 
-            "produtos": produtos, 
-            "mensagem": "Produto excluído com sucesso"})
+
+        # Flash message e redirect
+        informar_sucesso(request, f"Produto '{produto.nome}' excluído com sucesso!")
+        return RedirectResponse("/fornecedor/produtos/listar", status_code=status.HTTP_303_SEE_OTHER)
     else:
-        produtos = produto_repo.obter_produtos_por_fornecedor(usuario_logado['id'], limit=10, offset=0)
-        response = templates.TemplateResponse(
-            "fornecedor/produtos/produtos.html", 
-            {"request": request, 
-             "produtos": produtos, 
-             "mensagem": "Produto não encontrado ou acesso negado"})
-    return response
+        informar_erro(request, "Produto não encontrado ou acesso negado")
+        return RedirectResponse("/fornecedor/produtos/listar", status_code=status.HTTP_303_SEE_OTHER)
 
 @router.get("/confi_exclusao/{id}")
 @requer_autenticacao(['fornecedor'])
