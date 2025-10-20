@@ -6,7 +6,7 @@ diferenciando comportamento entre Development e Production.
 """
 
 from fastapi import Request, status
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, Response
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from util.template_util import criar_templates
@@ -19,7 +19,7 @@ import traceback
 templates = criar_templates("templates")
 
 
-async def http_exception_handler(request: Request, exc: StarletteHTTPException):
+async def http_exception_handler(request: Request, exc: StarletteHTTPException) -> Response:
     """
     Handler para exceções HTTP do Starlette/FastAPI
 
@@ -98,7 +98,7 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
     )
 
 
-async def validation_exception_handler(request: Request, exc: RequestValidationError):
+async def validation_exception_handler(request: Request, exc: RequestValidationError) -> Response:
     """
     Handler para erros de validação do Pydantic
     Loga o erro e exibe mensagem amigável
@@ -145,7 +145,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     )
 
 
-async def generic_exception_handler(request: Request, exc: Exception):
+async def generic_exception_handler(request: Request, exc: Exception) -> Response:
     """
     Handler genérico para todas as exceções não tratadas
     Loga o erro completo e exibe página de erro amigável

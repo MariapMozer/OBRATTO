@@ -346,3 +346,9 @@ class CartaoRepository:
 
 # Instância global do repositório
 cartao_repo = CartaoRepository()
+
+
+# Função standalone para compatibilidade com util.seed
+def criar_tabela_cartao() -> bool:
+    """Cria a tabela de cartões se não existir"""
+    return cartao_repo.criar_tabela_cartao()

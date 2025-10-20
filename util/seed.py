@@ -1,4 +1,4 @@
-from dados_para_testes_rotas.criar_tabela_cartao import criar_tabela_cartao
+from data.cartao.cartao_repo import criar_tabela_cartao
 from data.administrador.administrador_repo import criar_tabela_administrador
 from data.anuncio.anuncio_repo import criar_tabela_anuncio
 from data.avaliacao.avaliacao_repo import criar_tabela_avaliacao

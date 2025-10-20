@@ -1,5 +1,5 @@
 import os
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from contextlib import asynccontextmanager
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
@@ -15,7 +15,6 @@ from routes.fornecedor import fornecedor_promocoes
 from routes.fornecedor import fornecedor_solicitacoes_orcamento
 from routes.administrador import administrador_anuncios
 from routes.administrador import administrador_usuarios
-from routes import prestador
 from routes.prestador import (
     prestador_agenda,
     prestador_catalogo,
@@ -72,10 +71,23 @@ app.add_middleware(
 )
 logger.info("SessionMiddleware configurado")
 
+
 # Registrar Exception Handlers (ANTES dos routers)
-app.add_exception_handler(StarletteHTTPException, http_exception_handler)
-app.add_exception_handler(RequestValidationError, validation_exception_handler)
-app.add_exception_handler(Exception, generic_exception_handler)
+@app.exception_handler(StarletteHTTPException)
+async def _http_exception_handler(request: Request, exc: StarletteHTTPException):
+    return await http_exception_handler(request, exc)
+
+
+@app.exception_handler(RequestValidationError)
+async def _validation_exception_handler(request: Request, exc: RequestValidationError):
+    return await validation_exception_handler(request, exc)
+
+
+@app.exception_handler(Exception)
+async def _generic_exception_handler(request: Request, exc: Exception):
+    return await generic_exception_handler(request, exc)
+
+
 logger.info("Exception handlers registrados")
 
 # PÚBLICO
@@ -105,7 +117,6 @@ app.include_router(prestador_servicos.router, prefix="/prestador")
 app.include_router(prestador_contratacoes.router, prefix="/prestador")
 app.include_router(prestador_pagamento.router, prefix="/prestador")
 app.include_router(prestador_catalogo.router, prefix="/prestador")
-
 
 # CLIENTE
 app.include_router(cliente_perfil.router, prefix="/cliente")
