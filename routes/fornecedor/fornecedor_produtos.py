@@ -361,11 +361,30 @@ def apagar_arquivo_imagem(caminho_foto: str):
 
         caminho_completo = os.path.join(os.getcwd(), caminho_foto)
 
+        # ====================================================================
+        # TODO ALUNO: SUBSTITUIR print() POR logger
+        # ====================================================================
+        # PROBLEMA: Usando print() em vez do sistema de logging
+        #
+        # POR QUE É RUIM:
+        # - print() não grava em arquivo de log
+        # - Não tem níveis (INFO, WARNING, ERROR)
+        # - Não inclui timestamp automático
+        # - Dificulta debugging em produção
+        #
+        # O QUE FAZER:
+        # Substituir os 3 print() abaixo por:
+        #   logger.info(f"Imagem removida: {caminho_completo}")
+        #   logger.warning(f"Arquivo não encontrado: {caminho_completo}")
+        #   logger.error(f"Erro ao remover imagem {caminho_completo}: {e}")
+        #
+        # OBS: O logger já está importado no início do arquivo
+        # ====================================================================
         try:
             if os.path.exists(caminho_completo):
                 os.remove(caminho_completo)
-                print(f"Imagem removida: {caminho_completo}")
+                print(f"Imagem removida: {caminho_completo}")  # ← SUBSTITUIR por logger.info()
             else:
-                print(f"Arquivo não encontrado: {caminho_completo}")
+                print(f"Arquivo não encontrado: {caminho_completo}")  # ← SUBSTITUIR por logger.warning()
         except Exception as e:
-            print(f"Erro ao remover imagem {caminho_completo}: {e}")
+            print(f"Erro ao remover imagem {caminho_completo}: {e}")  # ← SUBSTITUIR por logger.error()

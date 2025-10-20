@@ -29,12 +29,13 @@ import uuid
 
 from util.flash_messages import informar_sucesso
 from util.security import criar_hash_senha, gerar_token_redefinicao, verificar_senha
+from util.template_util import criar_templates
 
 # Configurar logger
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
-templates = Jinja2Templates(directory="templates")
+templates = criar_templates("templates")
 
 
 @router.get("/")
@@ -820,6 +821,37 @@ async def exibir_perfil_publico_fornecedor(request: Request):
 
 
 # ROTAS PRINCIPAIS
+
+# ============================================================================
+# TODO ALUNO: REVISAR CÓDIGO COMENTADO - MENSAGENS
+# ============================================================================
+#
+# PROBLEMA IDENTIFICADO: 25 linhas de código comentadas (linhas 825-849)
+#
+# O QUE FAZER:
+# 1. ANALISE o código comentado abaixo
+# 2. DECIDA se ele deve ser:
+#    a) REMOVIDO (se não for mais necessário)
+#    b) IMPLEMENTADO (se for necessário mas incompleto)
+#    c) MOVIDO (se pertence a outro módulo)
+#
+# ANÁLISE INICIAL:
+# - Parece ser uma rota GET /mensagens para exibir caixa de mensagens
+# - NÃO usa @requer_autenticacao() (possível problema de segurança!)
+# - Usa obter_usuario_logado() manualmente
+# - Há uma função similar em linha 852: exibir_conversa()
+#
+# PERGUNTAS PARA VOCÊ:
+# 1. Esta rota é necessária? Já existe implementação similar?
+# 2. Se for necessária, por que está comentada?
+# 3. A autenticação está correta?
+# 4. A função organizar_conversas_por_contato() existe?
+#
+# AÇÃO RECOMENDADA:
+# - Se for implementar: use @requer_autenticacao() e teste
+# - Se for remover: delete todo o código comentado
+# - Se não souber: consulte o professor
+# ============================================================================
 
 # @router.get("/mensagens")
 # async def exibir_caixa_mensagens(request: Request):

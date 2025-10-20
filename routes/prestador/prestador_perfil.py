@@ -71,9 +71,51 @@ async def processar_edicao_perfil_prestador(
     razao_social: Optional[str] = Form(None),
     descricao_servicos: Optional[str] = Form(None),
 ):
+    # ============================================================================
+    # TODO ALUNO: PROCESSAR EDIÇÃO DE PERFIL DO PRESTADOR
+    # ============================================================================
+    #
+    # PROBLEMA IDENTIFICADO: Esta função recebe dados do formulário mas apenas
+    # retorna o template sem processar nada!
+    #
+    # O QUE ESTÁ ERRADO:
+    # - Recebe 11 parâmetros do Form (nome, email, telefone, etc.)
+    # - NÃO valida os dados
+    # - NÃO atualiza o banco de dados
+    # - NÃO exibe mensagem de sucesso/erro
+    # - Apenas retorna o template (deveria redirecionar após salvar)
+    #
+    # O QUE VOCÊ DEVE FAZER:
+    # 1. Obter o prestador atual do banco: prestador_repo.obter_prestador_por_id()
+    # 2. Validar se o email já está em uso por outro usuário
+    # 3. Atualizar os campos do objeto prestador com os dados do formulário
+    # 4. Salvar no banco: prestador_repo.atualizar_prestador()
+    # 5. Usar flash messages: informar_sucesso() ou informar_erro()
+    # 6. Redirecionar para a página de perfil: return RedirectResponse()
+    #
+    # DICAS:
+    # - Use try/except para capturar erros
+    # - Veja a função alterar_foto() abaixo como exemplo de estrutura
+    # - Use logger.info() para registrar a ação
+    # - Veja publico_routes.py::processar_cadastro_prestador como referência
+    #
+    # EXEMPLO DE ESTRUTURA:
+    #   try:
+    #       prestador = prestador_repo.obter_prestador_por_id(usuario_logado["id"])
+    #       prestador.nome = nome
+    #       prestador.email = email
+    #       # ... atualizar outros campos
+    #       prestador_repo.atualizar_prestador(prestador)
+    #       informar_sucesso(request, "Perfil atualizado!")
+    #       return RedirectResponse("/prestador/perfil", status.HTTP_303_SEE_OTHER)
+    #   except Exception as e:
+    #       logger.error(f"Erro: {e}")
+    #       informar_erro(request, "Erro ao atualizar perfil")
+    # ============================================================================
+
     return templates.TemplateResponse(
         "prestador/perfil/editar_dados.html", {"request": request}
-    )
+    )  # ← SUBSTITUA ESTA LINHA pela implementação correta
 
 
 # Rota para visualizar alteração de foto

@@ -24,8 +24,9 @@ def criar_tabela_produto():
         conn.commit()
 
 
-def inserir_produto(produto: Produto):
+def inserir_produto(produto: Produto) -> Optional[int]:
     with open_connection() as conn:
+        cursor = conn.cursor()
         if produto.id is None:
             # Insert without ID (autoincrement)
             params = (
@@ -38,10 +39,12 @@ def inserir_produto(produto: Produto):
                 produto.foto,
                 produto.fornecedor_id,
             )
-            conn.execute(INSERIR_PRODUTO_SEM_ID, params)
+            cursor.execute(INSERIR_PRODUTO_SEM_ID, params)
+            conn.commit()
+            return cursor.lastrowid
         else:
             # Insert with ID
-            conn.execute(
+            cursor.execute(
                 INSERIR_PRODUTO,
                 (
                     produto.id,
@@ -55,7 +58,8 @@ def inserir_produto(produto: Produto):
                     produto.fornecedor_id,
                 ),
             )
-        conn.commit()
+            conn.commit()
+            return produto.id
 
 
 def obter_produto_por_id(id: int) -> Optional[Produto]:

@@ -61,7 +61,41 @@ async def processar_edicao_perfil_cliente(
     foto: Optional[UploadFile] = File(None),  # ← arquivo enviado
     usuario_logado: Optional[dict] = None,
 ):
-    pass
+    # ============================================================================
+    # TODO ALUNO: IMPLEMENTAR EDIÇÃO DE PERFIL DO CLIENTE
+    # ============================================================================
+    #
+    # Esta função está VAZIA e precisa ser implementada por você!
+    #
+    # OBJETIVO: Processar o formulário de edição de perfil do cliente
+    #
+    # PASSOS RECOMENDADOS:
+    # 1. Validar os dados recebidos do formulário
+    # 2. Verificar se o email já está sendo usado por outro usuário
+    # 3. Se uma foto foi enviada, fazer upload e salvar o caminho
+    # 4. Atualizar os dados do cliente no banco usando cliente_repo
+    # 5. Usar flash messages para informar sucesso/erro (util.flash_messages)
+    # 6. Redirecionar para a página de perfil
+    #
+    # DICAS:
+    # - Use try/except para tratar erros
+    # - Veja a função alterar_foto() abaixo como exemplo de upload de arquivo
+    # - Use logger.info() e logger.error() para registrar eventos
+    # - Veja as rotas de cadastro em publico_routes.py como referência
+    #
+    # EXEMPLO DE ESTRUTURA:
+    #   try:
+    #       # Validar e processar dados
+    #       cliente = cliente_repo.obter_cliente_por_id(usuario_logado["id"])
+    #       # Atualizar campos
+    #       cliente_repo.atualizar_cliente(cliente)
+    #       informar_sucesso(request, "Perfil atualizado com sucesso!")
+    #       return RedirectResponse("/cliente/perfil", status.HTTP_303_SEE_OTHER)
+    #   except Exception as e:
+    #       logger.error(f"Erro ao editar perfil: {e}")
+    #       # Retornar template com erro
+    # ============================================================================
+    pass  # ← REMOVA ESTA LINHA após implementar a função
 
 
 # Editar foto de perfil
