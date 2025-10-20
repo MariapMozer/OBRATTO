@@ -4,7 +4,7 @@ import os
 from fastapi import APIRouter, Request, Form, UploadFile, File, HTTPException
 from data.usuario.usuario_sql import ATUALIZAR_FOTO
 from util.auth_decorator import requer_autenticacao
-from fastapi.templating import Jinja2Templates
+from util.template_util import criar_templates
 from data.fornecedor.fornecedor_model import Fornecedor
 from data.fornecedor import fornecedor_repo
 from util.security import criar_hash_senha
@@ -13,7 +13,7 @@ from data.avaliacao import avaliacao_repo
 from datetime import datetime
 
 router = APIRouter()
-templates = Jinja2Templates(directory="templates")
+templates = criar_templates("templates")
 
 
 @router.get("/perfil")

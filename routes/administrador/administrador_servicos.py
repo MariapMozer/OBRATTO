@@ -1,10 +1,10 @@
 from typing import Optional
 from fastapi import APIRouter, Form, Request, status, UploadFile, File
 from fastapi.responses import RedirectResponse
-from fastapi.templating import Jinja2Templates
 from data.servico import servico_repo
 from data.servico.servico_model import Servico
 from util.auth_decorator import requer_autenticacao
+from util.template_util import criar_templates
 from util.foto_util import (
     salvar_nova_foto,
     obter_foto_principal,
@@ -15,7 +15,7 @@ from util.foto_util import (
 
 
 router = APIRouter()
-templates = Jinja2Templates(directory="templates")
+templates = criar_templates("templates")
 
 
 # Rota para exibir a galeria

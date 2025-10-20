@@ -4,48 +4,48 @@ Módulo de segurança para gerenciar senhas e tokens
 import secrets
 import string
 from datetime import datetime, timedelta
-from passlib.context import CryptContext
-
-# Contexto para hash de senhas usando bcrypt
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+import bcrypt
 
 
 def criar_hash_senha(senha: str) -> str:
     """
     Cria um hash seguro da senha usando bcrypt
-    
+
     Args:
         senha: Senha em texto plano
-    
+
     Returns:
         Hash da senha
-    
+
     Note:
         Bcrypt tem limite de 72 bytes. Senhas mais longas são truncadas automaticamente.
     """
     # Bcrypt tem limite de 72 bytes - truncar se necessário
-    senha_truncada = senha.encode('utf-8')[:400].decode('utf-8', errors='ignore')
-    return pwd_context.hash(senha_truncada)
+    senha_bytes = senha.encode('utf-8')[:72]
+    salt = bcrypt.gensalt()
+    hash_bytes = bcrypt.hashpw(senha_bytes, salt)
+    return hash_bytes.decode('utf-8')
 
 
 def verificar_senha(senha_plana: str, senha_hash: str) -> bool:
     """
     Verifica se a senha em texto plano corresponde ao hash
-    
+
     Args:
         senha_plana: Senha em texto plano
         senha_hash: Hash da senha armazenado no banco
-    
+
     Returns:
         True se a senha está correta, False caso contrário
-    
+
     Note:
         Bcrypt tem limite de 72 bytes. Senhas mais longas são truncadas automaticamente.
     """
     try:
         # Bcrypt tem limite de 72 bytes - truncar se necessário (igual ao criar_hash_senha)
-        senha_truncada = senha_plana.encode('utf-8')[:72].decode('utf-8', errors='ignore')
-        return pwd_context.verify(senha_truncada, senha_hash)
+        senha_bytes = senha_plana.encode('utf-8')[:72]
+        hash_bytes = senha_hash.encode('utf-8')
+        return bcrypt.checkpw(senha_bytes, hash_bytes)
     except:
         return False
 

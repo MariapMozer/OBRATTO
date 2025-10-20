@@ -1,7 +1,7 @@
-{% extends "publico/base2.html" %}
-{% block css %} <link rel="stylesheet" href="/static/css/moderar_anuncio.css"> {% endblock %}
-{% block titulo %}Moderação de Anúncios{% endblock %}
-{% block conteudo %}
+{% extends "administrador/base_admin.html" %}
+{% block admin_css %}<link rel="stylesheet" href="/static/css/moderar_anuncio.css">{% endblock %}
+{% block admin_titulo %}Moderação de Anúncios{% endblock %}
+{% block admin_conteudo %}
 <main class="container-fluid p-0">
     <!-- Hero Section -->
     <section class="hero-section">
@@ -315,6 +315,6 @@
         </div>
     </div>
 </div>
-{% block scripts %}<script src="/static/js/moderar_anuncios.js"></script>{% endblock %}
+{% block admin_scripts %}<script src="/static/js/moderar_anuncios.js"></script>{% endblock %}
 {% endblock %}
 

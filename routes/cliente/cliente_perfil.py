@@ -1,17 +1,17 @@
 from typing import Optional
 from fastapi import APIRouter, Form, Request
 from fastapi.responses import RedirectResponse
-from fastapi.templating import Jinja2Templates
 from fastapi import UploadFile, File
 import os, secrets
 from data.cliente import cliente_repo
 from data.cliente.cliente_model import Cliente
 from util.auth_decorator import requer_autenticacao
+from util.template_util import criar_templates
 from util.security import criar_hash_senha
 from fastapi import status
 
 router = APIRouter()
-templates = Jinja2Templates(directory="templates")
+templates = criar_templates("templates")
 
 UPLOAD_DIR = "static/uploads/cliente"
 os.makedirs(UPLOAD_DIR, exist_ok=True)

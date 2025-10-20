@@ -1,0 +1,121 @@
+{% extends "administrador/base_admin.html" %}
+{% block admin_titulo %}Visualizar Relatórios{% endblock %}
+{% block admin_conteudo %}
+<main class="flex-grow-1">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 text-center">
+                <div class="card shadow-lg border-0 rounded-4">
+                    <div class="card-body p-5">
+                        <div class="mb-4">
+                            <i class="bi bi-tools display-1 text-warning"></i>
+                        </div>
+                        <h1 class="display-4 mb-3">Em Construção</h1>
+                        <p class="lead text-muted mb-4">
+                            Esta funcionalidade ainda está sendo desenvolvida pelos alunos.
+                        </p>
+
+                        <div class="alert alert-info text-start" role="alert">
+                            <h5 class="alert-heading"><i class="bi bi-info-circle me-2"></i><strong>TODO ALUNO:</strong> Implementar Dashboard de Relatórios Gerenciais</h5>
+                            <hr>
+                            <p class="mb-2"><strong>Descrição:</strong></p>
+                            <p>Esta página deve exibir um dashboard completo com estatísticas e métricas da plataforma, permitindo análise de desempenho e tomada de decisões estratégicas.</p>
+
+                            <p class="mb-2 mt-3"><strong>Funcionalidades a implementar:</strong></p>
+                            <ul class="text-start">
+                                <li><strong>Dashboard Principal:</strong>
+                                    <ul>
+                                        <li>Cards com KPIs principais:
+                                            <ul>
+                                                <li>Total de usuários (clientes, prestadores, fornecedores)</li>
+                                                <li>Novos cadastros (hoje, semana, mês)</li>
+                                                <li>Serviços/produtos publicados</li>
+                                                <li>Transações realizadas</li>
+                                                <li>Receita gerada (se aplicável)</li>
+                                            </ul>
+                                        </li>
+                                        <li>Gráficos interativos:
+                                            <ul>
+                                                <li>Evolução de cadastros ao longo do tempo</li>
+                                                <li>Serviços mais solicitados (categorias)</li>
+                                                <li>Taxa de conversão (visitantes → cadastros → contratações)</li>
+                                                <li>Distribuição geográfica de usuários</li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li><strong>Relatórios Disponíveis:</strong>
+                                    <ul>
+                                        <li><em>Usuários:</em>
+                                            <ul>
+                                                <li>Total de usuários por tipo</li>
+                                                <li>Taxa de crescimento mensal</li>
+                                                <li>Usuários ativos vs inativos</li>
+                                                <li>Taxa de retenção</li>
+                                            </ul>
+                                        </li>
+                                        <li><em>Serviços/Produtos:</em>
+                                            <ul>
+                                                <li>Total de anúncios publicados</li>
+                                                <li>Categorias mais populares</li>
+                                                <li>Anúncios com mais visualizações</li>
+                                                <li>Taxa de conversão por categoria</li>
+                                            </ul>
+                                        </li>
+                                        <li><em>Avaliações:</em>
+                                            <ul>
+                                                <li>Média geral de avaliações da plataforma</li>
+                                                <li>Distribuição de notas (1-5 estrelas)</li>
+                                                <li>Profissionais mais bem avaliados</li>
+                                                <li>Evolução da satisfação ao longo do tempo</li>
+                                            </ul>
+                                        </li>
+                                        <li><em>Engajamento:</em>
+                                            <ul>
+                                                <li>Páginas mais visitadas</li>
+                                                <li>Tempo médio na plataforma</li>
+                                                <li>Taxa de bounce</li>
+                                                <li>Origem do tráfego (direto, busca, redes sociais)</li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li><strong>Filtros e Períodos:</strong>
+                                    <ul>
+                                        <li>Filtrar dados por período: hoje, semana, mês, ano, customizado</li>
+                                        <li>Comparar períodos (ex: este mês vs mês anterior)</li>
+                                        <li>Filtrar por localização, categoria, tipo de usuário</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Visualizações:</strong>
+                                    <ul>
+                                        <li>Usar bibliotecas de gráficos (Chart.js, Plotly, etc.)</li>
+                                        <li>Gráficos de linha (evolução temporal)</li>
+                                        <li>Gráficos de barra (comparações)</li>
+                                        <li>Gráficos de pizza (distribuições)</li>
+                                        <li>Mapas de calor (distribuição geográfica)</li>
+                                    </ul>
+                                </li>
+                            </ul>
+
+                            <p class="mb-2 mt-3"><strong>Arquivos relacionados:</strong></p>
+                            <ul class="text-start">
+                                <li><code>routes/administrador/administrador_usuarios.py</code> (linha 694) - Rota GET</li>
+                                <li><code>data/relatorio/</code> - Criar módulo de relatórios com queries agregadas</li>
+                                <li>Todos os repositórios (usuario, prestador, fornecedor, anuncio, etc.)</li>
+                                <li><code>static/js/charts.js</code> - Scripts para renderização de gráficos</li>
+                            </ul>
+
+                            <p class="mb-0 mt-3"><strong>Dica:</strong> Use bibliotecas JavaScript como Chart.js ou Plotly para gráficos interativos. Implemente cache de relatórios pesados para melhor performance.</p>
+                        </div>
+
+                        <a href="/administrador/home" class="btn btn-primary btn-lg mt-3">
+                            <i class="bi bi-arrow-left me-2"></i>Voltar para Home
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}

@@ -1,0 +1,129 @@
+{% extends "administrador/base_admin.html" %}
+{% block admin_titulo %}Exportar Relatórios{% endblock %}
+{% block admin_conteudo %}
+<main class="flex-grow-1">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 text-center">
+                <div class="card shadow-lg border-0 rounded-4">
+                    <div class="card-body p-5">
+                        <div class="mb-4">
+                            <i class="bi bi-tools display-1 text-warning"></i>
+                        </div>
+                        <h1 class="display-4 mb-3">Em Construção</h1>
+                        <p class="lead text-muted mb-4">
+                            Esta funcionalidade ainda está sendo desenvolvida pelos alunos.
+                        </p>
+
+                        <div class="alert alert-info text-start" role="alert">
+                            <h5 class="alert-heading"><i class="bi bi-info-circle me-2"></i><strong>TODO ALUNO:</strong> Implementar Sistema de Exportação de Relatórios</h5>
+                            <hr>
+                            <p class="mb-2"><strong>Descrição:</strong></p>
+                            <p>Esta página deve permitir que administradores gerem e exportem relatórios customizados em diversos formatos para análise offline, apresentações e arquivamento.</p>
+
+                            <p class="mb-2 mt-3"><strong>Funcionalidades a implementar:</strong></p>
+                            <ul class="text-start">
+                                <li><strong>Tipos de Relatórios Disponíveis:</strong>
+                                    <ul>
+                                        <li><em>Relatório de Usuários:</em>
+                                            <ul>
+                                                <li>Lista completa de usuários com filtros</li>
+                                                <li>Dados: nome, email, tipo, data cadastro, status</li>
+                                            </ul>
+                                        </li>
+                                        <li><em>Relatório de Serviços/Produtos:</em>
+                                            <ul>
+                                                <li>Anúncios publicados no período</li>
+                                                <li>Dados: título, categoria, prestador, visualizações, status</li>
+                                            </ul>
+                                        </li>
+                                        <li><em>Relatório de Transações:</em>
+                                            <ul>
+                                                <li>Contratações realizadas</li>
+                                                <li>Dados: cliente, prestador, serviço, valor, data, status</li>
+                                            </ul>
+                                        </li>
+                                        <li><em>Relatório de Avaliações:</em>
+                                            <ul>
+                                                <li>Todas as avaliações do período</li>
+                                                <li>Dados: avaliador, avaliado, nota, comentário, data</li>
+                                            </ul>
+                                        </li>
+                                        <li><em>Relatório Financeiro:</em>
+                                            <ul>
+                                                <li>Receitas e transações financeiras (se aplicável)</li>
+                                                <li>Taxas cobradas, comissões, repasses</li>
+                                            </ul>
+                                        </li>
+                                        <li><em>Relatório de Moderação:</em>
+                                            <ul>
+                                                <li>Ações de moderação realizadas</li>
+                                                <li>Denúncias, remoções, advertências</li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li><strong>Configuração de Exportação:</strong>
+                                    <ul>
+                                        <li>Selecionar tipo de relatório</li>
+                                        <li>Escolher período (data início e fim)</li>
+                                        <li>Aplicar filtros específicos (categoria, status, etc.)</li>
+                                        <li>Selecionar colunas/campos a incluir</li>
+                                        <li>Escolher formato de exportação:
+                                            <ul>
+                                                <li>PDF (formatado, com gráficos)</li>
+                                                <li>Excel (XLSX)</li>
+                                                <li>CSV (importação em outras ferramentas)</li>
+                                                <li>JSON (integração com outras APIs)</li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li><strong>Recursos Avançados:</strong>
+                                    <ul>
+                                        <li>Salvar configurações de relatório para reutilização</li>
+                                        <li>Agendar geração automática de relatórios (diário, semanal, mensal)</li>
+                                        <li>Enviar relatório por email automaticamente</li>
+                                        <li>Histórico de relatórios gerados (com link para download)</li>
+                                        <li>Limite de tamanho e paginação para relatórios muito grandes</li>
+                                        <li>Compactação automática (ZIP) para arquivos grandes</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Interface:</strong>
+                                    <ul>
+                                        <li>Wizard/assistente de geração em etapas</li>
+                                        <li>Pré-visualização antes de exportar</li>
+                                        <li>Barra de progresso durante geração</li>
+                                        <li>Download direto do arquivo gerado</li>
+                                    </ul>
+                                </li>
+                            </ul>
+
+                            <p class="mb-2 mt-3"><strong>Bibliotecas Sugeridas:</strong></p>
+                            <ul class="text-start">
+                                <li><code>reportlab</code> ou <code>weasyprint</code> - Geração de PDF</li>
+                                <li><code>openpyxl</code> ou <code>xlsxwriter</code> - Geração de Excel</li>
+                                <li><code>pandas</code> - Manipulação e exportação de dados</li>
+                                <li><code>matplotlib</code> ou <code>plotly</code> - Gráficos para PDF</li>
+                            </ul>
+
+                            <p class="mb-2 mt-3"><strong>Arquivos relacionados:</strong></p>
+                            <ul class="text-start">
+                                <li><code>routes/administrador/administrador_usuarios.py</code> (linha 702) - Rota GET</li>
+                                <li><code>util/export_util.py</code> - Criar módulo de exportação</li>
+                                <li><code>data/relatorio/</code> - Queries para coleta de dados</li>
+                            </ul>
+
+                            <p class="mb-0 mt-3"><strong>Dica:</strong> Implemente geração assíncrona para relatórios grandes e notifique o usuário quando estiver pronto. Use cache para evitar regenerar relatórios idênticos.</p>
+                        </div>
+
+                        <a href="/administrador/home" class="btn btn-primary btn-lg mt-3">
+                            <i class="bi bi-arrow-left me-2"></i>Voltar para Home
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}

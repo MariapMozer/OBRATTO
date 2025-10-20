@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Request, Form, Depends, File, UploadFile, status
-from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse
 from pydantic import ValidationError
 from datetime import datetime
@@ -19,12 +18,13 @@ from dtos.Administrador.administrador_dto import (
 )
 from util.auth_decorator import requer_autenticacao
 from util.security import criar_hash_senha
+from util.template_util import criar_templates
 
 # Configurar logger
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
-templates = Jinja2Templates(directory="templates")
+templates = criar_templates("templates")
 administrador_usuarios = APIRouter()
 
 
@@ -32,8 +32,10 @@ administrador_usuarios = APIRouter()
 @requer_autenticacao(["administrador"])
 async def get_home_adm(request: Request, usuario_logado: Optional[dict] = None):
     return templates.TemplateResponse(
-        "administrador/home_adm.html", {"request": request}
+        "administrador/home_adm.html", {"request": request, "usuario_logado": usuario_logado}
     )
+
+
 
 
 # Rota para exibir o formulário de cadastro do administrador
@@ -43,7 +45,7 @@ async def exibir_cadastro_administrador(
     request: Request, usuario_logado: Optional[dict] = None
 ):
     return templates.TemplateResponse(
-        "administrador/moderar_adm/cadastrar_adm.html", {"request": request}
+        "administrador/moderar_adm/cadastrar_adm.html", {"request": request, "usuario_logado": usuario_logado}
     )
 
 
@@ -245,7 +247,7 @@ async def cadastrar_administrador(
 @requer_autenticacao(["administrador"])
 async def get_lista_adm(request: Request, usuario_logado: Optional[dict] = None):
     return templates.TemplateResponse(
-        "administrador/moderar_adm/lista_adm.html", {"request": request}
+        "administrador/lista.html", {"request": request}
     )
 
 
@@ -648,3 +650,75 @@ async def upload_foto_perfil_administrador(
         )
 
     return RedirectResponse("/administrador/perfil?foto_sucesso=1", status_code=303)
+
+
+# ============================================================================
+# ROTAS PARA FUNCIONALIDADES EM CONSTRUÇÃO (PARA OS ALUNOS IMPLEMENTAREM)
+# ============================================================================
+
+# Gestão de Profissionais
+@router.get("/aprovar_profissionais")
+@requer_autenticacao(["administrador"])
+async def get_aprovar_profissionais(request: Request, usuario_logado: Optional[dict] = None):
+    return templates.TemplateResponse(
+        "administrador/aprovar_profissionais.html", {"request": request}
+    )
+
+
+@router.get("/avaliar_profissionais")
+@requer_autenticacao(["administrador"])
+async def get_avaliar_profissionais(request: Request, usuario_logado: Optional[dict] = None):
+    return templates.TemplateResponse(
+        "administrador/avaliar_profissionais.html", {"request": request}
+    )
+
+
+# Gestão de Avaliações
+@router.get("/moderar_avaliacoes")
+@requer_autenticacao(["administrador"])
+async def get_moderar_avaliacoes(request: Request, usuario_logado: Optional[dict] = None):
+    return templates.TemplateResponse(
+        "administrador/moderar_avaliacoes.html", {"request": request}
+    )
+
+
+@router.get("/remover_avaliacoes")
+@requer_autenticacao(["administrador"])
+async def get_remover_avaliacoes(request: Request, usuario_logado: Optional[dict] = None):
+    return templates.TemplateResponse(
+        "administrador/remover_avaliacoes.html", {"request": request}
+    )
+
+
+# Relatórios
+@router.get("/visualizar_relatorios")
+@requer_autenticacao(["administrador"])
+async def get_visualizar_relatorios(request: Request, usuario_logado: Optional[dict] = None):
+    return templates.TemplateResponse(
+        "administrador/visualizar_relatorios.html", {"request": request}
+    )
+
+
+@router.get("/exportar_relatorios")
+@requer_autenticacao(["administrador"])
+async def get_exportar_relatorios(request: Request, usuario_logado: Optional[dict] = None):
+    return templates.TemplateResponse(
+        "administrador/exportar_relatorios.html", {"request": request}
+    )
+
+
+# Configurações
+@router.get("/ajustar_configuracoes")
+@requer_autenticacao(["administrador"])
+async def get_ajustar_configuracoes(request: Request, usuario_logado: Optional[dict] = None):
+    return templates.TemplateResponse(
+        "administrador/ajustar_configuracoes.html", {"request": request}
+    )
+
+
+@router.get("/configurar_seguranca")
+@requer_autenticacao(["administrador"])
+async def get_configurar_seguranca(request: Request, usuario_logado: Optional[dict] = None):
+    return templates.TemplateResponse(
+        "administrador/configurar_seguranca.html", {"request": request}
+    )

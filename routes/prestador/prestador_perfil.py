@@ -3,20 +3,20 @@ from fastapi import APIRouter, File, Request, Form, HTTPException, UploadFile, s
 from fastapi.responses import HTMLResponse, RedirectResponse
 from typing import Optional, List
 from config import templates
-from fastapi.templating import Jinja2Templates
 
 from data.cliente.cliente_model import Cliente
 from data.prestador import prestador_repo
 from data.prestador.prestador_model import Prestador
 from data.usuario import usuario_repo
 from util.auth_decorator import criar_sessao, requer_autenticacao
+from util.template_util import criar_templates
 from util.security import criar_hash_senha, verificar_senha
 
 
 # Tudo funcionando corretamente!
 
 router = APIRouter()
-templates = Jinja2Templates(directory="templates")
+templates = criar_templates("templates")
 
 
 # Rota para página inicial do Prestador

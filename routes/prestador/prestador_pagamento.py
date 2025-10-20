@@ -1,6 +1,5 @@
 from typing import Optional
 from fastapi import APIRouter, Request, Form, Response
-from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse, JSONResponse
 from data.plano.plano_repo import PlanoRepository
 from data.inscricaoplano.inscricao_plano_model import InscricaoPlano
@@ -8,6 +7,7 @@ from data.pagamento.pagamento_model import Pagamento
 from data.pagamento.pagamento_repo import PagamentoRepository
 from util.mercadopago_config import mp_config
 from util.auth_decorator import requer_autenticacao
+from util.template_util import criar_templates
 from services.mercadopago_service import MercadoPagoService
 from services.payment_service import PaymentService
 from datetime import datetime
@@ -19,7 +19,7 @@ mercadopago_service = MercadoPagoService()
 payment_service = PaymentService()
 
 router = APIRouter()
-templates = Jinja2Templates(directory="templates")
+templates = criar_templates("templates")
 
 
 # ===== ROTAS DE PAGAMENTO =====

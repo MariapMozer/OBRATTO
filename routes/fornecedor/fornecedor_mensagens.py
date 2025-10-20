@@ -1,12 +1,12 @@
 from typing import Optional
 from fastapi import APIRouter, Request, Form, HTTPException
 from util.auth_decorator import requer_autenticacao
-from fastapi.templating import Jinja2Templates
+from util.template_util import criar_templates
 from data.mensagem import mensagem_repo
 from data.usuario import usuario_repo
 
 router = APIRouter()
-templates = Jinja2Templates(directory="templates")
+templates = criar_templates("templates")
 
 
 # Listar mensagens recebidas pelo fornecedor

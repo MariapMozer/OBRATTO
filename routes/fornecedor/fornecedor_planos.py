@@ -1,7 +1,7 @@
 from typing import Optional
 from fastapi import APIRouter, Request, Form
 from util.auth_decorator import requer_autenticacao
-from fastapi.templating import Jinja2Templates
+from util.template_util import criar_templates
 from fastapi.responses import RedirectResponse, JSONResponse
 from data.plano.plano_model import Plano
 from data.plano import plano_repo
@@ -14,7 +14,7 @@ from util.mercadopago_config import mp_config
 pagamento_repo = PagamentoRepository()
 mercadopago_config = mp_config
 router = APIRouter()
-templates = Jinja2Templates(directory="templates")
+templates = criar_templates("templates")
 
 
 # Alias para compatibilidade: redireciona /fornecedor/planos/cartoes para /publico/pagamento/cartoes

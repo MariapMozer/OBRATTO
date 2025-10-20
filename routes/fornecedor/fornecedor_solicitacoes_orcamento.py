@@ -1,10 +1,10 @@
 from typing import Optional
 from fastapi import APIRouter, Request
-from fastapi.templating import Jinja2Templates
 from util.auth_decorator import requer_autenticacao
+from util.template_util import criar_templates
 
 router = APIRouter()
-templates = Jinja2Templates(directory="templates")
+templates = criar_templates("templates")
 
 
 # Rota GET para exibir solicitações recebidas

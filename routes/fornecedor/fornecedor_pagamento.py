@@ -1,6 +1,5 @@
 from typing import Optional
 from fastapi import APIRouter, Request, Form, Response
-from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse, JSONResponse
 from data.plano import plano_repo
 from data.inscricaoplano.inscricao_plano_model import InscricaoPlano
@@ -9,12 +8,13 @@ from data.pagamento.pagamento_model import Pagamento
 from data.pagamento.pagamento_repo import PagamentoRepository
 from util.mercadopago_config import mp_config
 from util.auth_decorator import requer_autenticacao
+from util.template_util import criar_templates
 from datetime import datetime
 
 pagamento_repo = PagamentoRepository()
 mercadopago_config = mp_config
 router = APIRouter()
-templates = Jinja2Templates(directory="templates")
+templates = criar_templates("templates")
 
 
 @router.get("/formulario")

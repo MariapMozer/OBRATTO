@@ -1,12 +1,12 @@
 from fastapi import APIRouter, Request
 from util.auth_decorator import requer_autenticacao
+from util.template_util import criar_templates
 from fastapi.responses import RedirectResponse
-from fastapi.templating import Jinja2Templates
 from data.produto.produto_repo import obter_produto_por_id, atualizar_produto
 from data.produto.produto_model import Produto
 
 router = APIRouter()
-templates = Jinja2Templates(directory="templates")
+templates = criar_templates("templates")
 
 
 # Rota para listar todas promoções
