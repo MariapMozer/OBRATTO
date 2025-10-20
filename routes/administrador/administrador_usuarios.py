@@ -288,7 +288,8 @@ async def post_excluir_adm(
 
 # buscar administrador por id
 @router.get("/id/{id}")
-async def get_administrador(request: Request, id: int):
+@requer_autenticacao(["administrador"])
+async def get_administrador(request: Request, id: int, usuario_logado: Optional[dict] = None):
     administrador = administrador_repo.obter_administrador_por_id(id)
     return templates.TemplateResponse(
         "administrador.html", {"request": request, "administrador": administrador}

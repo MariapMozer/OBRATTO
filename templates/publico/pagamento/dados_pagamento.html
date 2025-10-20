@@ -508,79 +508,34 @@
 
                         <div class="form-section" id="cartao-dados">
                             <h4>💳 Dados do Cartão</h4>
-                            
-                            {% if cartoes %}
+
+                            <div class="form-group">
+                                <label for="numero_cartao">Número do Cartão <span class="required">*</span></label>
+                                <input type="text" id="numero_cartao" name="numero_cartao" required
+                                       placeholder="0000 0000 0000 0000" maxlength="19">
+                            </div>
+                            <div class="form-row">
                                 <div class="form-group">
-                                    <label>Selecionar Cartão Salvo</label>
-                                    <div class="saved-cards">
-                                        <label class="card-option" for="novo_cartao">
-                                            <input type="radio" id="novo_cartao" name="cartao_salvo" value="" checked>
-                                            <div class="card-info">
-                                                <div class="card-number">➕ Usar novo cartão</div>
-                                                <div class="card-name">Digite os dados abaixo</div>
-                                            </div>
-                                        </label>
-                                        {% for cartao in cartoes %}
-                                            <label class="card-option" for="cartao_{{ cartao.id_cartao }}">
-                                                <input type="radio" id="cartao_{{ cartao.id_cartao }}" 
-                                                       name="cartao_salvo" value="{{ cartao.id_cartao }}">
-                                                <div class="card-info">
-                                                    <div class="card-number">
-                                                        {{ cartao.bandeira }} •••• {{ cartao.ultimos_4_digitos }}
-                                                        {% if cartao.principal %}
-                                                            <span class="principal-badge">⭐ PRINCIPAL</span>
-                                                        {% endif %}
-                                                    </div>
-                                                    <div class="card-name">{{ cartao.nome_titular }}</div>
-                                                    <div class="card-details">{{ cartao.apelido }} • {{ cartao.mes_vencimento }}/{{ cartao.ano_vencimento }}</div>
-                                                </div>
-                                            </label>
-                                        {% endfor %}
-                                    </div>
-                                    <div class="manage-cards">
-                                        <a href="/fornecedor/planos/cartoes?id_fornecedor={{ id_fornecedor }}" class="btn-link">💳 Gerenciar Cartões</a>
-                                    </div>
-                                </div>
-                            {% endif %}
-                            
-                            <div id="new-card-fields" {% if cartoes %}style="display: none;"{% endif %}>
-                                <div class="form-group">
-                                    <label for="numero_cartao">Número do Cartão <span class="required">*</span></label>
-                                    <input type="text" id="numero_cartao" name="numero_cartao" 
-                                           placeholder="0000 0000 0000 0000" maxlength="19">
-                                </div>
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label for="validade">Validade <span class="required">*</span></label>
-                                        <input type="text" id="validade" name="validade" 
-                                               placeholder="MM/AA" maxlength="5">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="cvv">CVV <span class="required">*</span></label>
-                                        <input type="text" id="cvv" name="cvv" 
-                                               placeholder="000" maxlength="4">
-                                    </div>
+                                    <label for="validade">Validade <span class="required">*</span></label>
+                                    <input type="text" id="validade" name="validade" required
+                                           placeholder="MM/AA" maxlength="5">
                                 </div>
                                 <div class="form-group">
-                                    <label for="nome_cartao">Nome no Cartão <span class="required">*</span></label>
-                                    <input type="text" id="nome_cartao" name="nome_cartao" 
-                                           placeholder="Nome como impresso no cartão">
+                                    <label for="cvv">CVV <span class="required">*</span></label>
+                                    <input type="text" id="cvv" name="cvv" required
+                                           placeholder="000" maxlength="4">
                                 </div>
-                                
-                                {% if cartoes %}
-                                <div class="form-group">
-                                    <div class="checkbox-group">
-                                        <input type="checkbox" id="salvar_cartao" name="salvar_cartao" value="true">
-                                        <label for="salvar_cartao">💾 Salvar este cartão para pagamentos futuros</label>
-                                    </div>
-                                </div>
-                                {% endif %}
+                            </div>
+                            <div class="form-group">
+                                <label for="nome_cartao">Nome no Cartão <span class="required">*</span></label>
+                                <input type="text" id="nome_cartao" name="nome_cartao" required
+                                       placeholder="Nome como impresso no cartão">
                             </div>
                         </div>
 
                         <div class="security-info">
-                            <p>🔒 <strong>Pagamento Seguro:</strong> Este é um ambiente de teste. 
-                            Seus dados não serão processados por gateways reais de pagamento.</p>
+                            <p>🔒 <strong>Pagamento Seguro:</strong> Seus dados de cartão NÃO são armazenados em nosso sistema.
+                            Todo o processamento é feito de forma segura através do Mercado Pago.</p>
                         </div>
 
                         <div class="form-actions">
@@ -652,32 +607,6 @@
 
         // Marcar primeiro método como selecionado
         document.querySelector('.payment-method').classList.add('selected');
-        
-        // Controlar exibição dos campos de novo cartão
-        const cartaoSalvoRadios = document.querySelectorAll('input[name="cartao_salvo"]');
-        const newCardFields = document.getElementById('new-card-fields');
-        
-        cartaoSalvoRadios.forEach(radio => {
-            radio.addEventListener('change', function() {
-                if (this.value === '') {
-                    // Novo cartão selecionado
-                    newCardFields.style.display = 'block';
-                    // Tornar campos obrigatórios
-                    document.getElementById('numero_cartao').required = true;
-                    document.getElementById('validade').required = true;
-                    document.getElementById('cvv').required = true;
-                    document.getElementById('nome_cartao').required = true;
-                } else {
-                    // Cartão salvo selecionado
-                    newCardFields.style.display = 'none';
-                    // Remover obrigatoriedade dos campos
-                    document.getElementById('numero_cartao').required = false;
-                    document.getElementById('validade').required = false;
-                    document.getElementById('cvv').required = false;
-                    document.getElementById('nome_cartao').required = false;
-                }
-            });
-        });
     </script>
 </body>
 </html>

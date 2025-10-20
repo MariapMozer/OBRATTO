@@ -18,7 +18,8 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 
 @router.get("/")
-async def get_page(request: Request):
+@requer_autenticacao(["cliente"])
+async def get_page(request: Request, usuario_logado: Optional[dict] = None):
     return templates.TemplateResponse("cliente/home.html", {"request": request})
 
 

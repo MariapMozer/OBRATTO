@@ -21,7 +21,7 @@ from dtos.cliente.cliente_dto import CriarClienteDTO
 from dtos.usuario.login_dto import LoginDTO
 from dtos.fornecedor.fornecedor_dto import CriarFornecedorDTO
 from dtos.prestador.prestador_dto import CriarPrestadorDTO
-from util.auth_decorator import obter_usuario_logado
+from util.auth_decorator import obter_usuario_logado, requer_autenticacao
 
 # from util.security import verificar_autenticacao
 import os
@@ -849,11 +849,10 @@ async def exibir_perfil_publico_fornecedor(request: Request):
 
 
 @router.get("/mensagens/conversa/{contato_id}")
-async def exibir_conversa(request: Request, contato_id: int):
+@requer_autenticacao()
+async def exibir_conversa(request: Request, contato_id: int, usuario_logado: Optional[dict] = None):
     """Exibe uma conversa específica entre o usuário logado e um contato"""
-    usuario = obter_usuario_logado(request)
-    if not usuario:
-        return RedirectResponse("/login", status_code=status.HTTP_303_SEE_OTHER)
+    assert usuario_logado is not None
 
     # Obter dados do contato
     contato = obter_dados_usuario_por_id(contato_id)
@@ -861,12 +860,12 @@ async def exibir_conversa(request: Request, contato_id: int):
         return RedirectResponse("/mensagens", status_code=status.HTTP_303_SEE_OTHER)
 
     # Obter mensagens da conversa
-    todas_mensagens = mensagem_repo.obter_mensagem(usuario["id"])
+    todas_mensagens = mensagem_repo.obter_mensagem(usuario_logado["id"])
     mensagens_conversa = [
         msg
         for msg in todas_mensagens
-        if (msg.id_remetente == usuario["id"] and msg.id_destinatario == contato_id)
-        or (msg.id_remetente == contato_id and msg.id_destinatario == usuario["id"])
+        if (msg.id_remetente == usuario_logado["id"] and msg.id_destinatario == contato_id)
+        or (msg.id_remetente == contato_id and msg.id_destinatario == usuario_logado["id"])
     ]
 
     # Ordenar por data
@@ -876,7 +875,7 @@ async def exibir_conversa(request: Request, contato_id: int):
         "publico/mensagens/mensagens.html",
         {
             "request": request,
-            "usuario": usuario,
+            "usuario": usuario_logado,
             "contato": contato,
             "mensagens": mensagens_conversa,
         },
@@ -884,35 +883,33 @@ async def exibir_conversa(request: Request, contato_id: int):
 
 
 @router.get("/mensagens/nova")
-async def exibir_nova_mensagem(request: Request):
+@requer_autenticacao()
+async def exibir_nova_mensagem(request: Request, usuario_logado: Optional[dict] = None):
     """Exibe formulário para nova mensagem"""
-    usuario = obter_usuario_logado(request)
-    if not usuario:
-        return RedirectResponse("/login", status_code=status.HTTP_303_SEE_OTHER)
+    assert usuario_logado is not None
 
     # Obter usuários disponíveis baseado no tipo do usuário logado
     usuarios_disponiveis = obter_usuarios_disponiveis_por_tipo(
-        usuario["perfil"], usuario["id"]
+        usuario_logado["perfil"], usuario_logado["id"]
     )
 
     return templates.TemplateResponse(
         "publico/mensagens/mensagens.html",
         {
             "request": request,
-            "usuario": usuario,
+            "usuario": usuario_logado,
             "usuarios_disponiveis": usuarios_disponiveis,
         },
     )
 
 
 @router.post("/mensagens/enviar")
+@requer_autenticacao()
 async def processar_envio_mensagem(
-    request: Request, destinatario_id: int = Form(...), conteudo: str = Form(...)
+    request: Request, destinatario_id: int = Form(...), conteudo: str = Form(...), usuario_logado: Optional[dict] = None
 ):
     """Processa o envio de uma nova mensagem"""
-    usuario = obter_usuario_logado(request)
-    if not usuario:
-        return RedirectResponse("/login", status_code=status.HTTP_303_SEE_OTHER)
+    assert usuario_logado is not None
 
     try:
         # Validar destinatário
@@ -923,11 +920,11 @@ async def processar_envio_mensagem(
         # Criar mensagem
         mensagem = Mensagem(
             id_mensagem=0,  # Será gerado automaticamente
-            id_remetente=usuario["id"],
+            id_remetente=usuario_logado["id"],
             id_destinatario=destinatario_id,
             conteudo=conteudo,
             data_hora=datetime.now(),
-            nome_remetente=usuario["nome"],
+            nome_remetente=usuario_logado["nome"],
             nome_destinatario=destinatario.nome,
         )
 

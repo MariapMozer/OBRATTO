@@ -8,12 +8,10 @@ from data.plano import plano_repo
 from data.inscricaoplano.inscricao_plano_model import InscricaoPlano
 from data.inscricaoplano import inscricao_plano_repo
 from data.pagamento.pagamento_repo import PagamentoRepository
-from data.cartao.cartao_repo import CartaoRepository
 from util.mercadopago_config import mp_config
 
 # Criar instância dos repositórios
 pagamento_repo = PagamentoRepository()
-cartao_repo = CartaoRepository()
 mercadopago_config = mp_config
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")

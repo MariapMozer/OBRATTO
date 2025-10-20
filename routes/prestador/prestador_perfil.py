@@ -21,7 +21,8 @@ templates = Jinja2Templates(directory="templates")
 
 # Rota para página inicial do Prestador
 @router.get("")
-async def home_prestador(request: Request):
+@requer_autenticacao(["prestador"])
+async def home_prestador(request: Request, usuario_logado: Optional[dict] = None):
     return templates.TemplateResponse("prestador/home.html", {"request": request})
 
 
@@ -147,6 +148,7 @@ async def excluir_perfil_prestador(request: Request):
 
 # Rota para processar a exclusão do perfil
 @router.post("/excluir")
+@requer_autenticacao(["prestador"])
 async def processar_exclusao_perfil_prestador(
     request: Request,
     nome: str = Form(...),
@@ -161,6 +163,7 @@ async def processar_exclusao_perfil_prestador(
     area_atuacao: str = Form(...),
     razao_social: Optional[str] = Form(None),
     descricao_servicos: Optional[str] = Form(None),
+    usuario_logado: Optional[dict] = None,
 ):
     return templates.TemplateResponse(
         "prestador/perfil/excluir.html", {"request": request}

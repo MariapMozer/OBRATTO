@@ -1,4 +1,3 @@
-from data.cartao.cartao_repo import criar_tabela_cartao
 from data.administrador.administrador_repo import criar_tabela_administrador
 from data.anuncio.anuncio_repo import criar_tabela_anuncio
 from data.avaliacao.avaliacao_repo import criar_tabela_avaliacao
@@ -25,7 +24,6 @@ def criar_tabelas():
     criar_tabela_produto()
     criar_tabela_servico()
     criar_tabela_inscricao_plano()
-    criar_tabela_cartao()
     criar_tabela_orcamento()
     criar_tabela_anuncio()
     criar_tabela_avaliacao()
