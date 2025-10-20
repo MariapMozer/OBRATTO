@@ -1,3 +1,4 @@
+from typing import Optional
 from fastapi import APIRouter, Request, Form
 from utils.auth_decorator import requer_autenticacao
 from fastapi.templating import Jinja2Templates
@@ -21,9 +22,9 @@ templates = Jinja2Templates(directory="templates")
 @router.get("/cartoes")
 @requer_autenticacao(['fornecedor'])
 async def alias_cartoes(request: Request, 
-                        id_fornecedor: int = None, 
-                        id_prestador: int = None, 
-                        id_cliente: int = None):
+                        id_fornecedor: Optional[int] = None, 
+                        id_prestador: Optional[int] = None, 
+                        id_cliente: Optional[int] = None):
     url = f"/publico/pagamento/cartoes?id_fornecedor={id_fornecedor}" if id_fornecedor else "/publico/pagamento/cartoes"
     return RedirectResponse(url=url, status_code=307)
 
@@ -79,8 +80,8 @@ async def alterar_plano(request: Request, id_plano: int = Form(...)):
     
     plano_novo = plano_repo.obter_plano_por_id(id_plano)
     plano_atual = plano_repo.obter_plano_por_id(assinatura_ativa.id_plano)
-    
-    if plano_novo:
+
+    if plano_novo and plano_atual and plano_novo.valor_mensal is not None and plano_atual.valor_mensal is not None:
         # Verificar se há diferença de valor que requer pagamento
         if plano_novo.valor_mensal > plano_atual.valor_mensal:
             # Redirecionar para dados de pagamento se o novo plano é mais caro
@@ -146,6 +147,7 @@ async def confirmar_cancelamento_plano(request: Request, id_fornecedor: int = Fo
         })
     
     # Cancelar a assinatura ativa
+    assert assinatura_ativa.id_inscricao_plano is not None
     inscricao_plano_repo.deletar_inscricao_plano(assinatura_ativa.id_inscricao_plano)
     response = RedirectResponse("/fornecedor/planos/listar", status_code=303)
     return response
@@ -228,7 +230,9 @@ async def assinar_plano(request: Request, plano_id: int = Form(...), id_forneced
 @router.get("/historico")
 @requer_autenticacao(['fornecedor'])
 async def historico_planos(request: Request, id_fornecedor: int = 1):
-    historico = inscricao_plano_repo.obter_historico_planos_por_fornecedor(id_fornecedor)
+    # TODO: Implementar obter_historico_planos_por_fornecedor no repo
+    # historico = inscricao_plano_repo.obter_historico_planos_por_fornecedor(id_fornecedor)
+    historico = []  # type: ignore
     return templates.TemplateResponse("fornecedor/planos/historico_planos.html", {
         "request": request,
         "historico": historico,

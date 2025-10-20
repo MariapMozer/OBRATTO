@@ -52,14 +52,14 @@ async def processar_edicao_perfil_cliente(
     genero: str = Form(...),
     data_nascimento: str = Form(...),
     foto: Optional[UploadFile] = File(None),  # ← arquivo enviado
-    usuario_logado: dict = None
+    usuario_logado: Optional[dict] = None
 ):
     pass
 
 # Editar foto de perfil
 @router.get("/editar/fotos")
 @requer_autenticacao(["cliente"])
-async def editar_foto_perfil_cliente(request: Request, usuario_logado: dict = None):
+async def editar_foto_perfil_cliente(request: Request, usuario_logado: Optional[dict] = None):
     return templates.TemplateResponse("cliente/perfil/editar_foto.html", {
     "request": request,
     "cliente": usuario_logado
@@ -72,8 +72,9 @@ async def editar_foto_perfil_cliente(request: Request, usuario_logado: dict = No
 async def alterar_foto(
     request: Request,
     foto: UploadFile = File(...),  # ← Recebe arquivo de foto
-    usuario_logado: dict = None
+    usuario_logado: Optional[dict] = None
 ):
+    assert usuario_logado is not None
     # 1. Validar tipo de arquivo
     tipos_permitidos = ["image/jpeg", "image/png", "image/jpg"]
     if foto.content_type not in tipos_permitidos:
@@ -85,7 +86,7 @@ async def alterar_foto(
 
     # 3. Gerar nome único para evitar conflitos
     import secrets
-    extensao = foto.filename.split(".")[-1]
+    extensao = foto.filename.split(".")[-1] if foto.filename else "jpg"
     nome_arquivo = f"{usuario_logado['id']}_{secrets.token_hex(8)}.{extensao}"
     caminho_arquivo = os.path.join(upload_dir, nome_arquivo)
 
@@ -120,8 +121,9 @@ async def excluir_perfil_cliente(request: Request):
 @requer_autenticacao(["cliente"])
 async def processar_exclusao_perfil_cliente(
     request: Request,
-    usuario_logado: dict = None
+    usuario_logado: Optional[dict] = None
 ):
+    assert usuario_logado is not None
     cliente_id = usuario_logado["id"]
 
     # Excluir cliente no banco

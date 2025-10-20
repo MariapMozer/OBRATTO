@@ -55,7 +55,8 @@ class MercadoPagoConfig:
                     "tipo": "assinatura_plano"
                 }
             }
-            
+
+            assert self.sdk is not None
             preference_response = self.sdk.preference().create(preference_data)
             
             if preference_response["status"] == 201:
@@ -82,6 +83,7 @@ class MercadoPagoConfig:
         Obtém informações de um pagamento específico
         """
         try:
+            assert self.sdk is not None
             payment_response = self.sdk.payment().get(payment_id)
             return payment_response["response"]
         except Exception as e:

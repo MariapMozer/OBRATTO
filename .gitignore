@@ -13,3 +13,4 @@ __pycache__
 *.log
 *.tmp
 .pytest_cache/
+.claude/

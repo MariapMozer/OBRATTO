@@ -1,4 +1,5 @@
 
+from typing import Optional
 from asyncio import open_connection
 import os
 from fastapi import APIRouter, Request, Form, UploadFile, File, HTTPException
@@ -18,12 +19,13 @@ templates = Jinja2Templates(directory="templates")
 
 @router.get("/perfil")
 @requer_autenticacao(['fornecedor'])
-async def visualizar_perfil_fornecedor(request: Request, usuario_logado: dict = None):
+async def visualizar_perfil_fornecedor(request: Request, usuario_logado: Optional[dict] = None):
+    assert usuario_logado is not None
     fornecedor = fornecedor_repo.obter_fornecedor_por_id(usuario_logado["id"])
     if not fornecedor:
         raise HTTPException(status_code=404, detail="Fornecedor não encontrado")
     return templates.TemplateResponse(
-        "fornecedor/perfil.html", 
+        "fornecedor/perfil.html",
         {"request": request,
         "fornecedor": fornecedor})
 
@@ -31,18 +33,19 @@ async def visualizar_perfil_fornecedor(request: Request, usuario_logado: dict = 
 @router.post("/perfil/editar")
 @requer_autenticacao(['fornecedor'])
 async def editar_perfil_fornecedor(
-    request: Request, 
-    nome: str = Form(...), 
-    email: str = Form(...), 
-    telefone: str = Form(...), 
+    request: Request,
+    nome: str = Form(...),
+    email: str = Form(...),
+    telefone: str = Form(...),
     estado: str = Form(...),
     cidade: str = Form(...),
     rua: str = Form(...),
     numero: str = Form(...),
     bairro: str = Form(...),
     razao_social: str = Form(...),
-    usuario_logado: dict = None):
-    fornecedor = fornecedor_repo.obter_fornecedor_por_id(usuario_logado.id)
+    usuario_logado: Optional[dict] = None):
+    assert usuario_logado is not None
+    fornecedor = fornecedor_repo.obter_fornecedor_por_id(usuario_logado["id"])
     if not fornecedor:
         raise HTTPException(status_code=404, detail="Fornecedor não encontrado")
     fornecedor.nome = nome
@@ -52,9 +55,9 @@ async def editar_perfil_fornecedor(
     fornecedor_repo.atualizar_fornecedor(fornecedor)
     mensagem = "Perfil atualizado com sucesso."
     return templates.TemplateResponse(
-        "fornecedor/perfil.html", 
-        {"request": request, 
-         "fornecedor": fornecedor, 
+        "fornecedor/perfil.html",
+        {"request": request,
+         "fornecedor": fornecedor,
          "mensagem": mensagem})
 
 # 3. Alterar senha do fornecedor
@@ -68,10 +71,11 @@ async def alterar_senha_fornecedor(
     id: int,
     senha_atual: str = Form(...),
     nova_senha: str = Form(...),
-    usuario_logado: dict = None
+    usuario_logado: Optional[dict] = None
 ):
     from data.usuario import usuario_repo
-    fornecedor = fornecedor_repo.obter_fornecedor_por_id(usuario_logado.id)
+    assert usuario_logado is not None
+    fornecedor = fornecedor_repo.obter_fornecedor_por_id(usuario_logado["id"])
     if not fornecedor:
         raise HTTPException(status_code=404, detail="Fornecedor não encontrado")
     # Verifica se a senha atual está correta (usando hash)
@@ -84,7 +88,7 @@ async def alterar_senha_fornecedor(
         )
     # Atualiza a senha com hash
     nova_senha_hash = criar_hash_senha(nova_senha)
-    usuario_repo.atualizar_senha_usuario(usuario_logado.id, nova_senha_hash)
+    usuario_repo.atualizar_senha_usuario(usuario_logado["id"], nova_senha_hash)
     from fastapi import status
     from fastapi.responses import RedirectResponse
     return RedirectResponse(
@@ -98,9 +102,10 @@ async def alterar_senha_fornecedor(
 async def upload_foto_perfil(
     request: Request,
     foto: UploadFile = File(...),
-    usuario_logado: dict = None
+    usuario_logado: Optional[dict] = None
 ):
-    fornecedor = fornecedor_repo.obter_fornecedor_por_id(usuario_logado.id)
+    assert usuario_logado is not None
+    fornecedor = fornecedor_repo.obter_fornecedor_por_id(usuario_logado["id"])
     if not fornecedor:
         raise HTTPException(status_code=404, detail="Fornecedor não encontrado")
 
@@ -116,8 +121,8 @@ async def upload_foto_perfil(
 
     # Gerar nome único para o arquivo
     import secrets
-    extensao = foto.filename.split(".")[-1]
-    nome_arquivo = f"{usuario_logado.id}_{secrets.token_hex(8)}.{extensao}"
+    extensao = foto.filename.split(".")[-1] if foto.filename else "jpg"
+    nome_arquivo = f"{usuario_logado['id']}_{secrets.token_hex(8)}.{extensao}"
     caminho_arquivo = os.path.join(upload_dir, nome_arquivo)
 
     # Salvar arquivo
@@ -128,13 +133,12 @@ async def upload_foto_perfil(
 
         # Atualizar caminho no banco (usar caminho relativo)
         caminho_relativo = f"/static/uploads/fornecedores/{nome_arquivo}"
-        atualizar_foto(usuario_logado.id, caminho_relativo)
+        atualizar_foto(usuario_logado["id"], caminho_relativo)
 
         # Atualizar sessão (se aplicável)
-        if usuario_logado is not None:
-            usuario_logado['foto'] = caminho_relativo
-            from utils.auth_decorator import criar_sessao
-            criar_sessao(request, usuario_logado)
+        usuario_logado['foto'] = caminho_relativo
+        from utils.auth_decorator import criar_sessao
+        criar_sessao(request, usuario_logado)
 
     except Exception as e:
         from fastapi.responses import RedirectResponse
@@ -146,11 +150,12 @@ async def upload_foto_perfil(
 # 13. Deletar conta do fornecedor
 @router.post("/perfil/excluir")
 @requer_autenticacao(['fornecedor'])
-async def deletar_conta_fornecedor(request: Request, usuario_logado: dict = None):
-    fornecedor = fornecedor_repo.obter_fornecedor_por_id(usuario_logado.id)
+async def deletar_conta_fornecedor(request: Request, usuario_logado: Optional[dict] = None):
+    assert usuario_logado is not None
+    fornecedor = fornecedor_repo.obter_fornecedor_por_id(usuario_logado["id"])
     if not fornecedor:
         raise HTTPException(status_code=404, detail="Fornecedor não encontrado")
-    fornecedor_repo.deletar_fornecedor(usuario_logado.id)
+    fornecedor_repo.deletar_fornecedor(usuario_logado["id"])
     from fastapi import status
     from fastapi.responses import RedirectResponse
     return RedirectResponse(
@@ -161,17 +166,19 @@ async def deletar_conta_fornecedor(request: Request, usuario_logado: dict = None
 # Visualizar perfil do fornecedor
 @router.get("/conta")
 @requer_autenticacao(['fornecedor'])
-async def visualizar_conta(request: Request, usuario_logado: dict = None):
+async def visualizar_conta(request: Request, usuario_logado: Optional[dict] = None):
+    assert usuario_logado is not None
     fornecedor = fornecedor_repo.obter_fornecedor_por_id(usuario_logado["id"])
     return templates.TemplateResponse(
-        "fornecedor/conta.html", 
-        {"request": request, 
+        "fornecedor/conta.html",
+        {"request": request,
          "fornecedor": fornecedor})
 
 # Visualizar avaliações recebidas pelo fornecedor
 @router.get("/avaliacoes")
 @requer_autenticacao(['fornecedor'])
-async def visualizar_avaliacoes_recebidas(request: Request, usuario_logado: dict = None):
+async def visualizar_avaliacoes_recebidas(request: Request, usuario_logado: Optional[dict] = None):
+    assert usuario_logado is not None
     avaliacoes = avaliacao_repo.obter_avaliacao_por_id(usuario_logado["id"])
     return templates.TemplateResponse(
         "fornecedor/avaliacoes_recebidas.html",
@@ -182,6 +189,7 @@ async def visualizar_avaliacoes_recebidas(request: Request, usuario_logado: dict
 
 def atualizar_foto(id: int, caminho_foto: str) -> bool:
     """Atualiza apenas a foto do usuário"""
+    from utils.db import open_connection
     with open_connection() as conn:
         cursor = conn.cursor()
         cursor.execute(ATUALIZAR_FOTO, (caminho_foto, id))

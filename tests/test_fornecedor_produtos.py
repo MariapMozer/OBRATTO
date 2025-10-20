@@ -25,8 +25,8 @@ def test_inserir_produto():
     data = {
         "nome": "Produto Teste",
         "descricao": "Descrição do produto teste",
-        "preco": 10.0,
-        "quantidade": 5
+        "preco": "10.0",
+        "quantidade": "5"
     }
     files = {"foto": ("foto.jpg", b"fakeimgdata", "image/jpeg")}
     response = client.post("/fornecedor/produtos/inserir", data=data, files=files, cookies=cookies)
@@ -39,8 +39,8 @@ def test_atualizar_produto():
     data = {
         "nome": "Produto Atualizar",
         "descricao": "Desc Atualizar",
-        "preco": 20.0,
-        "quantidade": 2
+        "preco": "20.0",
+        "quantidade": "2"
     }
     files = {"foto": ("foto2.jpg", b"fakeimgdata2", "image/jpeg")}
     insert_resp = client.post("/fornecedor/produtos/inserir", data=data, files=files, cookies=cookies)

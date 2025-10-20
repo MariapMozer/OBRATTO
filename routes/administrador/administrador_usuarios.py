@@ -4,12 +4,14 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse
 from pydantic import ValidationError
 from datetime import datetime
+from typing import Optional
 import logging
 
 from data.administrador import administrador_repo
 from data.administrador.administrador_model import Administrador
 from data.fornecedor import fornecedor_repo
 from data.prestador import prestador_repo
+from data.cliente import cliente_repo
 from data.usuario import usuario_repo
 from data.usuario.usuario_model import Usuario
 from dtos.Administrador.administrador_dto import CriarAdministradorDTO, AtualizarAdministradorDTO
@@ -26,13 +28,13 @@ administrador_usuarios = APIRouter()
 
 @router.get("/home")
 @requer_autenticacao(['administrador'])
-async def get_home_adm(request: Request, usuario_logado: dict = None):
+async def get_home_adm(request: Request, usuario_logado: Optional[dict] = None):
     return templates.TemplateResponse("administrador/home_adm.html", {"request": request})
 
 # Rota para exibir o formulário de cadastro do administrador
 @router.get("/cadastro")
 @requer_autenticacao(['administrador'])
-async def exibir_cadastro_administrador(request: Request, usuario_logado: dict = None):
+async def exibir_cadastro_administrador(request: Request, usuario_logado: Optional[dict] = None):
     return templates.TemplateResponse("administrador/moderar_adm/cadastrar_adm.html", {"request": request})
 
 # Rota para cadastrar um novo administrador
@@ -53,7 +55,7 @@ async def cadastrar_administrador(
     numero: str = Form(...),
     bairro: str = Form(...),
     complemento: str = Form(""),
-    usuario_logado: dict = None
+    usuario_logado: Optional[dict] = None
 ):
     logger.info(f"Iniciando cadastro de administrador. Email: {email}")
     
@@ -88,8 +90,7 @@ async def cadastrar_administrador(
             numero=numero,
             bairro=bairro,
             complemento=complemento or "",
-            tipo_usuario="administrador",
-            foto=None
+            tipo_usuario="administrador"
         )
 
         # Verificar se email já existe
@@ -113,7 +114,7 @@ async def cadastrar_administrador(
 
         # Criar objeto Usuario
         usuario = Usuario(
-            id=None,
+            id=0,  # Will be set by database auto-increment
             nome=admin_dto.nome,
             email=admin_dto.email,
             senha=senha_hash,
@@ -153,7 +154,7 @@ async def cadastrar_administrador(
 
         if not admin_id:
             # Se falhar, remover usuário criado (rollback manual)
-            usuario_repo.excluir_usuario(id_usuario)
+            usuario_repo.deletar_usuario(id_usuario)
             return templates.TemplateResponse(
                 "administrador/moderar_adm/cadastrar_adm.html",
                 {
@@ -164,6 +165,7 @@ async def cadastrar_administrador(
             )
 
         # Sucesso - Registrar log
+        assert usuario_logado is not None
         logger.info(f"Novo administrador criado: {admin_dto.email} por {usuario_logado.get('email', 'desconhecido')}")
 
         # Redirecionar com mensagem de sucesso
@@ -179,12 +181,14 @@ async def cadastrar_administrador(
     except ValidationError as e:
         # Extrair mensagens de erro do Pydantic
         erros = []
-        campos_erro = {}
-        
+        campos_erro: dict[str, list[str]] = {}
+
         for erro in e.errors():
-            campo = erro.get('loc')[0] if erro.get('loc') else 'campo'
-            mensagem = erro.get('msg')
-            texto = f"{campo.capitalize()}: {mensagem}"
+            loc_tuple = erro.get('loc')
+            campo = str(loc_tuple[0]) if loc_tuple and len(loc_tuple) > 0 else 'campo'
+            mensagem = erro.get('msg', '')
+            campo_str = str(campo).capitalize() if isinstance(campo, (str, int)) else 'campo'
+            texto = f"{campo_str}: {mensagem}"
             erros.append(texto)
             campos_erro.setdefault(campo, []).append(mensagem)
 
@@ -220,7 +224,7 @@ async def cadastrar_administrador(
 
 @router.get("/lista")
 @requer_autenticacao(['administrador'])
-async def get_lista_adm(request: Request, usuario_logado: dict = None):
+async def get_lista_adm(request: Request, usuario_logado: Optional[dict] = None):
     return templates.TemplateResponse("administrador/moderar_adm/lista_adm.html", {"request": request})
 
 
@@ -232,20 +236,24 @@ async def post_editar_adm(
     nome: str = Form(...),
     email: str = Form(...),
     senha: str = Form(...),
-    usuario_logado: dict = None
+    usuario_logado: Optional[dict] = None
 ):
-    adm_atualizado = {
-        "nome": nome,
-        "email": email,
-        "senha": senha 
-    }
-    administrador_repo.atualizar_administrador(id, adm_atualizado)
+    # TODO: Implement proper update logic - atualizar_administrador expects Administrador object
+    # For now, update via usuario_repo
+    usuario = usuario_repo.obter_usuario_por_id(id)
+    if usuario:
+        usuario.nome = nome
+        usuario.email = email
+        if senha:
+            from utils.security import criar_hash_senha
+            usuario.senha = criar_hash_senha(senha)
+        usuario_repo.atualizar_usuario(usuario)
     return templates.TemplateResponse("administrador/moderar_adm/editar_adm.html", {"request": request})
 
 @router.post("/excluir_administrador")
 @requer_autenticacao(['administrador'])
-async def post_excluir_adm(request: Request, id: int = Form(...), usuario_logado: dict = None):
-    administrador_repo.remover_administrador_por_id(id)
+async def post_excluir_adm(request: Request, id: int = Form(...), usuario_logado: Optional[dict] = None):
+    administrador_repo.deletar_administrador(id)
     return templates.TemplateResponse("administrador/moderar_adm/remover_adm.html", {"request": request})
 
 # buscar administrador por id
@@ -257,8 +265,8 @@ async def get_administrador(request: Request, id: int):
 # Moderar prestadores
 @router.get("/listar_prestador")
 @requer_autenticacao(['administrador'])
-async def get_listar_prestador(request: Request, usuario_logado: dict = None):
-    prestadores = administrador_repo.listar_prestadores()
+async def get_listar_prestador(request: Request, usuario_logado: Optional[dict] = None):
+    prestadores = prestador_repo.obter_prestador()
     return templates.TemplateResponse("administrador/listar_prestador.html", {"request": request, "prestadores": prestadores})
 
 
@@ -269,33 +277,34 @@ async def post_editar_prestador(
     id: int = Form(...),
     nome: str = Form(...),
     email: str = Form(...),
-    usuario_logado: dict = None
+    usuario_logado: Optional[dict] = None
 ):
-    prestador_atualizado = {
-        "nome": nome,
-        "email": email
-    }
-    administrador_repo.atualizar_prestador(id, prestador_atualizado)
+    # Update via usuario_repo
+    usuario = usuario_repo.obter_usuario_por_id(id)
+    if usuario:
+        usuario.nome = nome
+        usuario.email = email
+        usuario_repo.atualizar_usuario(usuario)
     return templates.TemplateResponse("administrador/listar_prestador.html", {"request": request})
 
 @router.post("/excluir_prestador")
 @requer_autenticacao(['administrador'])
-async def post_excluir_prestador(request: Request, id: int = Form(...), usuario_logado: dict = None):
-    administrador_repo.remover_prestador_por_id(id)
+async def post_excluir_prestador(request: Request, id: int = Form(...), usuario_logado: Optional[dict] = None):
+    prestador_repo.deletar_prestador_repo(id)
     return templates.TemplateResponse("administrador/listar_prestador.html", {"request": request})
 
 # Rota dinâmica para buscar prestador por id
 @router.get("/prestador/{id}")
 @requer_autenticacao(['administrador'])
-async def get_prestador_por_id(request: Request, id: int, usuario_logado: dict = None):
-    prestador = administrador_repo.obter_prestador_por_id(id)
+async def get_prestador_por_id(request: Request, id: int, usuario_logado: Optional[dict] = None):
+    prestador = prestador_repo.obter_prestador_por_id(id)
     return templates.TemplateResponse("administrador/detalhes_prestador.html", {"request": request, "prestador": prestador})
 
 # Moderar Fornecedores
 @router.get("/listar_fornecedor")
 @requer_autenticacao(['administrador'])
-async def get_listar_fornecedor(request: Request, usuario_logado: dict = None):
-    fornecedores = administrador_repo.listar_fornecedores()
+async def get_listar_fornecedor(request: Request, usuario_logado: Optional[dict] = None):
+    fornecedores = fornecedor_repo.obter_fornecedor()
     return templates.TemplateResponse("administrador/listar_fornecedor.html", {"request": request, "fornecedores": fornecedores})
 
 @router.post("/editar_fornecedor")
@@ -305,35 +314,36 @@ async def post_editar_fornecedor(
     id: int = Form(...),
     nome: str = Form(...),
     email: str = Form(...),
-    usuario_logado: dict = None
+    usuario_logado: Optional[dict] = None
 ):
-    fornecedor_atualizado = {
-        "nome": nome,
-        "email": email
-    }
-    administrador_repo.atualizar_fornecedor(id, fornecedor_atualizado)
+    # Update via usuario_repo
+    usuario = usuario_repo.obter_usuario_por_id(id)
+    if usuario:
+        usuario.nome = nome
+        usuario.email = email
+        usuario_repo.atualizar_usuario(usuario)
     return templates.TemplateResponse("administrador/listar_fornecedor.html", {"request": request})
 
 @router.post("/excluir_fornecedor")
 @requer_autenticacao(['administrador'])
-async def post_excluir_fornecedor(request: Request, id: int = Form(...), usuario_logado: dict = None):
-    administrador_repo.remover_fornecedor_por_id(id)
+async def post_excluir_fornecedor(request: Request, id: int = Form(...), usuario_logado: Optional[dict] = None):
+    fornecedor_repo.deletar_fornecedor(id)
     return templates.TemplateResponse("administrador/listar_fornecedor.html", {"request": request})
 
 # Rota dinâmica para buscar fornecedor por id
 
 @router.get("/fornecedor/{id}")
 @requer_autenticacao(['administrador'])
-async def get_fornecedor_por_id(request: Request, id: int, usuario_logado: dict = None):
-    fornecedor = administrador_repo.obter_fornecedor_por_id(id)
+async def get_fornecedor_por_id(request: Request, id: int, usuario_logado: Optional[dict] = None):
+    fornecedor = fornecedor_repo.obter_fornecedor_por_id(id)
     return templates.TemplateResponse("administrador/detalhes_fornecedor.html", {"request": request, "fornecedor": fornecedor})
 
 # Moderar Clientes
 
 @router.get("/listar_cliente")
 @requer_autenticacao(['administrador'])
-async def get_listar_cliente(request: Request, usuario_logado: dict = None):
-    clientes = administrador_repo.listar_clientes()
+async def get_listar_cliente(request: Request, usuario_logado: Optional[dict] = None):
+    clientes = cliente_repo.obter_cliente()
     return templates.TemplateResponse("administrador/listar_cliente.html", {"request": request, "clientes": clientes})
 
 @router.post("/editar_cliente")
@@ -343,32 +353,33 @@ async def post_editar_cliente(
     id: int = Form(...),
     nome: str = Form(...),
     email: str = Form(...),
-    usuario_logado: dict = None
+    usuario_logado: Optional[dict] = None
 ):
-    cliente_atualizado = {
-        "nome": nome,
-        "email": email
-    }
-    administrador_repo.atualizar_cliente(id, cliente_atualizado)
+    # Update via usuario_repo
+    usuario = usuario_repo.obter_usuario_por_id(id)
+    if usuario:
+        usuario.nome = nome
+        usuario.email = email
+        usuario_repo.atualizar_usuario(usuario)
     return templates.TemplateResponse("administrador/listar_cliente.html", {"request": request})
 
 @router.post("/excluir_cliente")
 @requer_autenticacao(['administrador'])
-async def post_excluir_cliente(request: Request, id: int = Form(...), usuario_logado: dict = None):
-    administrador_repo.remover_cliente_por_id(id)
+async def post_excluir_cliente(request: Request, id: int = Form(...), usuario_logado: Optional[dict] = None):
+    cliente_repo.deletar_cliente(id)
     return templates.TemplateResponse("administrador/listar_cliente.html", {"request": request})
 
 # Rota dinâmica para buscar cliente por id
 @router.get("/cliente/{id}")
 @requer_autenticacao(['administrador'])
-async def get_cliente_por_id(request: Request, id: int, usuario_logado: dict = None):
-    cliente = administrador_repo.obter_cliente_por_id(id)
+async def get_cliente_por_id(request: Request, id: int, usuario_logado: Optional[dict] = None):
+    cliente = cliente_repo.obter_cliente_por_id(id)
     return templates.TemplateResponse("administrador/detalhes_cliente.html", {"request": request, "cliente": cliente})
 
 # Rota para listar todos os usuários aguardando verificação de selo
 @router.get("/verificacao_selo")
 @requer_autenticacao(['administrador'])
-async def listar_usuarios_aguardando_selo(request: Request, usuario_logado: dict = None):
+async def listar_usuarios_aguardando_selo(request: Request, usuario_logado: Optional[dict] = None):
     fornecedores = [f for f in fornecedor_repo.obter_fornecedor() if not getattr(f, 'selo_confianca', False)]
     prestadores = []
     try:
@@ -383,7 +394,7 @@ async def listar_usuarios_aguardando_selo(request: Request, usuario_logado: dict
 
 @router.post("/aprovar_selo_fornecedor")
 @requer_autenticacao(['administrador'])
-async def aprovar_selo_fornecedor(request: Request, id: int = Form(...), usuario_logado: dict = None):
+async def aprovar_selo_fornecedor(request: Request, id: int = Form(...), usuario_logado: Optional[dict] = None):
     fornecedor = fornecedor_repo.obter_fornecedor_por_id(id)
     if fornecedor:
         fornecedor.selo_confianca = True
@@ -393,7 +404,7 @@ async def aprovar_selo_fornecedor(request: Request, id: int = Form(...), usuario
 # Aprovar selo de confiança para prestador
 @router.post("/aprovar_selo_prestador")
 @requer_autenticacao(['administrador'])
-async def aprovar_selo_prestador(request: Request, id: int = Form(...), usuario_logado: dict = None):
+async def aprovar_selo_prestador(request: Request, id: int = Form(...), usuario_logado: Optional[dict] = None):
     prestador = prestador_repo.obter_prestador_por_id(id)
     if prestador:
         prestador.selo_confianca = True
@@ -405,7 +416,8 @@ async def aprovar_selo_prestador(request: Request, id: int = Form(...), usuario_
 # Rota para exibir formulário de edição do próprio perfil do administrador
 @router.get("/perfil/editar")
 @requer_autenticacao(['administrador'])
-async def get_editar_perfil_administrador(request: Request, usuario_logado: dict = None):
+async def get_editar_perfil_administrador(request: Request, usuario_logado: Optional[dict] = None):
+    assert usuario_logado is not None
     adm = administrador_repo.obter_administrador_por_id(usuario_logado['id'])
     return templates.TemplateResponse("administrador/perfil_editar.html", {"request": request, "administrador": adm})
 
@@ -418,23 +430,36 @@ async def post_editar_perfil_administrador(
     email: str = Form(...),
     senha_atual: str = Form(...),
     senha_nova: str = Form(None),
-    usuario_logado: dict = None
+    usuario_logado: Optional[dict] = None
 ):
+    assert usuario_logado is not None
     adm = administrador_repo.obter_administrador_por_id(usuario_logado['id'])
     from utils.security import verificar_senha, criar_hash_senha
+
     # Verifica senha atual
+    if adm is None:
+        return templates.TemplateResponse(
+            "administrador/perfil_editar.html",
+            {"request": request, "erro": "Administrador não encontrado."}
+        )
+
     if not verificar_senha(senha_atual, adm.senha):
         return templates.TemplateResponse(
             "administrador/perfil_editar.html",
             {"request": request, "administrador": adm, "erro": "Senha atual incorreta."}
         )
-    # Atualiza dados básicos
+
+    # Atualiza dados básicos via usuario_repo
     adm.nome = nome
     adm.email = email
+
     # Atualiza senha se fornecida
     if senha_nova and senha_nova.strip():
         adm.senha = criar_hash_senha(senha_nova)
-    administrador_repo.atualizar_administrador(adm.id, adm)
+
+    # Update user via usuario_repo
+    usuario_repo.atualizar_usuario(adm)
+
     # Atualiza sessão
     usuario_logado['nome'] = nome
     usuario_logado['email'] = email
@@ -451,9 +476,11 @@ async def post_editar_perfil_administrador(
 async def upload_foto_perfil_administrador(
     request: Request,
     foto: UploadFile = File(...),
-    usuario_logado: dict = None
+    usuario_logado: Optional[dict] = None
 ):
     import os
+    assert usuario_logado is not None
+
     # Validar tipo de arquivo
     tipos_permitidos = ["image/jpeg", "image/png", "image/jpg"]
     if foto.content_type not in tipos_permitidos:
@@ -465,6 +492,9 @@ async def upload_foto_perfil_administrador(
 
     # Gerar nome único para o arquivo
     import secrets
+    if foto.filename is None:
+        return RedirectResponse("/administrador/perfil?erro=arquivo_invalido", status_code=303)
+
     extensao = foto.filename.split(".")[-1]
     nome_arquivo = f"{usuario_logado['id']}_{secrets.token_hex(8)}.{extensao}"
     caminho_arquivo = os.path.join(upload_dir, nome_arquivo)

@@ -21,7 +21,9 @@ def test_functions():
     
     # Testar obter plano por ID
     if planos:
-        primeiro_plano = plano_repo.obter_plano_por_id(planos[0].id_plano)
+        id_plano = planos[0].id_plano
+        assert id_plano is not None
+        primeiro_plano = plano_repo.obter_plano_por_id(id_plano)
         print(f"Primeiro plano: {primeiro_plano.nome_plano if primeiro_plano else 'Não encontrado'}")
     
     print("Testes concluídos!")

@@ -23,7 +23,7 @@ def criar_admin_padrao():
     if not admins:
         senha_hash = criar_hash_senha("admin123")
         admin_usuario = Usuario(
-            id=None,
+            id=0,
             nome="Administrador",
             email="admin@admin.com",
             senha=senha_hash,

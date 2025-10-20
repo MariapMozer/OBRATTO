@@ -135,14 +135,15 @@ async def processar_cadastro_prestador(
             senha=senha_hash,
             cpf_cnpj=dados_dto.cpf_cnpj,
             telefone=dados_dto.telefone,
+            cep=dados_dto.cep,
             estado=dados_dto.estado,
             cidade=dados_dto.cidade,
             rua=dados_dto.rua,
             numero=dados_dto.numero,
-            complemento=dados_dto.complemento,
+            complemento=dados_dto.complemento or "",
             bairro=dados_dto.bairro,
             tipo_usuario=dados_dto.tipo_usuario,
-            data_cadastro=datetime.now(),
+            data_cadastro=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             foto=None, # Assumindo que não há upload de foto para prestador neste momento
             token_redefinicao=None,
             data_token=None,
@@ -171,9 +172,11 @@ async def processar_cadastro_prestador(
         # Extrair mensagens de erro do Pydantic
         erros = []
         for erro in e.errors():
-            campo = erro["loc"][0] if erro["loc"] else "campo"
-            mensagem = erro["msg"]
-            erros.append(f"{campo.capitalize()}: {mensagem}")
+            loc_tuple = erro.get("loc")
+            campo = str(loc_tuple[0]) if loc_tuple and len(loc_tuple) > 0 else "campo"
+            mensagem = erro.get("msg", "")
+            campo_str = str(campo).capitalize() if isinstance(campo, (str, int)) else "campo"
+            erros.append(f"{campo_str}: {mensagem}")
 
         erro_msg = " | ".join(erros)
         # logger.warning(f"Erro de validação no cadastro de prestador: {erro_msg}")
@@ -211,10 +214,12 @@ async def post_cadastro(
     confirmar_senha: str = Form(...),
     cpf_cnpj: str = Form(...),
     telefone: str = Form(...),
+    cep: str = Form(""),
     estado: str = Form(...),
     cidade: str = Form(...),
     rua: str = Form(...),
     numero: str = Form(...),
+    complemento: str = Form(""),
     bairro: str = Form(...),
     foto: str = Form(None),
     genero: str = Form(...),
@@ -236,21 +241,33 @@ async def post_cadastro(
     }
 
     try:
+        # Convert data_nascimento string to date if provided
+        from datetime import date as date_class
+        data_nasc_obj: Optional[date_class] = None
+        if data_nascimento and data_nascimento.strip():
+            try:
+                data_nasc_obj = date_class.fromisoformat(data_nascimento)
+            except ValueError:
+                pass
+
         # Validar dados com Pydantic
         dados_dto = CriarClienteDTO(
             nome=nome,
             email=email,
             telefone=telefone,
+            cep=cep or "",
             estado=estado,
             cidade=cidade,
             rua=rua,
             numero=numero,
+            complemento=complemento or "",
             bairro=bairro,
             senha=senha,
             confirmar_senha=confirmar_senha,
             cpf_cnpj=cpf_cnpj,
+            tipo_usuario="cliente",
             genero=genero,
-            data_nascimento=data_nascimento
+            data_nascimento=data_nasc_obj
         )
 
         # Verificar se email já existe APÓS a validação do DTO
@@ -266,7 +283,7 @@ async def post_cadastro(
 
         # Criar hash da senha
         senha_hash = criar_hash_senha(dados_dto.senha)
-    
+
         # Criar objeto Cliente
         cliente = Cliente(
             id=0,
@@ -275,18 +292,20 @@ async def post_cadastro(
             senha=senha_hash,
             cpf_cnpj=cpf_cnpj,
             telefone=telefone,
+            cep=cep or "",
+            complemento=complemento or "",
             estado=estado,
             cidade=cidade,
             rua=rua,
             numero=numero,
             bairro=bairro,
             tipo_usuario="Cliente",
-            data_cadastro=None, 
+            data_cadastro=None,
             foto=foto,
             token_redefinicao=None,
             data_token=None,
             genero=genero,
-            data_nascimento=data_nascimento
+            data_nascimento=data_nasc_obj
         )
 
         # Inserir no banco de dados
@@ -309,9 +328,11 @@ async def post_cadastro(
         # Extrair mensagens de erro do Pydantic
         erros = []
         for erro in e.errors():
-            campo = erro["loc"][0] if erro["loc"] else "campo"
-            mensagem = erro["msg"]
-            erros.append(f"{campo.capitalize()}: {mensagem}")
+            loc_tuple = erro.get("loc")
+            campo = str(loc_tuple[0]) if loc_tuple and len(loc_tuple) > 0 else "campo"
+            mensagem = erro.get("msg", "")
+            campo_str = str(campo).capitalize() if isinstance(campo, (str, int)) else "campo"
+            erros.append(f"{campo_str}: {mensagem}")
 
         erro_msg = " | ".join(erros)
         # logger.warning(f"Erro de validação no cadastro de prestador: {erro_msg}")
@@ -395,8 +416,7 @@ async def processar_cadastro_fornecedor(
             razao_social=razao_social,
             complemento=complemento or "",
             cep=cep or "",
-            tipo_usuario="fornecedor",
-            foto=None
+            tipo_usuario="fornecedor"
         )
 
         # Log: valor depois da validação (limpo) — usar INFO para visibilidade
@@ -438,7 +458,8 @@ async def processar_cadastro_fornecedor(
         senha_hash = criar_hash_senha(fornecedor_dto.senha)
 
         # Garante que razao_social nunca seja None ou string vazia (usar DTO)
-        razao_social_final = fornecedor_dto.razao_social if getattr(fornecedor_dto, 'razao_social', None) and fornecedor_dto.razao_social.strip() else fornecedor_dto.nome
+        razao_social_value = getattr(fornecedor_dto, 'razao_social', None)
+        razao_social_final = razao_social_value if razao_social_value and razao_social_value.strip() else fornecedor_dto.nome
 
         # Lógica de upload de foto
         caminho_foto = None
@@ -480,7 +501,7 @@ async def processar_cadastro_fornecedor(
             complemento=getattr(fornecedor_dto, 'complemento', None) or "",
             bairro=fornecedor_dto.bairro,
             tipo_usuario="Fornecedor",
-            data_cadastro=datetime.now(),
+            data_cadastro=datetime.now().isoformat(),
             foto=caminho_foto,
             token_redefinicao=None,
             data_token=None,
@@ -509,17 +530,20 @@ async def processar_cadastro_fornecedor(
     except ValidationError as e:
         # Extrair mensagens de erro do Pydantic
         erros = []
-        campos_erro = {}
+        campos_erro: dict[str, list[str]] = {}
         # Log completo para debug (usar WARNING para visibilidade)
         logger.warning(f"[DEBUG-WARN] ValidationError.errors(): {e.errors()}")
         for erro in e.errors():
             # loc pode ser ('field',) ou ('field', 0, ...); pegamos o primeiro elemento
-            campo = erro.get('loc')[0] if erro.get('loc') else 'campo'
+            loc = erro.get('loc')
+            campo = str(loc[0]) if loc and len(loc) > 0 else 'campo'
             mensagem = erro.get('msg')
-            texto = f"{campo.capitalize()}: {mensagem}"
+            campo_str = str(campo) if not isinstance(campo, str) else campo
+            texto = f"{campo_str.capitalize()}: {mensagem}"
             erros.append(texto)
             # acumular por campo
-            campos_erro.setdefault(campo, []).append(mensagem)
+            if isinstance(mensagem, str):
+                campos_erro.setdefault(campo, []).append(mensagem)
 
         erro_msg = " | ".join(erros)
         logger.warning(f"Erro de validação no cadastro de fornecedor: {erro_msg}")
@@ -557,8 +581,8 @@ async def processar_cadastro_fornecedor(
 #--------------LOGIN/LOGOUT-----------------------------
 
 @router.get("/login")
-async def mostrar_login(request: Request, mensagem: str = None):
-    context = {"request": request}
+async def mostrar_login(request: Request, mensagem: Optional[str] = None):
+    context: dict = {"request": request}
     if mensagem:
         context["sucesso"] = mensagem
     return templates.TemplateResponse("publico/login_cadastro/login.html", context)
@@ -612,7 +636,8 @@ async def processar_login(
         # Extrair mensagens de erro do Pydantic
         erros = []
         for erro in e.errors():
-            campo = erro['loc'][0] if erro['loc'] else 'campo'
+            loc = erro['loc']
+            campo = str(loc[0]) if loc and len(loc) > 0 else 'campo'
             mensagem = erro['msg']
             erros.append(f"{campo.capitalize()}: {mensagem}")
 
@@ -689,17 +714,17 @@ async def resetar_senha_post(request: Request, token: str = Form(...), nova_senh
 
 # Rota para perfil público do prestador
 @router.get("/prestador/perfil_publico")
-async def exibir_perfil_publico(request: Request):
+async def exibir_perfil_publico_prestador(request: Request):
     return templates.TemplateResponse("publico/prestador/perfil_publico.html", {"request": request})
 
 # Rota para perfil público do cliente
 @router.get("/cliente/perfil_publico")
-async def exibir_perfil_publico(request: Request):
+async def exibir_perfil_publico_cliente(request: Request):
     return templates.TemplateResponse("publico/cliente/perfil_publico.html", {"request": request})
 
 # Rota para perfil público do fornecedor
 @router.get("/fornecedor/perfil_publico")
-async def exibir_perfil_publico(request: Request):
+async def exibir_perfil_publico_fornecedor(request: Request):
     return templates.TemplateResponse("publico/perfil_publico_fornecedor.html", {"request": request})
 
 #-----------------------------------------------------
@@ -747,9 +772,9 @@ async def exibir_conversa(request: Request, contato_id: int):
         return RedirectResponse("/mensagens", status_code=status.HTTP_303_SEE_OTHER)
     
     # Obter mensagens da conversa
-    todas_mensagens = mensagem_repo.obter_mensagem()
+    todas_mensagens = mensagem_repo.obter_mensagem(usuario["id"])
     mensagens_conversa = [
-        msg for msg in todas_mensagens 
+        msg for msg in todas_mensagens
         if (msg.id_remetente == usuario["id"] and msg.id_destinatario == contato_id) or
            (msg.id_remetente == contato_id and msg.id_destinatario == usuario["id"])
     ]

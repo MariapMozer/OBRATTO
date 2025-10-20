@@ -1,3 +1,4 @@
+from typing import Optional
 from fastapi import APIRouter, Request, Form, Response
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse, JSONResponse
@@ -32,11 +33,13 @@ templates = Jinja2Templates(directory="templates")
 @requer_autenticacao(["prestador"])
 async def mostrar_formulario_pagamento(
     request: Request,
-    plano_id: int = None,
+    plano_id: Optional[int] = None,
     tipo_pagamento: str = "plano",
-    usuario_logado: dict = None
+    usuario_logado: Optional[dict] = None
 ):
-    prestador_id = usuario_logado.id
+    assert usuario_logado is not None
+    prestador_id = usuario_logado["id"]
+    assert plano_id is not None
     plano = plano_repo.obter_plano_por_id(plano_id)
     cartoes = cartao_repo.obter_cartoes_por_prestador(prestador_id)
     return templates.TemplateResponse("publico/pagamento-prestador/dados_pagamento.html", {
@@ -68,9 +71,10 @@ async def processar_pagamento(
     cvv: str = Form(default=""),
     nome_cartao: str = Form(default=""),
     salvar_cartao: str = Form(default=""),
-    usuario_logado: dict = None
+    usuario_logado: Optional[dict] = None
 ):
-    prestador_id = usuario_logado.id
+    assert usuario_logado is not None
+    prestador_id = usuario_logado["id"]
     
     new_card_data = None
     if not cartao_salvo and metodo_pagamento == "cartao":
@@ -136,8 +140,9 @@ async def processar_pagamento(
 
 @router.get("/cartoes")
 @requer_autenticacao(["prestador"])
-async def listar_cartoes(request: Request, usuario_logado: dict = None):
-    prestador_id = usuario_logado.id
+async def listar_cartoes(request: Request, usuario_logado: Optional[dict] = None):
+    assert usuario_logado is not None
+    prestador_id = usuario_logado["id"]
     cartoes = cartao_repo.obter_cartoes_por_prestador(prestador_id)
     return templates.TemplateResponse("publico/pagamento-prestador/meus_cartoes.html", {
         "request": request,
@@ -147,8 +152,9 @@ async def listar_cartoes(request: Request, usuario_logado: dict = None):
 
 @router.get("/cartoes/adicionar")
 @requer_autenticacao(["prestador"])
-async def mostrar_adicionar_cartao(request: Request, usuario_logado: dict = None):
-    prestador_id = usuario_logado.id
+async def mostrar_adicionar_cartao(request: Request, usuario_logado: Optional[dict] = None):
+    assert usuario_logado is not None
+    prestador_id = usuario_logado["id"]
     return templates.TemplateResponse("publico/pagamento-prestador/adicionar_cartao.html", {
         "request": request,
         "id_prestador": prestador_id
@@ -164,12 +170,13 @@ async def adicionar_cartao(
     ano_vencimento: str = Form(...),
     apelido: str = Form(...),
     principal: str = Form(None),
-    usuario_logado: dict = None
+    usuario_logado: Optional[dict] = None
 ):
-    prestador_id = usuario_logado.id
+    assert usuario_logado is not None
+    prestador_id = usuario_logado["id"]
     try:
         resultado = payment_service.add_card(
-            id_prestador=prestador_id,
+            prestador_id=prestador_id,
             numero_cartao=numero_cartao,
             nome_titular=nome_titular,
             mes_vencimento=mes_vencimento,
@@ -194,10 +201,11 @@ async def adicionar_cartao(
 
 @router.get("/cartoes/editar/{id_cartao}")
 @requer_autenticacao(["prestador"])
-async def mostrar_editar_cartao(request: Request, id_cartao: int, usuario_logado: dict = None):
-    prestador_id = usuario_logado.id
+async def mostrar_editar_cartao(request: Request, id_cartao: int, usuario_logado: Optional[dict] = None):
+    assert usuario_logado is not None
+    prestador_id = usuario_logado["id"]
     cartao = cartao_repo.obter_cartao_por_id(id_cartao)
-    if not cartao or cartao.id_prestador != prestador_id:
+    if not cartao or cartao.id_fornecedor != prestador_id:
         return RedirectResponse(url="/prestador/pagamento/cartoes", status_code=303)
     return templates.TemplateResponse("publico/pagamento-prestador/adicionar_cartao.html", {
         "request": request,
@@ -213,9 +221,10 @@ async def editar_cartao(
     nome_titular: str = Form(...),
     apelido: str = Form(...),
     principal: str = Form(None),
-    usuario_logado: dict = None
+    usuario_logado: Optional[dict] = None
 ):
-    prestador_id = usuario_logado.id
+    assert usuario_logado is not None
+    prestador_id = usuario_logado["id"]
     try:
         resultado = payment_service.update_card(
             id_cartao=id_cartao,
@@ -245,10 +254,11 @@ async def editar_cartao(
 
 @router.get("/cartoes/excluir/{id_cartao}")
 @requer_autenticacao(["prestador"])
-async def mostrar_confirmar_exclusao(request: Request, id_cartao: int, usuario_logado: dict = None):
-    prestador_id = usuario_logado.id
+async def mostrar_confirmar_exclusao(request: Request, id_cartao: int, usuario_logado: Optional[dict] = None):
+    assert usuario_logado is not None
+    prestador_id = usuario_logado["id"]
     cartao = cartao_repo.obter_cartao_por_id(id_cartao)
-    if not cartao or cartao.id_prestador != prestador_id:
+    if not cartao or cartao.id_fornecedor != prestador_id:
         return RedirectResponse(url="/prestador/pagamento/cartoes", status_code=303)
     return templates.TemplateResponse("publico/pagamento-prestador/confirmar_exclusao_cartao.html", {
         "request": request,
@@ -257,8 +267,9 @@ async def mostrar_confirmar_exclusao(request: Request, id_cartao: int, usuario_l
 
 @router.post("/cartoes/excluir/{id_cartao}")
 @requer_autenticacao(["prestador"])
-async def excluir_cartao(request: Request, id_cartao: int, usuario_logado: dict = None):
-    prestador_id = usuario_logado.id
+async def excluir_cartao(request: Request, id_cartao: int, usuario_logado: Optional[dict] = None):
+    assert usuario_logado is not None
+    prestador_id = usuario_logado["id"]
     try:
         resultado = payment_service.delete_card(id_cartao, prestador_id)
         if resultado:
@@ -280,12 +291,17 @@ async def excluir_cartao(request: Request, id_cartao: int, usuario_logado: dict 
 
 @router.post("/cartoes/definir_principal")
 @requer_autenticacao(["prestador"])
-async def definir_cartao_principal(request: Request, usuario_logado: dict = None):
+async def definir_cartao_principal(request: Request, usuario_logado: Optional[dict] = None):
     form = await request.form()
-    id_cartao = form.get("id_cartao")
-    prestador_id = usuario_logado.id
+    id_cartao_raw = form.get("id_cartao")
+    assert usuario_logado is not None
+    prestador_id = usuario_logado["id"]
 
-    resultado = payment_service.set_main_card(int(id_cartao), prestador_id)
+    if isinstance(id_cartao_raw, str):
+        id_cartao = int(id_cartao_raw)
+    else:
+        id_cartao = 0
+    resultado = payment_service.set_main_card(id_cartao, prestador_id)
     if resultado:
         return RedirectResponse(url=f"/prestador/pagamento/cartoes", status_code=303)
     else:

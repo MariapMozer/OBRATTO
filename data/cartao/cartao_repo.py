@@ -144,7 +144,7 @@ class CartaoRepository:
                 for row in rows:
                     cartao = CartaoCredito(
                         id_cartao=row[0],
-                        id_prestador=row[1],
+                        id_fornecedor=row[1],
                         nome_titular=row[2],
                         numero_cartao_criptografado=row[3],
                         ultimos_4_digitos=row[4],

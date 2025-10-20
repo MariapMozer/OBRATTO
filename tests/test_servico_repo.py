@@ -30,25 +30,37 @@ class TestServicoRepo:
             senha="123456",
             cpf_cnpj="12345678900",
             telefone="999999999",
-            endereco="Rua Exemplo, 123",
-            tipo_usuario="prestador", 
+            cep="88888-888",
+            rua="Rua Teste",
+            numero="123",
+            complemento="",
+            bairro="Centro",
+            cidade="Vitória",
+            estado="ES",
+            tipo_usuario="prestador",
             data_cadastro=datetime.now().isoformat()
         )
 
         id_usuario = inserir_usuario(usuario)
+        assert id_usuario is not None
 
         prestador = Prestador(
-            id=id_usuario, 
+            id=id_usuario,
             nome=usuario.nome,
             email=usuario.email,
             senha=usuario.senha,
             cpf_cnpj=usuario.cpf_cnpj,
             telefone=usuario.telefone,
+            cep=usuario.cep,
+            rua=usuario.rua,
+            numero=usuario.numero,
+            complemento=usuario.complemento,
+            bairro=usuario.bairro,
+            cidade=usuario.cidade,
+            estado=usuario.estado,
             data_cadastro=usuario.data_cadastro,
-            endereco=usuario.endereco,
             tipo_usuario=usuario.tipo_usuario,
             area_atuacao="TI",
-            tipo_pessoa="Física",
             razao_social=None,
             descricao_servicos=None
         )
@@ -78,6 +90,7 @@ class TestServicoRepo:
         )
 
         id_inserido = inserir_servico(servico)
+        assert id_inserido is not None
         servico_db = obter_servico_por_id(id_inserido)
 
         print("ID inserido:", id_inserido)
@@ -122,6 +135,7 @@ class TestServicoRepo:
             valor_base=120.0
         )
         id_inserido = inserir_servico(servico)
+        assert id_inserido is not None
         resultado = obter_servico_por_id(id_inserido)
 
         assert resultado is not None
@@ -176,6 +190,7 @@ class TestServicoRepo:
             valor_base=100.0
         )
         id_servico = inserir_servico(servico)
+        assert id_servico is not None
 
         servico_atualizado = Servico(
             id_servico=id_servico,
@@ -189,7 +204,9 @@ class TestServicoRepo:
         resultado = atualizar_servico(servico_atualizado)
         assert resultado is True
 
+        assert id_servico is not None
         atualizado = obter_servico_por_id(id_servico)
+        assert atualizado is not None
         assert atualizado.titulo == "Serviço Novo"
         assert atualizado.valor_base == 300.0
 
@@ -208,9 +225,11 @@ class TestServicoRepo:
             valor_base=90.0
         )
         id_servico = inserir_servico(servico)
+        assert id_servico is not None
 
         resultado = deletar_servico(id_servico)
         assert resultado is True
 
+        assert id_servico is not None
         apagado = obter_servico_por_id(id_servico)
         assert apagado is None

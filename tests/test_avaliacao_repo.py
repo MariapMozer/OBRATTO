@@ -41,10 +41,17 @@ class TestAvaliacaoRepo:
             cpf_cnpj="11111111111",
             telefone="11999999999",
             data_cadastro=datetime.now().isoformat(),
-            endereco="Rua A, 123",
+            cep="12345-678",
+            rua="Rua A",
+            numero="123",
+            complemento="",
+            bairro="Centro",
+            cidade="São Paulo",
+            estado="SP",
             tipo_usuario="cliente"
         )
         id_usuario_avaliador = inserir_usuario(usuario_avaliador)
+        assert id_usuario_avaliador is not None
 
         cliente = Cliente(
             id=id_usuario_avaliador,
@@ -54,13 +61,20 @@ class TestAvaliacaoRepo:
             cpf_cnpj="11111111111",
             telefone="11999999999",
             data_cadastro=datetime.now().isoformat(),
-            endereco="Rua A, 123",
+            cep="12345-678",
+            rua="Rua A",
+            numero="123",
+            complemento="",
+            bairro="Centro",
+            cidade="São Paulo",
+            estado="SP",
             tipo_usuario="cliente",
             genero="Feminino",
             data_nascimento=datetime.strptime("2000-01-01", "%Y-%m-%d").date()
         )
-        
+
         id_cliente = inserir_cliente(cliente)
+        assert id_cliente is not None
         cliente.id = id_cliente
 
         usuario_prestador = Usuario(
@@ -71,10 +85,17 @@ class TestAvaliacaoRepo:
             cpf_cnpj="22222222222",
             telefone="11999999999",
             data_cadastro=datetime.now().isoformat(),
-            endereco="Rua B, 456",
+            cep="98765-432",
+            rua="Rua B",
+            numero="456",
+            complemento="",
+            bairro="Vila Nova",
+            cidade="Rio de Janeiro",
+            estado="RJ",
             tipo_usuario="prestador"
         )
         id_usuario_prestador = inserir_usuario(usuario_prestador)
+        assert id_usuario_prestador is not None
 
         prestador = Prestador(
             id=id_usuario_prestador,
@@ -83,16 +104,22 @@ class TestAvaliacaoRepo:
             senha="123",
             cpf_cnpj="22222222222",
             telefone="11999999999",
-            endereco="Rua B, 456",
+            cep="98765-432",
+            rua="Rua B",
+            numero="456",
+            complemento="",
+            bairro="Vila Nova",
+            cidade="Rio de Janeiro",
+            estado="RJ",
             tipo_usuario="prestador",
             data_cadastro=datetime.now().isoformat(),
             area_atuacao="Limpeza",
-            tipo_pessoa="Física",
             razao_social="Avaliado Prestador",
             descricao_servicos="Serviço de limpeza"
         )
 
         id_prestador = inserir_prestador(prestador)
+        assert id_prestador is not None
         prestador.id = id_prestador
 
         avaliacao = Avaliacao(
@@ -105,6 +132,7 @@ class TestAvaliacaoRepo:
         )
         id_avaliacao = inserir_avaliacao(avaliacao)
 
+        assert id_avaliacao is not None
         return id_avaliacao
 
     def test_inserir_avaliacao(self, test_db):
@@ -125,8 +153,14 @@ class TestAvaliacaoRepo:
             cpf_cnpj="12345678900",
             telefone="11999999999",
             data_cadastro=datetime.now().isoformat(),
-            endereco="Rua A, 123",
-            tipo_usuario="cliente"
+            tipo_usuario="cliente",
+            cep="88888-888",
+            rua="Rua Teste",
+            numero="123",
+            complemento="",
+            bairro="Centro",
+            cidade="Vitória",
+            estado="ES"
         )
 
         usuario2 = Usuario(
@@ -137,8 +171,14 @@ class TestAvaliacaoRepo:
             cpf_cnpj="98765432100",
             telefone="21999999999",
             data_cadastro=datetime.now().isoformat(),
-            endereco="Rua B, 456",
-            tipo_usuario="fornecedor"
+            tipo_usuario="fornecedor",
+            cep="88888-888",
+            rua="Rua Teste",
+            numero="123",
+            complemento="",
+            bairro="Centro",
+            cidade="Vitória",
+            estado="ES"
         )
         id1 = inserir_usuario(usuario1)
         id2 = inserir_usuario(usuario2)
@@ -153,6 +193,7 @@ class TestAvaliacaoRepo:
         )
 
         id_avaliacao = inserir_avaliacao(avaliacao)
+        assert id_avaliacao is not None
         avaliacao_db = obter_avaliacao_por_id(id_avaliacao)
         #Assert
         assert avaliacao_db is not None
@@ -282,6 +323,7 @@ class TestAvaliacaoRepo:
         #Act
         id_avaliacao = self.inserir_avaliacao_para_teste()
         avaliacao = obter_avaliacao_por_id(id_avaliacao)
+        assert avaliacao is not None
         avaliacao.descricao = "Avaliação atualizada"
         resultado = atualizar_avaliacao(avaliacao)
         #Assert

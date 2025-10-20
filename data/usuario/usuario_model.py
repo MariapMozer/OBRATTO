@@ -21,7 +21,7 @@ class Usuario:
     estado: str
     tipo_usuario: str
     data_cadastro: Optional[str] = None
-    foto: str = None
+    foto: Optional[str] = None
     token_redefinicao: Optional[str] = None
     data_token: Optional[str] = None
 

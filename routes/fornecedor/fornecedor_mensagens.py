@@ -1,3 +1,4 @@
+from typing import Optional
 from fastapi import APIRouter, Request, Form, HTTPException
 from utils.auth_decorator import requer_autenticacao
 from fastapi.templating import Jinja2Templates
@@ -10,7 +11,8 @@ templates = Jinja2Templates(directory="templates")
 # Listar mensagens recebidas pelo fornecedor
 @router.get("/recebidas")
 @requer_autenticacao(['fornecedor'])
-async def listar_mensagens_recebidas(request: Request, usuario_logado: dict = None):
+async def listar_mensagens_recebidas(request: Request, usuario_logado: Optional[dict] = None):
+    assert usuario_logado is not None
     mensagens = mensagem_repo.obter_mensagem(usuario_logado["id"])
     return templates.TemplateResponse(
         "fornecedor/mensagens/mensagens_recebidas.html",
@@ -20,8 +22,10 @@ async def listar_mensagens_recebidas(request: Request, usuario_logado: dict = No
 # Listar mensagens enviadas pelo fornecedor
 @router.get("/enviadas")
 @requer_autenticacao(['fornecedor'])
-async def listar_mensagens_enviadas(request: Request, usuario_logado: dict = None):
-    mensagens = mensagem_repo.obter_mensagens_enviadas(usuario_logado.id)
+async def listar_mensagens_enviadas(request: Request, usuario_logado: Optional[dict] = None):
+    assert usuario_logado is not None
+    # TODO: Implement obter_mensagens_enviadas or filter obter_mensagem results
+    mensagens = mensagem_repo.obter_mensagem(usuario_logado["id"])
     return templates.TemplateResponse(
         "fornecedor/mensagens_enviadas.html",
         {"request": request, "mensagens": mensagens}
@@ -30,9 +34,10 @@ async def listar_mensagens_enviadas(request: Request, usuario_logado: dict = Non
 # Visualizar mensagem específica
 @router.get("/{id_mensagem}")
 @requer_autenticacao(['fornecedor'])
-async def visualizar_mensagem(request: Request, id_mensagem: int, usuario_logado: dict = None):
+async def visualizar_mensagem(request: Request, id_mensagem: int, usuario_logado: Optional[dict] = None):
+    assert usuario_logado is not None
     mensagem = mensagem_repo.obter_mensagem_por_id(id_mensagem)
-    if not mensagem or mensagem.id_destinatario != usuario_logado.id:
+    if not mensagem or mensagem.id_destinatario != usuario_logado["id"]:
         raise HTTPException(status_code=404, detail="Mensagem não encontrada")
     return templates.TemplateResponse(
         "fornecedor/mensagem_detalhe.html",
@@ -42,8 +47,20 @@ async def visualizar_mensagem(request: Request, id_mensagem: int, usuario_logado
 # Enviar nova mensagem
 @router.post("/enviar")
 @requer_autenticacao(['fornecedor'])
-async def enviar_mensagem(request: Request, destinatario_id: int = Form(...), conteudo: str = Form(...), usuario_logado: dict = None):
-    mensagem_repo.enviar_mensagem(usuario_logado.id, destinatario_id, conteudo)
+async def enviar_mensagem_fornecedor(request: Request, destinatario_id: int = Form(...), conteudo: str = Form(...), usuario_logado: Optional[dict] = None):
+    assert usuario_logado is not None
+    from data.mensagem.mensagem_model import Mensagem
+    from datetime import datetime
+    mensagem = Mensagem(
+        id_mensagem=0,
+        id_remetente=usuario_logado["id"],
+        id_destinatario=destinatario_id,
+        conteudo=conteudo,
+        data_hora=datetime.now(),
+        nome_remetente="",
+        nome_destinatario=""
+    )
+    mensagem_repo.inserir_mensagem(mensagem)
     return templates.TemplateResponse(
         "fornecedor/mensagem_enviada_sucesso.html",
         {"request": request}
@@ -52,7 +69,7 @@ async def enviar_mensagem(request: Request, destinatario_id: int = Form(...), co
 # # Chat / Conversação com outro usuário
 # @router.get("/chat/{id_usuario}")
 # @requer_autenticacao(['fornecedor'])
-# async def abrir_chat(request: Request, id_usuario: int, usuario_logado: dict = None):
+# async def abrir_chat(request: Request, id_usuario: int, usuario_logado: Optional[dict] = None):
 #     """
 #     Abre a tela de chat/conversação com um usuário específico.
 #     Mostra todo o histórico de mensagens trocadas entre os dois usuários.
@@ -93,7 +110,7 @@ async def enviar_mensagem(request: Request, destinatario_id: int = Form(...), co
 #     request: Request, 
 #     id_usuario: int, 
 #     mensagem: str = Form(...), 
-#     usuario_logado: dict = None
+#     usuario_logado: Optional[dict] = None
 # ):
 #     """
 #     Envia uma mensagem no chat (usado via AJAX).

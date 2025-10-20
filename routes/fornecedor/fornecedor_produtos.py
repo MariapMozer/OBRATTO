@@ -1,3 +1,4 @@
+from typing import Optional
 from fastapi import APIRouter, Request, Form, UploadFile, File, Query
 from utils.auth_decorator import requer_autenticacao
 from fastapi.templating import Jinja2Templates
@@ -13,7 +14,8 @@ templates = Jinja2Templates(directory="templates")
 ## Página inicial do fornecedor, exibe lista de produtos cadastrados
 @router.get("/")
 @requer_autenticacao(['fornecedor'])
-async def home_adm(request: Request, usuario_logado: dict = None):
+async def home_adm(request: Request, usuario_logado: Optional[dict] = None):
+    assert usuario_logado is not None
     produtos = produto_repo.obter_produtos_por_fornecedor(usuario_logado['id'], limit=10, offset=0)
     return templates.TemplateResponse(
         "fornecedor/home_fornecedor.html", 
@@ -23,13 +25,14 @@ async def home_adm(request: Request, usuario_logado: dict = None):
 @router.get("/buscar")
 @requer_autenticacao(['fornecedor'])
 async def buscar_produto(
-    request: Request, 
+    request: Request,
     id: str = Query("", description="ID do produto"),
     nome: str = Query("", description="Nome do produto"),
-    usuario_logado: dict = None
+    usuario_logado: Optional[dict] = None
 ):
+    assert usuario_logado is not None
     produtos = []
-    
+
     # Converter ID para int se não estiver vazio
     produto_id = None
     if id and id.strip():
@@ -37,7 +40,7 @@ async def buscar_produto(
             produto_id = int(id)
         except ValueError:
             produto_id = None
-    
+
     if produto_id is not None:
         produto = produto_repo.obter_produto_por_id(produto_id)
         if produto and produto.fornecedor_id == usuario_logado['id']:
@@ -54,7 +57,8 @@ async def buscar_produto(
 
 @router.get("/listar")
 @requer_autenticacao(['fornecedor'])
-async def listar_produtos(request: Request, usuario_logado: dict = None):
+async def listar_produtos(request: Request, usuario_logado: Optional[dict] = None):
+    assert usuario_logado is not None
     produtos = produto_repo.obter_produtos_por_fornecedor(usuario_logado['id'], limit=10, offset=0)
     response = templates.TemplateResponse(
         "fornecedor/produtos/produtos.html", 
@@ -79,8 +83,9 @@ async def cadastrar_produto(
     preco: float = Form(...),
     quantidade: int = Form(...),
     foto: UploadFile = File(...),
-    usuario_logado: dict = None
+    usuario_logado: Optional[dict] = None
 ):
+    assert usuario_logado is not None
     import os
     tipos_permitidos = ["image/jpeg", "image/png", "image/jpg", "image/webp", "image/avif"]
     pasta_fotos = "static/uploads/produtos_fornecedor"
@@ -100,17 +105,17 @@ async def cadastrar_produto(
         with open(caminho_arquivo, "wb") as f:
             f.write(conteudo)
         caminho_foto = f"/static/uploads/produtos_fornecedor/{nome_arquivo}"
-    
+
     produto = Produto(
-        id=None, 
-        nome=nome, 
-        descricao=descricao, 
-        preco=preco, 
-        quantidade=quantidade, 
+        id=None,
+        nome=nome,
+        descricao=descricao,
+        preco=preco,
+        quantidade=quantidade,
         foto=caminho_foto,
         fornecedor_id=usuario_logado['id']
     )
-    
+
     produto_repo.inserir_produto(produto)
     produtos = produto_repo.obter_produtos_por_fornecedor(usuario_logado['id'], limit=10, offset=0)
     response = templates.TemplateResponse(
@@ -122,12 +127,13 @@ async def cadastrar_produto(
 
 @router.get("/atualizar/{id}")
 @requer_autenticacao(['fornecedor'])
-async def mostrar_formulario_atualizar_produto(request: Request, id: int, usuario_logado: dict = None):
+async def mostrar_formulario_atualizar_produto(request: Request, id: int, usuario_logado: Optional[dict] = None):
+    assert usuario_logado is not None
     produto = produto_repo.obter_produto_por_id(id)
     if produto and produto.fornecedor_id == usuario_logado['id']:
         response = templates.TemplateResponse(
-            "fornecedor/produtos/alterar_produtos.html", 
-            {"request": request, 
+            "fornecedor/produtos/alterar_produtos.html",
+            {"request": request,
              "produto": produto})
     else:
         produtos = produto_repo.obter_produtos_por_fornecedor(usuario_logado['id'], limit=10, offset=0)
@@ -148,8 +154,9 @@ async def atualizar_produto(
     preco: float = Form(...),
     quantidade: int = Form(...),
     foto: UploadFile = File(None),
-    usuario_logado: dict = None
+    usuario_logado: Optional[dict] = None
 ):
+    assert usuario_logado is not None
     produto = produto_repo.obter_produto_por_id(id)
     if not produto or produto.fornecedor_id != usuario_logado['id']:
         produtos = produto_repo.obter_produtos_por_fornecedor(usuario_logado['id'], limit=10, offset=0)
@@ -195,7 +202,8 @@ async def atualizar_produto(
 
 @router.get("/excluir/{id}")
 @requer_autenticacao(['fornecedor'])
-async def excluir_produto_get(request: Request, id: int, usuario_logado: dict = None):
+async def excluir_produto_get(request: Request, id: int, usuario_logado: Optional[dict] = None):
+    assert usuario_logado is not None
     produto = produto_repo.obter_produto_por_id(id)
     if produto and produto.fornecedor_id == usuario_logado['id']:
         # Apagar a imagem do sistema de arquivos
@@ -221,7 +229,8 @@ async def excluir_produto_get(request: Request, id: int, usuario_logado: dict = 
 
 @router.post("/excluir/{id}")
 @requer_autenticacao(['fornecedor'])
-async def excluir_produto(request: Request, id: int, usuario_logado: dict = None):
+async def excluir_produto(request: Request, id: int, usuario_logado: Optional[dict] = None):
+    assert usuario_logado is not None
     produto = produto_repo.obter_produto_por_id(id)
     if produto and produto.fornecedor_id == usuario_logado['id']:
         # Apagar a imagem do sistema de arquivos
@@ -247,7 +256,8 @@ async def excluir_produto(request: Request, id: int, usuario_logado: dict = None
 
 @router.get("/confi_exclusao/{id}")
 @requer_autenticacao(['fornecedor'])
-async def confi_exclusao_produto(request: Request, id: int,  usuario_logado: dict = None):
+async def confi_exclusao_produto(request: Request, id: int,  usuario_logado: Optional[dict] = None):
+    assert usuario_logado is not None
     produto = produto_repo.obter_produto_por_id(id)
     if produto and produto.fornecedor_id == usuario_logado['id']:
         return templates.TemplateResponse(

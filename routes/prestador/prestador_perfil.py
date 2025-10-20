@@ -65,17 +65,18 @@ async def processar_edicao_perfil_prestador(
 # Rota para visualizar alteração de foto
 @router.get("/perfil/alterar-foto")
 @requer_autenticacao(["prestador"])
-async def alterar_foto(request: Request, usuario_logado: dict = None):
+async def mostrar_alterar_foto(request: Request, usuario_logado: Optional[dict] = None):
     return templates.TemplateResponse("prestador/perfil/foto/dados.html", {"request": request, "usuario": usuario_logado})
 
 # Rota para processar alteração de foto
 @router.post("/perfil/alterar-foto")
-@requer_autenticacao("prestador")
+@requer_autenticacao(["prestador"])
 async def alterar_foto(
     request: Request,
-    foto: UploadFile = File(...), 
-    usuario_logado: dict = None
+    foto: UploadFile = File(...),
+    usuario_logado: Optional[dict] = None
 ):
+    assert usuario_logado is not None
     # 1. Validar tipo de arquivo
     tipos_permitidos = ["image/jpeg", "image/png", "image/jpg"]
     if foto.content_type not in tipos_permitidos:
@@ -87,7 +88,11 @@ async def alterar_foto(
 
     # 3. Gerar nome único para evitar conflitos
     import secrets
-    extensao = foto.filename.split(".")[-1]
+    filename = foto.filename
+    if filename:
+        extensao = filename.split(".")[-1]
+    else:
+        extensao = "jpg"
     nome_arquivo = f"{usuario_logado['id']}_{secrets.token_hex(8)}.{extensao}"
     caminho_arquivo = os.path.join(upload_dir, nome_arquivo)
 

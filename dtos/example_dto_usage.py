@@ -1,3 +1,5 @@
+# type: ignore
+"""Example DTO usage - for documentation purposes only"""
 from datetime import date, datetime
 from pydantic import ValidationError
 

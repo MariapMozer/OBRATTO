@@ -17,7 +17,7 @@ templates = Jinja2Templates(directory="templates")
 # Rota para exibir a galeria
 @router.get("/{id}/galeria")
 @requer_autenticacao(["admin"])
-async def get_galeria(request: Request, id: int, usuario_logado: dict = None):
+async def get_galeria(request: Request, id: int, usuario_logado: Optional[dict] = None):
     servico = servico_repo.obter_servico_por_id(id)
     if not servico:
         return RedirectResponse("/admin/servico", status.HTTP_303_SEE_OTHER)
@@ -39,7 +39,7 @@ async def post_galeria_upload(
     request: Request,
     id: int,
     fotos: list[UploadFile] = File(...),  # ← Recebe múltiplas fotos
-    usuario_logado: dict = None
+    usuario_logado: Optional[dict] = None
 ):
     servico = servico_repo.obter_servico_por_id(id)
     if not servico:
@@ -64,7 +64,7 @@ async def post_galeria_excluir(
     request: Request,
     id: int,
     numero: int,  # ← Número da foto a ser excluída (001, 002, etc.)
-    usuario_logado: dict = None
+    usuario_logado: Optional[dict] = None
 ):
     servico = servico_repo.obter_servico_por_id(id)
     if not servico:
@@ -84,7 +84,7 @@ async def post_galeria_reordenar(
     request: Request,
     id: int,
     nova_ordem: str = Form(...),  # ← Recebe string: "1,3,2,4"
-    usuario_logado: dict = None
+    usuario_logado: Optional[dict] = None
 ):
     servico = servico_repo.obter_servico_por_id(id)
     if not servico:
@@ -110,7 +110,7 @@ async def post_galeria_reordenar(
 #     valor_base: int = Form(...),
 #     nome_prestador: int = Form(...),
 #     foto: Optional[UploadFile] = File(None),  # ← Foto opcional no cadastro
-#     usuario_logado: dict = None
+#     usuario_logado: Optional[dict] = None
 # ):
 #     # 1. Criar produto primeiro
 #     servico = Servico(

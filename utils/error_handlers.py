@@ -3,13 +3,15 @@ Decoradores e handlers para tratamento de erros
 """
 
 import functools
+import logging
 from typing import Callable, Optional
 from fastapi import Request
 from fastapi.templating import Jinja2Templates
 from pydantic import ValidationError
 from utils.exceptions import ValidacaoError, RecursoNaoEncontradoError, ObrattoError
-from infrastructure.logging import logger
 from utils.flash_messages import informar_erro, informar_sucesso
+
+logger = logging.getLogger(__name__)
 
 
 def tratar_erro_rota(template_erro: Optional[str] = None,
@@ -36,8 +38,7 @@ def tratar_erro_rota(template_erro: Optional[str] = None,
             except ValidationError as e:
                 # Extrair primeira mensagem de erro do Pydantic
                 error_msg = e.errors()[0]["msg"]
-                logger.warning("Erro de validação Pydantic",
-                             erro=error_msg, rota=str(request.url))
+                logger.warning(f"Erro de validação Pydantic: {error_msg} - Rota: {request.url}")
 
                 if template_erro:
                     templates = Jinja2Templates(directory="templates")
@@ -47,8 +48,7 @@ def tratar_erro_rota(template_erro: Optional[str] = None,
                     })
 
             except ValidacaoError as e:
-                logger.warning("Erro de validação customizado",
-                             erro=e, rota=str(request.url))
+                logger.warning(f"Erro de validação customizado: {e} - Rota: {request.url}")
                 informar_erro(request, f"Dados inválidos: {e.mensagem}")
 
                 if template_erro:
@@ -59,15 +59,15 @@ def tratar_erro_rota(template_erro: Optional[str] = None,
                     })
 
             except RecursoNaoEncontradoError as e:
-                logger.info("Recurso não encontrado", erro=e, rota=str(request.url))
+                logger.info(f"Recurso não encontrado: {e} - Rota: {request.url}")
                 informar_erro(request, e.mensagem)
 
             except ObrattoError as e:
-                logger.error("Erro de negócio", erro=e, rota=str(request.url))
+                logger.error(f"Erro de negócio: {e} - Rota: {request.url}")
                 informar_erro(request, e.mensagem)
 
             except Exception as e:
-                logger.error("Erro inesperado", erro=e, rota=str(request.url))
+                logger.error(f"Erro inesperado: {e} - Rota: {request.url}")
                 informar_erro(request, "Erro interno. Tente novamente.")
 
             # Fallback para redirect ou template

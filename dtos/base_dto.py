@@ -48,7 +48,7 @@ class BaseDTO(BaseModel):
         return {"exemplo": "Sobrescrever na classe filha", **overrides}
 
     @classmethod
-    def validar_campo_wrapper(cls, validador_func, campo_nome: str = ""):
+    def validar_campo_wrapper(cls, validador_func, campo_nome: str = "", **validator_kwargs):
         """
         Wrapper para padronizar o tratamento de erros de validação.
         Evita repetir try/except em cada field_validator.
@@ -56,16 +56,17 @@ class BaseDTO(BaseModel):
         Args:
             validador_func: Função de validação a ser envolvida
             campo_nome: Nome do campo para mensagens de erro
+            **validator_kwargs: Argumentos adicionais para o validador (min_chars, max_chars, etc.)
 
         Returns:
             Função wrapper que trata os erros automaticamente
         """
-        def wrapper(valor, **kwargs):
+        def wrapper(valor):
             try:
                 if campo_nome:
-                    return validador_func(valor, campo_nome, **kwargs)
+                    return validador_func(valor, campo_nome, **validator_kwargs)
                 else:
-                    return validador_func(valor, **kwargs)
+                    return validador_func(valor, **validator_kwargs)
             except ValidacaoError as e:
                 raise ValueError(str(e))
         return wrapper

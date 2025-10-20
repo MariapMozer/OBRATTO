@@ -30,6 +30,7 @@ def testar_fluxo_pagamento():
     
     if assinatura_ativa:
         plano_atual = plano_repo.obter_plano_por_id(assinatura_ativa.id_plano)
+        assert plano_atual is not None
         print(f"   ✅ Assinatura ativa: {plano_atual.nome_plano}")
     else:
         print(f"   ⚠️ Nenhuma assinatura ativa")

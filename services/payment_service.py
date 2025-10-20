@@ -6,6 +6,7 @@ from data.plano.plano_repo import PlanoRepository
 from data.cartao.cartao_repo import CartaoRepository
 from services.mercadopago_service import MercadoPagoService
 from datetime import datetime
+from typing import Optional, Any
 
 class PaymentService:
     def __init__(self):
@@ -15,7 +16,7 @@ class PaymentService:
         self.cartao_repo = CartaoRepository()
         self.mercadopago_service = MercadoPagoService()
 
-    async def process_plan_payment(self, prestador_id: int, plano_id: int, valor: float, metodo_pagamento: str, cartao_salvo_id: int = None, new_card_data: dict = None):
+    async def process_plan_payment(self, prestador_id: int, plano_id: int, valor: float, metodo_pagamento: str, cartao_salvo_id: Optional[int] = None, new_card_data: Optional[dict[Any, Any]] = None):
         plano = self.plano_repo.obter_plano_por_id(plano_id)
         if not plano:
             return {"success": False, "message": "Plano não encontrado.", "status_code": 404}
@@ -28,7 +29,7 @@ class PaymentService:
         # Handle card data
         if cartao_salvo_id:
             cartao_usado = self.cartao_repo.obter_cartao_por_id(cartao_salvo_id)
-            if not cartao_usado or cartao_usado.id_prestador != prestador_id:
+            if not cartao_usado or cartao_usado.id_fornecedor != prestador_id:
                 return {"success": False, "message": "Cartão selecionado não é válido.", "status_code": 400}
             # Use tokenized card or reference from Mercado Pago
             # For now, simulate with saved card
@@ -41,7 +42,7 @@ class PaymentService:
                     mes_vencimento, ano_vencimento = new_card_data["validade"].split("/")
                     numero_cartao = new_card_data["numero_cartao"].replace(" ", "")
                     self.cartao_repo.criar_cartao_from_form(
-                        id_prestador=prestador_id,
+                        id_fornecedor=prestador_id,
                         numero_cartao=numero_cartao,
                         nome_titular=new_card_data["nome_cartao"],
                         mes_vencimento=mes_vencimento,
@@ -96,7 +97,7 @@ class PaymentService:
         pagamento = Pagamento(
             id_pagamento=0,
             plano_id=plano_id,
-            prestador_id=prestador_id,
+            fornecedor_id=prestador_id,
             mp_payment_id=str(mp_payment_id),
             mp_preference_id=str(mp_preference_id),
             valor=valor,
@@ -146,7 +147,7 @@ class PaymentService:
         # and storing the token, not the full card number.
         # For now, it uses the existing repo method.
         return self.cartao_repo.criar_cartao_from_form(
-            id_prestador=prestador_id,
+            id_fornecedor=prestador_id,
             numero_cartao=numero_cartao,
             nome_titular=nome_titular,
             mes_vencimento=mes_vencimento,
@@ -157,7 +158,7 @@ class PaymentService:
 
     def update_card(self, id_cartao: int, prestador_id: int, nome_titular: str, apelido: str, principal: bool):
         cartao = self.cartao_repo.obter_cartao_por_id(id_cartao)
-        if not cartao or cartao.id_prestador != prestador_id:
+        if not cartao or cartao.id_fornecedor != prestador_id:
             return False
         cartao.nome_titular = nome_titular.strip().upper()
         cartao.apelido = apelido.strip()
@@ -166,13 +167,13 @@ class PaymentService:
 
     def delete_card(self, id_cartao: int, prestador_id: int):
         cartao = self.cartao_repo.obter_cartao_por_id(id_cartao)
-        if not cartao or cartao.id_prestador != prestador_id:
+        if not cartao or cartao.id_fornecedor != prestador_id:
             return False
-        return self.cartao_repo.remover_cartao(id_cartao)
+        return self.cartao_repo.excluir_cartao(id_cartao)
 
     def set_main_card(self, id_cartao: int, prestador_id: int):
         cartao = self.cartao_repo.obter_cartao_por_id(id_cartao)
-        if not cartao or cartao.id_prestador != prestador_id:
+        if not cartao or cartao.id_fornecedor != prestador_id:
             return False
         self.cartao_repo.definir_todos_nao_principal(prestador_id)
         cartao.principal = True

@@ -40,9 +40,9 @@ def obter_fornecedor() -> List[Fornecedor]:
                 id=row["id"],
                 nome=row["nome"],
                 email=row["email"],
-                senha=None,
-                cpf_cnpj=None,
-                telefone=None,
+                senha=row.get("senha", ""),
+                cpf_cnpj=row.get("cpf_cnpj", ""),
+                telefone=row.get("telefone", ""),
                 cep="",  # Campo adicionado
                 estado=row["estado"],
                 cidade=row["cidade"],
@@ -50,7 +50,7 @@ def obter_fornecedor() -> List[Fornecedor]:
                 numero=row["numero"],
                 complemento="",  # Campo adicionado
                 bairro=row["bairro"],
-                data_cadastro=None,
+                data_cadastro=row.get("data_cadastro"),
                 razao_social=row["razao_social"],
                 selo_confianca=bool(row["selo_confianca"]) if "selo_confianca" in row.keys() else False,
                 tipo_usuario=row["tipo_usuario"]

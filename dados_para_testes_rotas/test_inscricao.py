@@ -33,15 +33,19 @@ def test_inscricao():
     if assinatura_existente:
         print(f"Plano atual: ID {assinatura_existente.id_plano}")
         # Deletar assinatura existente para teste
-        inscricao_plano_repo.deletar_inscricao_plano(assinatura_existente.id_inscricao_plano)
+        id_inscricao = assinatura_existente.id_inscricao_plano
+        assert id_inscricao is not None
+        inscricao_plano_repo.deletar_inscricao_plano(id_inscricao)
         print("Assinatura existente removida para teste")
     
     # Criar nova inscrição
+    id_plano_escolhido = plano_escolhido.id_plano
+    assert id_plano_escolhido is not None
     nova_inscricao = InscricaoPlano(
         id_inscricao_plano=0,
         id_fornecedor=id_fornecedor,
         id_prestador=None,
-        id_plano=plano_escolhido.id_plano
+        id_plano=id_plano_escolhido
     )
     
     try:

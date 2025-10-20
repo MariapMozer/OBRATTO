@@ -42,26 +42,37 @@ class TestOrcamentoServicoRepo:
             cpf_cnpj="11111111111",
             telefone="11999999999",
             data_cadastro=datetime.now().isoformat(),
-            endereco="Rua Cliente, 123",
+            cep="12345-678",
+            rua="Rua Cliente",
+            numero="123",
+            complemento="",
+            bairro="Centro",
+            cidade="São Paulo",
+            estado="SP",
             tipo_usuario="cliente"
         )
         id_usuario_cliente = inserir_usuario(usuario_cliente)
+        assert id_usuario_cliente is not None
         # Act
         cliente = Cliente(
-            id=0,
+            id=id_usuario_cliente,
             nome="Cliente Teste",
             email="email@gamil.com",
             senha="123",
             cpf_cnpj="11111111111",
             telefone="11999999999",
             data_cadastro=datetime.now().isoformat(),
-            endereco="Rua Cliente, 123",
+            cep="12345-678",
+            rua="Rua Cliente",
+            numero="123",
+            complemento="",
+            bairro="Centro",
+            cidade="São Paulo",
+            estado="SP",
             tipo_usuario="cliente",
             genero="Masculino",
             data_nascimento=date(1990, 1, 1)
         )
-            
-        cliente.id_usuario = id_usuario_cliente
         id_cliente = inserir_cliente(cliente)
 
         usuario_prestador = Usuario(
@@ -72,10 +83,17 @@ class TestOrcamentoServicoRepo:
             cpf_cnpj="22222222222",
             telefone="21999999999",
             data_cadastro=datetime.now().isoformat(),
-            endereco="Rua Prestador, 456",
+            cep="98765-432",
+            rua="Rua Prestador",
+            numero="456",
+            complemento="",
+            bairro="Vila Nova",
+            cidade="Rio de Janeiro",
+            estado="RJ",
             tipo_usuario="prestador"
         )
         id_usuario_prestador = inserir_usuario(usuario_prestador)
+        assert id_usuario_prestador is not None
 
         prestador = Prestador(
             id=id_usuario_prestador,
@@ -85,15 +103,23 @@ class TestOrcamentoServicoRepo:
             cpf_cnpj="22222222222",
             telefone="21999999999",
             data_cadastro=datetime.now().isoformat(),
-            endereco="Rua Prestador, 456",
+            cep="98765-432",
+            rua="Rua Prestador",
+            numero="456",
+            complemento="",
+            bairro="Vila Nova",
+            cidade="Rio de Janeiro",
+            estado="RJ",
             tipo_usuario="prestador",
             area_atuacao="Jardinagem",
-            tipo_pessoa="Física",
             razao_social=None,
             descricao_servicos="Serviços de jardinagem"
         )
         id_prestador = inserir_prestador(prestador)
+        assert id_prestador is not None
         prestador.id = id_prestador
+
+        assert id_cliente is not None
 
         orcamento = OrcamentoServico(
             id_orcamento=0,
@@ -121,6 +147,7 @@ class TestOrcamentoServicoRepo:
         # Act
         id_orcamento = inserir_orcamento_servico(orcamento)
         # Assert
+        assert id_orcamento is not None
         return id_orcamento
 
     def test_inserir_orcamento_servico(self, test_db):
@@ -181,9 +208,9 @@ class TestOrcamentoServicoRepo:
             senha="123",
             cpf_cnpj="11111111111",
             telefone="27999999999",
-            endereco="Rua A, 123",
             tipo_usuario="prestador",
-            data_cadastro=datetime.now().isoformat()
+            data_cadastro=datetime.now().isoformat(),
+            cep="88888-888", rua="Rua Teste", numero="123", complemento="", bairro="Centro", cidade="Vitória", estado="ES"
         )
 
         usuario2 = Usuario(
@@ -193,9 +220,9 @@ class TestOrcamentoServicoRepo:
             senha="456",
             cpf_cnpj="22222222222",
             telefone="27988888888",
-            endereco="Rua B, 456",
             tipo_usuario="cliente",
-            data_cadastro=datetime.now().isoformat()
+            data_cadastro=datetime.now().isoformat(),
+            cep="88888-888", rua="Rua Teste", numero="123", complemento="", bairro="Centro", cidade="Vitória", estado="ES"
         )
 
         inserir_usuario(usuario1)
@@ -246,6 +273,7 @@ class TestOrcamentoServicoRepo:
         # Act
         id_orcamento = self.inserir_orcamento_para_teste()
         orcamento = obter_orcamento_servico_por_id(id_orcamento)
+        assert orcamento is not None
         orcamento.status = "Concluído"
         resultado = atualizar_orcamento_servico(orcamento)
         # Assert

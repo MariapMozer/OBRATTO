@@ -2,7 +2,7 @@ from pydantic import Field, field_validator
 from typing import Optional, Literal
 from datetime import datetime
 from ..base_dto import BaseDTO
-from utils.validacoes_dto import validar_texto_opcional, validar_texto
+from utils.validacoes_dto import validar_texto_opcional, validar_texto_obrigatorio
 
 
 class CriarNotificacaoDTO(BaseDTO):
@@ -23,7 +23,7 @@ class CriarNotificacaoDTO(BaseDTO):
     @field_validator("mensagem")
     @classmethod
     def validar_mensagem(cls, v: str) -> str:
-        return cls.validar_campo_wrapper(validar_texto, "Mensagem", max_chars=500)(v)
+        return cls.validar_campo_wrapper(validar_texto_obrigatorio, "Mensagem", max_chars=500)(v)
 
     @field_validator("data_hora")
     @classmethod

@@ -17,15 +17,17 @@ UPLOAD_DIR = "static/uploads"
 # Rota para listar serviços do Prestador 
 @router.get("/meus/servicos")
 @requer_autenticacao(["prestador"])
-async def gets(request: Request, usuario_logado: dict = None):
+async def gets(request: Request, usuario_logado: Optional[dict] = None):
     servicos = servico_repo.obter_servico()
 
     # Adicionar informação de foto para cada produto
+    servicos_com_foto = []
     for servico in servicos:
-        servico.foto_principal = obter_foto_principal(servico.id)  # ← Adiciona foto
+        foto_principal = obter_foto_principal(servico.id_servico)
+        servicos_com_foto.append({"servico": servico, "foto_principal": foto_principal})
 
     return templates.TemplateResponse(
-        "prestador/servicos/meus_servicos.html", {"request": request, "servicos": servicos}
+        "prestador/servicos/meus_servicos.html", {"request": request, "servicos": servicos_com_foto}
     )
 
 # Rota para cadastrar novo serviço
@@ -49,15 +51,13 @@ async def processar_novo_servico(
     foto: UploadFile = File(None)   # << aqui entra a foto
 ):
     servico = Servico(
-        id=0,
+        id_servico=0,
         id_prestador=id_prestador,
         titulo=titulo,
         descricao=descricao,
         categoria=categoria,
         valor_base=valor_base,
-        nome_prestador=nome_prestador,
-        data_cadastro=datetime.now(),
-        foto=None
+        nome_prestador=nome_prestador
     )
 
     servico_id = servico_repo.inserir_servico(servico)

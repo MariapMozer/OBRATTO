@@ -1,4 +1,5 @@
 
+from typing import Optional
 from fastapi import APIRouter, Request, Form, Response
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse, JSONResponse
@@ -23,13 +24,19 @@ templates = Jinja2Templates(directory="templates")
 @requer_autenticacao(['fornecedor'])
 async def mostrar_formulario_pagamento(
     request: Request,
-    plano_id: int = None,
+    plano_id: Optional[int] = None,
     tipo_pagamento: str = "plano",
-    usuario_logado: dict = None
+    usuario_logado: Optional[dict] = None
 ):
     # Apenas fornecedor autenticado
-    fornecedor_id = usuario_logado.id
-    plano = plano_repo.obter_plano_por_id(plano_id)
+    assert usuario_logado is not None
+    fornecedor_id = usuario_logado["id"]
+
+    # Handle optional plano_id
+    plano = None
+    if plano_id is not None:
+        plano = plano_repo.obter_plano_por_id(plano_id)
+
     cartoes = cartao_repo.obter_cartoes_fornecedor(fornecedor_id)
     return templates.TemplateResponse("publico/pagamento/dados_pagamento.html", {
         "request": request,
@@ -54,9 +61,10 @@ async def processar_pagamento(
     cvv: str = Form(default=""),
     nome_cartao: str = Form(default=""),
     salvar_cartao: str = Form(default=""),
-    usuario_logado: dict = None
+    usuario_logado: Optional[dict] = None
 ):
-    fornecedor_id = usuario_logado.id
+    assert usuario_logado is not None
+    fornecedor_id = usuario_logado["id"]
     plano = plano_repo.obter_plano_por_id(plano_id)
     if not plano:
         cartoes = cartao_repo.obter_cartoes_fornecedor(fornecedor_id)
@@ -150,9 +158,9 @@ async def processar_pagamento(
 @requer_autenticacao(['fornecedor'])
 async def pagamento_sucesso(
     request: Request, 
-    payment_id: str = None, 
-    status: str = None, 
-    external_reference: str = None):
+    payment_id: Optional[str] = None, 
+    status: Optional[str] = None, 
+    external_reference: Optional[str] = None):
     if payment_id:
         payment_info = mp_config.get_payment_info(payment_id)
         if payment_info.get("status") == "approved":
@@ -192,8 +200,9 @@ async def pagamento_pendente(request: Request):
 
 @router.get("/cartoes")
 @requer_autenticacao(['fornecedor'])
-async def listar_cartoes(request: Request, usuario_logado: dict = None):
-    fornecedor_id = usuario_logado.id
+async def listar_cartoes(request: Request, usuario_logado: Optional[dict] = None):
+    assert usuario_logado is not None
+    fornecedor_id = usuario_logado["id"]
     cartoes = cartao_repo.obter_cartoes_fornecedor(fornecedor_id)
     return templates.TemplateResponse("publico/pagamento/meus_cartoes.html", {
         "request": request,
@@ -204,8 +213,9 @@ async def listar_cartoes(request: Request, usuario_logado: dict = None):
 # Mostrar formulário para adicionar cartão
 @router.get("/cartoes/adicionar")
 @requer_autenticacao(['fornecedor'])
-async def mostrar_adicionar_cartao(request: Request, usuario_logado: dict = None):
-    fornecedor_id = usuario_logado.id
+async def mostrar_adicionar_cartao(request: Request, usuario_logado: Optional[dict] = None):
+    assert usuario_logado is not None
+    fornecedor_id = usuario_logado["id"]
     return templates.TemplateResponse("publico/pagamento/adicionar_cartao.html", {
         "request": request,
         "id_fornecedor": fornecedor_id
@@ -222,9 +232,10 @@ async def adicionar_cartao(
     ano_vencimento: str = Form(...),
     apelido: str = Form(...),
     principal: str = Form(None),
-    usuario_logado: dict = None
+    usuario_logado: Optional[dict] = None
 ):
-    fornecedor_id = usuario_logado.id
+    assert usuario_logado is not None
+    fornecedor_id = usuario_logado["id"]
     try:
         resultado = cartao_repo.criar_cartao_from_form(
             id_fornecedor=fornecedor_id,
@@ -255,8 +266,9 @@ async def adicionar_cartao(
 
 @router.get("/cartoes/editar/{id_cartao}")
 @requer_autenticacao(['fornecedor'])
-async def mostrar_editar_cartao(request: Request, id_cartao: int, usuario_logado: dict = None):
-    fornecedor_id = usuario_logado.id
+async def mostrar_editar_cartao(request: Request, id_cartao: int, usuario_logado: Optional[dict] = None):
+    assert usuario_logado is not None
+    fornecedor_id = usuario_logado["id"]
     cartao = cartao_repo.obter_cartao_por_id(id_cartao)
     if not cartao or cartao.id_fornecedor != fornecedor_id:
         return RedirectResponse(url="/publico/pagamento/cartoes", status_code=303)
@@ -275,9 +287,10 @@ async def editar_cartao(
     nome_titular: str = Form(...),
     apelido: str = Form(...),
     principal: str = Form(None),
-    usuario_logado: dict = None
+    usuario_logado: Optional[dict] = None
 ):
-    fornecedor_id = usuario_logado.id
+    assert usuario_logado is not None
+    fornecedor_id = usuario_logado["id"]
     try:
         cartao = cartao_repo.obter_cartao_por_id(id_cartao)
         if not cartao or cartao.id_fornecedor != fornecedor_id:
@@ -307,8 +320,9 @@ async def editar_cartao(
 # Mostrar confirmação de exclusão
 @router.get("/cartoes/excluir/{id_cartao}") # Nesse caso é perigoso?
 @requer_autenticacao(['fornecedor'])
-async def mostrar_confirmar_exclusao(request: Request, id_cartao: int, usuario_logado: dict = None):
-    fornecedor_id = usuario_logado.id
+async def mostrar_confirmar_exclusao(request: Request, id_cartao: int, usuario_logado: Optional[dict] = None):
+    assert usuario_logado is not None
+    fornecedor_id = usuario_logado["id"]
     cartao = cartao_repo.obter_cartao_por_id(id_cartao)
     if not cartao or cartao.id_fornecedor != fornecedor_id:
         return RedirectResponse(url="/publico/pagamento/cartoes", status_code=303)
@@ -320,13 +334,14 @@ async def mostrar_confirmar_exclusao(request: Request, id_cartao: int, usuario_l
 # Processar exclusão de cartão
 @router.post("/cartoes/excluir/{id_cartao}")
 @requer_autenticacao(['fornecedor'])
-async def excluir_cartao(request: Request, id_cartao: int, usuario_logado: dict = None):
-    fornecedor_id = usuario_logado.id
+async def excluir_cartao(request: Request, id_cartao: int, usuario_logado: Optional[dict] = None):
+    assert usuario_logado is not None
+    fornecedor_id = usuario_logado["id"]
     try:
         cartao = cartao_repo.obter_cartao_por_id(id_cartao)
         if not cartao or cartao.id_fornecedor != fornecedor_id:
             return RedirectResponse(url="/publico/pagamento/cartoes", status_code=303)
-        resultado = cartao_repo.remover_cartao(id_cartao)
+        resultado = cartao_repo.excluir_cartao(id_cartao)
         if resultado:
             return RedirectResponse(url="/publico/pagamento/cartoes", status_code=303)
         else:
@@ -348,17 +363,24 @@ async def excluir_cartao(request: Request, id_cartao: int, usuario_logado: dict 
 
 @router.post("/cartoes/definir_principal")
 @requer_autenticacao(['fornecedor'])
-async def definir_cartao_principal(request: Request, usuario_logado: dict = None):
+async def definir_cartao_principal(request: Request, usuario_logado: Optional[dict] = None):
     form = await request.form()
-    id_cartao = form.get("id_cartao")
-    fornecedor_id = usuario_logado.id
+    id_cartao_raw = form.get("id_cartao")
+    assert usuario_logado is not None
+    fornecedor_id = usuario_logado["id"]
 
-    cartao = cartao_repo.obter_cartao_por_id(int(id_cartao))
+    # Handle form data which can be UploadFile | str | None
+    if id_cartao_raw is None or isinstance(id_cartao_raw, bytes):
+        return RedirectResponse(url=f"/publico/pagamento/cartoes?id_fornecedor={fornecedor_id}",
+        status_code=303)
+
+    id_cartao = int(str(id_cartao_raw))
+    cartao = cartao_repo.obter_cartao_por_id(id_cartao)
     if not cartao or cartao.id_fornecedor != int(fornecedor_id):
-        return RedirectResponse(url=f"/publico/pagamento/cartoes?id_fornecedor={fornecedor_id}", 
+        return RedirectResponse(url=f"/publico/pagamento/cartoes?id_fornecedor={fornecedor_id}",
         status_code=303)
     cartao_repo.definir_todos_nao_principal(int(fornecedor_id))
     cartao.principal = True
     cartao_repo.atualizar_cartao(cartao)
-    return RedirectResponse(url=f"/publico/pagamento/cartoes?id_fornecedor={fornecedor_id}", 
+    return RedirectResponse(url=f"/publico/pagamento/cartoes?id_fornecedor={fornecedor_id}",
     status_code=303)

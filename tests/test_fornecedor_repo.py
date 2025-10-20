@@ -33,14 +33,21 @@ class TestFornecedorRepo:
             senha="senha123",
             cpf_cnpj="12345678900",
             telefone="27999999999",
+            cep="88888-888",
+            rua="Rua Teste",
+            numero="123",
+            complemento="",
+            bairro="Bairro Teste",
+            cidade="Cidade Teste",
+            estado="ES",
+            tipo_usuario="fornecedor",
             data_cadastro=datetime.now().isoformat(),
-            endereco="Rua dos Fornecedores, 123",
-            razao_social="Fornecedor Ltda",
-            tipo_usuario="fornecedor" 
+            razao_social="Fornecedor Ltda"
         )
         # Act
         id_inserido = inserir_fornecedor(fornecedor)
         # Assert
+        assert id_inserido is not None
         fornecedor_db = obter_fornecedor_por_id(id_inserido)
         assert fornecedor_db is not None, "O fornecedor inserido não deveria ser None"
         assert fornecedor_db.nome == "Fornecedor Teste", "O nome do fornecedor inserido não confere"
@@ -57,10 +64,16 @@ class TestFornecedorRepo:
             senha="senha123",
             cpf_cnpj="12345678900",
             telefone="27999999999",
+            cep="88888-888",
+            rua="Rua Teste",
+            numero="123",
+            complemento="",
+            bairro="Bairro Teste",
+            cidade="Cidade Teste",
+            estado="ES",
+            tipo_usuario="fornecedor",
             data_cadastro=datetime.now().isoformat(),
-            endereco="Rua dos Fornecedores, 123",
-            razao_social="Fornecedor Ltda",
-            tipo_usuario="fornecedor"
+            razao_social="Fornecedor Ltda"
         )
         inserir_fornecedor(fornecedor)
 
@@ -81,16 +94,23 @@ class TestFornecedorRepo:
             senha="senha123",
             cpf_cnpj="12345678900",
             telefone="27999999999",
+            cep="88888-888",
+            rua="Rua Teste",
+            numero="123",
+            complemento="",
+            bairro="Bairro Teste",
+            cidade="Cidade Teste",
+            estado="ES",
+            tipo_usuario="fornecedor",
             data_cadastro=datetime.now().isoformat(),
-            endereco="Rua dos Fornecedores, 123",
-            razao_social="Fornecedor Ltda",
-            tipo_usuario="fornecedor"
+            razao_social="Fornecedor Ltda"
         )
         #Act
         id_inserido = inserir_fornecedor(fornecedor)
+        assert id_inserido is not None
         fornecedor_bd = obter_fornecedor_por_id(id_inserido)
-        
-        # Assert 
+
+        # Assert
         assert fornecedor_bd is not None, "Deveria retornar um fornecedor"
         assert fornecedor_bd.id == id_inserido, "ID do fornecedor retornado deve ser igual ao inserido"
         assert fornecedor_bd.nome == "Fornecedor Teste"
@@ -111,10 +131,16 @@ class TestFornecedorRepo:
                 senha="senha123",
                 cpf_cnpj="12345678900",
                 telefone="27999999999",
+                cep="88888-888",
+                rua="Rua Teste",
+                numero="123",
+                complemento="",
+                bairro="Bairro Teste",
+                cidade="Cidade Teste",
+                estado="ES",
+                tipo_usuario="fornecedor",
                 data_cadastro=datetime.now().isoformat(),
-                endereco="Rua dos Fornecedores, 123",
-                razao_social="Fornecedor Ltda",
-                tipo_usuario="fornecedor"
+                razao_social="Fornecedor Ltda"
             )
             inserir_fornecedor(fornecedor)
         with sqlite3.connect(test_db) as conn:
@@ -142,14 +168,22 @@ class TestFornecedorRepo:
             senha="senha123",
             cpf_cnpj="12345678900",
             telefone="27999999999",
+            cep="88888-888",
+            rua="Rua Teste",
+            numero="123",
+            complemento="",
+            bairro="Bairro Teste",
+            cidade="Cidade Teste",
+            estado="ES",
+            tipo_usuario="fornecedor",
             data_cadastro=datetime.now().isoformat(),
-            endereco="Rua dos Fornecedores, 123",
-            razao_social="Fornecedor Ltda",
-            tipo_usuario="fornecedor"
+            razao_social="Fornecedor Ltda"
         )
 
         id_inserido = inserir_fornecedor(fornecedor)
+        assert id_inserido is not None
         fornecedor_db = obter_fornecedor_por_id(id_inserido)
+        assert fornecedor_db is not None
 
         fornecedor_db.nome = "Fornecedor Atualizado"
         fornecedor_db.razao_social = "Razão Atualizada"
@@ -161,6 +195,7 @@ class TestFornecedorRepo:
         assert resultado is True, "A atualização do fornecedor deveria retornar True"
 
         atualizado = obter_fornecedor_por_id(id_inserido)
+        assert atualizado is not None
         assert atualizado.nome == "Fornecedor Atualizado"
         assert atualizado.razao_social == "Razão Atualizada"
 
@@ -176,12 +211,19 @@ class TestFornecedorRepo:
             senha="senha123",
             cpf_cnpj="12345678900",
             telefone="27999999999",
+            cep="88888-888",
+            rua="Rua Teste",
+            numero="123",
+            complemento="",
+            bairro="Bairro Teste",
+            cidade="Cidade Teste",
+            estado="ES",
+            tipo_usuario="fornecedor",
             data_cadastro=datetime.now().isoformat(),
-            endereco="Rua dos Fornecedores, 123",
-            razao_social="Fornecedor Ltda",
-            tipo_usuario="fornecedor"
+            razao_social="Fornecedor Ltda"
         )
         id_inserido = inserir_fornecedor(fornecedor)
+        assert id_inserido is not None
 
         fornecedor_bd = obter_fornecedor_por_id(id_inserido)
         assert fornecedor_bd is not None

@@ -26,8 +26,16 @@ async def cadastrar_promocao(request: Request):
 @requer_autenticacao(['fornecedor'])
 async def cadastrar_promocao_post(request: Request):
     dados = await request.form()
-    id_produto = int(dados.get("id_produto"))
-    desconto = float(dados.get("desconto", 0))
+    id_produto_raw = dados.get("id_produto")
+    if isinstance(id_produto_raw, str):
+        id_produto = int(id_produto_raw)
+    else:
+        id_produto = 0
+    desconto_raw = dados.get("desconto", "0")
+    if isinstance(desconto_raw, str):
+        desconto = float(desconto_raw)
+    else:
+        desconto = 0.0
     produto = obter_produto_por_id(id_produto)
     if produto:
         produto.em_promocao = True
@@ -50,8 +58,16 @@ async def alterar_promocao(request: Request):
 @requer_autenticacao(['fornecedor'])
 async def alterar_promocao_post(request: Request):
     dados = await request.form()
-    id_produto = int(dados.get("id_produto"))
-    desconto = float(dados.get("desconto", 0))
+    id_produto_raw = dados.get("id_produto")
+    if isinstance(id_produto_raw, str):
+        id_produto = int(id_produto_raw)
+    else:
+        id_produto = 0
+    desconto_raw = dados.get("desconto", "0")
+    if isinstance(desconto_raw, str):
+        desconto = float(desconto_raw)
+    else:
+        desconto = 0.0
     produto = obter_produto_por_id(id_produto)
     if produto:
         produto.em_promocao = True
@@ -93,7 +109,11 @@ async def confirmar_exclusao_promocao(request: Request):
 @requer_autenticacao(['fornecedor'])
 async def confirmar_exclusao_promocao_post(request: Request):
     dados = await request.form()
-    id_produto = int(dados.get("id_produto"))
+    id_produto_raw = dados.get("id_produto")
+    if isinstance(id_produto_raw, str):
+        id_produto = int(id_produto_raw)
+    else:
+        id_produto = 0
     produto = obter_produto_por_id(id_produto)
     if produto:
         produto.em_promocao = False

@@ -61,6 +61,7 @@ class PagamentoRepository:
                         data_aprovacao=row[9],
                         external_reference=row[10]
                     )
+                return None
         except Exception as e:
             print(f"Erro ao obter pagamento: {e}")
             return None
@@ -87,6 +88,7 @@ class PagamentoRepository:
                         data_aprovacao=row[9],
                         external_reference=row[10]
                     )
+                return None
         except Exception as e:
             print(f"Erro ao obter pagamento por MP ID: {e}")
             return None
@@ -98,7 +100,7 @@ class PagamentoRepository:
                 cursor = conexao.cursor()
                 cursor.execute(SQL_OBTER_PAGAMENTO_POR_PREFERENCE, (mp_preference_id,))
                 row = cursor.fetchone()
-                
+
                 if row:
                     return Pagamento(
                         id_pagamento=row[0],
@@ -113,11 +115,12 @@ class PagamentoRepository:
                         data_aprovacao=row[9],
                         external_reference=row[10]
                     )
+                return None
         except Exception as e:
             print(f"Erro ao obter pagamento por preference: {e}")
             return None
 
-    def atualizar_status_pagamento(self, mp_payment_id: str, status: str, metodo_pagamento: str = None) -> bool:
+    def atualizar_status_pagamento(self, mp_payment_id: str, status: str, metodo_pagamento: Optional[str] = None) -> bool:
         """Atualiza o status de um pagamento"""
         try:
             with open_connection() as conexao:
@@ -234,7 +237,7 @@ class PagamentoRepository:
                 cursor = conexao.cursor()
                 cursor.execute(SQL_ATUALIZAR_PAGAMENTO, (
                     pagamento.plano_id,
-                    pagamento.prestador_id,
+                    pagamento.fornecedor_id,
                     pagamento.mp_payment_id,
                     pagamento.mp_preference_id,
                     pagamento.valor,

@@ -82,8 +82,8 @@ def test_ver_mensagens():
 
 def test_enviar_mensagem():
     response = client.post("/publico/mensagens/enviar", data={
-        "id_remetente": 1,
-        "id_destinatario": 2,
+        "id_remetente": "1",
+        "id_destinatario": "2",
         "conteudo": "Olá!",
         "nome_remetente": "Remetente",
         "nome_destinatario": "Destinatário"

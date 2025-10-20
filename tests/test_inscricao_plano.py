@@ -58,16 +58,16 @@ class Test_InscricaoPlanoRepo:
             cpf_cnpj="12345678000199",
             telefone="27999999999",
             data_cadastro="2023-01-01",
-            endereco="Rua dos Fornecedores",
             tipo_usuario="Fornecedor",
-            razao_social="Fornecedor LTDA"
+            razao_social="Fornecedor LTDA",
+            cep="88888-888", rua="Rua Teste", numero="123", complemento="", bairro="Centro", cidade="Vitória", estado="ES"
         )
         id_fornecedor = inserir_fornecedor(fornecedor)
         assert id_fornecedor is not None, "Fornecedor não foi inserido"
 
         plano = Plano(
             nome_plano="Plano Básico",
-            valor_mensal="49.90",
+            valor_mensal=49.90,
             limite_servico=0,
             tipo_plano="Básico",
             descricao="Descrição do plano"
@@ -75,6 +75,7 @@ class Test_InscricaoPlanoRepo:
         id_plano = inserir_plano(plano)
         assert id_plano is not None, "Plano não foi inserido"
 
+        assert id_plano is not None
         id_usuario = inserir_usuario(Usuario(
             id=0,
             nome="Maria Prestadora",
@@ -82,12 +83,13 @@ class Test_InscricaoPlanoRepo:
             senha="senha123",
             cpf_cnpj="11122233344",
             telefone="27988887777",
-            endereco="Rua das Prestadoras",
             tipo_usuario="Prestador",
-            data_cadastro="2023-01-01"
+            data_cadastro="2023-01-01",
+            cep="88888-888", rua="Rua Teste", numero="123", complemento="", bairro="Centro", cidade="Vitória", estado="ES"
         ))
         assert id_usuario is not None, "Usuário não foi inserido"
 
+        assert id_usuario is not None
         prestador = Prestador(
             id=id_usuario,
             nome="Maria Prestadora",
@@ -95,13 +97,12 @@ class Test_InscricaoPlanoRepo:
             senha="senha123",
             cpf_cnpj="11122233344",
             telefone="27988887777",
-            endereco="Rua das Prestadoras",
             tipo_usuario="Prestador",
             data_cadastro="2023-01-01",
             area_atuacao="Serviços gerais",
-            tipo_pessoa="Física",
             razao_social="",
-            descricao_servicos="Serviços de limpeza"
+            descricao_servicos="Serviços de limpeza",
+            cep="88888-888", rua="Rua Teste", numero="123", complemento="", bairro="Centro", cidade="Vitória", estado="ES"
         )
 
         id_prestador = inserir_prestador(prestador)
@@ -122,9 +123,9 @@ class Test_InscricaoPlanoRepo:
             cpf_cnpj="12345678000199",
             telefone="27999999999",
             data_cadastro="2023-01-01",
-            endereco="Rua dos Fornecedores",
             tipo_usuario="Fornecedor",
-            razao_social="Fornecedor LTDA"
+            razao_social="Fornecedor LTDA",
+            cep="88888-888", rua="Rua Teste", numero="123", complemento="", bairro="Centro", cidade="Vitória", estado="ES"
         ))
         assert id_fornecedor is not None
         
@@ -135,9 +136,9 @@ class Test_InscricaoPlanoRepo:
             senha="senha123",
             cpf_cnpj="11122233344",
             telefone="27988887777",
-            endereco="Rua das Prestadoras",
             tipo_usuario="Prestador",
-            data_cadastro="2023-01-01"
+            data_cadastro="2023-01-01",
+            cep="88888-888", rua="Rua Teste", numero="123", complemento="", bairro="Centro", cidade="Vitória", estado="ES"
         ))
         assert id_usuario is not None
         
@@ -148,13 +149,12 @@ class Test_InscricaoPlanoRepo:
             senha="senha123",
             cpf_cnpj="11122233344",
             telefone="27988887777",
-            endereco="Rua das Prestadoras",
             tipo_usuario="Prestador",
             data_cadastro="2023-01-01",
             area_atuacao="Serviços gerais",
-            tipo_pessoa="Física",
             razao_social="",
-            descricao_servicos="Serviços de limpeza"
+            descricao_servicos="Serviços de limpeza",
+            cep="88888-888", rua="Rua Teste", numero="123", complemento="", bairro="Centro", cidade="Vitória", estado="ES"
         ))
         assert id_prestador is not None
         
@@ -166,7 +166,10 @@ class Test_InscricaoPlanoRepo:
             descricao="Descrição do plano"
         ))
         assert id_plano is not None
-        
+
+        assert id_fornecedor is not None
+        assert id_prestador is not None
+        assert id_plano is not None
         inscricao_teste = InscricaoPlano(
             id_inscricao_plano=None,
             id_fornecedor=id_fornecedor,
@@ -199,9 +202,9 @@ class Test_InscricaoPlanoRepo:
             cpf_cnpj="12345678000100",
             telefone="27999990000",
             data_cadastro="2023-01-01",
-            endereco="Rua Paginada",
             tipo_usuario="Fornecedor",
-            razao_social="Fornecedor LTDA"
+            razao_social="Fornecedor LTDA",
+            cep="88888-888", rua="Rua Teste", numero="123", complemento="", bairro="Centro", cidade="Vitória", estado="ES"
         ))
 
         id_usuario = inserir_usuario(Usuario(
@@ -211,11 +214,12 @@ class Test_InscricaoPlanoRepo:
             senha="senha123",
             cpf_cnpj="11122233300",
             telefone="27988880000",
-            endereco="Rua dos Paginadores",
             tipo_usuario="Prestador",
-            data_cadastro="2023-01-01"
+            data_cadastro="2023-01-01",
+            cep="88888-888", rua="Rua Teste", numero="123", complemento="", bairro="Centro", cidade="Vitória", estado="ES"
         ))
 
+        assert id_usuario is not None
         id_prestador = inserir_prestador(Prestador(
             id=id_usuario,
             nome="Prestador Paginado",
@@ -223,13 +227,12 @@ class Test_InscricaoPlanoRepo:
             senha="senha123",
             cpf_cnpj="11122233300",
             telefone="27988880000",
-            endereco="Rua dos Paginadores",
             tipo_usuario="Prestador",
             data_cadastro="2023-01-01",
             area_atuacao="Serviços",
-            tipo_pessoa="Física",
             razao_social="",
-            descricao_servicos="Serviços gerais"
+            descricao_servicos="Serviços gerais",
+            cep="88888-888", rua="Rua Teste", numero="123", complemento="", bairro="Centro", cidade="Vitória", estado="ES"
         ))
 
         id_plano = inserir_plano(Plano(
@@ -241,6 +244,9 @@ class Test_InscricaoPlanoRepo:
         ))
 
         # Inserindo várias inscrições
+        assert id_fornecedor is not None
+        assert id_prestador is not None
+        assert id_plano is not None
         for i in range(10):
             inserir_inscricao_plano(InscricaoPlano(
                 id_inscricao_plano=None,
@@ -280,9 +286,9 @@ class Test_InscricaoPlanoRepo:
             cpf_cnpj="12345678000199",
             telefone="27999999999",
             data_cadastro="2023-01-01",
-            endereco="Rua dos Fornecedores",
             tipo_usuario="Fornecedor",
-            razao_social="Fornecedor LTDA"
+            razao_social="Fornecedor LTDA",
+            cep="88888-888", rua="Rua Teste", numero="123", complemento="", bairro="Centro", cidade="Vitória", estado="ES"
         ))
 
         id_usuario = inserir_usuario(Usuario(
@@ -292,23 +298,23 @@ class Test_InscricaoPlanoRepo:
             senha="senha123",
             cpf_cnpj="11122233344",
             telefone="27988887777",
-            endereco="Rua das Prestadoras",
             tipo_usuario="Prestador",
-            data_cadastro="2023-01-01"
+            data_cadastro="2023-01-01",
+            cep="88888-888", rua="Rua Teste", numero="123", complemento="", bairro="Centro", cidade="Vitória", estado="ES"
         ))
 
+        assert id_usuario is not None
         id_prestador = inserir_prestador(Prestador(
-            id=id_usuario, 
+            id=id_usuario,
             nome="Prestador Teste",
             email="prestador@teste.com",
             senha="senha123",
             cpf_cnpj="11122233344",
             telefone="27988887777",
-            endereco="Rua das Prestadoras",
             tipo_usuario="Prestador",
             data_cadastro="2023-01-01",
             area_atuacao="Serviços gerais",
-            tipo_pessoa="Física",
+            cep="88888-888", rua="Rua Teste", numero="123", complemento="", bairro="Centro", cidade="Vitória", estado="ES",
             razao_social="",
             descricao_servicos="Serviços de limpeza"
         ))
@@ -321,6 +327,9 @@ class Test_InscricaoPlanoRepo:
             descricao="Descrição do plano"
         ))
 
+        assert id_fornecedor is not None
+        assert id_prestador is not None
+        assert id_plano is not None
         inscricao_original = InscricaoPlano(
             id_inscricao_plano=None,
             id_fornecedor=id_fornecedor,
@@ -330,6 +339,7 @@ class Test_InscricaoPlanoRepo:
         id_inscricao = inserir_inscricao_plano(inscricao_original)
         assert id_inscricao is not None
 
+        assert id_inscricao is not None
         inscricao_atualizada = InscricaoPlano(
             id_inscricao_plano=id_inscricao,
             id_fornecedor=id_fornecedor,
@@ -359,9 +369,9 @@ class Test_InscricaoPlanoRepo:
             cpf_cnpj="12345678000199",
             telefone="27999999999",
             data_cadastro="2023-01-01",
-            endereco="Rua dos Fornecedores",
             tipo_usuario="Fornecedor",
-            razao_social="Fornecedor LTDA"
+            razao_social="Fornecedor LTDA",
+            cep="88888-888", rua="Rua Teste", numero="123", complemento="", bairro="Centro", cidade="Vitória", estado="ES"
         ))
         id_usuario = inserir_usuario(Usuario(
             id=0,
@@ -370,24 +380,24 @@ class Test_InscricaoPlanoRepo:
             senha="senha123",
             cpf_cnpj="11122233344",
             telefone="27988887777",
-            endereco="Rua das Prestadoras",
             tipo_usuario="Prestador",
-            data_cadastro="2023-01-01"
+            data_cadastro="2023-01-01",
+            cep="88888-888", rua="Rua Teste", numero="123", complemento="", bairro="Centro", cidade="Vitória", estado="ES"
         ))
+        assert id_usuario is not None
         id_prestador = inserir_prestador(Prestador(
-            id=id_usuario, 
+            id=id_usuario,
             nome="Prestador Teste",
             email="prestador@teste.com",
             senha="senha123",
             cpf_cnpj="11122233344",
             telefone="27988887777",
-            endereco="Rua das Prestadoras",
             tipo_usuario="Prestador",
             data_cadastro="2023-01-01",
             area_atuacao="Serviços gerais",
-            tipo_pessoa="Física",
             razao_social="",
-            descricao_servicos="Serviços de limpeza"
+            descricao_servicos="Serviços de limpeza",
+            cep="88888-888", rua="Rua Teste", numero="123", complemento="", bairro="Centro", cidade="Vitória", estado="ES"
         ))
         id_plano = inserir_plano(Plano(
             nome_plano="Plano Básico",
@@ -397,6 +407,9 @@ class Test_InscricaoPlanoRepo:
             descricao="Descrição do plano"
         ))
 
+        assert id_fornecedor is not None
+        assert id_prestador is not None
+        assert id_plano is not None
         inscricao = InscricaoPlano(
             id_inscricao_plano=None,
             id_fornecedor=id_fornecedor,

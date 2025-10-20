@@ -98,7 +98,9 @@ class CriarUsuarioDTO(BaseDTO):
     @classmethod
     def validar_senha_criar(cls, v: str) -> str:
         # usar validar_senha do utils
-        return validar_senha(v, min_chars=8, obrigatorio=True)
+        resultado = validar_senha(v, min_chars=8, obrigatorio=True)
+        assert resultado is not None  # validar_senha with obrigatorio=True never returns None
+        return resultado
 
     # Validar senhas no nível do modelo para garantir ambos os campos disponíveis
     @model_validator(mode='after')
@@ -123,12 +125,16 @@ class CriarUsuarioDTO(BaseDTO):
     @field_validator('cep')
     @classmethod
     def validar_cep_criar(cls, v: str) -> str:
-        return validar_cep(v)
+        resultado = validar_cep(v)
+        assert resultado is not None  # validar_cep returns None only if input is empty
+        return resultado
 
     @field_validator('estado')
     @classmethod
     def validar_estado_criar(cls, v: str) -> str:
-        return validar_estado_brasileiro(v)
+        resultado = validar_estado_brasileiro(v)
+        assert resultado is not None  # validar_estado_brasileiro returns None only if input is empty
+        return resultado
 
 
     @classmethod
