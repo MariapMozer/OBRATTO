@@ -7,14 +7,16 @@ from typing import Optional, List
 from config import templates
 from data.servico import servico_repo
 from data.servico.servico_model import Servico
-from utils.auth_decorator import requer_autenticacao
-from utils.foto_util import obter_foto_principal, salvar_nova_foto
+from util.auth_decorator import requer_autenticacao
+from util.foto_util import obter_foto_principal, salvar_nova_foto
+
 router = APIRouter()
 UPLOAD_DIR = "static/uploads"
 
 # Tudo funcionando perfeitamente
 
-# Rota para listar serviços do Prestador 
+
+# Rota para listar serviços do Prestador
 @router.get("/meus/servicos")
 @requer_autenticacao(["prestador"])
 async def gets(request: Request, usuario_logado: Optional[dict] = None):
@@ -27,14 +29,19 @@ async def gets(request: Request, usuario_logado: Optional[dict] = None):
         servicos_com_foto.append({"servico": servico, "foto_principal": foto_principal})
 
     return templates.TemplateResponse(
-        "prestador/servicos/meus_servicos.html", {"request": request, "servicos": servicos_com_foto}
+        "prestador/servicos/meus_servicos.html",
+        {"request": request, "servicos": servicos_com_foto},
     )
+
 
 # Rota para cadastrar novo serviço
 @router.get("/novo")
 @requer_autenticacao(["prestador"])
 async def form_novo_servicos(request: Request):
-    return templates.TemplateResponse("prestador/servicos/novo.html", {"request": request})
+    return templates.TemplateResponse(
+        "prestador/servicos/novo.html", {"request": request}
+    )
+
 
 # Rota para processar o formulário de novo serviço
 @router.post("/novo")
@@ -48,7 +55,7 @@ async def processar_novo_servico(
     categoria: str = Form(...),
     valor_base: float = Form(...),
     nome_prestador: str = Form(...),
-    foto: UploadFile = File(None)   # << aqui entra a foto
+    foto: UploadFile = File(None),  # << aqui entra a foto
 ):
     servico = Servico(
         id_servico=0,
@@ -57,7 +64,7 @@ async def processar_novo_servico(
         descricao=descricao,
         categoria=categoria,
         valor_base=valor_base,
-        nome_prestador=nome_prestador
+        nome_prestador=nome_prestador,
     )
 
     servico_id = servico_repo.inserir_servico(servico)
@@ -73,7 +80,7 @@ async def processar_novo_servico(
     else:
         return templates.TemplateResponse(
             "prestador/servicos/novo.html",
-            {"request": request, "erro": "Erro ao cadastrar serviço."}
+            {"request": request, "erro": "Erro ao cadastrar serviço."},
         )
 
 
@@ -81,76 +88,85 @@ async def processar_novo_servico(
 @router.get("/editar/servicos")
 @requer_autenticacao(["prestador"])
 async def editar_servicos(request: Request, id_servico: int):
-    return templates.TemplateResponse("prestador/servicos/editar_servico.html", {"request": request, "id_servico": id_servico})
+    return templates.TemplateResponse(
+        "prestador/servicos/editar_servico.html",
+        {"request": request, "id_servico": id_servico},
+    )
+
 
 # Rota para processar o formulário de edição do serviço
 @router.post("/editar/servicos")
 @requer_autenticacao(["prestador"])
-async def processar_edicao_servico(request: Request, 
-    id_servico: int = Form(...), 
-    id_prestador: int = Form(...), 
+async def processar_edicao_servico(
+    request: Request,
+    id_servico: int = Form(...),
+    id_prestador: int = Form(...),
     titulo: str = Form(...),
     descricao: str = Form(...),
     categoria: str = Form(...),
     valor_base: float = Form(...),
-    nome_prestador: str = Form(...)):
-    return templates.TemplateResponse("prestador/servicos/editar_servico.html", {"request": request})
+    nome_prestador: str = Form(...),
+):
+    return templates.TemplateResponse(
+        "prestador/servicos/editar_servico.html", {"request": request}
+    )
+
 
 # Detalhes do serviço
 @router.get("/detalhes")
 @requer_autenticacao(["prestador"])
 async def detalhes_servicos(request: Request, id_servico: int):
-    return templates.TemplateResponse("prestador/servicos/detalhes.html", {"request": request, "id_servico": id_servico})
+    return templates.TemplateResponse(
+        "prestador/servicos/detalhes.html",
+        {"request": request, "id_servico": id_servico},
+    )
+
 
 # Buscar serviço
 @router.get("/buscar")
 @requer_autenticacao(["prestador"])
 async def buscar_servicos(request: Request, id_servico: int):
-    return templates.TemplateResponse("prestador/servicos/buscar.html", {"request": request, "id_servico": id_servico})
+    return templates.TemplateResponse(
+        "prestador/servicos/buscar.html", {"request": request, "id_servico": id_servico}
+    )
+
 
 # status do serviço
 @router.get("/status")
 @requer_autenticacao(["prestador"])
-async def status_servicos(request: Request, id_servico: int): 
-    return templates.TemplateResponse("prestador/servicos/status.html", {"request": request, "id_servico": id_servico})
+async def status_servicos(request: Request, id_servico: int):
+    return templates.TemplateResponse(
+        "prestador/servicos/status.html", {"request": request, "id_servico": id_servico}
+    )
+
 
 # Excluir serviço
 @router.get("/servicos/excluir")
 @requer_autenticacao(["prestador"])
 async def excluir_servico(request: Request, id_servico: int):
-    return templates.TemplateResponse("prestador/servicos/excluir.html", {"request": request, "id_servico": id_servico})
+    return templates.TemplateResponse(
+        "prestador/servicos/excluir.html",
+        {"request": request, "id_servico": id_servico},
+    )
+
 
 # Rota para processar a exclusão do serviço
 @router.post("/servicos/excluir")
 @requer_autenticacao(["prestador"])
-async def processar_exclusao_servico(request: Request, 
-    id_servico: int = Form(...), 
-    id_prestador: int = Form(...), 
+async def processar_exclusao_servico(
+    request: Request,
+    id_servico: int = Form(...),
+    id_prestador: int = Form(...),
     titulo: str = Form(...),
     descricao: str = Form(...),
     categoria: str = Form(...),
     valor_base: float = Form(...),
-    nome_prestador: str = Form(...)):
-    return templates.TemplateResponse("prestador/servicos/excluir.html", {"request": request, "id_servico": id_servico})
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    nome_prestador: str = Form(...),
+):
+    return templates.TemplateResponse(
+        "prestador/servicos/excluir.html",
+        {"request": request, "id_servico": id_servico},
+    )
 
 
 # # Rota POST para cadastrar novo serviço

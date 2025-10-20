@@ -7,7 +7,7 @@ from fastapi.templating import Jinja2Templates
 from jinja2 import Environment, FileSystemLoader
 from typing import Optional
 import os
-from utils.flash_messages import get_flashed_messages
+from util.flash_messages import get_flashed_messages
 
 
 def criar_templates(directory: str = "templates", **kwargs) -> Jinja2Templates:
@@ -23,7 +23,7 @@ def criar_templates(directory: str = "templates", **kwargs) -> Jinja2Templates:
 
     Exemplo:
         ```python
-        from utils.template_util import criar_templates
+        from util.template_util import criar_templates
 
         # Criar templates para um módulo específico
         templates = criar_templates("templates/fornecedor")
@@ -41,14 +41,12 @@ def criar_templates(directory: str = "templates", **kwargs) -> Jinja2Templates:
 
     # Criar environment Jinja2 customizado
     env = Environment(
-        loader=FileSystemLoader(directory),
-        autoescape=True,
-        auto_reload=True
+        loader=FileSystemLoader(directory), autoescape=True, auto_reload=True
     )
 
     # Injetar funções globais
-    env.globals['get_flashed_messages'] = get_flashed_messages
-    env.globals['obter_mensagens'] = get_flashed_messages  # Alias em português
+    env.globals["get_flashed_messages"] = get_flashed_messages
+    env.globals["obter_mensagens"] = get_flashed_messages  # Alias em português
 
     # Criar instância de Jinja2Templates com environment customizado
     templates = Jinja2Templates(env=env)

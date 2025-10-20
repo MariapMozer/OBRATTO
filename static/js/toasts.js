@@ -3,7 +3,7 @@
  * Lê mensagens do JSON e exibe como toasts Bootstrap 5
  *
  * Uso no backend:
- *   from utils.flash_messages import informar_sucesso, informar_erro
+ *   from util.flash_messages import informar_sucesso, informar_erro
  *   informar_sucesso(request, "Operação realizada com sucesso!")
  *   informar_erro(request, "Erro ao processar dados")
  *

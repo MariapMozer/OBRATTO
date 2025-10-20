@@ -7,38 +7,39 @@ Melhorias v2.0:
 - Validação robusta de perfis
 - Flash messages informativos
 """
+
 from functools import wraps
 from typing import List, Optional
 from fastapi import Request, HTTPException, status
 from fastapi.responses import RedirectResponse
 from collections import defaultdict
 from datetime import datetime, timedelta
-from utils.logger_config import logger
-from utils.flash_messages import informar_erro
+from util.logger_config import logger
+from util.flash_messages import informar_erro
 
 
 def obter_usuario_logado(request: Request) -> Optional[dict]:
     """
     Obtém os dados do usuário logado da sessão
-    
+
     Args:
         request: Objeto Request do FastAPI
-    
+
     Returns:
         Dicionário com dados do usuário ou None se não estiver logado
     """
-    if not hasattr(request, 'session'):
+    if not hasattr(request, "session"):
         return None
-    return request.session.get('usuario')
+    return request.session.get("usuario")
 
 
 def esta_logado(request: Request) -> bool:
     """
     Verifica se há um usuário logado
-    
+
     Args:
         request: Objeto Request do FastAPI
-    
+
     Returns:
         True se há usuário logado, False caso contrário
     """
@@ -48,26 +49,26 @@ def esta_logado(request: Request) -> bool:
 def criar_sessao(request: Request, usuario: dict) -> None:
     """
     Cria uma sessão para o usuário após login
-    
+
     Args:
         request: Objeto Request do FastAPI
         usuario: Dicionário com dados do usuário
     """
-    if hasattr(request, 'session'):
+    if hasattr(request, "session"):
         # Remove senha da sessão por segurança
         usuario_sessao = usuario.copy()
-        usuario_sessao.pop('senha', None)
-        request.session['usuario'] = usuario_sessao
+        usuario_sessao.pop("senha", None)
+        request.session["usuario"] = usuario_sessao
 
 
 def destruir_sessao(request: Request) -> None:
     """
     Destrói a sessão do usuário (logout)
-    
+
     Args:
         request: Objeto Request do FastAPI
     """
-    if hasattr(request, 'session'):
+    if hasattr(request, "session"):
         request.session.clear()
 
 
@@ -98,6 +99,7 @@ def requer_autenticacao(perfis_autorizados: Optional[List[str]] = None):
         async def perfil(request: Request, usuario_logado: dict):
             ...
     """
+
     def decorator(func):
         @wraps(func)
         async def wrapper(*args, **kwargs):
@@ -117,7 +119,7 @@ def requer_autenticacao(perfis_autorizados: Optional[List[str]] = None):
                 logger.error(f"Request object not found in {func.__name__}")
                 raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    detail="Request object not found"
+                    detail="Request object not found",
                 )
 
             # Verifica se o usuário está logado
@@ -130,17 +132,19 @@ def requer_autenticacao(perfis_autorizados: Optional[List[str]] = None):
                 )
 
                 # Flash message informativa
-                informar_erro(request, "Você precisa estar autenticado para acessar esta página.")
+                informar_erro(
+                    request, "Você precisa estar autenticado para acessar esta página."
+                )
 
                 # Redireciona para login preservando destino original
                 return RedirectResponse(
                     url=f"/login?redirect={request.url.path}",
-                    status_code=status.HTTP_303_SEE_OTHER
+                    status_code=status.HTTP_303_SEE_OTHER,
                 )
 
             # Verifica autorização se perfis foram especificados
             if perfis_autorizados:
-                perfil_usuario = usuario.get('perfil', '').lower()
+                perfil_usuario = usuario.get("perfil", "").lower()
                 perfis_permitidos_lower = [p.lower() for p in perfis_autorizados]
 
                 if perfil_usuario not in perfis_permitidos_lower:
@@ -154,14 +158,12 @@ def requer_autenticacao(perfis_autorizados: Optional[List[str]] = None):
 
                     # Flash message informativa
                     informar_erro(
-                        request,
-                        "Você não tem permissão para acessar esta página."
+                        request, "Você não tem permissão para acessar esta página."
                     )
 
                     # Redireciona para página inicial do perfil do usuário
                     return RedirectResponse(
-                        url=f"/{perfil_usuario}",
-                        status_code=status.HTTP_303_SEE_OTHER
+                        url=f"/{perfil_usuario}", status_code=status.HTTP_303_SEE_OTHER
                     )
 
             # Log de acesso bem-sucedido (apenas DEBUG para não poluir logs)
@@ -172,9 +174,10 @@ def requer_autenticacao(perfis_autorizados: Optional[List[str]] = None):
 
             # Adiciona o usuário aos kwargs apenas se a função aceita esse parâmetro
             import inspect
+
             sig = inspect.signature(func)
-            if 'usuario_logado' in sig.parameters:
-                kwargs['usuario_logado'] = usuario
+            if "usuario_logado" in sig.parameters:
+                kwargs["usuario_logado"] = usuario
 
             # Chama a função original
             if asyncio.iscoroutinefunction(func):
@@ -182,12 +185,14 @@ def requer_autenticacao(perfis_autorizados: Optional[List[str]] = None):
             return func(*args, **kwargs)
 
         return wrapper
+
     return decorator
 
 
 # ============================================================
 # RATE LIMITER SIMPLES (Proteção contra Força Bruta)
 # ============================================================
+
 
 class SimpleRateLimiter:
     """
@@ -218,8 +223,7 @@ class SimpleRateLimiter:
 
         # Limpar tentativas antigas
         self.tentativas[identificador] = [
-            t for t in self.tentativas[identificador]
-            if agora - t < self.janela
+            t for t in self.tentativas[identificador] if agora - t < self.janela
         ]
 
         # Verificar se excedeu limite

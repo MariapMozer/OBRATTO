@@ -3,12 +3,17 @@ Rota de teste para o sistema de toasts
 Acesse: http://localhost:8000/teste-toast para testar
 
 Para usar em produção, importe as funções no seu código:
-from utils.flash_messages import informar_sucesso, informar_erro, informar_aviso, informar_info
+from util.flash_messages import informar_sucesso, informar_erro, informar_aviso, informar_info
 """
 
 from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
-from utils.flash_messages import informar_sucesso, informar_erro, informar_aviso, informar_info
+from util.flash_messages import (
+    informar_sucesso,
+    informar_erro,
+    informar_aviso,
+    informar_info,
+)
 
 router = APIRouter()
 
@@ -16,7 +21,8 @@ router = APIRouter()
 @router.get("/teste-toast", response_class=HTMLResponse)
 async def teste_toast_page(request: Request):
     """Página de teste do sistema de toasts"""
-    return HTMLResponse("""
+    return HTMLResponse(
+        """
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -89,7 +95,7 @@ async def teste_toast_page(request: Request):
             <div class="code-example">
                 <strong>Exemplo de uso no backend:</strong><br>
                 <code>
-from utils.flash_messages import informar_sucesso<br>
+from util.flash_messages import informar_sucesso<br>
 <br>
 @app.post("/criar-produto")<br>
 async def criar(request: Request):<br>
@@ -187,7 +193,8 @@ window.showInfo('FYI');
     </script>
 </body>
 </html>
-    """)
+    """
+    )
 
 
 @router.get("/teste-toast/flash-sucesso")

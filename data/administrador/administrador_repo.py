@@ -3,7 +3,7 @@ from typing import Optional, List
 from data.administrador.administrador_model import Administrador
 from data.administrador.administrador_sql import *
 from data.usuario.usuario_model import Usuario
-from utils.db import open_connection
+from util.db import open_connection
 
 
 def criar_tabela_administrador() -> bool:
@@ -44,9 +44,11 @@ def obter_todos_administradores() -> List[Usuario]:
                 cidade=row["cidade"] if "cidade" in row.keys() else "",
                 estado=row["estado"] if "estado" in row.keys() else "",
                 tipo_usuario=row["tipo_usuario"],
-                data_cadastro=row["data_cadastro"]
-            ) for row in rows
+                data_cadastro=row["data_cadastro"],
+            )
+            for row in rows
         ]
+
 
 def obter_administrador_por_id(administrador_id: int) -> Optional[Usuario]:
     with open_connection() as conn:
@@ -69,7 +71,7 @@ def obter_administrador_por_id(administrador_id: int) -> Optional[Usuario]:
                 cidade=row["cidade"] if "cidade" in row.keys() else "",
                 estado=row["estado"] if "estado" in row.keys() else "",
                 tipo_usuario=row["tipo_usuario"],
-                data_cadastro=row["data_cadastro"]
+                data_cadastro=row["data_cadastro"],
             )
     return None
 
@@ -77,10 +79,9 @@ def obter_administrador_por_id(administrador_id: int) -> Optional[Usuario]:
 def atualizar_administrador(administrador: Administrador) -> bool:
     with open_connection() as conn:
         cursor = conn.cursor()
-        cursor.execute(ATUALIZAR_ADMINISTRADOR, (
-            administrador.id_usuario,
-            administrador.id
-        ))
+        cursor.execute(
+            ATUALIZAR_ADMINISTRADOR, (administrador.id_usuario, administrador.id)
+        )
         conn.commit()
         return cursor.rowcount > 0
 
@@ -91,5 +92,3 @@ def deletar_administrador(administrador_id: int) -> bool:
         cursor.execute(DELETAR_ADMINISTRADOR, (administrador_id,))
         conn.commit()
         return cursor.rowcount > 0
-
-

@@ -484,7 +484,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Utilitários globais
-window.AdminFormUtils = {
+window.AdminFormutil = {
     // Função para exportar dados do formulário
     exportFormData() {
         const form = document.getElementById('adminForm');

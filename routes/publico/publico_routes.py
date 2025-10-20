@@ -21,13 +21,14 @@ from dtos.cliente.cliente_dto import CriarClienteDTO
 from dtos.usuario.login_dto import LoginDTO
 from dtos.fornecedor.fornecedor_dto import CriarFornecedorDTO
 from dtos.prestador.prestador_dto import CriarPrestadorDTO
-from utils.auth_decorator import obter_usuario_logado
-# from utils.security import verificar_autenticacao
+from util.auth_decorator import obter_usuario_logado
+
+# from util.security import verificar_autenticacao
 import os
 import uuid
 
-from utils.flash_messages import informar_sucesso
-from utils.security import criar_hash_senha, gerar_token_redefinicao, verificar_senha
+from util.flash_messages import informar_sucesso
+from util.security import criar_hash_senha, gerar_token_redefinicao, verificar_senha
 
 # Configurar logger
 logger = logging.getLogger(__name__)
@@ -43,14 +44,21 @@ async def get_root(request: Request):
 
 @router.get("/escolha_cadastro")
 async def mostrar_escolha_cadastro(request: Request):
-    return templates.TemplateResponse("publico/login_cadastro/escolha_cadastro.html", {"request": request})
+    return templates.TemplateResponse(
+        "publico/login_cadastro/escolha_cadastro.html", {"request": request}
+    )
 
-#--------------CADASTRO-----------------------------
+
+# --------------CADASTRO-----------------------------
+
 
 # Cadastro do prestador
 @router.get("/cadastro/prestador")
 async def exibir_cadastro_prestador(request: Request):
-    return templates.TemplateResponse("publico/prestador/prestador_cadastro.html", {"request": request, "dados": None})
+    return templates.TemplateResponse(
+        "publico/prestador/prestador_cadastro.html", {"request": request, "dados": None}
+    )
+
 
 # Rota para processar o formulário de cadastro
 @router.post("/cadastro/prestador")
@@ -71,7 +79,7 @@ async def processar_cadastro_prestador(
     documento: str = Form(...),
     area_atuacao: str = Form(...),
     razao_social: Optional[str] = Form(None),
-    descricao_servicos: Optional[str] = Form(None)
+    descricao_servicos: Optional[str] = Form(None),
 ):
     # Criar dicionário com dados do formulário (para preservar)
     dados_formulario = {
@@ -87,7 +95,7 @@ async def processar_cadastro_prestador(
         "cpf_cnpj": documento,
         "area_atuacao": area_atuacao,
         "razao_social": razao_social,
-        "descricao_servicos": descricao_servicos
+        "descricao_servicos": descricao_servicos,
     }
 
     try:
@@ -109,8 +117,7 @@ async def processar_cadastro_prestador(
             area_atuacao=area_atuacao,
             razao_social=razao_social,
             descricao_servicos=descricao_servicos,
-            tipo_usuario="prestador"
-
+            tipo_usuario="prestador",
         )
 
         # Verificar se email já existe APÓS a validação do DTO
@@ -120,8 +127,8 @@ async def processar_cadastro_prestador(
                 {
                     "request": request,
                     "erro": "Email já cadastrado",
-                    "dados": dados_formulario
-                }
+                    "dados": dados_formulario,
+                },
             )
 
         # Criar hash da senha
@@ -129,7 +136,7 @@ async def processar_cadastro_prestador(
 
         # Criar objeto Prestador
         prestador = Prestador(
-            id=0, # O ID será gerado pelo banco de dados
+            id=0,  # O ID será gerado pelo banco de dados
             nome=dados_dto.nome,
             email=dados_dto.email,
             senha=senha_hash,
@@ -144,12 +151,12 @@ async def processar_cadastro_prestador(
             bairro=dados_dto.bairro,
             tipo_usuario=dados_dto.tipo_usuario,
             data_cadastro=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            foto=None, # Assumindo que não há upload de foto para prestador neste momento
+            foto=None,  # Assumindo que não há upload de foto para prestador neste momento
             token_redefinicao=None,
             data_token=None,
             area_atuacao=dados_dto.area_atuacao,
             razao_social=dados_dto.razao_social,
-            descricao_servicos=dados_dto.descricao_servicos
+            descricao_servicos=dados_dto.descricao_servicos,
         )
 
         # Inserir no banco de dados
@@ -160,12 +167,15 @@ async def processar_cadastro_prestador(
                 {
                     "request": request,
                     "erro": "Erro ao cadastrar prestador. Tente novamente.",
-                    "dados": dados_formulario
-                }
+                    "dados": dados_formulario,
+                },
             )
 
         # Sucesso - Redirecionar com mensagem flash
-        informar_sucesso(request, f"Cadastro de prestador realizado com sucesso! Bem-vindo(a), {nomeCompleto}!")
+        informar_sucesso(
+            request,
+            f"Cadastro de prestador realizado com sucesso! Bem-vindo(a), {nomeCompleto}!",
+        )
         return RedirectResponse("/login", status_code=status.HTTP_303_SEE_OTHER)
 
     except ValidationError as e:
@@ -175,33 +185,43 @@ async def processar_cadastro_prestador(
             loc_tuple = erro.get("loc")
             campo = str(loc_tuple[0]) if loc_tuple and len(loc_tuple) > 0 else "campo"
             mensagem = erro.get("msg", "")
-            campo_str = str(campo).capitalize() if isinstance(campo, (str, int)) else "campo"
+            campo_str = (
+                str(campo).capitalize() if isinstance(campo, (str, int)) else "campo"
+            )
             erros.append(f"{campo_str}: {mensagem}")
 
         erro_msg = " | ".join(erros)
         # logger.warning(f"Erro de validação no cadastro de prestador: {erro_msg}")
 
         # Retornar template com dados preservados e erro
-        return templates.TemplateResponse("publico/prestador/prestador_cadastro.html", {
-            "request": request,
-            "erro": erro_msg,
-            "dados": dados_formulario  # Preservar dados digitados
-        })
+        return templates.TemplateResponse(
+            "publico/prestador/prestador_cadastro.html",
+            {
+                "request": request,
+                "erro": erro_msg,
+                "dados": dados_formulario,  # Preservar dados digitados
+            },
+        )
 
     except Exception as e:
         # logger.error(f"Erro ao processar cadastro de prestador: {e}")
 
-        return templates.TemplateResponse("publico/prestador/prestador_cadastro.html", {
-            "request": request,
-            "erro": "Erro ao processar cadastro. Tente novamente.",
-            "dados": dados_formulario
-        })
+        return templates.TemplateResponse(
+            "publico/prestador/prestador_cadastro.html",
+            {
+                "request": request,
+                "erro": "Erro ao processar cadastro. Tente novamente.",
+                "dados": dados_formulario,
+            },
+        )
 
 
 # Rota para cadastro de cliente
 @router.get("/cadastro/cliente")
 async def get_page(request: Request):
-    return templates.TemplateResponse("publico/login_cadastro/cadastro.html", {"request": request, "dados": None})
+    return templates.TemplateResponse(
+        "publico/login_cadastro/cadastro.html", {"request": request, "dados": None}
+    )
 
 
 # Rota para processar o formulário de cadastro
@@ -223,7 +243,8 @@ async def post_cadastro(
     bairro: str = Form(...),
     foto: str = Form(None),
     genero: str = Form(...),
-    data_nascimento: str = Form(...)):
+    data_nascimento: str = Form(...),
+):
 
     # Criar dicionário com dados do formulário (para preservar)
     dados_formulario = {
@@ -237,12 +258,13 @@ async def post_cadastro(
         "numero": numero,
         "bairro": bairro,
         "genero": genero,
-        "data_nascimento": data_nascimento
+        "data_nascimento": data_nascimento,
     }
 
     try:
         # Convert data_nascimento string to date if provided
         from datetime import date as date_class
+
         data_nasc_obj: Optional[date_class] = None
         if data_nascimento and data_nascimento.strip():
             try:
@@ -267,7 +289,7 @@ async def post_cadastro(
             cpf_cnpj=cpf_cnpj,
             tipo_usuario="cliente",
             genero=genero,
-            data_nascimento=data_nasc_obj
+            data_nascimento=data_nasc_obj,
         )
 
         # Verificar se email já existe APÓS a validação do DTO
@@ -277,8 +299,8 @@ async def post_cadastro(
                 {
                     "request": request,
                     "erro": "Email já cadastrado",
-                    "dados": dados_formulario
-                }
+                    "dados": dados_formulario,
+                },
             )
 
         # Criar hash da senha
@@ -305,7 +327,7 @@ async def post_cadastro(
             token_redefinicao=None,
             data_token=None,
             genero=genero,
-            data_nascimento=data_nasc_obj
+            data_nascimento=data_nasc_obj,
         )
 
         # Inserir no banco de dados
@@ -316,12 +338,14 @@ async def post_cadastro(
                 {
                     "request": request,
                     "erro": "Erro ao cadastrar cliente. Tente novamente.",
-                    "dados": dados_formulario
-                }
+                    "dados": dados_formulario,
+                },
             )
 
         # Sucesso - Redirecionar com mensagem flash
-        informar_sucesso(request, f"Cadastro de cliente realizado com sucesso! Bem-vindo(a), {nome}!")
+        informar_sucesso(
+            request, f"Cadastro de cliente realizado com sucesso! Bem-vindo(a), {nome}!"
+        )
         return RedirectResponse("/login", status_code=status.HTTP_303_SEE_OTHER)
 
     except ValidationError as e:
@@ -331,34 +355,44 @@ async def post_cadastro(
             loc_tuple = erro.get("loc")
             campo = str(loc_tuple[0]) if loc_tuple and len(loc_tuple) > 0 else "campo"
             mensagem = erro.get("msg", "")
-            campo_str = str(campo).capitalize() if isinstance(campo, (str, int)) else "campo"
+            campo_str = (
+                str(campo).capitalize() if isinstance(campo, (str, int)) else "campo"
+            )
             erros.append(f"{campo_str}: {mensagem}")
 
         erro_msg = " | ".join(erros)
         # logger.warning(f"Erro de validação no cadastro de prestador: {erro_msg}")
 
         # Retornar template com dados preservados e erro
-        return templates.TemplateResponse("publico/cliente/cadastro_cliente.html", {
-            "request": request,
-            "erro": erro_msg,
-            "dados": dados_formulario  # Preservar dados digitados
-        })
+        return templates.TemplateResponse(
+            "publico/cliente/cadastro_cliente.html",
+            {
+                "request": request,
+                "erro": erro_msg,
+                "dados": dados_formulario,  # Preservar dados digitados
+            },
+        )
 
     except Exception as e:
         # logger.error(f"Erro ao processar cadastro de prestador: {e}")
 
-        return templates.TemplateResponse("publico/cliente/cadastro_cliente.html", {
-            "request": request,
-            "erro": "Erro ao processar cadastro. Tente novamente.",
-            "dados": dados_formulario
-        })
-
+        return templates.TemplateResponse(
+            "publico/cliente/cadastro_cliente.html",
+            {
+                "request": request,
+                "erro": "Erro ao processar cadastro. Tente novamente.",
+                "dados": dados_formulario,
+            },
+        )
 
 
 # Rota para cadastro de fornecedor
 @router.get("/cadastro/fornecedor")
 async def exibir_cadastro_fornecedor(request: Request):
-    return templates.TemplateResponse("publico/fornecedor2/cadastro_fornecedor.html", {"request": request})
+    return templates.TemplateResponse(
+        "publico/fornecedor2/cadastro_fornecedor.html", {"request": request}
+    )
+
 
 # Cadastro de fornecedor (POST)
 @router.post("/cadastro/fornecedor")
@@ -378,7 +412,7 @@ async def processar_cadastro_fornecedor(
     razao_social: Optional[str] = Form(None),
     complemento: Optional[str] = Form(None),
     cep: Optional[str] = Form(None),
-    foto: UploadFile = File(None)
+    foto: UploadFile = File(None),
 ):
     # Preservar dados do formulário (exceto senhas por segurança)
     dados_formulario = {
@@ -393,7 +427,7 @@ async def processar_cadastro_fornecedor(
         "cpf_cnpj": cpf_cnpj,
         "razao_social": razao_social,
         "complemento": complemento,
-        "cep": cep
+        "cep": cep,
     }
 
     try:
@@ -416,18 +450,30 @@ async def processar_cadastro_fornecedor(
             razao_social=razao_social,
             complemento=complemento or "",
             cep=cep or "",
-            tipo_usuario="fornecedor"
+            tipo_usuario="fornecedor",
         )
 
         # Log: valor depois da validação (limpo) — usar INFO para visibilidade
-        logger.info(f"[DEBUG-INFO] fornecedor_dto.cpf_cnpj (após validação): {repr(getattr(fornecedor_dto, 'cpf_cnpj', None))}")
+        logger.info(
+            f"[DEBUG-INFO] fornecedor_dto.cpf_cnpj (após validação): {repr(getattr(fornecedor_dto, 'cpf_cnpj', None))}"
+        )
 
         # Verificar se todos os campos obrigatórios foram preenchidos (usar valores validados pelo DTO)
-        if not fornecedor_dto.nome or not fornecedor_dto.email or not fornecedor_dto.senha or not fornecedor_dto.confirmar_senha or not fornecedor_dto.cpf_cnpj:
+        if (
+            not fornecedor_dto.nome
+            or not fornecedor_dto.email
+            or not fornecedor_dto.senha
+            or not fornecedor_dto.confirmar_senha
+            or not fornecedor_dto.cpf_cnpj
+        ):
             return templates.TemplateResponse(
                 "publico/fornecedor2/cadastro_fornecedor.html",
-                {"request": request, "erro": "Preencha todos os campos.", "dados": dados_formulario},
-                status_code=status.HTTP_400_BAD_REQUEST
+                {
+                    "request": request,
+                    "erro": "Preencha todos os campos.",
+                    "dados": dados_formulario,
+                },
+                status_code=status.HTTP_400_BAD_REQUEST,
             )
 
         # Verificar se senhas coincidem (usar valores do DTO)
@@ -437,9 +483,9 @@ async def processar_cadastro_fornecedor(
                 {
                     "request": request,
                     "erro": "As senhas não coincidem.",
-                    "dados": dados_formulario
+                    "dados": dados_formulario,
                 },
-                status_code=status.HTTP_400_BAD_REQUEST
+                status_code=status.HTTP_400_BAD_REQUEST,
             )
 
         # Verificar se email já existe (usar email validado pelo DTO)
@@ -449,17 +495,21 @@ async def processar_cadastro_fornecedor(
                 {
                     "request": request,
                     "erro": "Email já cadastrado. Tente fazer login ou use outro email.",
-                    "dados": dados_formulario
+                    "dados": dados_formulario,
                 },
-                status_code=status.HTTP_400_BAD_REQUEST
+                status_code=status.HTTP_400_BAD_REQUEST,
             )
 
         # Criar hash da senha (usar senha validada)
         senha_hash = criar_hash_senha(fornecedor_dto.senha)
 
         # Garante que razao_social nunca seja None ou string vazia (usar DTO)
-        razao_social_value = getattr(fornecedor_dto, 'razao_social', None)
-        razao_social_final = razao_social_value if razao_social_value and razao_social_value.strip() else fornecedor_dto.nome
+        razao_social_value = getattr(fornecedor_dto, "razao_social", None)
+        razao_social_final = (
+            razao_social_value
+            if razao_social_value and razao_social_value.strip()
+            else fornecedor_dto.nome
+        )
 
         # Lógica de upload de foto
         caminho_foto = None
@@ -469,14 +519,15 @@ async def processar_cadastro_fornecedor(
                 return templates.TemplateResponse(
                     "publico/fornecedor2/cadastro_fornecedor.html",
                     {
-                        "request": request, 
+                        "request": request,
                         "erro": "Tipo de arquivo de foto inválido. Use apenas JPG, JPEG ou PNG.",
-                        "dados": dados_formulario
-                    }
+                        "dados": dados_formulario,
+                    },
                 )
             upload_dir = "static/uploads/fornecedores"
             os.makedirs(upload_dir, exist_ok=True)
             import secrets
+
             extensao = foto.filename.split(".")[-1]
             nome_arquivo = f"{fornecedor_dto.email}_{secrets.token_hex(8)}.{extensao}"
             caminho_arquivo = os.path.join(upload_dir, nome_arquivo)
@@ -493,12 +544,12 @@ async def processar_cadastro_fornecedor(
             senha=senha_hash,
             cpf_cnpj=fornecedor_dto.cpf_cnpj,
             telefone=fornecedor_dto.telefone,
-            cep=getattr(fornecedor_dto, 'cep', '') or "",
+            cep=getattr(fornecedor_dto, "cep", "") or "",
             estado=fornecedor_dto.estado,
             cidade=fornecedor_dto.cidade,
             rua=fornecedor_dto.rua,
             numero=fornecedor_dto.numero,
-            complemento=getattr(fornecedor_dto, 'complemento', None) or "",
+            complemento=getattr(fornecedor_dto, "complemento", None) or "",
             bairro=fornecedor_dto.bairro,
             tipo_usuario="Fornecedor",
             data_cadastro=datetime.now().isoformat(),
@@ -514,17 +565,17 @@ async def processar_cadastro_fornecedor(
             return templates.TemplateResponse(
                 "publico/fornecedor2/cadastro_fornecedor.html",
                 {
-                    "request": request, 
+                    "request": request,
                     "erro": "Erro ao cadastrar fornecedor. Tente novamente.",
-                    "dados": dados_formulario
-                }
+                    "dados": dados_formulario,
+                },
             )
 
         # Cadastro realizado com sucesso - redirecionar para login
         logger.info(f"Fornecedor cadastrado com sucesso: {fornecedor_dto.email}")
         return RedirectResponse(
-            url="/login?mensagem=Cadastro realizado com sucesso! Faça seu login.", 
-            status_code=status.HTTP_303_SEE_OTHER
+            url="/login?mensagem=Cadastro realizado com sucesso! Faça seu login.",
+            status_code=status.HTTP_303_SEE_OTHER,
         )
 
     except ValidationError as e:
@@ -535,9 +586,9 @@ async def processar_cadastro_fornecedor(
         logger.warning(f"[DEBUG-WARN] ValidationError.errors(): {e.errors()}")
         for erro in e.errors():
             # loc pode ser ('field',) ou ('field', 0, ...); pegamos o primeiro elemento
-            loc = erro.get('loc')
-            campo = str(loc[0]) if loc and len(loc) > 0 else 'campo'
-            mensagem = erro.get('msg')
+            loc = erro.get("loc")
+            campo = str(loc[0]) if loc and len(loc) > 0 else "campo"
+            mensagem = erro.get("msg")
             campo_str = str(campo) if not isinstance(campo, str) else campo
             texto = f"{campo_str.capitalize()}: {mensagem}"
             erros.append(texto)
@@ -556,8 +607,8 @@ async def processar_cadastro_fornecedor(
                 "erro": erro_msg,
                 "erros_list": erros,
                 "campos_erro": campos_erro,
-                "dados": dados_formulario  # Preservar dados digitados
-            }
+                "dados": dados_formulario,  # Preservar dados digitados
+            },
         )
 
     except Exception as e:
@@ -568,17 +619,15 @@ async def processar_cadastro_fornecedor(
             {
                 "request": request,
                 "erro": "Erro ao processar cadastro. Tente novamente.",
-                "dados": dados_formulario
-            }
+                "dados": dados_formulario,
+            },
         )
 
 
-       
-    
-   
-#---------------------------------------------------------------------
+# ---------------------------------------------------------------------
 
-#--------------LOGIN/LOGOUT-----------------------------
+# --------------LOGIN/LOGOUT-----------------------------
+
 
 @router.get("/login")
 async def mostrar_login(request: Request, mensagem: Optional[str] = None):
@@ -587,93 +636,111 @@ async def mostrar_login(request: Request, mensagem: Optional[str] = None):
         context["sucesso"] = mensagem
     return templates.TemplateResponse("publico/login_cadastro/login.html", context)
 
+
 @router.post("/login")
-async def processar_login(
-    request: Request,
-    email: str = Form(), 
-    senha: str = Form()):
+async def processar_login(request: Request, email: str = Form(), senha: str = Form()):
 
     dados_formulario = {"email": email}
     try:
         login_dto = LoginDTO(email=email, senha=senha)
 
         if not email or not senha:
-            return templates.TemplateResponse("publico/login_cadastro/login.html", 
-                {"request": request, "erro": "Preencha todos os campos."}, 
-                status_code=status.HTTP_400_BAD_REQUEST)
+            return templates.TemplateResponse(
+                "publico/login_cadastro/login.html",
+                {"request": request, "erro": "Preencha todos os campos."},
+                status_code=status.HTTP_400_BAD_REQUEST,
+            )
 
         usuario = usuario_repo.obter_usuario_por_email(login_dto.email)
         print("DEBUG usuario:", usuario)
         if not usuario or not verificar_senha(login_dto.senha, usuario.senha):
-            return templates.TemplateResponse("publico/login_cadastro/login.html", 
-                {"request": request, "erro": "Email ou senha inválidos"}, status_code=status.HTTP_401_UNAUTHORIZED)
+            return templates.TemplateResponse(
+                "publico/login_cadastro/login.html",
+                {"request": request, "erro": "Email ou senha inválidos"},
+                status_code=status.HTTP_401_UNAUTHORIZED,
+            )
 
         # Cria sessão completa
-        perfil_usuario = getattr(usuario, "perfil", getattr(usuario, "tipo_usuario", "cliente"))
+        perfil_usuario = getattr(
+            usuario, "perfil", getattr(usuario, "tipo_usuario", "cliente")
+        )
         usuario_dict = {
             "id": usuario.id,
             "nome": usuario.nome,
             "email": usuario.email,
             "perfil": perfil_usuario.lower(),  # Normaliza o perfil para minúsculas
-            "foto": getattr(usuario, "foto", None)
+            "foto": getattr(usuario, "foto", None),
         }
         request.session["usuario"] = usuario_dict
 
         # Redireciona conforme perfil
         perfil = usuario_dict["perfil"]
         if perfil == "admin" or perfil == "administrador":
-            return RedirectResponse("/administrador/home", status_code=status.HTTP_303_SEE_OTHER)
+            return RedirectResponse(
+                "/administrador/home", status_code=status.HTTP_303_SEE_OTHER
+            )
         elif perfil == "fornecedor":
-            return RedirectResponse("/fornecedor", status_code=status.HTTP_303_SEE_OTHER)
+            return RedirectResponse(
+                "/fornecedor", status_code=status.HTTP_303_SEE_OTHER
+            )
         elif perfil == "cliente":
             return RedirectResponse("/cliente", status_code=status.HTTP_303_SEE_OTHER)
         elif perfil == "prestador":
             return RedirectResponse("/prestador", status_code=status.HTTP_303_SEE_OTHER)
         else:
             return RedirectResponse("/", status_code=status.HTTP_303_SEE_OTHER)
-            
+
     except ValidationError as e:
         # Extrair mensagens de erro do Pydantic
         erros = []
         for erro in e.errors():
-            loc = erro['loc']
-            campo = str(loc[0]) if loc and len(loc) > 0 else 'campo'
-            mensagem = erro['msg']
+            loc = erro["loc"]
+            campo = str(loc[0]) if loc and len(loc) > 0 else "campo"
+            mensagem = erro["msg"]
             erros.append(f"{campo.capitalize()}: {mensagem}")
 
         erro_msg = " | ".join(erros)
         logger.warning(f"Erro de validação no cadastro: {erro_msg}")
 
         # Retornar template com dados preservados e erro
-        return templates.TemplateResponse("publico/login_cadastro/login.html", {
-            "request": request,
-            "erro": erro_msg,
-            "dados": dados_formulario  # Preservar dados digitados
-        })
+        return templates.TemplateResponse(
+            "publico/login_cadastro/login.html",
+            {
+                "request": request,
+                "erro": erro_msg,
+                "dados": dados_formulario,  # Preservar dados digitados
+            },
+        )
 
     except Exception as e:
         logger.error(f"Erro ao processar cadastro: {e}")
 
-        return templates.TemplateResponse("publico/login_cadastro/login.html", {
-            "request": request,
-            "erro": "Erro ao processar cadastro. Tente novamente.",
-            "dados": dados_formulario
-        })
-    
-        
+        return templates.TemplateResponse(
+            "publico/login_cadastro/login.html",
+            {
+                "request": request,
+                "erro": "Erro ao processar cadastro. Tente novamente.",
+                "dados": dados_formulario,
+            },
+        )
+
 
 @router.get("/logout")
 async def logout(request: Request):
     request.session.clear()
     return RedirectResponse("/", status_code=status.HTTP_303_SEE_OTHER)
 
-#-----------------------------------------------------
 
-#--------------RECUPERAR SENHA-----------------------------
+# -----------------------------------------------------
+
+# --------------RECUPERAR SENHA-----------------------------
+
 
 @router.get("/recuperar-senha")
 async def recuperar_senha_get(request: Request):
-    return templates.TemplateResponse("publico/login_cadastro/recuperar_senha.html", {"request": request})
+    return templates.TemplateResponse(
+        "publico/login_cadastro/recuperar_senha.html", {"request": request}
+    )
 
 
 @router.post("/recuperar-senha")
@@ -689,15 +756,23 @@ async def recuperar_senha_post(request: Request, email: str = Form(...)):
         mensagem = f"Enviamos um link de recuperação para o e-mail: {email}. (Simulação: {link})"
     else:
         mensagem = "E-mail não encontrado."
-    return templates.TemplateResponse("publico/recuperar_senha.html", {"request": request, "mensagem": mensagem})
+    return templates.TemplateResponse(
+        "publico/recuperar_senha.html", {"request": request, "mensagem": mensagem}
+    )
 
 
 @router.get("/resetar-senha")
 async def resetar_senha_get(request: Request, token: str):
-    return templates.TemplateResponse("publico/login_cadastro/redefinir_senha.html", {"request": request, "token": token})
+    return templates.TemplateResponse(
+        "publico/login_cadastro/redefinir_senha.html",
+        {"request": request, "token": token},
+    )
+
 
 @router.post("/resetar-senha")
-async def resetar_senha_post(request: Request, token: str = Form(...), nova_senha: str = Form(...)):
+async def resetar_senha_post(
+    request: Request, token: str = Form(...), nova_senha: str = Form(...)
+):
     usuario = usuario_repo.obter_usuario_por_token(token)
     if usuario:
         usuario.senha = criar_hash_senha(nova_senha)
@@ -707,31 +782,44 @@ async def resetar_senha_post(request: Request, token: str = Form(...), nova_senh
         return RedirectResponse("/publico/login_cadastro/login.html", status_code=303)
     else:
         mensagem = "Token inválido ou expirado."
-        return templates.TemplateResponse("publico/login_cadastro/redefinir_senha.html", {"request": request, 
-        "mensagem": mensagem, "token": token})
+        return templates.TemplateResponse(
+            "publico/login_cadastro/redefinir_senha.html",
+            {"request": request, "mensagem": mensagem, "token": token},
+        )
 
-#-----------------------------------------------------
+
+# -----------------------------------------------------
+
 
 # Rota para perfil público do prestador
 @router.get("/prestador/perfil_publico")
 async def exibir_perfil_publico_prestador(request: Request):
-    return templates.TemplateResponse("publico/prestador/perfil_publico.html", {"request": request})
+    return templates.TemplateResponse(
+        "publico/prestador/perfil_publico.html", {"request": request}
+    )
+
 
 # Rota para perfil público do cliente
 @router.get("/cliente/perfil_publico")
 async def exibir_perfil_publico_cliente(request: Request):
-    return templates.TemplateResponse("publico/cliente/perfil_publico.html", {"request": request})
+    return templates.TemplateResponse(
+        "publico/cliente/perfil_publico.html", {"request": request}
+    )
+
 
 # Rota para perfil público do fornecedor
 @router.get("/fornecedor/perfil_publico")
 async def exibir_perfil_publico_fornecedor(request: Request):
-    return templates.TemplateResponse("publico/perfil_publico_fornecedor.html", {"request": request})
+    return templates.TemplateResponse(
+        "publico/perfil_publico_fornecedor.html", {"request": request}
+    )
 
-#-----------------------------------------------------
-#----------------- MENSAGEM --------------------------
+
+# -----------------------------------------------------
+# ----------------- MENSAGEM --------------------------
 
 
-# ROTAS PRINCIPAIS 
+# ROTAS PRINCIPAIS
 
 # @router.get("/mensagens")
 # async def exibir_caixa_mensagens(request: Request):
@@ -739,19 +827,19 @@ async def exibir_perfil_publico_fornecedor(request: Request):
 #     usuario = obter_usuario_logado(request)
 #     if not usuario:
 #         return RedirectResponse("/login", status_code=status.HTTP_303_SEE_OTHER)
-    
+
 #     # Obter todas as mensagens do usuário (enviadas e recebidas)
 #     todas_mensagens = mensagem_repo.obter_mensagem()
-    
+
 #     # Filtrar mensagens do usuário atual
 #     mensagens_usuario = [
-#         msg for msg in todas_mensagens 
+#         msg for msg in todas_mensagens
 #         if msg.id_remetente == usuario["id"] or msg.id_destinatario == usuario["id"]
 #     ]
-    
+
 #     # Organizar conversas por contato
 #     conversas = organizar_conversas_por_contato(mensagens_usuario, usuario["id"])
-    
+
 #     return templates.TemplateResponse("publico/mensagens/mensagens.html", {
 #         "request": request,
 #         "usuario": usuario,
@@ -759,35 +847,41 @@ async def exibir_perfil_publico_fornecedor(request: Request):
 #         "mensagens": mensagens_usuario
 #     })
 
+
 @router.get("/mensagens/conversa/{contato_id}")
 async def exibir_conversa(request: Request, contato_id: int):
     """Exibe uma conversa específica entre o usuário logado e um contato"""
     usuario = obter_usuario_logado(request)
     if not usuario:
         return RedirectResponse("/login", status_code=status.HTTP_303_SEE_OTHER)
-    
+
     # Obter dados do contato
     contato = obter_dados_usuario_por_id(contato_id)
     if not contato:
         return RedirectResponse("/mensagens", status_code=status.HTTP_303_SEE_OTHER)
-    
+
     # Obter mensagens da conversa
     todas_mensagens = mensagem_repo.obter_mensagem(usuario["id"])
     mensagens_conversa = [
-        msg for msg in todas_mensagens
-        if (msg.id_remetente == usuario["id"] and msg.id_destinatario == contato_id) or
-           (msg.id_remetente == contato_id and msg.id_destinatario == usuario["id"])
+        msg
+        for msg in todas_mensagens
+        if (msg.id_remetente == usuario["id"] and msg.id_destinatario == contato_id)
+        or (msg.id_remetente == contato_id and msg.id_destinatario == usuario["id"])
     ]
-    
+
     # Ordenar por data
     mensagens_conversa.sort(key=lambda x: x.data_hora)
-    
-    return templates.TemplateResponse("publico/mensagens/mensagens.html", {
-        "request": request,
-        "usuario": usuario,
-        "contato": contato,
-        "mensagens": mensagens_conversa
-    })
+
+    return templates.TemplateResponse(
+        "publico/mensagens/mensagens.html",
+        {
+            "request": request,
+            "usuario": usuario,
+            "contato": contato,
+            "mensagens": mensagens_conversa,
+        },
+    )
+
 
 @router.get("/mensagens/nova")
 async def exibir_nova_mensagem(request: Request):
@@ -795,33 +889,37 @@ async def exibir_nova_mensagem(request: Request):
     usuario = obter_usuario_logado(request)
     if not usuario:
         return RedirectResponse("/login", status_code=status.HTTP_303_SEE_OTHER)
-    
+
     # Obter usuários disponíveis baseado no tipo do usuário logado
-    usuarios_disponiveis = obter_usuarios_disponiveis_por_tipo(usuario["perfil"], usuario["id"])
-    
-    return templates.TemplateResponse("publico/mensagens/mensagens.html", {
-        "request": request,
-        "usuario": usuario,
-        "usuarios_disponiveis": usuarios_disponiveis
-    })
+    usuarios_disponiveis = obter_usuarios_disponiveis_por_tipo(
+        usuario["perfil"], usuario["id"]
+    )
+
+    return templates.TemplateResponse(
+        "publico/mensagens/mensagens.html",
+        {
+            "request": request,
+            "usuario": usuario,
+            "usuarios_disponiveis": usuarios_disponiveis,
+        },
+    )
+
 
 @router.post("/mensagens/enviar")
 async def processar_envio_mensagem(
-    request: Request,
-    destinatario_id: int = Form(...),
-    conteudo: str = Form(...)
+    request: Request, destinatario_id: int = Form(...), conteudo: str = Form(...)
 ):
     """Processa o envio de uma nova mensagem"""
     usuario = obter_usuario_logado(request)
     if not usuario:
         return RedirectResponse("/login", status_code=status.HTTP_303_SEE_OTHER)
-    
+
     try:
         # Validar destinatário
         destinatario = obter_dados_usuario_por_id(destinatario_id)
         if not destinatario:
             return RedirectResponse("/mensagens", status_code=status.HTTP_303_SEE_OTHER)
-        
+
         # Criar mensagem
         mensagem = Mensagem(
             id_mensagem=0,  # Será gerado automaticamente
@@ -830,146 +928,167 @@ async def processar_envio_mensagem(
             conteudo=conteudo,
             data_hora=datetime.now(),
             nome_remetente=usuario["nome"],
-            nome_destinatario=destinatario.nome
-        )
-        
-        # Inserir mensagem no banco
-        mensagem_repo.inserir_mensagem(mensagem)
-        
-        return RedirectResponse(
-            f"/mensagens/conversa/{destinatario_id}", 
-            status_code=status.HTTP_303_SEE_OTHER
-        )
-        
-    except Exception as e:
-        return RedirectResponse(
-            "/mensagens", 
-            status_code=status.HTTP_303_SEE_OTHER
+            nome_destinatario=destinatario.nome,
         )
 
-#-----------------------------------------------------
-#------------- FUNÇÕES AUXILIARES -------------------
-#-----------------------------------------------------
+        # Inserir mensagem no banco
+        mensagem_repo.inserir_mensagem(mensagem)
+
+        return RedirectResponse(
+            f"/mensagens/conversa/{destinatario_id}",
+            status_code=status.HTTP_303_SEE_OTHER,
+        )
+
+    except Exception as e:
+        return RedirectResponse("/mensagens", status_code=status.HTTP_303_SEE_OTHER)
+
+
+# -----------------------------------------------------
+# ------------- FUNÇÕES AUXILIARES -------------------
+# -----------------------------------------------------
+
 
 def obter_dados_usuario_por_id(usuario_id: int):
     """Obtém dados de um usuário por ID, buscando em todas as tabelas"""
     # Tentar buscar em clientes
     try:
-        if hasattr(cliente_repo, 'obter_cliente_por_id'):
+        if hasattr(cliente_repo, "obter_cliente_por_id"):
             cliente = cliente_repo.obter_cliente_por_id(usuario_id)
             if cliente:
                 return cliente
     except:
         pass
-    
+
     # Tentar buscar em prestadores
     try:
-        if hasattr(prestador_repo, 'obter_prestador_por_id'):
+        if hasattr(prestador_repo, "obter_prestador_por_id"):
             prestador = prestador_repo.obter_prestador_por_id(usuario_id)
             if prestador:
                 return prestador
     except:
         pass
-    
+
     # Tentar buscar em fornecedores
     try:
-        if hasattr(fornecedor_repo, 'obter_fornecedor_por_id'):
+        if hasattr(fornecedor_repo, "obter_fornecedor_por_id"):
             fornecedor = fornecedor_repo.obter_fornecedor_por_id(usuario_id)
             if fornecedor:
                 return fornecedor
     except:
         pass
-    
+
     # Tentar buscar na tabela geral de usuários
     try:
-        if hasattr(usuario_repo, 'obter_usuario_por_id'):
+        if hasattr(usuario_repo, "obter_usuario_por_id"):
             usuario = usuario_repo.obter_usuario_por_id(usuario_id)
             if usuario:
                 return usuario
     except:
         pass
-    
+
     return None
+
 
 def obter_usuarios_disponiveis_por_tipo(tipo_usuario: str, usuario_id: int):
     """Obtém usuários disponíveis baseado no tipo do usuário logado"""
     usuarios = []
-    
+
     if tipo_usuario.lower() == "cliente":
         # Clientes podem enviar para prestadores e fornecedores
         try:
-            if hasattr(prestador_repo, 'obter_todos_prestadores'):
+            if hasattr(prestador_repo, "obter_todos_prestadores"):
                 prestadores = prestador_repo.obter_todos_prestadores()
                 for p in prestadores:
                     if p.id != usuario_id:
-                        usuarios.append({
-                            "id": p.id,
-                            "nome": p.nome,
-                            "tipo": "prestador",
-                            "email": getattr(p, 'email', ''),
-                            "area_atuacao": getattr(p, 'area_atuacao', '')
-                        })
+                        usuarios.append(
+                            {
+                                "id": p.id,
+                                "nome": p.nome,
+                                "tipo": "prestador",
+                                "email": getattr(p, "email", ""),
+                                "area_atuacao": getattr(p, "area_atuacao", ""),
+                            }
+                        )
         except:
             pass
-        
+
         try:
-            if hasattr(fornecedor_repo, 'obter_todos_fornecedores'):
+            if hasattr(fornecedor_repo, "obter_todos_fornecedores"):
                 fornecedores = fornecedor_repo.obter_todos_fornecedores()
                 for f in fornecedores:
                     if f.id != usuario_id:
-                        usuarios.append({
-                            "id": f.id,
-                            "nome": f.nome,
-                            "tipo": "fornecedor",
-                            "email": getattr(f, 'email', ''),
-                            "razao_social": getattr(f, 'razao_social', '')
-                        })
+                        usuarios.append(
+                            {
+                                "id": f.id,
+                                "nome": f.nome,
+                                "tipo": "fornecedor",
+                                "email": getattr(f, "email", ""),
+                                "razao_social": getattr(f, "razao_social", ""),
+                            }
+                        )
         except:
             pass
-    
+
     elif tipo_usuario.lower() in ["prestador", "fornecedor"]:
         # Prestadores e fornecedores podem enviar para clientes
         try:
-            if hasattr(cliente_repo, 'obter_todos_clientes'):
+            if hasattr(cliente_repo, "obter_todos_clientes"):
                 clientes = cliente_repo.obter_todos_clientes()
                 for c in clientes:
                     if c.id != usuario_id:
-                        usuarios.append({
-                            "id": c.id,
-                            "nome": c.nome,
-                            "tipo": "cliente",
-                            "email": getattr(c, 'email', '')
-                        })
+                        usuarios.append(
+                            {
+                                "id": c.id,
+                                "nome": c.nome,
+                                "tipo": "cliente",
+                                "email": getattr(c, "email", ""),
+                            }
+                        )
         except:
             pass
-    
+
     return usuarios
+
 
 def organizar_conversas_por_contato(mensagens, usuario_id):
     """Organiza mensagens em conversas por contato"""
     conversas = {}
-    
+
     for msg in mensagens:
         # Determinar o ID do contato (quem não é o usuário atual)
-        contato_id = msg.id_destinatario if msg.id_remetente == usuario_id else msg.id_remetente
-        contato_nome = msg.nome_destinatario if msg.id_remetente == usuario_id else msg.nome_remetente
-        
+        contato_id = (
+            msg.id_destinatario if msg.id_remetente == usuario_id else msg.id_remetente
+        )
+        contato_nome = (
+            msg.nome_destinatario
+            if msg.id_remetente == usuario_id
+            else msg.nome_remetente
+        )
+
         if contato_id not in conversas:
             conversas[contato_id] = {
                 "contato_id": contato_id,
                 "contato_nome": contato_nome,
                 "mensagens": [],
-                "ultima_mensagem": None
+                "ultima_mensagem": None,
             }
-        
+
         conversas[contato_id]["mensagens"].append(msg)
-        
+
         # Atualizar última mensagem (assumindo que as mensagens estão ordenadas)
-        if not conversas[contato_id]["ultima_mensagem"] or msg.data_hora > conversas[contato_id]["ultima_mensagem"].data_hora:
+        if (
+            not conversas[contato_id]["ultima_mensagem"]
+            or msg.data_hora > conversas[contato_id]["ultima_mensagem"].data_hora
+        ):
             conversas[contato_id]["ultima_mensagem"] = msg
-    
+
     # Converter para lista e ordenar por última mensagem
     lista_conversas = list(conversas.values())
-    lista_conversas.sort(key=lambda x: x["ultima_mensagem"].data_hora if x["ultima_mensagem"] else datetime.min, reverse=True)
-    
+    lista_conversas.sort(
+        key=lambda x: (
+            x["ultima_mensagem"].data_hora if x["ultima_mensagem"] else datetime.min
+        ),
+        reverse=True,
+    )
+
     return lista_conversas

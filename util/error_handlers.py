@@ -8,14 +8,15 @@ from typing import Callable, Optional
 from fastapi import Request
 from fastapi.templating import Jinja2Templates
 from pydantic import ValidationError
-from utils.exceptions import ValidacaoError, RecursoNaoEncontradoError, ObrattoError
-from utils.flash_messages import informar_erro, informar_sucesso
+from util.exceptions import ValidacaoError, RecursoNaoEncontradoError, ObrattoError
+from util.flash_messages import informar_erro, informar_sucesso
 
 logger = logging.getLogger(__name__)
 
 
-def tratar_erro_rota(template_erro: Optional[str] = None,
-                     redirect_erro: Optional[str] = None):
+def tratar_erro_rota(
+    template_erro: Optional[str] = None, redirect_erro: Optional[str] = None
+):
     """
     Decorador para tratar erros em rotas web
 
@@ -29,6 +30,7 @@ def tratar_erro_rota(template_erro: Optional[str] = None,
         async def cadastrar(request: Request):
             # Seu código aqui
     """
+
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
         async def wrapper(request: Request, *args, **kwargs):
@@ -38,25 +40,27 @@ def tratar_erro_rota(template_erro: Optional[str] = None,
             except ValidationError as e:
                 # Extrair primeira mensagem de erro do Pydantic
                 error_msg = e.errors()[0]["msg"]
-                logger.warning(f"Erro de validação Pydantic: {error_msg} - Rota: {request.url}")
+                logger.warning(
+                    f"Erro de validação Pydantic: {error_msg} - Rota: {request.url}"
+                )
 
                 if template_erro:
                     templates = Jinja2Templates(directory="templates")
-                    return templates.TemplateResponse(template_erro, {
-                        "request": request,
-                        "erro": error_msg
-                    })
+                    return templates.TemplateResponse(
+                        template_erro, {"request": request, "erro": error_msg}
+                    )
 
             except ValidacaoError as e:
-                logger.warning(f"Erro de validação customizado: {e} - Rota: {request.url}")
+                logger.warning(
+                    f"Erro de validação customizado: {e} - Rota: {request.url}"
+                )
                 informar_erro(request, f"Dados inválidos: {e.mensagem}")
 
                 if template_erro:
                     templates = Jinja2Templates(directory="templates")
-                    return templates.TemplateResponse(template_erro, {
-                        "request": request,
-                        "erro": e.mensagem
-                    })
+                    return templates.TemplateResponse(
+                        template_erro, {"request": request, "erro": e.mensagem}
+                    )
 
             except RecursoNaoEncontradoError as e:
                 logger.info(f"Recurso não encontrado: {e} - Rota: {request.url}")
@@ -73,13 +77,15 @@ def tratar_erro_rota(template_erro: Optional[str] = None,
             # Fallback para redirect ou template
             if redirect_erro:
                 from fastapi.responses import RedirectResponse
+
                 return RedirectResponse(redirect_erro)
             elif template_erro:
                 templates = Jinja2Templates(directory="templates")
-                return templates.TemplateResponse(template_erro, {
-                    "request": request,
-                    "erro": "Ocorreu um erro. Tente novamente."
-                })
+                return templates.TemplateResponse(
+                    template_erro,
+                    {"request": request, "erro": "Ocorreu um erro. Tente novamente."},
+                )
 
         return wrapper
+
     return decorator

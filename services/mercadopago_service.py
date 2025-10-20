@@ -1,4 +1,5 @@
-from utils.mercadopago_config import mp_config
+from util.mercadopago_config import mp_config
+
 
 class MercadoPagoService:
     def __init__(self):

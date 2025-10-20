@@ -2,7 +2,7 @@ from datetime import datetime
 from pydantic import Field, field_validator
 from typing import Optional
 from ..base_dto import BaseDTO
-from utils.validacoes_dto import validar_texto_opcional
+from util.validacoes_dto import validar_texto_opcional
 
 
 class CriarServicoDTO(BaseDTO):
@@ -14,32 +14,30 @@ class CriarServicoDTO(BaseDTO):
     valor_base: float = Field(..., gt=0)
     nome_prestador: Optional[str] = Field(None, description="Nome do prestador")
 
-
-    @field_validator('titulo')
+    @field_validator("titulo")
     @classmethod
     def validar_titulo(cls, v: Optional[str]) -> Optional[str]:
         return cls.validar_campo_wrapper(
-            lambda valor, campo: validar_texto_opcional(valor, max_chars=100),
-            "Título"
+            lambda valor, campo: validar_texto_opcional(valor, max_chars=100), "Título"
         )(v)
-    
-    @field_validator('descricao')
+
+    @field_validator("descricao")
     @classmethod
     def validar_descricao(cls, v: Optional[str]) -> Optional[str]:
         return cls.validar_campo_wrapper(
             lambda valor, campo: validar_texto_opcional(valor, max_chars=500),
-            "Descrição do serviço"
+            "Descrição do serviço",
         )(v)
 
-    @field_validator('categoria')
+    @field_validator("categoria")
     @classmethod
     def validar_categoria(cls, v: Optional[str]) -> Optional[str]:
         return cls.validar_campo_wrapper(
             lambda valor, campo: validar_texto_opcional(valor, max_chars=50),
-            "Categoria"
+            "Categoria",
         )(v)
-    
-    @field_validator('valor_base')
+
+    @field_validator("valor_base")
     @classmethod
     def validar_valor_base(cls, v: Optional[float]) -> Optional[float]:
         if v is not None and v <= 0:
@@ -52,7 +50,7 @@ class CriarServicoDTO(BaseDTO):
             "titulo": "Serviço de Manutenção",
             "descricao": "Serviço completo de manutenção residencial.",
             "categoria": "Manutenção",
-            "valor_base": 150.00
+            "valor_base": 150.00,
         }
         exemplo.update(overrides)
         return exemplo
@@ -64,31 +62,30 @@ class AtualizarServicoDTO(BaseDTO):
     categoria: Optional[str] = Field(None, min_length=3, max_length=50)
     valor_base: Optional[float] = Field(None, gt=0)
 
-    @field_validator('titulo')
+    @field_validator("titulo")
     @classmethod
     def validar_titulo(cls, v: Optional[str]) -> Optional[str]:
         return cls.validar_campo_wrapper(
-            lambda valor, campo: validar_texto_opcional(valor, max_chars=100),
-            "Título"
+            lambda valor, campo: validar_texto_opcional(valor, max_chars=100), "Título"
         )(v)
-    
-    @field_validator('descricao')
+
+    @field_validator("descricao")
     @classmethod
     def validar_descricao(cls, v: Optional[str]) -> Optional[str]:
         return cls.validar_campo_wrapper(
             lambda valor, campo: validar_texto_opcional(valor, max_chars=1500),
-            "Descrição do serviço"
+            "Descrição do serviço",
         )(v)
 
-    @field_validator('categoria')
+    @field_validator("categoria")
     @classmethod
     def validar_categoria(cls, v: Optional[str]) -> Optional[str]:
         return cls.validar_campo_wrapper(
             lambda valor, campo: validar_texto_opcional(valor, max_chars=50),
-            "Categoria"
+            "Categoria",
         )(v)
-    
-    @field_validator('valor_base')
+
+    @field_validator("valor_base")
     @classmethod
     def validar_valor_base(cls, v: Optional[float]) -> Optional[float]:
         if v is not None and v <= 0:
@@ -96,8 +93,6 @@ class AtualizarServicoDTO(BaseDTO):
         return v
 
 
-CriarServicoDTO.model_config.update({
-    "json_schema_extra": {
-        "example": CriarServicoDTO.criar_exemplo_servico_json()
-    }
-})
+CriarServicoDTO.model_config.update(
+    {"json_schema_extra": {"example": CriarServicoDTO.criar_exemplo_servico_json()}}
+)
