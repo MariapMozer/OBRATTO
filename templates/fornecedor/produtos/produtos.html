@@ -22,7 +22,7 @@
 
     <aside class="sidebar" id="sidebarMenu">
         <div class="sidebar-header">
-            <h2 class="logo">Nome da Loja</h2>
+            <h2 class="logo">{% if fornecedor and fornecedor.razao_social %}{{ fornecedor.razao_social }}{% else %}Nome da Loja{% endif %}</h2>
             <label for="toggleSidebar" class="toggle-btn">
             <i class="bi bi-list"></i>
             </label>
@@ -38,19 +38,19 @@
             <a href="/fornecedor/produtos/listar" class="sidebar-item active">
                 <i class="bi bi-box-seam"></i><span>Meus Produtos</span>
             </a>
-            <a href="#" class="sidebar-item">
-                <i class="bi bi-chat-dots"></i><span>Chats</span>
+            <a href="/fornecedor/mensagens/recebidas" class="sidebar-item">
+                <i class="bi bi-chat-dots"></i><span>Mensagens</span>
             </a>
-            <a href="/fornecedor/promocao/listar" class="sidebar-item">
+            <a href="/fornecedor/promocao/cadastrar" class="sidebar-item">
                 <i class="bi bi-tag"></i><span>Cadastrar promoção</span>
             </a>
             <a href="#" class="sidebar-item">
                 <i class="bi bi-star"></i><span>Avaliações Recebidas</span>
             </a>
-            <a href="fornecedor/perfil_publico/{id}" class="sidebar-item">
+            <a href="/fornecedor/perfil_publico/{{ fornecedor.id if fornecedor else usuario_logado.id }}" class="sidebar-item">
                 <i class="bi bi-person"></i><span>Perfil</span>
             </a>
-            <a href="/fornecedor/conta/{id}" class="sidebar-item">
+            <a href="/fornecedor/conta/{{ fornecedor.id if fornecedor else usuario_logado.id }}" class="sidebar-item">
                 <i class="bi bi-gear"></i><span>Conta</span>
             </a>
         </nav>
@@ -73,11 +73,7 @@
                                     <span class="stat-label">Total</span>
                                 </div>
                                 <div class="stat-item">
-                                    <span class="stat-number">12</span>
-                                    <span class="stat-label">Ativos</span>
-                                </div>
-                                <div class="stat-item">
-                                    <span class="stat-number">3</span>
+                                    <span class="stat-number">{{ produtos|length if promocao else 0 }}</span>
                                     <span class="stat-label">Promoção</span>
                                 </div>
                             </div>

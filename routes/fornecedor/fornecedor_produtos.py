@@ -2,6 +2,7 @@ from fastapi import APIRouter, Request, Form, UploadFile, File, Query
 from utils.auth_decorator import requer_autenticacao
 from fastapi.templating import Jinja2Templates
 import os
+import logging
 
 from data.produto.produto_model import Produto
 from data.produto import produto_repo
@@ -9,16 +10,23 @@ from data.produto import produto_repo
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
 
+logger = logging.getLogger(__name__)
+
 
 ## Página inicial do fornecedor, exibe lista de produtos cadastrados
 @router.get("/")
 @requer_autenticacao(['fornecedor'])
 async def home_adm(request: Request, usuario_logado: dict = None):
     produtos = produto_repo.obter_produtos_por_fornecedor(usuario_logado['id'], limit=10, offset=0)
+    # obter dados completos do fornecedor para exibir razao_social e outros
+    from data.fornecedor import fornecedor_repo
+    fornecedor = fornecedor_repo.obter_fornecedor_por_id(usuario_logado['id'])
+    logger.info(f"home_adm: fornecedor for user {usuario_logado['id']} -> {fornecedor}")
     return templates.TemplateResponse(
         "fornecedor/home_fornecedor.html", 
         {"request": request, 
-        "produtos": produtos})
+         "produtos": produtos,
+         "fornecedor": fornecedor})
 
 @router.get("/buscar")
 @requer_autenticacao(['fornecedor'])
@@ -56,18 +64,31 @@ async def buscar_produto(
 @requer_autenticacao(['fornecedor'])
 async def listar_produtos(request: Request, usuario_logado: dict = None):
     produtos = produto_repo.obter_produtos_por_fornecedor(usuario_logado['id'], limit=10, offset=0)
+    from data.fornecedor import fornecedor_repo
+    fornecedor = fornecedor_repo.obter_fornecedor_por_id(usuario_logado['id'])
     response = templates.TemplateResponse(
         "fornecedor/produtos/produtos.html", 
         {"request": request, 
-         "produtos": produtos})
+         "produtos": produtos,
+         "fornecedor": fornecedor,
+         "usuario_logado": usuario_logado})
     return response
 
 @router.get("/inserir")
 @requer_autenticacao(['fornecedor'])
 async def mostrar_formulario_produto(request: Request):
+    # obter fornecedor para o template
+    usuario_logado = None
+    try:
+        # tentar obter usuario_logado do request.session
+        usuario_logado = request.session.get('usuario') if hasattr(request, 'session') else None
+    except Exception:
+        usuario_logado = None
+    from data.fornecedor import fornecedor_repo
+    fornecedor = fornecedor_repo.obter_fornecedor_por_id(usuario_logado['id']) if usuario_logado else None
     response = templates.TemplateResponse(
         "fornecedor/produtos/cadastrar_produtos.html", 
-        {"request": request})
+        {"request": request, "fornecedor": fornecedor})
     return response
 
 @router.post("/inserir")
@@ -113,11 +134,15 @@ async def cadastrar_produto(
     
     produto_repo.inserir_produto(produto)
     produtos = produto_repo.obter_produtos_por_fornecedor(usuario_logado['id'], limit=10, offset=0)
+    from data.fornecedor import fornecedor_repo
+    fornecedor = fornecedor_repo.obter_fornecedor_por_id(usuario_logado['id'])
     response = templates.TemplateResponse(
         "fornecedor/produtos/produtos.html", 
         {"request": request, 
          "produtos": produtos, 
-         "mensagem": "Produto inserido com sucesso"})
+         "mensagem": "Produto inserido com sucesso",
+         "fornecedor": fornecedor,
+         "usuario_logado": usuario_logado})
     return response
 
 @router.get("/atualizar/{id}")

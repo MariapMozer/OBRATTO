@@ -25,6 +25,13 @@ from utils.seed import criar_tabelas
 
 
 criar_tabelas()
+# Popula registros de tipo para usuários existentes (apenas uma vez no startup)
+try:
+    from data.usuario import usuario_repo
+    usuario_repo.backfill_registros_tipo()
+except Exception:
+    # não bloquear startup se backfill falhar
+    pass
 
 app = FastAPI(
     title="Obratto",
