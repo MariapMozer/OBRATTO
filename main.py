@@ -28,6 +28,7 @@ from routes.prestador import prestador_servicos
 from routes.cliente import cliente_perfil
 from routes.cliente import cliente_contratacoes
 from util.seed import criar_tabelas
+from util.db import seed_usuarios_padrao
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from util.exception_handlers import (
@@ -38,6 +39,7 @@ from util.exception_handlers import (
 
 
 criar_tabelas()
+seed_usuarios_padrao()
 
 app = FastAPI(
     title="Obratto",

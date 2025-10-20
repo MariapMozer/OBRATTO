@@ -13,6 +13,7 @@ from util.template_util import criar_templates
 from util.flash_messages import informar_erro, informar_aviso
 from util.logger_config import logger
 from util.config import IS_DEVELOPMENT
+from util.auth_decorator import obter_usuario_logado
 import traceback
 
 # Configurar templates de erro
@@ -67,15 +68,18 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException) 
 
     # 404 - Não encontrado
     if status_code == status.HTTP_404_NOT_FOUND:
+        usuario_logado = obter_usuario_logado(request)
         return templates.TemplateResponse(
             "errors/404.html",
-            {"request": request},
+            {"request": request, "usuario_logado": usuario_logado},
             status_code=status.HTTP_404_NOT_FOUND,
         )
 
     # Outros erros HTTP - página de erro genérica
+    usuario_logado = obter_usuario_logado(request)
     context = {
         "request": request,
+        "usuario_logado": usuario_logado,
         "error_code": status_code,
         "error_message": (
             exc.detail
@@ -128,7 +132,8 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 
     informar_erro(request, mensagem_flash)
 
-    context = {"request": request, "error_code": 422, "error_message": error_message}
+    usuario_logado = obter_usuario_logado(request)
+    context = {"request": request, "usuario_logado": usuario_logado, "error_code": 422, "error_message": error_message}
 
     # Em desenvolvimento, adicionar detalhes técnicos
     if IS_DEVELOPMENT:
@@ -164,7 +169,8 @@ async def generic_exception_handler(request: Request, exc: Exception) -> Respons
     else:
         error_message = "Erro interno do servidor. Nossa equipe foi notificada."
 
-    context = {"request": request, "error_code": 500, "error_message": error_message}
+    usuario_logado = obter_usuario_logado(request)
+    context = {"request": request, "usuario_logado": usuario_logado, "error_code": 500, "error_message": error_message}
 
     # Em desenvolvimento, adicionar detalhes técnicos completos
     if IS_DEVELOPMENT:

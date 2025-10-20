@@ -40,7 +40,8 @@ templates = criar_templates("templates")
 
 @router.get("/")
 async def get_root(request: Request):
-    return templates.TemplateResponse("publico/home.html", {"request": request})
+    usuario_logado = obter_usuario_logado(request)
+    return templates.TemplateResponse("publico/home.html", {"request": request, "usuario_logado": usuario_logado})
 
 
 @router.get("/escolha_cadastro")

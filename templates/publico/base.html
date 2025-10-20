@@ -19,9 +19,11 @@
                     <img src="./static/img/logo_casinha_azul.png" height="40">
                     <img src="/static/img/logo_nome_azul.png" height="30" alt="">
                 </a>
+                {% if not usuario_logado %}
                 <a href="/login" class="text-white">
                     <h5><strong>ENTRAR</strong></h5>
                 </a>
+                {% endif %}
             </div>
         </nav>
     </header>
