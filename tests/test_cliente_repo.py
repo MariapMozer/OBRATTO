@@ -1,5 +1,6 @@
 from datetime import datetime, date
 import sqlite3
+import uuid
 from data.cliente.cliente_repo import (
     criar_tabela_cliente,
     inserir_cliente,
@@ -22,16 +23,16 @@ class TestClienteRepo:
         # Assert
         assert resultado is True, "A criação da tabela cliente deveria retornar True"
 
-    def test_inserir_cliente(self, test_db):
+    def test_inserir_cliente(self, test_db, email_unico, cpf_unico):
         # Arrange
         criar_tabela_usuario()
         criar_tabela_cliente()
         cliente_novo = Cliente(
             id=0,
             nome="Maria Silva",
-            email="maria.silva@email.com",
+            email=email_unico,
             senha="senhaforte123",
-            cpf_cnpj="111.222.333-44",
+            cpf_cnpj=cpf_unico,
             telefone="27988887777",
             cep="88888-888",
             rua="Rua Teste",
@@ -59,8 +60,13 @@ class TestClienteRepo:
         # Arrange
         criar_tabela_usuario()
         criar_tabela_cliente()
-        cliente_1 = Cliente(id=0, nome="Cliente A", email="a@a.com", senha="123", cpf_cnpj="1", telefone="1", cep="88888-888", rua="Rua A", numero="1", complemento="", bairro="Bairro A", cidade="Cidade A", estado="ES", tipo_usuario="2", data_cadastro=datetime.now().isoformat(), genero="M", data_nascimento=date(2001, 1, 1))
-        cliente_2 = Cliente(id=0, nome="Cliente B", email="b@b.com", senha="456", cpf_cnpj="2", telefone="2", cep="88888-888", rua="Rua B", numero="2", complemento="", bairro="Bairro B", cidade="Cidade B", estado="ES", tipo_usuario="2", data_cadastro=datetime.now().isoformat(), genero="F", data_nascimento=date(2002, 2, 2))
+        email1 = f"cliente_a_{uuid.uuid4().hex[:8]}@teste.com"
+        email2 = f"cliente_b_{uuid.uuid4().hex[:8]}@teste.com"
+        cpf1 = f"{uuid.uuid4().hex[:11]}"
+        cpf2 = f"{uuid.uuid4().hex[:11]}"
+
+        cliente_1 = Cliente(id=0, nome="Cliente A", email=email1, senha="123", cpf_cnpj=cpf1, telefone="27991111111", cep="88888-888", rua="Rua A", numero="1", complemento="", bairro="Bairro A", cidade="Cidade A", estado="ES", tipo_usuario="2", data_cadastro=datetime.now().isoformat(), genero="M", data_nascimento=date(2001, 1, 1))
+        cliente_2 = Cliente(id=0, nome="Cliente B", email=email2, senha="456", cpf_cnpj=cpf2, telefone="27992222222", cep="88888-888", rua="Rua B", numero="2", complemento="", bairro="Bairro B", cidade="Cidade B", estado="ES", tipo_usuario="2", data_cadastro=datetime.now().isoformat(), genero="F", data_nascimento=date(2002, 2, 2))
         inserir_cliente(cliente_1)
         inserir_cliente(cliente_2)
         # Act
@@ -76,13 +82,15 @@ class TestClienteRepo:
             criar_tabela_cliente()
 
             for i in range(15):
+                email_temp = f"cliente_{i}_{uuid.uuid4().hex[:8]}@teste.com"
+                cpf_temp = f"{i:011d}"
                 cliente = Cliente(
                     id=0,
-                    nome="Cliente Teste",
-                    email="cliente@email.com",
+                    nome=f"Cliente Teste {i}",
+                    email=email_temp,
                     senha="senha123",
-                    cpf_cnpj="12345678900",
-                    telefone="27999999999",
+                    cpf_cnpj=cpf_temp,
+                    telefone=f"2799999{i:04d}",
                     cep="88888-888",
                     rua="Rua Teste",
                     numero="123",
@@ -109,16 +117,16 @@ class TestClienteRepo:
             ids_pagina_2 = {f.id for f in cliente_pagina_2}
             assert ids_pagina_1.isdisjoint(ids_pagina_2), "Os clientes da página 1 não devem se repetir na página 2"
 
-    def test_atualizar_cliente(self, test_db):
+    def test_atualizar_cliente(self, test_db, email_unico, cpf_unico):
         # Arrange
         criar_tabela_usuario()
         criar_tabela_cliente()
         cliente_original = Cliente(
             id=0,
             nome="João Santos",
-            email="joao.santos@email.com",
+            email=email_unico,
             senha="senhaoriginal",
-            cpf_cnpj="444.555.666-77",
+            cpf_cnpj=cpf_unico,
             telefone="27977776666",
             cep="88888-888",
             rua="Rua Teste",
@@ -151,11 +159,11 @@ class TestClienteRepo:
         assert cliente_atualizado_db.rua == "Endereço Novo"
         assert cliente_atualizado_db.numero == "100"
 
-    def test_deletar_cliente(self, test_db):
+    def test_deletar_cliente(self, test_db, email_unico, cpf_unico):
         # Arrange
         criar_tabela_usuario()
         criar_tabela_cliente()
-        cliente_para_deletar = Cliente(id=0, nome="Cliente Temporário", email="temp@temp.com", senha="123", cpf_cnpj="0", telefone="0", cep="88888-888", rua="Rua Teste", numero="123", complemento="", bairro="Bairro Teste", cidade="Cidade Teste", estado="ES", tipo_usuario="2", data_cadastro=datetime.now().isoformat(), genero="N/A", data_nascimento=date(2000, 1, 1))
+        cliente_para_deletar = Cliente(id=0, nome="Cliente Temporário", email=email_unico, senha="123", cpf_cnpj=cpf_unico, telefone="27999998888", cep="88888-888", rua="Rua Teste", numero="123", complemento="", bairro="Bairro Teste", cidade="Cidade Teste", estado="ES", tipo_usuario="2", data_cadastro=datetime.now().isoformat(), genero="N/A", data_nascimento=date(2000, 1, 1))
         id_inserido = inserir_cliente(cliente_para_deletar)
         assert id_inserido is not None
         assert obter_cliente_por_id(id_inserido) is not None

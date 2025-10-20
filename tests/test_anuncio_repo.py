@@ -1,5 +1,6 @@
 import sys
 import os
+import uuid
 
 from data.anuncio.anuncio_repo import *
 from data.fornecedor.fornecedor_repo import *
@@ -203,43 +204,23 @@ class TestAnuncioRepo:
         assert anuncio_db.id_fornecedor == id_fornecedor, "O fornecedor do anúncio não corresponde ao esperado."
         assert anuncio_db.data_criacao == "2023-10-01", "A data de criação do anúncio não corresponde ao esperado."
 
-    def test_obter_anuncio_paginado(self, test_db):
-    # Arrange 
+    def test_obter_anuncio_paginado(self, test_db, email_unico, cpf_unico):
+    # Arrange
         criar_tabela_usuario()
         criar_tabela_fornecedor()
         criar_tabela_anuncio()
 
-        usuario = Usuario(
+        fornecedor = Fornecedor(
             id=0,
             nome="Fornecedor Paginado",
-            email="fornecedor@exemplo.com",
+            email=email_unico,
             senha="senha123",
-            cpf_cnpj="12345678900",
+            cpf_cnpj=cpf_unico,
             telefone="999999999",
             data_cadastro="2023-01-01",
-            tipo_usuario="Fornecedor",
-            cep="88888-888", rua="Rua Teste", numero="123", complemento="", bairro="Centro", cidade="Vitória", estado="ES"
-        )
-        id_usuario = inserir_usuario(usuario)
-
-        assert id_usuario is not None
-        fornecedor = Fornecedor(
-            id=id_usuario,
-            nome=usuario.nome,
-            email=usuario.email,
-            senha=usuario.senha,
-            cpf_cnpj=usuario.cpf_cnpj,
-            telefone=usuario.telefone,
-            data_cadastro=usuario.data_cadastro,
-            cep=usuario.cep,
-            rua=usuario.rua,
-            numero=usuario.numero,
-            complemento=usuario.complemento,
-            bairro=usuario.bairro,
-            cidade=usuario.cidade,
-            estado=usuario.estado,
+            cep="88888-888", rua="Rua Teste", numero="123", complemento="", bairro="Centro", cidade="Vitória", estado="ES",
             razao_social="Fornecedor LTDA",
-            tipo_usuario=usuario.tipo_usuario
+            tipo_usuario="Fornecedor"
         )
         id_fornecedor = inserir_fornecedor(fornecedor)
 
@@ -283,43 +264,23 @@ class TestAnuncioRepo:
             assert row["nome_anuncio"] == f"Anúncio {i}", f"Nome do anúncio incorreto no índice {i}"
             assert row["nome_fornecedor"] == "Fornecedor Paginado", "Nome do fornecedor incorreto"
 
-    def test_obter_anuncio_por_termo_paginado(self, test_db):
+    def test_obter_anuncio_por_termo_paginado(self, test_db, email_unico, cpf_unico):
     # Arrange – preparar tabelas e dados
         criar_tabela_usuario()
         criar_tabela_fornecedor()
         criar_tabela_anuncio()
 
-        usuario = Usuario(
+        fornecedor = Fornecedor(
             id=0,
             nome="Fornecedor Paginado",
-            email="fornecedor@exemplo.com",
+            email=email_unico,
             senha="senha123",
-            cpf_cnpj="12345678900",
+            cpf_cnpj=cpf_unico,
             telefone="999999999",
             data_cadastro="2023-01-01",
-            tipo_usuario="Fornecedor",
-            cep="88888-888", rua="Rua Teste", numero="123", complemento="", bairro="Centro", cidade="Vitória", estado="ES"
-        )
-        id_usuario = inserir_usuario(usuario)
-
-        assert id_usuario is not None
-        fornecedor = Fornecedor(
-            id=id_usuario,
-            nome=usuario.nome,
-            email=usuario.email,
-            senha=usuario.senha,
-            cpf_cnpj=usuario.cpf_cnpj,
-            telefone=usuario.telefone,
-            data_cadastro=usuario.data_cadastro,
-            cep=usuario.cep,
-            rua=usuario.rua,
-            numero=usuario.numero,
-            complemento=usuario.complemento,
-            bairro=usuario.bairro,
-            cidade=usuario.cidade,
-            estado=usuario.estado,
+            cep="88888-888", rua="Rua Teste", numero="123", complemento="", bairro="Centro", cidade="Vitória", estado="ES",
             razao_social="Fornecedor LTDA",
-            tipo_usuario=usuario.tipo_usuario
+            tipo_usuario="Fornecedor"
         )
         id_fornecedor = inserir_fornecedor(fornecedor)
 
@@ -350,43 +311,23 @@ class TestAnuncioRepo:
         assert len(resultados) == 1
         assert resultados[0].nome_anuncio == "Quarto Decorado"
 
-    def test_atualizar_anuncio_por_nome(self, test_db):
+    def test_atualizar_anuncio_por_nome(self, test_db, email_unico, cpf_unico):
     # Arrange - preparar tabelas e dados
         criar_tabela_usuario()
         criar_tabela_fornecedor()
         criar_tabela_anuncio()
 
-        usuario = Usuario(
+        fornecedor = Fornecedor(
             id=0,
             nome="Fornecedor Teste",
-            email="fornecedor@teste.com",
+            email=email_unico,
             senha="senha123",
-            cpf_cnpj="12345678900",
+            cpf_cnpj=cpf_unico,
             telefone="999999999",
             data_cadastro="2023-01-01",
-            tipo_usuario="Fornecedor",
-            cep="88888-888", rua="Rua Teste", numero="123", complemento="", bairro="Centro", cidade="Vitória", estado="ES"
-        )
-        id_usuario = inserir_usuario(usuario)
-
-        assert id_usuario is not None
-        fornecedor = Fornecedor(
-            id=id_usuario,
-            nome=usuario.nome,
-            email=usuario.email,
-            senha=usuario.senha,
-            cpf_cnpj=usuario.cpf_cnpj,
-            telefone=usuario.telefone,
-            data_cadastro=usuario.data_cadastro,
-            cep=usuario.cep,
-            rua=usuario.rua,
-            numero=usuario.numero,
-            complemento=usuario.complemento,
-            bairro=usuario.bairro,
-            cidade=usuario.cidade,
-            estado=usuario.estado,
+            cep="88888-888", rua="Rua Teste", numero="123", complemento="", bairro="Centro", cidade="Vitória", estado="ES",
             razao_social="Fornecedor LTDA",
-            tipo_usuario=usuario.tipo_usuario
+            tipo_usuario="Fornecedor"
         )
         id_fornecedor = inserir_fornecedor(fornecedor)
 
@@ -425,43 +366,23 @@ class TestAnuncioRepo:
         assert anuncio_bd.preco == 150.0
 
 
-    def test_deletar_anuncio(self, test_db):
+    def test_deletar_anuncio(self, test_db, email_unico, cpf_unico):
     # Arrange - preparar tabelas e dados
         criar_tabela_usuario()
         criar_tabela_fornecedor()
         criar_tabela_anuncio()
 
-        usuario = Usuario(
+        fornecedor = Fornecedor(
             id=0,
             nome="Fornecedor Teste",
-            email="fornecedor@teste.com",
+            email=email_unico,
             senha="senha123",
-            cpf_cnpj="12345678900",
+            cpf_cnpj=cpf_unico,
             telefone="999999999",
             data_cadastro="2023-01-01",
-            tipo_usuario="Fornecedor",
-            cep="88888-888", rua="Rua Teste", numero="123", complemento="", bairro="Centro", cidade="Vitória", estado="ES"
-        )
-        id_usuario = inserir_usuario(usuario)
-
-        assert id_usuario is not None
-        fornecedor = Fornecedor(
-            id=id_usuario,
-            nome=usuario.nome,
-            email=usuario.email,
-            senha=usuario.senha,
-            cpf_cnpj=usuario.cpf_cnpj,
-            telefone=usuario.telefone,
-            data_cadastro=usuario.data_cadastro,
-            cep=usuario.cep,
-            rua=usuario.rua,
-            numero=usuario.numero,
-            complemento=usuario.complemento,
-            bairro=usuario.bairro,
-            cidade=usuario.cidade,
-            estado=usuario.estado,
+            cep="88888-888", rua="Rua Teste", numero="123", complemento="", bairro="Centro", cidade="Vitória", estado="ES",
             razao_social="Fornecedor LTDA",
-            tipo_usuario=usuario.tipo_usuario
+            tipo_usuario="Fornecedor"
         )
         id_fornecedor = inserir_fornecedor(fornecedor)
         assert id_fornecedor is not None

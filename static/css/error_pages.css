@@ -1,0 +1,84 @@
+/* Estilos para Páginas de Erro do OBRATTO */
+
+/* Container Principal de Erro */
+.error-container {
+    padding: 4rem 1rem;
+    text-align: center;
+}
+
+/* Código de Erro (404, 500, etc) */
+.error-code {
+    font-size: 8rem;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+}
+
+/* Título do Erro */
+.error-heading {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+}
+
+/* Detalhes da Mensagem de Erro */
+.error-details {
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+}
+
+/* Botões de Ação */
+.error-actions {
+    margin-top: 2rem;
+}
+
+/* Detalhes Técnicos (Modo Development) */
+.error-technical-details {
+    text-align: left;
+    margin-top: 3rem;
+}
+
+.error-technical-details pre {
+    max-height: 400px;
+    overflow-y: auto;
+    font-size: 0.875rem;
+}
+
+/* Responsividade para Tablets e Mobile */
+@media (max-width: 768px) {
+    .error-code {
+        font-size: 5rem;
+    }
+
+    .error-heading {
+        font-size: 1.5rem;
+    }
+
+    .error-details {
+        font-size: 1rem;
+    }
+
+    .error-actions .btn {
+        display: block;
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+
+    .error-actions .btn:last-child {
+        margin-bottom: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .error-container {
+        padding: 2rem 0.5rem;
+    }
+
+    .error-code {
+        font-size: 4rem;
+    }
+
+    .error-heading {
+        font-size: 1.25rem;
+    }
+}

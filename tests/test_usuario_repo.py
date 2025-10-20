@@ -2,7 +2,8 @@ from contextlib import contextmanager
 import sqlite3
 import sys
 import os
-from data.usuario.usuario_repo import*
+from datetime import datetime
+from data.usuario.usuario_repo import *
 from data.usuario.usuario_model import Usuario
 
 class TestUsuarioRepo:

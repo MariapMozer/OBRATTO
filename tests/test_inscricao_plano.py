@@ -1,5 +1,6 @@
 import sys
 import os
+import uuid
 from data.fornecedor.fornecedor_model import *
 from data.fornecedor.fornecedor_repo import *
 from data.inscricaoplano.inscricao_plano_repo import *
@@ -43,19 +44,22 @@ class Test_InscricaoPlanoRepo:
         assert inscricao_plano_db is not None
         assert inscricao_plano_db.id_fornecedor
 
-    def test_obter_inscricao_plano(self, test_db):
+    def test_obter_inscricao_plano(self, test_db, email_unico, cpf_unico):
         criar_tabela_usuario()
         criar_tabela_fornecedor()
         criar_tabela_plano()
         criar_tabela_prestador()
         criar_tabela_inscricao_plano()
 
+        email_fornecedor = f"fornecedor_{uuid.uuid4().hex[:8]}@teste.com"
+        cpf_fornecedor = f"{uuid.uuid4().int % 100000000000000:014d}"
+
         fornecedor = Fornecedor(
             id=0,
             nome="Fornecedor Teste",
-            email="fornecedor@teste.com",
+            email=email_fornecedor,
             senha="senha123",
-            cpf_cnpj="12345678000199",
+            cpf_cnpj=cpf_fornecedor,
             telefone="27999999999",
             data_cadastro="2023-01-01",
             tipo_usuario="Fornecedor",
@@ -75,27 +79,12 @@ class Test_InscricaoPlanoRepo:
         id_plano = inserir_plano(plano)
         assert id_plano is not None, "Plano não foi inserido"
 
-        assert id_plano is not None
-        id_usuario = inserir_usuario(Usuario(
+        prestador = Prestador(
             id=0,
             nome="Maria Prestadora",
-            email="maria@prestadora.com",
+            email=email_unico,
             senha="senha123",
-            cpf_cnpj="11122233344",
-            telefone="27988887777",
-            tipo_usuario="Prestador",
-            data_cadastro="2023-01-01",
-            cep="88888-888", rua="Rua Teste", numero="123", complemento="", bairro="Centro", cidade="Vitória", estado="ES"
-        ))
-        assert id_usuario is not None, "Usuário não foi inserido"
-
-        assert id_usuario is not None
-        prestador = Prestador(
-            id=id_usuario,
-            nome="Maria Prestadora",
-            email="maria@prestadora.com",
-            senha="senha123",
-            cpf_cnpj="11122233344",
+            cpf_cnpj=cpf_unico,
             telefone="27988887777",
             tipo_usuario="Prestador",
             data_cadastro="2023-01-01",
@@ -108,19 +97,22 @@ class Test_InscricaoPlanoRepo:
         id_prestador = inserir_prestador(prestador)
         assert id_prestador is not None, "Prestador não foi inserido"
 
-    def test_obter_inscricao_plano_por_id(self, test_db):
+    def test_obter_inscricao_plano_por_id(self, test_db, email_unico, cpf_unico):
         criar_tabela_usuario()
         criar_tabela_fornecedor()
         criar_tabela_prestador()
         criar_tabela_plano()
         criar_tabela_inscricao_plano()
-    
+
+        email_fornecedor = f"fornecedor_{uuid.uuid4().hex[:8]}@teste.com"
+        cpf_fornecedor = f"{uuid.uuid4().int % 100000000000000:014d}"
+
         id_fornecedor = inserir_fornecedor(Fornecedor(
             id=0,
             nome="Fornecedor Teste",
-            email="fornecedor@teste.com",
+            email=email_fornecedor,
             senha="senha123",
-            cpf_cnpj="12345678000199",
+            cpf_cnpj=cpf_fornecedor,
             telefone="27999999999",
             data_cadastro="2023-01-01",
             tipo_usuario="Fornecedor",
@@ -128,26 +120,13 @@ class Test_InscricaoPlanoRepo:
             cep="88888-888", rua="Rua Teste", numero="123", complemento="", bairro="Centro", cidade="Vitória", estado="ES"
         ))
         assert id_fornecedor is not None
-        
-        id_usuario = inserir_usuario(Usuario(
+
+        id_prestador = inserir_prestador(Prestador(
             id=0,
             nome="Prestador Teste",
-            email="prestador@teste.com",
+            email=email_unico,
             senha="senha123",
-            cpf_cnpj="11122233344",
-            telefone="27988887777",
-            tipo_usuario="Prestador",
-            data_cadastro="2023-01-01",
-            cep="88888-888", rua="Rua Teste", numero="123", complemento="", bairro="Centro", cidade="Vitória", estado="ES"
-        ))
-        assert id_usuario is not None
-        
-        id_prestador = inserir_prestador(Prestador(
-            id=id_usuario,  
-            nome="Prestador Teste",
-            email="prestador@teste.com",
-            senha="senha123",
-            cpf_cnpj="11122233344",
+            cpf_cnpj=cpf_unico,
             telefone="27988887777",
             tipo_usuario="Prestador",
             data_cadastro="2023-01-01",
@@ -186,20 +165,23 @@ class Test_InscricaoPlanoRepo:
         assert inscricao_obtida.id_prestador == inscricao_teste.id_prestador
         assert inscricao_obtida.id_plano == inscricao_teste.id_plano
 
-    def test_obter_inscricao_plano_por_pagina(self, test_db):
+    def test_obter_inscricao_plano_por_pagina(self, test_db, email_unico, cpf_unico):
         criar_tabela_usuario()
         criar_tabela_fornecedor()
         criar_tabela_prestador()
         criar_tabela_plano()
         criar_tabela_inscricao_plano()
 
+        email_fornecedor = f"fornecedor_{uuid.uuid4().hex[:8]}@teste.com"
+        cpf_fornecedor = f"{uuid.uuid4().int % 100000000000000:014d}"
+
         # Inserindo dados de base
         id_fornecedor = inserir_fornecedor(Fornecedor(
             id=0,
             nome="Fornecedor Paginado",
-            email="fornecedor@pagina.com",
+            email=email_fornecedor,
             senha="senha123",
-            cpf_cnpj="12345678000100",
+            cpf_cnpj=cpf_fornecedor,
             telefone="27999990000",
             data_cadastro="2023-01-01",
             tipo_usuario="Fornecedor",
@@ -207,25 +189,12 @@ class Test_InscricaoPlanoRepo:
             cep="88888-888", rua="Rua Teste", numero="123", complemento="", bairro="Centro", cidade="Vitória", estado="ES"
         ))
 
-        id_usuario = inserir_usuario(Usuario(
+        id_prestador = inserir_prestador(Prestador(
             id=0,
             nome="Prestador Paginado",
-            email="prestador@pagina.com",
+            email=email_unico,
             senha="senha123",
-            cpf_cnpj="11122233300",
-            telefone="27988880000",
-            tipo_usuario="Prestador",
-            data_cadastro="2023-01-01",
-            cep="88888-888", rua="Rua Teste", numero="123", complemento="", bairro="Centro", cidade="Vitória", estado="ES"
-        ))
-
-        assert id_usuario is not None
-        id_prestador = inserir_prestador(Prestador(
-            id=id_usuario,
-            nome="Prestador Paginado",
-            email="prestador@pagina.com",
-            senha="senha123",
-            cpf_cnpj="11122233300",
+            cpf_cnpj=cpf_unico,
             telefone="27988880000",
             tipo_usuario="Prestador",
             data_cadastro="2023-01-01",
@@ -271,19 +240,22 @@ class Test_InscricaoPlanoRepo:
         assert len(pagina_3) == 0
 
 
-    def test_atualizar_inscricao_plano(self, test_db):
+    def test_atualizar_inscricao_plano(self, test_db, email_unico, cpf_unico):
         criar_tabela_usuario()
         criar_tabela_fornecedor()
         criar_tabela_prestador()
         criar_tabela_plano()
         criar_tabela_inscricao_plano()
 
+        email_fornecedor = f"fornecedor_{uuid.uuid4().hex[:8]}@teste.com"
+        cpf_fornecedor = f"{uuid.uuid4().int % 100000000000000:014d}"
+
         id_fornecedor = inserir_fornecedor(Fornecedor(
             id=0,
             nome="Fornecedor Teste",
-            email="fornecedor@teste.com",
+            email=email_fornecedor,
             senha="senha123",
-            cpf_cnpj="12345678000199",
+            cpf_cnpj=cpf_fornecedor,
             telefone="27999999999",
             data_cadastro="2023-01-01",
             tipo_usuario="Fornecedor",
@@ -291,25 +263,12 @@ class Test_InscricaoPlanoRepo:
             cep="88888-888", rua="Rua Teste", numero="123", complemento="", bairro="Centro", cidade="Vitória", estado="ES"
         ))
 
-        id_usuario = inserir_usuario(Usuario(
+        id_prestador = inserir_prestador(Prestador(
             id=0,
             nome="Prestador Teste",
-            email="prestador@teste.com",
+            email=email_unico,
             senha="senha123",
-            cpf_cnpj="11122233344",
-            telefone="27988887777",
-            tipo_usuario="Prestador",
-            data_cadastro="2023-01-01",
-            cep="88888-888", rua="Rua Teste", numero="123", complemento="", bairro="Centro", cidade="Vitória", estado="ES"
-        ))
-
-        assert id_usuario is not None
-        id_prestador = inserir_prestador(Prestador(
-            id=id_usuario,
-            nome="Prestador Teste",
-            email="prestador@teste.com",
-            senha="senha123",
-            cpf_cnpj="11122233344",
+            cpf_cnpj=cpf_unico,
             telefone="27988887777",
             tipo_usuario="Prestador",
             data_cadastro="2023-01-01",
@@ -354,43 +313,35 @@ class Test_InscricaoPlanoRepo:
         assert inscricao_db is not None
         assert inscricao_db.id_plano == inscricao_atualizada.id_plano
 
-    def test_deletar_inscricao_plano(self, test_db):
+    def test_deletar_inscricao_plano(self, test_db, email_unico, cpf_unico):
         criar_tabela_usuario()
         criar_tabela_fornecedor()
         criar_tabela_prestador()
         criar_tabela_plano()
         criar_tabela_inscricao_plano()
 
+        email_fornecedor = f"fornecedor_{uuid.uuid4().hex[:8]}@teste.com"
+        cpf_fornecedor = f"{uuid.uuid4().int % 100000000000000:014d}"
+
         id_fornecedor = inserir_fornecedor(Fornecedor(
             id=0,
             nome="Fornecedor Teste",
-            email="fornecedor@teste.com",
+            email=email_fornecedor,
             senha="senha123",
-            cpf_cnpj="12345678000199",
+            cpf_cnpj=cpf_fornecedor,
             telefone="27999999999",
             data_cadastro="2023-01-01",
             tipo_usuario="Fornecedor",
             razao_social="Fornecedor LTDA",
             cep="88888-888", rua="Rua Teste", numero="123", complemento="", bairro="Centro", cidade="Vitória", estado="ES"
         ))
-        id_usuario = inserir_usuario(Usuario(
+
+        id_prestador = inserir_prestador(Prestador(
             id=0,
             nome="Prestador Teste",
-            email="prestador@teste.com",
+            email=email_unico,
             senha="senha123",
-            cpf_cnpj="11122233344",
-            telefone="27988887777",
-            tipo_usuario="Prestador",
-            data_cadastro="2023-01-01",
-            cep="88888-888", rua="Rua Teste", numero="123", complemento="", bairro="Centro", cidade="Vitória", estado="ES"
-        ))
-        assert id_usuario is not None
-        id_prestador = inserir_prestador(Prestador(
-            id=id_usuario,
-            nome="Prestador Teste",
-            email="prestador@teste.com",
-            senha="senha123",
-            cpf_cnpj="11122233344",
+            cpf_cnpj=cpf_unico,
             telefone="27988887777",
             tipo_usuario="Prestador",
             data_cadastro="2023-01-01",

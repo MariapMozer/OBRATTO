@@ -1,5 +1,6 @@
 import sqlite3
 import pytest
+import uuid
 from datetime import datetime
 from data.prestador.prestador_model import Prestador
 from data.prestador.prestador_repo import (
@@ -14,13 +15,13 @@ from data.prestador.prestador_repo import (
 from data.usuario.usuario_repo import criar_tabela_usuario
 
 @pytest.fixture
-def prestador_exemplo():
+def prestador_exemplo(email_unico, cpf_unico):
     return Prestador(
         id=0,
         nome="Prestador Teste",
-        email="prestador.teste@email.com",
+        email=email_unico,
         senha="senhaSuperForte123",
-        cpf_cnpj="12345678901234",
+        cpf_cnpj=cpf_unico,
         telefone="27999887766",
         cep="88888-888",
         rua="Rua Teste",
@@ -84,7 +85,7 @@ class TestPrestadorRepo:
         # Assert
         assert prestador_db is not None
         assert prestador_db.id == id_inserido
-        assert prestador_db.email == "prestador.teste@email.com"
+        assert prestador_db.email == prestador_exemplo.email
 
     def test_obter_prestador_por_pagina(self, test_db):
             # Arrange
@@ -92,12 +93,14 @@ class TestPrestadorRepo:
             criar_tabela_prestador()
 
             for i in range(15):
+                email_temp = f"prestador_{i}_{uuid.uuid4().hex[:8]}@teste.com"
+                cpf_temp = f"{i:014d}"
                 prestador = Prestador(
                     id=0,
-                    nome="Prestador Teste",
-                    email="prestador@email.com",
+                    nome=f"Prestador Teste {i}",
+                    email=email_temp,
                     senha="senha123",
-                    cpf_cnpj="12345678900",
+                    cpf_cnpj=cpf_temp,
                     telefone="27999999999",
                     cep="88888-888",
                     rua="Rua Teste",

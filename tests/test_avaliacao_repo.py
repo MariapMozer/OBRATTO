@@ -1,5 +1,6 @@
 from asyncio import open_connection as async_open_connection
 import sqlite3
+import uuid
 from utils.db import open_connection
 import pytest
 from datetime import datetime
@@ -32,33 +33,13 @@ class TestAvaliacaoRepo:
         #Assert
         assert resultado is True
 
-    def inserir_avaliacao_para_teste(self) -> int:
-        usuario_avaliador = Usuario(
+    def inserir_avaliacao_para_teste(self, email_cliente, cpf_cliente, email_prestador, cpf_prestador) -> int:
+        cliente = Cliente(
             id=0,
             nome="Avaliador",
-            email="avaliador@teste.com",
+            email=email_cliente,
             senha="123",
-            cpf_cnpj="11111111111",
-            telefone="11999999999",
-            data_cadastro=datetime.now().isoformat(),
-            cep="12345-678",
-            rua="Rua A",
-            numero="123",
-            complemento="",
-            bairro="Centro",
-            cidade="São Paulo",
-            estado="SP",
-            tipo_usuario="cliente"
-        )
-        id_usuario_avaliador = inserir_usuario(usuario_avaliador)
-        assert id_usuario_avaliador is not None
-
-        cliente = Cliente(
-            id=id_usuario_avaliador,
-            nome="Avaliador",
-            email="avaliador@teste.com",
-            senha="123",
-            cpf_cnpj="11111111111",
+            cpf_cnpj=cpf_cliente,
             telefone="11999999999",
             data_cadastro=datetime.now().isoformat(),
             cep="12345-678",
@@ -75,34 +56,13 @@ class TestAvaliacaoRepo:
 
         id_cliente = inserir_cliente(cliente)
         assert id_cliente is not None
-        cliente.id = id_cliente
-
-        usuario_prestador = Usuario(
-            id=0,
-            nome="Avaliado",
-            email="avaliado@teste.com",
-            senha="123",
-            cpf_cnpj="22222222222",
-            telefone="11999999999",
-            data_cadastro=datetime.now().isoformat(),
-            cep="98765-432",
-            rua="Rua B",
-            numero="456",
-            complemento="",
-            bairro="Vila Nova",
-            cidade="Rio de Janeiro",
-            estado="RJ",
-            tipo_usuario="prestador"
-        )
-        id_usuario_prestador = inserir_usuario(usuario_prestador)
-        assert id_usuario_prestador is not None
 
         prestador = Prestador(
-            id=id_usuario_prestador,
+            id=0,
             nome="Avaliado",
-            email="avaliado@teste.com",
+            email=email_prestador,
             senha="123",
-            cpf_cnpj="22222222222",
+            cpf_cnpj=cpf_prestador,
             telefone="11999999999",
             cep="98765-432",
             rua="Rua B",
@@ -120,7 +80,6 @@ class TestAvaliacaoRepo:
 
         id_prestador = inserir_prestador(prestador)
         assert id_prestador is not None
-        prestador.id = id_prestador
 
         avaliacao = Avaliacao(
             id_avaliacao=0,
@@ -198,7 +157,7 @@ class TestAvaliacaoRepo:
         #Assert
         assert avaliacao_db is not None
 
-    def test_obter_avaliacao(self, test_db):
+    def test_obter_avaliacao(self, test_db, email_unico, cpf_unico):
 
         with open_connection() as conn:
             cursor = conn.cursor()
@@ -208,7 +167,7 @@ class TestAvaliacaoRepo:
             cursor.execute("DROP TABLE IF EXISTS fornecedor")
         with open_connection() as conn:
             cursor = conn.cursor()
-            cursor.execute("DROP TABLE IF EXISTS prestador")    
+            cursor.execute("DROP TABLE IF EXISTS prestador")
         with open_connection() as conn:
             cursor = conn.cursor()
             cursor.execute("DROP TABLE IF EXISTS usuario")
@@ -220,8 +179,11 @@ class TestAvaliacaoRepo:
         criar_tabela_fornecedor()
         criar_tabela_prestador()
 
+        email_prestador = f"prestador_{uuid.uuid4().hex[:8]}@teste.com"
+        cpf_prestador = f"{uuid.uuid4().int % 100000000000000:014d}"
+
         #Act
-        id_avaliacao = self.inserir_avaliacao_para_teste()
+        id_avaliacao = self.inserir_avaliacao_para_teste(email_unico, cpf_unico, email_prestador, cpf_prestador)
         avaliacoes = obter_todos()
 
         for a in avaliacoes:
@@ -229,8 +191,8 @@ class TestAvaliacaoRepo:
         #Assert
         assert any(a.id_avaliacao == id_avaliacao for a in avaliacoes)
 
-    def test_obter_avaliacao_por_id(self, test_db):
-        
+    def test_obter_avaliacao_por_id(self, test_db, email_unico, cpf_unico):
+
         with open_connection() as conn:
             cursor = conn.cursor()
             cursor.execute("DROP TABLE IF EXISTS cliente")
@@ -239,7 +201,7 @@ class TestAvaliacaoRepo:
             cursor.execute("DROP TABLE IF EXISTS fornecedor")
         with open_connection() as conn:
             cursor = conn.cursor()
-            cursor.execute("DROP TABLE IF EXISTS prestador")    
+            cursor.execute("DROP TABLE IF EXISTS prestador")
         with open_connection() as conn:
             cursor = conn.cursor()
             cursor.execute("DROP TABLE IF EXISTS usuario")
@@ -250,8 +212,12 @@ class TestAvaliacaoRepo:
         criar_tabela_cliente()
         criar_tabela_fornecedor()
         criar_tabela_prestador()
+
+        email_prestador = f"prestador_{uuid.uuid4().hex[:8]}@teste.com"
+        cpf_prestador = f"{uuid.uuid4().int % 100000000000000:014d}"
+
         #Act
-        id_avaliacao = self.inserir_avaliacao_para_teste()
+        id_avaliacao = self.inserir_avaliacao_para_teste(email_unico, cpf_unico, email_prestador, cpf_prestador)
         avaliacao_db = obter_avaliacao_por_id(id_avaliacao)
         #Assert
         assert avaliacao_db is not None
@@ -312,7 +278,7 @@ class TestAvaliacaoRepo:
         assert ids_pagina_1.isdisjoint(ids_pagina_2), "As avaliações da página 1 não devem se repetir na página 2"
 
 
-    def test_atualizar_avaliacao(self, test_db):
+    def test_atualizar_avaliacao(self, test_db, email_unico, cpf_unico):
         #Arrange
         criar_tabela_usuario()
         criar_tabela_avaliacao()
@@ -320,8 +286,11 @@ class TestAvaliacaoRepo:
         criar_tabela_fornecedor()
         criar_tabela_prestador()
 
+        email_prestador = f"prestador_{uuid.uuid4().hex[:8]}@teste.com"
+        cpf_prestador = f"{uuid.uuid4().int % 100000000000000:014d}"
+
         #Act
-        id_avaliacao = self.inserir_avaliacao_para_teste()
+        id_avaliacao = self.inserir_avaliacao_para_teste(email_unico, cpf_unico, email_prestador, cpf_prestador)
         avaliacao = obter_avaliacao_por_id(id_avaliacao)
         assert avaliacao is not None
         avaliacao.descricao = "Avaliação atualizada"
@@ -329,7 +298,7 @@ class TestAvaliacaoRepo:
         #Assert
         assert resultado is True
 
-    def test_deletar_avaliacao(self, test_db):
+    def test_deletar_avaliacao(self, test_db, email_unico, cpf_unico):
         #Arrange
         criar_tabela_usuario()
         criar_tabela_avaliacao()
@@ -337,8 +306,11 @@ class TestAvaliacaoRepo:
         criar_tabela_fornecedor()
         criar_tabela_prestador()
 
+        email_prestador = f"prestador_{uuid.uuid4().hex[:8]}@teste.com"
+        cpf_prestador = f"{uuid.uuid4().int % 100000000000000:014d}"
+
         #Act
-        id_avaliacao = self.inserir_avaliacao_para_teste()
+        id_avaliacao = self.inserir_avaliacao_para_teste(email_unico, cpf_unico, email_prestador, cpf_prestador)
         resultado = deletar_avaliacao(id_avaliacao)
         #Assert
         assert resultado is True

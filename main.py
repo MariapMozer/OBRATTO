@@ -5,6 +5,7 @@ from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 
 from routes.publico import publico_routes
+from routes.publico import test_toasts
 from routes.fornecedor import fornecedor_pagamento
 from routes.fornecedor import fornecedor_produtos
 from routes.fornecedor import fornecedor_planos
@@ -22,6 +23,13 @@ from routes.prestador import prestador_servicos
 from routes.cliente import cliente_perfil
 from routes.cliente import cliente_contratacoes
 from utils.seed import criar_tabelas
+from fastapi.exceptions import RequestValidationError
+from starlette.exceptions import HTTPException as StarletteHTTPException
+from util.exception_handlers import (
+    http_exception_handler,
+    validation_exception_handler,
+    generic_exception_handler
+)
 
 
 criar_tabelas()
@@ -34,18 +42,37 @@ app = FastAPI(
 )
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
+# Importar configurações centralizadas
+try:
+    from util.config import SECRET_KEY, SESSION_MAX_AGE, APP_NAME, VERSION
+    from utils.logger_config import logger
+    logger.info(f"{APP_NAME} v{VERSION} iniciando...")
+except ImportError:
+    # Fallback se configuração ainda não existir
+    SECRET_KEY = os.getenv("SECRET_KEY", "sua-chave-secreta-aqui")
+    SESSION_MAX_AGE = 3600
+    import logging
+    logger = logging.getLogger(__name__)
+
 # Configurar middleware de sessão
-SECRET_KEY = os.getenv("SECRET_KEY", "sua-chave-secreta-aqui")
 app.add_middleware(
     SessionMiddleware,
     secret_key=SECRET_KEY,
-    max_age=3600,  # 1 hora
+    max_age=SESSION_MAX_AGE,
     same_site="lax",
     https_only=False  # True em produção com HTTPS
 )
+logger.info("SessionMiddleware configurado")
+
+# Registrar Exception Handlers (ANTES dos routers)
+app.add_exception_handler(StarletteHTTPException, http_exception_handler)
+app.add_exception_handler(RequestValidationError, validation_exception_handler)
+app.add_exception_handler(Exception, generic_exception_handler)
+logger.info("Exception handlers registrados")
 
 # PÚBLICO
 app.include_router(publico_routes.router)
+app.include_router(test_toasts.router)  # Rota de teste para toasts
 
 # FORNECEDOR
 app.include_router(fornecedor_promocoes.router, prefix="/fornecedor/promocao")

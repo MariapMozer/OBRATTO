@@ -1,7 +1,7 @@
 from pydantic import Field, field_validator
 from typing import Optional
 from ..base_dto import BaseDTO
-from utils.validacoes_dto import validar_texto_obrigatorio, validar_decimal_positivo
+from utils.validacoes_dto import validar_texto_obrigatorio
 
 
 class CriarProdutoDTO(BaseDTO):

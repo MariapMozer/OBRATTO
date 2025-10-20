@@ -380,6 +380,60 @@ def validar_senha(senha: Optional[str], min_chars: int = 6, max_chars: int = 128
 
 
 
+def validar_senha_forte(senha: Optional[str], min_chars: int = 8, max_chars: int = 128,
+                        obrigatorio: bool = True) -> Optional[str]:
+    """
+    Valida senha forte com requisitos de segurança:
+    - Mínimo 8 caracteres
+    - Pelo menos uma letra maiúscula
+    - Pelo menos uma letra minúscula
+    - Pelo menos um número
+    - Pelo menos um caractere especial
+
+    Args:
+        senha: Senha a ser validada
+        min_chars: Número mínimo de caracteres (padrão: 8)
+        max_chars: Número máximo de caracteres
+        obrigatorio: Se a senha é obrigatória
+
+    Returns:
+        Senha validada ou None se opcional e vazia
+
+    Raises:
+        ValidacaoError: Se senha não atender aos requisitos
+    """
+    import re
+
+    if not senha:
+        if obrigatorio:
+            raise ValidacaoError('Senha é obrigatória')
+        return None
+
+    if len(senha) < min_chars:
+        raise ValidacaoError(f'Senha deve ter pelo menos {min_chars} caracteres')
+
+    if len(senha) > max_chars:
+        raise ValidacaoError(f'Senha deve ter no máximo {max_chars} caracteres')
+
+    # Verificar letra maiúscula
+    if not re.search(r'[A-Z]', senha):
+        raise ValidacaoError('Senha deve conter pelo menos uma letra maiúscula')
+
+    # Verificar letra minúscula
+    if not re.search(r'[a-z]', senha):
+        raise ValidacaoError('Senha deve conter pelo menos uma letra minúscula')
+
+    # Verificar número
+    if not re.search(r'[0-9]', senha):
+        raise ValidacaoError('Senha deve conter pelo menos um número')
+
+    # Verificar caractere especial
+    if not re.search(r'[!@#$%^&*(),.?":{}|<>_\-+=\[\]\\;/`~]', senha):
+        raise ValidacaoError('Senha deve conter pelo menos um caractere especial (!@#$%^&*...)')
+
+    return senha
+
+
 def validar_senhas_coincidem(senha: str, confirmar_senha: str) -> str:
     """
     Valida se duas senhas coincidem
@@ -518,7 +572,8 @@ class ValidadorWrapper:
 # Validadores mais usados, pré-configurados para facilitar uso
 VALIDADOR_NOME = ValidadorWrapper.criar_validador(validar_nome_pessoa, "Nome")
 VALIDADOR_EMAIL = ValidadorWrapper.criar_validador_opcional(lambda v, c: v, "Email")  # Pydantic já valida
-VALIDADOR_SENHA = ValidadorWrapper.criar_validador(validar_senha, "Senha")
+VALIDADOR_SENHA = ValidadorWrapper.criar_validador(validar_senha, "Senha")  # Básico
+VALIDADOR_SENHA_FORTE = ValidadorWrapper.criar_validador(validar_senha_forte, None)  # Forte (para cadastro)
 VALIDADOR_CPF_CNPJ = ValidadorWrapper.criar_validador(validar_cpf_cnpj, "CPF/CNPJ")
 VALIDADOR_TELEFONE = ValidadorWrapper.criar_validador_opcional(validar_telefone, "Telefone")
 VALIDADOR_CEP = ValidadorWrapper.criar_validador_opcional(lambda v, c: v, "CEP")  # Pode ser validado externamente

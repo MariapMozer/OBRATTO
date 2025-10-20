@@ -1,5 +1,6 @@
 from datetime import datetime
 import sqlite3
+import uuid
 from data.fornecedor.fornecedor_repo import (
     criar_tabela_fornecedor,
     inserir_fornecedor,
@@ -22,16 +23,16 @@ class TestFornecedorRepo:
         # Assert
         assert resultado is True, "A criação da tabela fornecedor deveria retornar True"
 
-    def test_inserir_fornecedor(self, test_db):
+    def test_inserir_fornecedor(self, test_db, email_unico, cpf_unico):
         # Arrange
         criar_tabela_usuario()
         criar_tabela_fornecedor()
         fornecedor = Fornecedor(
             id=0,
             nome="Fornecedor Teste",
-            email="fornecedor@email.com",
+            email=email_unico,
             senha="senha123",
-            cpf_cnpj="12345678900",
+            cpf_cnpj=cpf_unico,
             telefone="27999999999",
             cep="88888-888",
             rua="Rua Teste",
@@ -51,18 +52,18 @@ class TestFornecedorRepo:
         fornecedor_db = obter_fornecedor_por_id(id_inserido)
         assert fornecedor_db is not None, "O fornecedor inserido não deveria ser None"
         assert fornecedor_db.nome == "Fornecedor Teste", "O nome do fornecedor inserido não confere"
-        assert fornecedor_db.email == "fornecedor@email.com"
+        assert fornecedor_db.email == email_unico
 
-    def test_obter_fornecedor(self, test_db):
+    def test_obter_fornecedor(self, test_db, email_unico, cpf_unico):
         criar_tabela_usuario()
         criar_tabela_fornecedor()
-        
+
         fornecedor = Fornecedor(
             id=0,
             nome="Fornecedor Teste",
-            email="fornecedor@email.com",
+            email=email_unico,
             senha="senha123",
-            cpf_cnpj="12345678900",
+            cpf_cnpj=cpf_unico,
             telefone="27999999999",
             cep="88888-888",
             rua="Rua Teste",
@@ -82,17 +83,17 @@ class TestFornecedorRepo:
         assert len(fornecedores) > 0, "Deveria haver pelo menos um fornecedor"
 
 
-    def test_obter_fornecedor_por_id(self, test_db):
+    def test_obter_fornecedor_por_id(self, test_db, email_unico, cpf_unico):
         # Arrange
-        criar_tabela_usuario()      
+        criar_tabela_usuario()
         criar_tabela_fornecedor()
-        
+
         fornecedor = Fornecedor(
             id=0,
             nome="Fornecedor Teste",
-            email="fornecedor@email.com",
+            email=email_unico,
             senha="senha123",
-            cpf_cnpj="12345678900",
+            cpf_cnpj=cpf_unico,
             telefone="27999999999",
             cep="88888-888",
             rua="Rua Teste",
@@ -114,7 +115,7 @@ class TestFornecedorRepo:
         assert fornecedor_bd is not None, "Deveria retornar um fornecedor"
         assert fornecedor_bd.id == id_inserido, "ID do fornecedor retornado deve ser igual ao inserido"
         assert fornecedor_bd.nome == "Fornecedor Teste"
-        assert fornecedor_bd.email == "fornecedor@email.com"
+        assert fornecedor_bd.email == email_unico
         assert fornecedor_bd.tipo_usuario == "fornecedor"
         assert fornecedor_bd.razao_social == "Fornecedor Ltda"
 
@@ -124,12 +125,14 @@ class TestFornecedorRepo:
         criar_tabela_fornecedor()
 
         for i in range(15):
+            email_temp = f"fornecedor_{i}_{uuid.uuid4().hex[:8]}@teste.com"
+            cpf_temp = f"{i:011d}"
             fornecedor = Fornecedor(
                 id=0,
-                nome="Fornecedor Teste",
-                email="fornecedor@email.com",
+                nome=f"Fornecedor Teste {i}",
+                email=email_temp,
                 senha="senha123",
-                cpf_cnpj="12345678900",
+                cpf_cnpj=cpf_temp,
                 telefone="27999999999",
                 cep="88888-888",
                 rua="Rua Teste",
@@ -156,7 +159,7 @@ class TestFornecedorRepo:
         ids_pagina_2 = {f.id for f in fornecedor_pagina_2}
         assert ids_pagina_1.isdisjoint(ids_pagina_2), "Os fornecedores da página 1 não devem se repetir na página 2"
 
-    def test_atualizar_fornecedor(self, test_db):
+    def test_atualizar_fornecedor(self, test_db, email_unico, cpf_unico):
         # Arrange
         criar_tabela_usuario()
         criar_tabela_fornecedor()
@@ -164,9 +167,9 @@ class TestFornecedorRepo:
         fornecedor = Fornecedor(
             id=0,
             nome="Fornecedor Teste",
-            email="fornecedor@email.com",
+            email=email_unico,
             senha="senha123",
-            cpf_cnpj="12345678900",
+            cpf_cnpj=cpf_unico,
             telefone="27999999999",
             cep="88888-888",
             rua="Rua Teste",
@@ -200,16 +203,16 @@ class TestFornecedorRepo:
         assert atualizado.razao_social == "Razão Atualizada"
 
 
-    def test_deletar_fornecedor(self, test_db):
+    def test_deletar_fornecedor(self, test_db, email_unico, cpf_unico):
         criar_tabela_usuario()
         criar_tabela_fornecedor()
 
         fornecedor = Fornecedor(
             id=0,
             nome="Fornecedor Teste",
-            email="fornecedor@email.com",
+            email=email_unico,
             senha="senha123",
-            cpf_cnpj="12345678900",
+            cpf_cnpj=cpf_unico,
             telefone="27999999999",
             cep="88888-888",
             rua="Rua Teste",

@@ -40,11 +40,11 @@ def obter_cliente() -> List[Cliente]:
                 id=row["id"],
                 nome=row["nome"],
                 email=row["email"],
-                senha=row.get("senha", ""),
+                senha=row["senha"] if "senha" in row.keys() else "",
                 cpf_cnpj=row["cpf_cnpj"],
                 telefone=row["telefone"],
-                cep=row.get("cep", ""),
-                complemento=row.get("complemento", ""),
+                cep=row["cep"] if "cep" in row.keys() else "",
+                complemento=row["complemento"] if "complemento" in row.keys() else "",
                 estado=row["estado"],
                 cidade=row["cidade"],
                 rua=row["rua"],
@@ -53,7 +53,7 @@ def obter_cliente() -> List[Cliente]:
                 data_cadastro=row["data_cadastro"],
                 tipo_usuario=row["tipo_usuario"],
                 genero=row["genero"],
-                data_nascimento=date.fromisoformat(row["data_nascimento"]) if row.get("data_nascimento") else None,
+                data_nascimento=date.fromisoformat(row["data_nascimento"]) if "data_nascimento" in row.keys() and row["data_nascimento"] else None,
                 foto=row["foto"],
                 token_redefinicao=row["token_redefinicao"],
                 data_token=row["data_token"],
@@ -73,8 +73,8 @@ def obter_cliente_por_id(cliente_id: int) -> Optional[Cliente]:
                 senha=row["senha"],
                 cpf_cnpj=row["cpf_cnpj"],
                 telefone=row["telefone"],
-                cep=row.get("cep", ""),
-                complemento=row.get("complemento", ""),
+                cep=row["cep"] if "cep" in row.keys() else "",
+                complemento=row["complemento"] if "complemento" in row.keys() else "",
                 estado=row["estado"],
                 cidade=row["cidade"],
                 rua=row["rua"],
@@ -82,7 +82,7 @@ def obter_cliente_por_id(cliente_id: int) -> Optional[Cliente]:
                 bairro=row["bairro"],
                 data_cadastro=row["data_cadastro"],
                 genero=row["genero"],
-                data_nascimento=date.fromisoformat(row["data_nascimento"]) if row.get("data_nascimento") else None,
+                data_nascimento=date.fromisoformat(row["data_nascimento"]) if "data_nascimento" in row.keys() and row["data_nascimento"] else None,
                 tipo_usuario=row["tipo_usuario"],
                 foto=row["foto"],
                 token_redefinicao=row["token_redefinicao"],
@@ -91,7 +91,7 @@ def obter_cliente_por_id(cliente_id: int) -> Optional[Cliente]:
         return None
     
 def obter_cliente_por_pagina(conn, limit: int, offset: int) -> list[Cliente]:
-    conn.row_factory = sqlite3.Row 
+    conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
     cursor.execute(OBTER_CLIENTE_POR_PAGINA,(limit, offset))
     rows = cursor.fetchall()
@@ -103,8 +103,8 @@ def obter_cliente_por_pagina(conn, limit: int, offset: int) -> list[Cliente]:
             senha=row["senha"],
             cpf_cnpj=row["cpf_cnpj"],
             telefone=row["telefone"],
-            cep=row.get("cep", ""),
-            complemento=row.get("complemento", ""),
+            cep=row["cep"] if "cep" in row.keys() else "",
+            complemento=row["complemento"] if "complemento" in row.keys() else "",
             estado=row["estado"],
             cidade=row["cidade"],
             rua=row["rua"],
@@ -112,7 +112,7 @@ def obter_cliente_por_pagina(conn, limit: int, offset: int) -> list[Cliente]:
             bairro=row["bairro"],
             data_cadastro=row["data_cadastro"],
             genero=row["genero"],
-            data_nascimento=row.get("data_nascimento"),
+            data_nascimento=row["data_nascimento"] if "data_nascimento" in row.keys() else None,
             tipo_usuario=row["tipo_usuario"],
             foto=row["foto"],
             token_redefinicao=row["token_redefinicao"],
@@ -138,6 +138,7 @@ def atualizar_cliente(cliente: Cliente) -> bool:
         cursor.execute(ATUALIZAR_CLIENTE, (
             cliente.genero,
             data_nascimento_str,
+            cliente.id,
         ))
         conn.commit()
         return sucesso_usuario or cursor.rowcount > 0

@@ -40,17 +40,17 @@ def obter_fornecedor() -> List[Fornecedor]:
                 id=row["id"],
                 nome=row["nome"],
                 email=row["email"],
-                senha=row.get("senha", ""),
-                cpf_cnpj=row.get("cpf_cnpj", ""),
-                telefone=row.get("telefone", ""),
-                cep="",  # Campo adicionado
+                senha=row["senha"] if "senha" in row.keys() else "",
+                cpf_cnpj=row["cpf_cnpj"] if "cpf_cnpj" in row.keys() else "",
+                telefone=row["telefone"] if "telefone" in row.keys() else "",
+                cep=row["cep"] if "cep" in row.keys() else "",
                 estado=row["estado"],
                 cidade=row["cidade"],
                 rua=row["rua"],
                 numero=row["numero"],
-                complemento="",  # Campo adicionado
+                complemento=row["complemento"] if "complemento" in row.keys() else "",
                 bairro=row["bairro"],
-                data_cadastro=row.get("data_cadastro"),
+                data_cadastro=row["data_cadastro"] if "data_cadastro" in row.keys() else None,
                 razao_social=row["razao_social"],
                 selo_confianca=bool(row["selo_confianca"]) if "selo_confianca" in row.keys() else False,
                 tipo_usuario=row["tipo_usuario"]
@@ -74,12 +74,12 @@ def obter_fornecedor_por_id(fornecedor_id: int) -> Optional[Fornecedor]:
                 senha=row["senha"],
                 cpf_cnpj=row["cpf_cnpj"],
                 telefone=row["telefone"],
-                cep=row.get("cep", ""),  # Campo adicionado com fallback
+                cep=row["cep"] if "cep" in row.keys() else "",
                 estado=row["estado"],
                 cidade=row["cidade"],
                 rua=row["rua"],
                 numero=row["numero"],
-                complemento=row.get("complemento", ""),  # Campo adicionado com fallback
+                complemento=row["complemento"] if "complemento" in row.keys() else "",
                 bairro=row["bairro"],
                 data_cadastro=row["data_cadastro"],
                 razao_social=row["razao_social"],
@@ -89,7 +89,7 @@ def obter_fornecedor_por_id(fornecedor_id: int) -> Optional[Fornecedor]:
         return None
     
 def obter_fornecedor_por_pagina(conn, limit: int, offset: int) -> list[Fornecedor]:
-    conn.row_factory = sqlite3.Row 
+    conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
     cursor.execute(OBTER_FORNECEDOR_POR_PAGINA,(limit, offset))
     rows = cursor.fetchall()
@@ -101,12 +101,12 @@ def obter_fornecedor_por_pagina(conn, limit: int, offset: int) -> list[Fornecedo
             senha=row["senha"],
             cpf_cnpj=row["cpf_cnpj"],
             telefone=row["telefone"],
-            cep=row.get("cep", ""),  # Campo adicionado com fallback
+            cep=row["cep"] if "cep" in row.keys() else "",
             estado=row["estado"],
             cidade=row["cidade"],
             rua=row["rua"],
             numero=row["numero"],
-            complemento=row.get("complemento", ""),  # Campo adicionado com fallback
+            complemento=row["complemento"] if "complemento" in row.keys() else "",
             bairro=row["bairro"],
             data_cadastro=row["data_cadastro"],
             razao_social=row["razao_social"],
@@ -134,12 +134,12 @@ def obter_fornecedor_por_email(email: str) -> Optional[Fornecedor]:
                 senha=row["senha"],
                 cpf_cnpj=row["cpf_cnpj"],
                 telefone=row["telefone"],
-                cep=row.get("cep", ""),  # Campo adicionado com fallback
+                cep=row["cep"] if "cep" in row.keys() else "",
                 estado=row["estado"],
                 cidade=row["cidade"],
                 rua=row["rua"],
                 numero=row["numero"],
-                complemento=row.get("complemento", ""),  # Campo adicionado com fallback
+                complemento=row["complemento"] if "complemento" in row.keys() else "",
                 bairro=row["bairro"],
                 data_cadastro=data_cadastro,
                 razao_social=row["razao_social"],
@@ -156,7 +156,8 @@ def atualizar_fornecedor(fornecedor: Fornecedor) -> bool:
         cursor.execute("""
             UPDATE usuario
             SET nome = ?, email = ?, senha = ?, cpf_cnpj = ?, telefone = ?,
-                data_cadastro = ?, endereco = ?
+                cep = ?, rua = ?, numero = ?, complemento = ?, bairro = ?, cidade = ?, estado = ?,
+                data_cadastro = ?
             WHERE id = ?
         """, (
             fornecedor.nome,
@@ -164,11 +165,13 @@ def atualizar_fornecedor(fornecedor: Fornecedor) -> bool:
             fornecedor.senha,
             fornecedor.cpf_cnpj,
             fornecedor.telefone,
-            fornecedor.estado,
-            fornecedor.cidade,
+            getattr(fornecedor, 'cep', ''),
             fornecedor.rua,
             fornecedor.numero,
+            getattr(fornecedor, 'complemento', ''),
             fornecedor.bairro,
+            fornecedor.cidade,
+            fornecedor.estado,
             fornecedor.data_cadastro.isoformat() if isinstance(fornecedor.data_cadastro, datetime) else fornecedor.data_cadastro,
             fornecedor.id
         ))
@@ -185,7 +188,7 @@ def atualizar_fornecedor(fornecedor: Fornecedor) -> bool:
         ))
 
         conn.commit()
-        return cursor.rowcount > 0  # Pode melhorar para checar as duas queries se quiser
+        return cursor.rowcount > 0
 
 
 

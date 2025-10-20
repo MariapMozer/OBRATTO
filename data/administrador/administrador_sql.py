@@ -21,8 +21,17 @@ SELECT
     u.cpf_cnpj,
     u.telefone,
     u.data_cadastro,
-    u.endereco,
-    u.tipo_usuario
+    u.cep,
+    u.rua,
+    u.numero,
+    u.complemento,
+    u.bairro,
+    u.cidade,
+    u.estado,
+    u.tipo_usuario,
+    u.foto,
+    u.token_redefinicao,
+    u.data_token
 FROM administrador ad
 JOIN usuario u ON ad.id_usuario = u.id
 ORDER BY u.nome;
@@ -37,8 +46,17 @@ SELECT
     u.cpf_cnpj,
     u.telefone,
     u.data_cadastro,
-    u.endereco,
-    u.tipo_usuario
+    u.cep,
+    u.rua,
+    u.numero,
+    u.complemento,
+    u.bairro,
+    u.cidade,
+    u.estado,
+    u.tipo_usuario,
+    u.foto,
+    u.token_redefinicao,
+    u.data_token
 FROM administrador ad
 JOIN usuario u ON ad.id_usuario = u.id
 WHERE ad.id = ?;

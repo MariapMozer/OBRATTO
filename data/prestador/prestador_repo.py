@@ -49,7 +49,7 @@ def obter_prestador_por_id(prestador_id: int) -> Optional[Prestador]:
         cursor.execute(OBTER_PRESTADOR_POR_ID, (prestador_id,))
         row = cursor.fetchone()
         if row:
-            if isinstance(row.get("data_cadastro"), str):
+            if isinstance(row.get("data_cadastro", None), str):
                 row["data_cadastro"] = datetime.fromisoformat(row["data_cadastro"])
             if "selo_confianca" in row:
                 row["selo_confianca"] = bool(row["selo_confianca"])
@@ -57,7 +57,7 @@ def obter_prestador_por_id(prestador_id: int) -> Optional[Prestador]:
         return None
     
 def obter_prestador_por_pagina(conn, limit: int, offset: int) -> list[Prestador]:
-    conn.row_factory = sqlite3.Row 
+    conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
     cursor.execute(OBTER_PRESTADOR_POR_PAGINA, (limit, offset))
     rows = cursor.fetchall()
@@ -69,8 +69,8 @@ def obter_prestador_por_pagina(conn, limit: int, offset: int) -> list[Prestador]
             senha=row["senha"],
             cpf_cnpj=row["cpf_cnpj"],
             telefone=row["telefone"],
-            cep=row.get("cep", ""),
-            complemento=row.get("complemento", ""),
+            cep=row["cep"] if "cep" in row.keys() else "",
+            complemento=row["complemento"] if "complemento" in row.keys() else "",
             estado=row["estado"],
             cidade=row["cidade"],
             rua=row["rua"],
@@ -78,13 +78,13 @@ def obter_prestador_por_pagina(conn, limit: int, offset: int) -> list[Prestador]
             bairro=row["bairro"],
             data_cadastro=row["data_cadastro"],
             area_atuacao=row["area_atuacao"],
-            tipo_usuario=row.get("tipo_usuario", row.get("tipo_pessoa", "prestador")),
+            tipo_usuario=row["tipo_usuario"] if "tipo_usuario" in row.keys() else "prestador",
             razao_social=row["razao_social"],
             descricao_servicos=row["descricao_servicos"],
             selo_confianca=bool(row["selo_confianca"]) if "selo_confianca" in row.keys() else False,
-            foto=row.get("foto"),
-            token_redefinicao=row.get("token_redefinicao"),
-            data_token=row.get("data_token"),
+            foto=row["foto"] if "foto" in row.keys() else None,
+            token_redefinicao=row["token_redefinicao"] if "token_redefinicao" in row.keys() else None,
+            data_token=row["data_token"] if "data_token" in row.keys() else None,
         )
         for row in rows
     ]
@@ -97,7 +97,7 @@ def obter_prestador_por_email(email: str) -> Optional[Prestador]:
         cursor.execute(OBTER_PRESTADOR_POR_EMAIL, (email,))
         row = cursor.fetchone()
         if row:
-            if isinstance(row.get("data_cadastro"), str):
+            if isinstance(row.get("data_cadastro", None), str):
                 row["data_cadastro"] = datetime.fromisoformat(row["data_cadastro"])
             if "selo_confianca" in row:
                 row["selo_confianca"] = bool(row["selo_confianca"])

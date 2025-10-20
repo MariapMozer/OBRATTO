@@ -57,3 +57,7 @@ def get_flashed_messages(request: Request) -> List[Dict[str, Any]]:
     """
     messages = request.session.pop("flash_messages", [])
     return messages
+
+
+# Alias para compatibilidade com o comando
+obter_mensagens = get_flashed_messages

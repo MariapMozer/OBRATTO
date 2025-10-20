@@ -4,8 +4,10 @@ Centraliza a criação e configuração de templates.
 """
 
 from fastapi.templating import Jinja2Templates
+from jinja2 import Environment, FileSystemLoader
 from typing import Optional
 import os
+from utils.flash_messages import get_flashed_messages
 
 
 def criar_templates(directory: str = "templates", **kwargs) -> Jinja2Templates:
@@ -37,17 +39,21 @@ def criar_templates(directory: str = "templates", **kwargs) -> Jinja2Templates:
     if not os.path.exists(directory):
         raise ValueError(f"Diretório de templates não encontrado: {directory}")
 
-    # Configurações padrão
-    config = {
-        "autoescape": True,  # Prevenir XSS
-        "auto_reload": True,  # Recarregar templates em desenvolvimento
-    }
+    # Criar environment Jinja2 customizado
+    env = Environment(
+        loader=FileSystemLoader(directory),
+        autoescape=True,
+        auto_reload=True
+    )
 
-    # Sobrescrever com kwargs fornecidos
-    config.update(kwargs)
+    # Injetar funções globais
+    env.globals['get_flashed_messages'] = get_flashed_messages
+    env.globals['obter_mensagens'] = get_flashed_messages  # Alias em português
 
-    # Criar e retornar instância de Jinja2Templates
-    return Jinja2Templates(directory=directory, **config)
+    # Criar instância de Jinja2Templates com environment customizado
+    templates = Jinja2Templates(env=env)
+
+    return templates
 
 
 def criar_templates_multi(directories: list[str], **kwargs) -> Jinja2Templates:

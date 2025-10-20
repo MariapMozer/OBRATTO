@@ -1,0 +1,3 @@
+"""
+Utilitários centralizados do OBRATTO
+"""

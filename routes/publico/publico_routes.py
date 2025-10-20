@@ -273,7 +273,7 @@ async def post_cadastro(
         # Verificar se email já existe APÓS a validação do DTO
         if cliente_repo.obter_cliente_por_email(dados_dto.email):
             return templates.TemplateResponse(
-                "publico/cliente/cliente_cadastro.html",
+                "publico/cliente/cadastro_cliente.html",
                 {
                     "request": request,
                     "erro": "Email já cadastrado",
@@ -312,7 +312,7 @@ async def post_cadastro(
         cliente_id = cliente_repo.inserir_cliente(cliente)
         if not cliente_id:
             return templates.TemplateResponse(
-                "publico/cliente/cliente_cadastro.html",
+                "publico/cliente/cadastro_cliente.html",
                 {
                     "request": request,
                     "erro": "Erro ao cadastrar cliente. Tente novamente.",
@@ -338,7 +338,7 @@ async def post_cadastro(
         # logger.warning(f"Erro de validação no cadastro de prestador: {erro_msg}")
 
         # Retornar template com dados preservados e erro
-        return templates.TemplateResponse("publico/cliente/cliente_cadastro.html", {
+        return templates.TemplateResponse("publico/cliente/cadastro_cliente.html", {
             "request": request,
             "erro": erro_msg,
             "dados": dados_formulario  # Preservar dados digitados
@@ -347,7 +347,7 @@ async def post_cadastro(
     except Exception as e:
         # logger.error(f"Erro ao processar cadastro de prestador: {e}")
 
-        return templates.TemplateResponse("publico/cliente/cliente_cadastro.html", {
+        return templates.TemplateResponse("publico/cliente/cadastro_cliente.html", {
             "request": request,
             "erro": "Erro ao processar cadastro. Tente novamente.",
             "dados": dados_formulario

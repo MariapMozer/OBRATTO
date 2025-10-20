@@ -80,38 +80,100 @@ def obter_data_expiracao_token(horas: int = 24) -> str:
 
 def validar_forca_senha(senha: str) -> tuple[bool, str]:
     """
-    Valida se a senha atende aos requisitos mínimos de segurança
-    
+    Valida se a senha atende aos requisitos FORTES de segurança
+
+    Requisitos:
+    - Mínimo 8 caracteres
+    - Pelo menos 1 letra maiúscula
+    - Pelo menos 1 letra minúscula
+    - Pelo menos 1 número
+    - Pelo menos 1 caractere especial (!@#$%^&*(),.?":{}|<>)
+
     Args:
         senha: Senha a ser validada
-    
+
     Returns:
         Tupla (válida, mensagem de erro se inválida)
     """
-    if len(senha) < 6:
-        return False, "A senha deve ter pelo menos 6 caracteres"
-    
-    # Adicione mais validações conforme necessário
-    # if not any(c.isupper() for c in senha):
-    #     return False, "A senha deve conter pelo menos uma letra maiúscula"
-    # if not any(c.islower() for c in senha):
-    #     return False, "A senha deve conter pelo menos uma letra minúscula"
-    # if not any(c.isdigit() for c in senha):
-    #     return False, "A senha deve conter pelo menos um número"
-    
+    import re
+
+    if not senha:
+        return False, "Senha é obrigatória"
+
+    if len(senha) < 8:
+        return False, "Senha deve ter no mínimo 8 caracteres"
+
+    if not re.search(r"[A-Z]", senha):
+        return False, "Senha deve conter pelo menos uma letra maiúscula"
+
+    if not re.search(r"[a-z]", senha):
+        return False, "Senha deve conter pelo menos uma letra minúscula"
+
+    if not re.search(r"\d", senha):
+        return False, "Senha deve conter pelo menos um número"
+
+    if not re.search(r"[!@#$%^&*(),.?\":{}|<>]", senha):
+        return False, "Senha deve conter pelo menos um caractere especial (!@#$%^&*(),.?\":{}|<>)"
+
     return True, ""
 
 
-def gerar_senha_aleatoria(tamanho: int = 8) -> str:
+def gerar_senha_aleatoria(tamanho: int = 12) -> str:
     """
-    Gera uma senha aleatória segura
-    
+    Gera uma senha aleatória FORTE que atende todos os requisitos
+
     Args:
-        tamanho: Tamanho da senha
-    
+        tamanho: Tamanho da senha (mínimo 8, padrão 12)
+
     Returns:
-        Senha aleatória
+        Senha aleatória que atende validar_forca_senha()
     """
-    caracteres = string.ascii_letters + string.digits + "!@#$%"
-    senha = ''.join(secrets.choice(caracteres) for _ in range(tamanho))
-    return senha
+    if tamanho < 8:
+        tamanho = 8
+
+    # Garantir que tem pelo menos um de cada tipo
+    senha_lista = [
+        secrets.choice(string.ascii_uppercase),  # Maiúscula
+        secrets.choice(string.ascii_lowercase),  # Minúscula
+        secrets.choice(string.digits),           # Número
+        secrets.choice("!@#$%^&*(),.?\":{}|<>")  # Especial
+    ]
+
+    # Preencher o restante com caracteres aleatórios
+    caracteres = string.ascii_letters + string.digits + "!@#$%^&*(),.?\":{}|<>"
+    for _ in range(tamanho - 4):
+        senha_lista.append(secrets.choice(caracteres))
+
+    # Embaralhar para não ter padrão previsível
+    secrets.SystemRandom().shuffle(senha_lista)
+
+    return ''.join(senha_lista)
+
+
+def calcular_nivel_senha(senha: str) -> str:
+    """
+    Calcula o nível de força da senha
+
+    Args:
+        senha: Senha a avaliar
+
+    Returns:
+        "fraca", "média" ou "forte"
+    """
+    import re
+
+    pontos = 0
+
+    if len(senha) >= 8: pontos += 1
+    if len(senha) >= 12: pontos += 1
+    if re.search(r"[A-Z]", senha): pontos += 1
+    if re.search(r"[a-z]", senha): pontos += 1
+    if re.search(r"\d", senha): pontos += 1
+    if re.search(r"[!@#$%^&*(),.?\":{}|<>]", senha): pontos += 1
+
+    if pontos <= 2:
+        return "fraca"
+    elif pontos <= 4:
+        return "média"
+    else:
+        return "forte"
