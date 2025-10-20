@@ -77,7 +77,7 @@ class PlanoData(TypedDict):
 # ==============================================================================
 
 # Senha padrão para TODOS os usuários de teste (use senha forte!)
-SENHA_PADRAO = "Senha@123"
+SENHA_PADRAO = "1234aA@#"
 
 # Configuração de exibição
 EMOJI_SUCESSO = "✅"
