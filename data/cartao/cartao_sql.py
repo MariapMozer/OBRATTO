@@ -3,7 +3,7 @@ SQL statements para gerenciamento de cartões de crédito
 """
 
 # Criar tabela de cartões
-SQL_CRIAR_TABELA_CARTAO = """
+CRIAR_TABELA_CARTAO = """
 CREATE TABLE IF NOT EXISTS cartao_credito (
     id_cartao INTEGER PRIMARY KEY AUTOINCREMENT,
     id_fornecedor INTEGER NOT NULL,
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS cartao_credito (
 """
 
 # Inserir cartão
-SQL_INSERIR_CARTAO = """
+INSERIR_CARTAO = """
 INSERT INTO cartao_credito (
     id_fornecedor, nome_titular, numero_cartao_criptografado, 
     ultimos_4_digitos, mes_vencimento, ano_vencimento, 
@@ -32,7 +32,7 @@ INSERT INTO cartao_credito (
 """
 
 # Obter cartões do fornecedor
-SQL_OBTER_CARTOES_FORNECEDOR = """
+OBTER_CARTOES_FORNECEDOR = """
 SELECT id_cartao, id_fornecedor, nome_titular, numero_cartao_criptografado,
        ultimos_4_digitos, mes_vencimento, ano_vencimento, bandeira,
        apelido, principal, ativo, data_criacao, data_atualizacao
@@ -42,7 +42,7 @@ ORDER BY principal DESC, data_criacao DESC
 """
 
 # Obter cartões por prestador
-SQL_OBTER_CARTOES_POR_PRESTADOR = """
+OBTER_CARTOES_POR_PRESTADOR = """
 SELECT id_cartao, id_prestador, nome_titular, numero_cartao_criptografado,
        ultimos_4_digitos, mes_vencimento, ano_vencimento, bandeira,
        apelido, principal, ativo, data_criacao, data_atualizacao
@@ -52,7 +52,7 @@ ORDER BY principal DESC, data_criacao DESC
 """
 
 # Obter cartão por ID
-SQL_OBTER_CARTAO_POR_ID = """
+OBTER_CARTAO_POR_ID = """
 SELECT id_cartao, id_fornecedor, nome_titular, numero_cartao_criptografado,
        ultimos_4_digitos, mes_vencimento, ano_vencimento, bandeira,
        apelido, principal, ativo, data_criacao, data_atualizacao
@@ -61,7 +61,7 @@ WHERE id_cartao = ? AND ativo = TRUE
 """
 
 # Obter cartão principal
-SQL_OBTER_CARTAO_PRINCIPAL = """
+OBTER_CARTAO_PRINCIPAL = """
 SELECT id_cartao, id_fornecedor, nome_titular, numero_cartao_criptografado,
        ultimos_4_digitos, mes_vencimento, ano_vencimento, bandeira,
        apelido, principal, ativo, data_criacao, data_atualizacao
@@ -70,28 +70,28 @@ WHERE id_fornecedor = ? AND principal = TRUE AND ativo = TRUE
 """
 
 # Atualizar cartão
-SQL_ATUALIZAR_CARTAO = """
+ATUALIZAR_CARTAO = """
 UPDATE cartao_credito SET 
     nome_titular = ?, apelido = ?, principal = ?, data_atualizacao = ?
 WHERE id_cartao = ?
 """
 
 # Desativar cartão (soft delete)
-SQL_DESATIVAR_CARTAO = """
+DESATIVAR_CARTAO = """
 UPDATE cartao_credito SET 
     ativo = FALSE, data_atualizacao = ?
 WHERE id_cartao = ?
 """
 
 # Remover status principal de outros cartões
-SQL_REMOVER_PRINCIPAL_OUTROS = """
+REMOVER_PRINCIPAL_OUTROS = """
 UPDATE cartao_credito SET 
     principal = FALSE, data_atualizacao = ?
 WHERE id_fornecedor = ? AND id_cartao != ?
 """
 
 # Definir cartão como principal
-SQL_DEFINIR_PRINCIPAL = """
+DEFINIR_PRINCIPAL = """
 UPDATE cartao_credito SET 
     principal = TRUE, data_atualizacao = ?
 WHERE id_cartao = ?

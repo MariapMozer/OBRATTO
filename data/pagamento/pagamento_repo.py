@@ -7,13 +7,14 @@ from utils.db import open_connection
 from data.pagamento.pagamento_model import Pagamento
 from data.pagamento.pagamento_sql import *
 from datetime import datetime
+from utils.logger_config import logger
 
 class PagamentoRepository:
     def criar_tabela_pagamento(self):
         """Cria a tabela de pagamentos"""
         with open_connection() as conexao:
             cursor = conexao.cursor()
-            cursor.execute(SQL_CRIAR_TABELA_PAGAMENTO)
+            cursor.execute(CRIAR_TABELA_PAGAMENTO)
             conexao.commit()
 
     def inserir_pagamento(self, pagamento: Pagamento) -> Optional[int]:
@@ -21,7 +22,7 @@ class PagamentoRepository:
         try:
             with open_connection() as conexao:
                 cursor = conexao.cursor()
-                cursor.execute(SQL_INSERIR_PAGAMENTO, (
+                cursor.execute(INSERIR_PAGAMENTO, (
                     pagamento.plano_id,
                     pagamento.fornecedor_id,
                     pagamento.mp_payment_id,
@@ -36,7 +37,7 @@ class PagamentoRepository:
                 conexao.commit()
                 return cursor.lastrowid
         except Exception as e:
-            print(f"Erro ao inserir pagamento: {e}")
+            logger.error(f"Erro ao inserir pagamento: {e}")
             return None
 
     def obter_pagamento_por_id(self, id_pagamento: int) -> Optional[Pagamento]:
@@ -44,7 +45,7 @@ class PagamentoRepository:
         try:
             with open_connection() as conexao:
                 cursor = conexao.cursor()
-                cursor.execute(SQL_OBTER_PAGAMENTO_POR_ID, (id_pagamento,))
+                cursor.execute(OBTER_PAGAMENTO_POR_ID, (id_pagamento,))
                 row = cursor.fetchone()
                 
                 if row:
@@ -63,7 +64,7 @@ class PagamentoRepository:
                     )
                 return None
         except Exception as e:
-            print(f"Erro ao obter pagamento: {e}")
+            logger.error(f"Erro ao obter pagamento: {e}")
             return None
 
     def obter_pagamento_por_mp_id(self, mp_payment_id: str) -> Optional[Pagamento]:
@@ -71,7 +72,7 @@ class PagamentoRepository:
         try:
             with open_connection() as conexao:
                 cursor = conexao.cursor()
-                cursor.execute(SQL_OBTER_PAGAMENTO_POR_MP_ID, (mp_payment_id,))
+                cursor.execute(OBTER_PAGAMENTO_POR_MP_ID, (mp_payment_id,))
                 row = cursor.fetchone()
                 
                 if row:
@@ -90,7 +91,7 @@ class PagamentoRepository:
                     )
                 return None
         except Exception as e:
-            print(f"Erro ao obter pagamento por MP ID: {e}")
+            logger.error(f"Erro ao obter pagamento por MP ID: {e}")
             return None
 
     def obter_pagamento_por_preference(self, mp_preference_id: str) -> Optional[Pagamento]:
@@ -98,7 +99,7 @@ class PagamentoRepository:
         try:
             with open_connection() as conexao:
                 cursor = conexao.cursor()
-                cursor.execute(SQL_OBTER_PAGAMENTO_POR_PREFERENCE, (mp_preference_id,))
+                cursor.execute(OBTER_PAGAMENTO_POR_PREFERENCE, (mp_preference_id,))
                 row = cursor.fetchone()
 
                 if row:
@@ -117,7 +118,7 @@ class PagamentoRepository:
                     )
                 return None
         except Exception as e:
-            print(f"Erro ao obter pagamento por preference: {e}")
+            logger.error(f"Erro ao obter pagamento por preference: {e}")
             return None
 
     def atualizar_status_pagamento(self, mp_payment_id: str, status: str, metodo_pagamento: Optional[str] = None) -> bool:
@@ -127,7 +128,7 @@ class PagamentoRepository:
                 cursor = conexao.cursor()
                 data_aprovacao = datetime.now().isoformat() if status == "aprovado" else None
                 
-                cursor.execute(SQL_ATUALIZAR_STATUS_PAGAMENTO, (
+                cursor.execute(ATUALIZAR_STATUS_PAGAMENTO, (
                     status, 
                     data_aprovacao, 
                     metodo_pagamento, 
@@ -136,7 +137,7 @@ class PagamentoRepository:
                 conexao.commit()
                 return cursor.rowcount > 0
         except Exception as e:
-            print(f"Erro ao atualizar status do pagamento: {e}")
+            logger.error(f"Erro ao atualizar status do pagamento: {e}")
             return False
 
     def obter_pagamentos_fornecedor(self, fornecedor_id: int) -> List[dict]:
@@ -144,7 +145,7 @@ class PagamentoRepository:
         try:
             with open_connection() as conexao:
                 cursor = conexao.cursor()
-                cursor.execute(SQL_OBTER_PAGAMENTOS_FORNECEDOR, (fornecedor_id,))
+                cursor.execute(OBTER_PAGAMENTOS_FORNECEDOR, (fornecedor_id,))
                 rows = cursor.fetchall()
                 
                 pagamentos = []
@@ -166,7 +167,7 @@ class PagamentoRepository:
                 
                 return pagamentos
         except Exception as e:
-            print(f"Erro ao obter pagamentos do fornecedor: {e}")
+            logger.error(f"Erro ao obter pagamentos do fornecedor: {e}")
             return []
         
     def obter_pagamentos_prestador(self, prestador_id: int) -> List[dict]:
@@ -174,7 +175,7 @@ class PagamentoRepository:
         try:
             with open_connection() as conexao:
                 cursor = conexao.cursor()
-                cursor.execute(SQL_OBTER_PAGAMENTOS_PRESTADOR, (prestador_id,))
+                cursor.execute(OBTER_PAGAMENTOS_PRESTADOR, (prestador_id,))
                 rows = cursor.fetchall()
                 
                 pagamentos = []
@@ -196,7 +197,7 @@ class PagamentoRepository:
                 
                 return pagamentos
         except Exception as e:
-            print(f"Erro ao obter pagamentos do prestador: {e}")
+            logger.error(f"Erro ao obter pagamentos do prestador: {e}")
             return []
 
 
@@ -205,7 +206,7 @@ class PagamentoRepository:
         try:
             with open_connection() as conexao:
                 cursor = conexao.cursor()
-                cursor.execute(SQL_OBTER_PAGAMENTOS_POR_STATUS, (status,))
+                cursor.execute(OBTER_PAGAMENTOS_POR_STATUS, (status,))
                 rows = cursor.fetchall()
                 
                 pagamentos = []
@@ -227,7 +228,7 @@ class PagamentoRepository:
                 
                 return pagamentos
         except Exception as e:
-            print(f"Erro ao obter pagamentos por status: {e}")
+            logger.error(f"Erro ao obter pagamentos por status: {e}")
             return []
 
     def atualizar_pagamento(self, pagamento: Pagamento) -> bool:
@@ -235,7 +236,7 @@ class PagamentoRepository:
         try:
             with open_connection() as conexao:
                 cursor = conexao.cursor()
-                cursor.execute(SQL_ATUALIZAR_PAGAMENTO, (
+                cursor.execute(ATUALIZAR_PAGAMENTO, (
                     pagamento.plano_id,
                     pagamento.fornecedor_id,
                     pagamento.mp_payment_id,
@@ -251,5 +252,5 @@ class PagamentoRepository:
                 conexao.commit()
                 return cursor.rowcount > 0
         except Exception as e:
-            print(f"Erro ao atualizar pagamento: {e}")
+            logger.error(f"Erro ao atualizar pagamento: {e}")
             return False

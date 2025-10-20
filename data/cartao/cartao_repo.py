@@ -1,9 +1,10 @@
 from utils.db import open_connection
 from data.cartao.cartao_model import CartaoCredito
-from data.cartao import cartao_sql 
+from data.cartao import cartao_sql
 from typing import List, Optional
 from datetime import datetime
 import hashlib
+from utils.logger_config import logger
 
 class CartaoRepository:
     """Repository para gerenciamento de cartões de crédito"""
@@ -20,7 +21,7 @@ class CartaoRepository:
                 con.commit()
                 return True
         except Exception as e:
-            print(f"Erro ao definir todos como não principal: {e}")
+            logger.error(f"Erro ao definir todos como não principal: {e}")
             return False
 
     def criar_tabela_cartao(self):
@@ -28,11 +29,11 @@ class CartaoRepository:
         try:
             with open_connection() as con:
                 cursor = con.cursor()
-                cursor.execute(cartao_sql.SQL_CRIAR_TABELA_CARTAO)
+                cursor.execute(cartao_sql.CRIAR_TABELA_CARTAO)
                 con.commit()
             return True
         except Exception as e:
-            print(f"Erro ao criar tabela cartao_credito: {e}")
+            logger.error(f"Erro ao criar tabela cartao_credito: {e}")
             return False
     
     def criptografar_numero_cartao(self, numero_cartao: str) -> str:
@@ -71,11 +72,11 @@ class CartaoRepository:
                 # remover status principal de outros
                 if cartao.principal:
                     cursor.execute(
-                        cartao_sql.SQL_REMOVER_PRINCIPAL_OUTROS,
+                        cartao_sql.REMOVER_PRINCIPAL_OUTROS,
                         (datetime.now().isoformat(), cartao.id_fornecedor, 0)
                     )
-                
-                cursor.execute(cartao_sql.SQL_INSERIR_CARTAO, (
+
+                cursor.execute(cartao_sql.INSERIR_CARTAO, (
                     cartao.id_fornecedor,
                     cartao.nome_titular,
                     cartao.numero_cartao_criptografado,
@@ -95,7 +96,7 @@ class CartaoRepository:
                 return cartao_id
                 
         except Exception as e:
-            print(f"Erro ao inserir cartão: {e}")
+            logger.error(f"Erro ao inserir cartão: {e}")
             return None
     
     def obter_cartoes_fornecedor(self, id_fornecedor: int) -> List[CartaoCredito]:
@@ -103,7 +104,7 @@ class CartaoRepository:
         try:
             with open_connection() as con:
                 cursor = con.cursor()
-                cursor.execute(cartao_sql.SQL_OBTER_CARTOES_FORNECEDOR, (id_fornecedor,))
+                cursor.execute(cartao_sql.OBTER_CARTOES_FORNECEDOR, (id_fornecedor,))
                 rows = cursor.fetchall()
                 
                 cartoes = []
@@ -128,7 +129,7 @@ class CartaoRepository:
                 return cartoes
                 
         except Exception as e:
-            print(f"Erro ao obter cartões: {e}")
+            logger.error(f"Erro ao obter cartões: {e}")
             return []
         
 
@@ -137,7 +138,7 @@ class CartaoRepository:
         try:
             with open_connection() as con:
                 cursor = con.cursor()
-                cursor.execute(cartao_sql.SQL_OBTER_CARTOES_POR_PRESTADOR, (id_prestador,))
+                cursor.execute(cartao_sql.OBTER_CARTOES_POR_PRESTADOR, (id_prestador,))
                 rows = cursor.fetchall()
                 
                 cartoes = []
@@ -162,7 +163,7 @@ class CartaoRepository:
                 return cartoes
                 
         except Exception as e:
-            print(f"Erro ao obter cartões: {e}")
+            logger.error(f"Erro ao obter cartões: {e}")
             return []
           
     
@@ -171,7 +172,7 @@ class CartaoRepository:
         try:
             with open_connection() as con:
                 cursor = con.cursor()
-                cursor.execute(cartao_sql.SQL_OBTER_CARTAO_POR_ID, (id_cartao,))
+                cursor.execute(cartao_sql.OBTER_CARTAO_POR_ID, (id_cartao,))
                 row = cursor.fetchone()
                 
                 if row:
@@ -193,7 +194,7 @@ class CartaoRepository:
                 return None
                 
         except Exception as e:
-            print(f"Erro ao obter cartão: {e}")
+            logger.error(f"Erro ao obter cartão: {e}")
             return None
     
     def obter_cartao_principal(self, id_fornecedor: int) -> Optional[CartaoCredito]:
@@ -201,7 +202,7 @@ class CartaoRepository:
         try:
             with open_connection() as con:
                 cursor = con.cursor()
-                cursor.execute(cartao_sql.SQL_OBTER_CARTAO_PRINCIPAL, (id_fornecedor,))
+                cursor.execute(cartao_sql.OBTER_CARTAO_PRINCIPAL, (id_fornecedor,))
                 row = cursor.fetchone()
                 
                 if row:
@@ -223,7 +224,7 @@ class CartaoRepository:
                 return None
                 
         except Exception as e:
-            print(f"Erro ao obter cartão principal: {e}")
+            logger.error(f"Erro ao obter cartão principal: {e}")
             return None
     
     def atualizar_cartao(self, cartao: CartaoCredito) -> bool:
@@ -235,11 +236,11 @@ class CartaoRepository:
                 # Se está definindo como principal, remover de outros
                 if cartao.principal:
                     cursor.execute(
-                        cartao_sql.SQL_REMOVER_PRINCIPAL_OUTROS,
+                        cartao_sql.REMOVER_PRINCIPAL_OUTROS,
                         (datetime.now().isoformat(), cartao.id_fornecedor, cartao.id_cartao)
                     )
-                
-                cursor.execute(cartao_sql.SQL_ATUALIZAR_CARTAO, (
+
+                cursor.execute(cartao_sql.ATUALIZAR_CARTAO, (
                     cartao.nome_titular,
                     cartao.apelido,
                     cartao.principal,
@@ -251,7 +252,7 @@ class CartaoRepository:
                 return cursor.rowcount > 0
                 
         except Exception as e:
-            print(f"Erro ao atualizar cartão: {e}")
+            logger.error(f"Erro ao atualizar cartão: {e}")
             return False
     
     def definir_cartao_principal(self, id_cartao: int, id_fornecedor: int) -> bool:
@@ -262,13 +263,13 @@ class CartaoRepository:
                 
                 # Remover status principal de outros cartões
                 cursor.execute(
-                    cartao_sql.SQL_REMOVER_PRINCIPAL_OUTROS,
+                    cartao_sql.REMOVER_PRINCIPAL_OUTROS,
                     (datetime.now().isoformat(), id_fornecedor, id_cartao)
                 )
-                
+
                 # Definir este cartão como principal
                 cursor.execute(
-                    cartao_sql.SQL_DEFINIR_PRINCIPAL,
+                    cartao_sql.DEFINIR_PRINCIPAL,
                     (datetime.now().isoformat(), id_cartao)
                 )
                 
@@ -276,7 +277,7 @@ class CartaoRepository:
                 return True
                 
         except Exception as e:
-            print(f"Erro ao definir cartão principal: {e}")
+            logger.error(f"Erro ao definir cartão principal: {e}")
             return False
     
     def excluir_cartao(self, id_cartao: int) -> bool:
@@ -285,14 +286,14 @@ class CartaoRepository:
             with open_connection() as con:
                 cursor = con.cursor()
                 cursor.execute(
-                    cartao_sql.SQL_DESATIVAR_CARTAO,
+                    cartao_sql.DESATIVAR_CARTAO,
                     (datetime.now().isoformat(), id_cartao)
                 )
                 con.commit()
                 return cursor.rowcount > 0
                 
         except Exception as e:
-            print(f"Erro ao excluir cartão: {e}")
+            logger.error(f"Erro ao excluir cartão: {e}")
             return False
     
     def criar_cartao_from_form(self, id_fornecedor: int, numero_cartao: str, 
@@ -323,7 +324,7 @@ class CartaoRepository:
             return self.inserir_cartao(cartao)
             
         except Exception as e:
-            print(f"Erro ao criar cartão: {e}")
+            logger.error(f"Erro ao criar cartão: {e}")
             return None
 
 # Instância global do repositório
