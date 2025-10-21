@@ -1,0 +1,106 @@
+{#
+    Componente: Card de Serviço
+    Descrição: Card reutilizável para exibir serviços de prestadores
+
+    Parâmetros:
+    - servico: Objeto serviço (deve ter .id, .nome, .descricao, .preco, .foto, .categoria, .status)
+    - show_actions: Exibir botões de ação (editar/excluir) - padrão: True
+    - card_class: Classes CSS adicionais para o card - padrão: ''
+    - edit_url: URL para edição (opcional)
+    - delete_handler: Nome da função JS para exclusão (opcional, padrão: 'confirmDelete')
+    - show_category: Exibir categoria - padrão: True
+    - show_rating: Exibir avaliação - padrão: False
+    - rating: Nota do serviço (0-5)
+
+    Uso:
+    {% from 'components/service_card.html' import service_card %}
+    {{ service_card(servico) }}
+    {{ service_card(servico, show_actions=False, show_rating=True, rating=4.5) }}
+#}
+
+{% macro service_card(
+    servico,
+    show_actions=True,
+    card_class='',
+    edit_url=None,
+    delete_handler='confirmDelete',
+    show_category=True,
+    show_rating=False,
+    rating=0
+) %}
+<div class="service-card {{ card_class }}">
+    <div class="service-header">
+        <div class="service-id">ID: {{ servico.id }}</div>
+        {% if servico.status %}
+        <div class="service-status">
+            <span class="status-badge status-{{ servico.status }}">
+                {{ servico.status|title }}
+            </span>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="service-image">
+        {% if servico.foto %}
+        <img src="{{ servico.foto if servico.foto.startswith('/') or servico.foto.startswith('http') else '/static/img/' + servico.foto }}"
+             alt="{{ servico.nome }}"
+             class="service-img"
+             loading="lazy">
+        {% else %}
+        <i class="bi bi-tools service-icon"></i>
+        {% endif %}
+    </div>
+
+    <div class="service-info">
+        <h5 class="service-name">{{ servico.nome }}</h5>
+
+        {% if show_category and servico.categoria %}
+        <span class="badge bg-secondary mb-2">{{ servico.categoria }}</span>
+        {% endif %}
+
+        {% if servico.descricao %}
+        <p class="service-description">{{ servico.descricao }}</p>
+        {% endif %}
+
+        <div class="service-details">
+            {% if servico.preco %}
+            <div class="detail-row">
+                <span class="detail-label">Preço:</span>
+                <span class="detail-value price">R$ {{ "%.2f"|format(servico.preco) }}</span>
+            </div>
+            {% endif %}
+
+            {% if show_rating and rating > 0 %}
+            <div class="detail-row">
+                <span class="detail-label">Avaliação:</span>
+                <span class="detail-value rating">
+                    {% for i in range(5) %}
+                        {% if i < rating|int %}
+                        <i class="bi bi-star-fill text-warning"></i>
+                        {% elif i < rating %}
+                        <i class="bi bi-star-half text-warning"></i>
+                        {% else %}
+                        <i class="bi bi-star text-warning"></i>
+                        {% endif %}
+                    {% endfor %}
+                    <span class="ms-1">({{ "%.1f"|format(rating) }})</span>
+                </span>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if show_actions %}
+    <div class="service-actions">
+        <button class="btn btn-sm btn-outline-primary"
+                onclick="location.href='{{ edit_url if edit_url else '/prestador/servicos/atualizar/' + servico.id|string }}'">
+            <i class="bi bi-pencil me-1"></i> Alterar
+        </button>
+        <button class="btn btn-sm btn-outline-danger"
+                onclick="{{ delete_handler }}('{{ servico.id }}', '{{ servico.nome }}')">
+            <i class="bi bi-trash me-1"></i> Excluir
+        </button>
+    </div>
+    {% endif %}
+</div>
+{% endmacro %}

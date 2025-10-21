@@ -1,60 +1,52 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="/static/css/toasts.css">
-    {% block css %}{% endblock %}
-    <title>Obratto :: {% block titulo %}{% endblock %}</title>
-</head>
-<body class="d-flex flex-column min-vh-100">
-    <header>
-        <nav class="navbar navbar-expand-lg navbar-dark fundo-azul">
-            <div class="container">
-                <a class="navbar-brand d-flex align-items-center py-3 logo" href="/">
-                    <img src="/static/img/logo_casinha_azul.png" alt="Logo" height="40" class="me-2">
-                    <img src="/static/img/logo_nome_azul.png" alt="Logo" height="40" class="me-2">
-                </a>
-                {% block menu %}
-                {% endblock %}
-            </div>
-        </nav>
-    </header>
-    {% block conteudo %}
-    {% endblock %}
-    <footer id="rodapé" class="text-white py-4">
-        <div class="container text-center">
-            <div class="logo-footer mb-3">
-                <img src="/static/img/logo_branca.png" alt="" id="logo-footer">
-            </div>
-            <p class="mb-2">Transformando a forma como a construção civil conecta profissionais, fornecedores e clientes.</p>
+{% extends "base_root.html" %}
 
-            <nav class="mb-3">
-                <a href="/" class="text-white text-decoration-none mx-2">Home</a> |
-                <a href="/servicos" class="text-white text-decoration-none mx-2">Serviços</a> |
-                <a href="/" class="text-white text-decoration-none mx-2">Sobre nós</a> |
-                <a href="/" class="text-white text-decoration-none mx-2">Contato</a>
-            </nav>
+{#
+    Template: Base Público Simplificado (Base2)
+    Descrição: Template base simplificado para páginas públicas sem footer completo
+    Estende: base_root.html
+    Usado por: administrador/base_admin.html e páginas simples
+#}
 
-            <hr class="border-light">
+{% block titulo %}{% block base2_titulo %}Obratto{% endblock %}{% endblock %}
 
-            <p class="mb-0 text-muted">&copy; 2025 Obratto. Todos os direitos reservados.</p>
+{% block navbar %}
+<nav class="navbar navbar-expand-lg navbar-dark fundo-azul">
+    <div class="container">
+        <a class="navbar-brand d-flex align-items-center py-3 logo" href="/">
+            <img src="/static/img/logo_casinha_azul.png" alt="Logo" height="40" class="me-2">
+            <img src="/static/img/logo_nome_azul.png" alt="Logo" height="40" class="me-2">
+        </a>
+        {% block menu %}{% endblock %}
+    </div>
+</nav>
+{% endblock %}
+
+{% block conteudo %}
+{% block base2_conteudo %}{% endblock %}
+{% endblock %}
+
+{% block footer %}
+<footer id="rodapé" class="text-white py-4">
+    <div class="container text-center">
+        <div class="logo-footer mb-3">
+            <img src="/static/img/logo_branca.png" alt="Obratto Logo" id="logo-footer" height="80">
         </div>
-    </footer>
+        <p class="mb-2">Transformando a forma como a construção civil conecta profissionais, fornecedores e clientes.</p>
 
-    <!-- Container para Toasts -->
-    <div id="toast-container" class="toast-container position-fixed bottom-0 end-0 p-4 toast-offset"></div>
+        <nav class="mb-3">
+            <a href="/" class="text-white text-decoration-none mx-2">Home</a> |
+            <a href="/servicos" class="text-white text-decoration-none mx-2">Serviços</a> |
+            <a href="/" class="text-white text-decoration-none mx-2">Sobre nós</a> |
+            <a href="/" class="text-white text-decoration-none mx-2">Contato</a>
+        </nav>
 
-    <!-- Dados de mensagens flash (hidden) -->
-    <script id="mensagens-data" type="application/json">
-        {{ get_flashed_messages(request) | tojson }}
-    </script>
+        <hr class="border-light">
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/static/js/toasts.js"></script>
-    {% block scripts %}{% endblock %}
-</body>
-</html>
+        <p class="mb-0 text-muted">&copy; 2025 Obratto. Todos os direitos reservados.</p>
+    </div>
+</footer>
+{% endblock %}
+
+{% block scripts %}
+{% block base2_scripts %}{% endblock %}
+{% endblock %}

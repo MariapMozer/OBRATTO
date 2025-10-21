@@ -46,7 +46,8 @@ def verificar_senha(senha_plana: str, senha_hash: str) -> bool:
         senha_bytes = senha_plana.encode('utf-8')[:72]
         hash_bytes = senha_hash.encode('utf-8')
         return bcrypt.checkpw(senha_bytes, hash_bytes)
-    except:
+    except (ValueError, TypeError, AttributeError) as e:
+        # Falha na verificação (hash inválido, senha None, etc.)
         return False
 
 

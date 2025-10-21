@@ -1,4 +1,187 @@
-{% set titulo = "Minhas Contratações" %}
-{% set descricao = "Gerencie todas as suas contratações: serviços em andamento, concluídos e histórico completo." %}
-{% set icone = "bi-briefcase" %}
-{% include "prestador/em_construcao.html" %}
+{% extends "prestador/base.html" %}
+
+{#
+    Template: Minhas Contratações (Prestador)
+    Descrição: Lista contratações/trabalhos do prestador
+    Estende: prestador/base.html
+#}
+
+{% from 'components/data_table.html' import data_table %}
+{% from 'components/breadcrumbs.html' import breadcrumbs %}
+{% from 'components/search_form.html' import search_form %}
+{% from 'components/empty_state.html' import empty_state %}
+{% from 'components/pagination.html' import pagination %}
+
+{% block prestador_titulo %}Minhas Contratações{% endblock %}
+
+{% block prestador_conteudo %}
+<div class="container-fluid px-4 py-4">
+    {{ breadcrumbs(items=[
+        {'text': 'Home', 'url': '/prestador/home'},
+        {'text': 'Contratações', 'active': True}
+    ]) }}
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-1">Minhas Contratações</h1>
+            <p class="text-muted mb-0">Gerencie seus trabalhos contratados</p>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            {{ search_form(
+                action_url='/prestador/contratacoes',
+                placeholder='Buscar por cliente ou serviço...',
+                show_filters=True,
+                filters=[
+                    {
+                        'name': 'status',
+                        'label': 'Status',
+                        'type': 'select',
+                        'options': [
+                            {'value': '', 'text': 'Todos'},
+                            {'value': 'agendada', 'text': 'Agendada'},
+                            {'value': 'em_andamento', 'text': 'Em Andamento'},
+                            {'value': 'concluida', 'text': 'Concluída'},
+                            {'value': 'cancelada', 'text': 'Cancelada'}
+                        ]
+                    }
+                ]
+            ) }}
+        </div>
+    </div>
+
+    {% if contratacoes and contratacoes|length > 0 %}
+    <div class="card">
+        <div class="card-body">
+            {{ data_table(
+                headers=[
+                    {'text': 'Nº', 'class': 'text-center', 'style': 'width: 70px'},
+                    {'text': 'Cliente', 'sortable': True},
+                    {'text': 'Serviço', 'sortable': True},
+                    {'text': 'Data Agendada', 'sortable': True, 'class': 'text-center'},
+                    {'text': 'Valor', 'sortable': True, 'class': 'text-end'},
+                    {'text': 'Status', 'class': 'text-center'},
+                    {'text': 'Ações', 'class': 'text-center', 'style': 'width: 180px'}
+                ],
+                rows=contratacoes,
+                row_template='
+                    <tr>
+                        <td class="text-center"><strong>#{{ row.id }}</strong></td>
+                        <td>
+                            <div class="fw-semibold">{{ row.cliente_nome }}</div>
+                            <small class="text-muted"><i class="bi bi-telephone me-1"></i>{{ row.cliente_telefone|default("N/A") }}</small>
+                        </td>
+                        <td>
+                            <div class="fw-semibold">{{ row.servico_nome }}</div>
+                            <small class="text-muted">{{ row.endereco_resumo|default("") }}</small>
+                        </td>
+                        <td class="text-center">
+                            <div>{{ row.data_agendada|default("A definir") }}</div>
+                            {% if row.hora_agendada %}
+                            <small class="text-muted">{{ row.hora_agendada }}</small>
+                            {% endif %}
+                        </td>
+                        <td class="text-end">
+                            <strong class="text-success">R$ {{ "%.2f"|format(row.valor|float) }}</strong>
+                        </td>
+                        <td class="text-center">
+                            {% if row.status == "agendada" %}
+                            <span class="badge bg-info"><i class="bi bi-calendar-check me-1"></i>Agendada</span>
+                            {% elif row.status == "em_andamento" %}
+                            <span class="badge bg-primary"><i class="bi bi-arrow-repeat me-1"></i>Em Andamento</span>
+                            {% elif row.status == "concluida" %}
+                            <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Concluída</span>
+                            {% elif row.status == "cancelada" %}
+                            <span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i>Cancelada</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <div class="btn-group btn-group-sm">
+                                <a href="/prestador/contratacoes/detalhes/{{ row.id }}"
+                                   class="btn btn-outline-primary" title="Ver Detalhes">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                {% if row.status == "agendada" %}
+                                <button class="btn btn-outline-success"
+                                        onclick="iniciarTrabalho({{ row.id }})"
+                                        title="Iniciar Trabalho">
+                                    <i class="bi bi-play-circle"></i>
+                                </button>
+                                {% elif row.status == "em_andamento" %}
+                                <button class="btn btn-outline-warning"
+                                        onclick="concluirTrabalho({{ row.id }})"
+                                        title="Concluir Trabalho">
+                                    <i class="bi bi-check-circle"></i>
+                                </button>
+                                {% endif %}
+                                <a href="/prestador/mensagens/{{ row.cliente_id }}"
+                                   class="btn btn-outline-info" title="Mensagens">
+                                    <i class="bi bi-chat-dots"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                ',
+                striped=True,
+                hover=True,
+                responsive=True
+            ) }}
+        </div>
+    </div>
+
+    {% if total_pages and total_pages > 1 %}
+    <div class="mt-4">
+        {{ pagination(
+            current_page=current_page|default(1),
+            total_pages=total_pages,
+            base_url='/prestador/contratacoes'
+        ) }}
+    </div>
+    {% endif %}
+
+    {% else %}
+    {{ empty_state(
+        icon='briefcase',
+        title='Nenhuma contratação ativa',
+        message='Você não possui contratações no momento. Responda às solicitações de serviço para conseguir novos trabalhos!',
+        action_url='/prestador/solicitacoes',
+        action_text='Ver Solicitações',
+        action_icon='inbox'
+    ) }}
+    {% endif %}
+</div>
+
+{% block prestador_scripts %}
+<script>
+function iniciarTrabalho(id) {
+    if (confirm('Deseja marcar este trabalho como "Em Andamento"?')) {
+        fetch(`/prestador/contratacoes/${id}/iniciar`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'}
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) location.reload();
+            else alert('Erro: ' + data.message);
+        });
+    }
+}
+
+function concluirTrabalho(id) {
+    if (confirm('Deseja marcar este trabalho como "Concluído"?')) {
+        fetch(`/prestador/contratacoes/${id}/concluir`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'}
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) location.reload();
+            else alert('Erro: ' + data.message);
+        });
+    }
+}
+</script>
+{% endblock %}
+{% endblock %}

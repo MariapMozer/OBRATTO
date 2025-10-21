@@ -1,7 +1,266 @@
 {% extends "cliente/base.html" %}
-{% block titulo %}Minhas contratacoes{% endblock %}
+
+{#
+    Template: Minhas Contratações (Cliente)
+    Descrição: Lista todas as contratações do cliente
+    Estende: cliente/base.html
+#}
+
+{% from 'components/data_table.html' import data_table %}
+{% from 'components/breadcrumbs.html' import breadcrumbs %}
+{% from 'components/search_form.html' import search_form %}
+{% from 'components/empty_state.html' import empty_state %}
+{% from 'components/pagination.html' import pagination %}
+
+{% block titulo %}Minhas Contratações{% endblock %}
+
 {% block conteudo %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="h3">Minhas Contratações</h1>
+<div class="container-fluid px-4 py-4">
+    <!-- Breadcrumbs -->
+    {{ breadcrumbs(items=[
+        {'text': 'Home', 'url': '/cliente/home'},
+        {'text': 'Minhas Contratações', 'active': True}
+    ]) }}
+
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-1">Minhas Contratações</h1>
+            <p class="text-muted mb-0">Gerencie suas contratações de serviços</p>
+        </div>
+        <a href="/cliente/contratacoes/solicitar" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-2"></i>Nova Solicitação
+        </a>
+    </div>
+
+    <!-- Search and Filters -->
+    <div class="card mb-4">
+        <div class="card-body">
+            {{ search_form(
+                action_url='/cliente/contratacoes',
+                placeholder='Buscar por serviço, prestador ou número da contratação...',
+                show_filters=True,
+                filters=[
+                    {
+                        'name': 'status',
+                        'label': 'Status',
+                        'type': 'select',
+                        'options': [
+                            {'value': '', 'text': 'Todos'},
+                            {'value': 'pendente', 'text': 'Pendente'},
+                            {'value': 'em_andamento', 'text': 'Em Andamento'},
+                            {'value': 'concluida', 'text': 'Concluída'},
+                            {'value': 'cancelada', 'text': 'Cancelada'}
+                        ]
+                    },
+                    {
+                        'name': 'data_inicio',
+                        'label': 'Data Início',
+                        'type': 'date'
+                    },
+                    {
+                        'name': 'data_fim',
+                        'label': 'Data Fim',
+                        'type': 'date'
+                    }
+                ]
+            ) }}
+        </div>
+    </div>
+
+    <!-- Contrações Table -->
+    {% if contratacoes and contratacoes|length > 0 %}
+    <div class="card">
+        <div class="card-body">
+            {{ data_table(
+                headers=[
+                    {'text': 'Nº', 'class': 'text-center', 'style': 'width: 80px'},
+                    {'text': 'Serviço', 'sortable': True},
+                    {'text': 'Prestador', 'sortable': True},
+                    {'text': 'Data', 'sortable': True, 'class': 'text-center'},
+                    {'text': 'Valor', 'sortable': True, 'class': 'text-end'},
+                    {'text': 'Status', 'class': 'text-center'},
+                    {'text': 'Ações', 'class': 'text-center', 'style': 'width: 200px'}
+                ],
+                rows=contratacoes,
+                row_template='
+                    <tr>
+                        <td class="text-center"><strong>#{{ row.id }}</strong></td>
+                        <td>
+                            <div class="fw-semibold">{{ row.servico_nome }}</div>
+                            <small class="text-muted">{{ row.servico_categoria }}</small>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                {% if row.prestador_foto %}
+                                <img src="{{ row.prestador_foto }}" alt="{{ row.prestador_nome }}"
+                                     class="rounded-circle me-2" width="32" height="32">
+                                {% else %}
+                                <div class="bg-secondary rounded-circle me-2 d-flex align-items-center justify-content-center"
+                                     style="width: 32px; height: 32px;">
+                                    <i class="bi bi-person text-white"></i>
+                                </div>
+                                {% endif %}
+                                <div>
+                                    <div class="fw-semibold">{{ row.prestador_nome }}</div>
+                                    <small class="text-muted">
+                                        {% if row.prestador_avaliacao %}
+                                        <i class="bi bi-star-fill text-warning"></i> {{ row.prestador_avaliacao }}
+                                        {% endif %}
+                                    </small>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="text-center">{{ row.data_contratacao|default("N/A") }}</td>
+                        <td class="text-end">
+                            <strong class="text-primary">R$ {{ "%.2f"|format(row.valor|float) }}</strong>
+                        </td>
+                        <td class="text-center">
+                            {% if row.status == "pendente" %}
+                            <span class="badge bg-warning">
+                                <i class="bi bi-clock me-1"></i>Pendente
+                            </span>
+                            {% elif row.status == "em_andamento" %}
+                            <span class="badge bg-info">
+                                <i class="bi bi-arrow-repeat me-1"></i>Em Andamento
+                            </span>
+                            {% elif row.status == "concluida" %}
+                            <span class="badge bg-success">
+                                <i class="bi bi-check-circle me-1"></i>Concluída
+                            </span>
+                            {% elif row.status == "cancelada" %}
+                            <span class="badge bg-danger">
+                                <i class="bi bi-x-circle me-1"></i>Cancelada
+                            </span>
+                            {% else %}
+                            <span class="badge bg-secondary">{{ row.status|title }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <div class="btn-group btn-group-sm" role="group">
+                                <a href="/cliente/contratacoes/detalhes/{{ row.id }}"
+                                   class="btn btn-outline-primary"
+                                   title="Ver Detalhes">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                {% if row.status == "concluida" and not row.avaliada %}
+                                <a href="/cliente/contratacoes/avaliar/{{ row.id }}"
+                                   class="btn btn-outline-success"
+                                   title="Avaliar">
+                                    <i class="bi bi-star"></i>
+                                </a>
+                                {% endif %}
+                                {% if row.status == "pendente" or row.status == "em_andamento" %}
+                                <button type="button"
+                                        class="btn btn-outline-danger"
+                                        onclick="cancelarContratacao({{ row.id }}, \'{{ row.servico_nome }}\')"
+                                        title="Cancelar">
+                                    <i class="bi bi-x-circle"></i>
+                                </button>
+                                {% endif %}
+                                <a href="/cliente/mensagens/{{ row.prestador_id }}"
+                                   class="btn btn-outline-info"
+                                   title="Mensagens">
+                                    <i class="bi bi-chat-dots"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                ',
+                striped=True,
+                hover=True,
+                responsive=True
+            ) }}
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    {% if total_pages and total_pages > 1 %}
+    <div class="mt-4">
+        {{ pagination(
+            current_page=current_page|default(1),
+            total_pages=total_pages,
+            base_url='/cliente/contratacoes'
+        ) }}
+    </div>
+    {% endif %}
+
+    {% else %}
+    <!-- Empty State -->
+    {{ empty_state(
+        icon='briefcase',
+        title='Nenhuma contratação encontrada',
+        message='Você ainda não possui contratações registradas. Comece buscando prestadores de serviço!',
+        action_url='/catalogo/prestadores',
+        action_text='Buscar Prestadores',
+        action_icon='search'
+    ) }}
+    {% endif %}
+
+    <!-- Statistics Summary (opcional, se disponível) -->
+    {% if contratacoes_stats %}
+    <div class="row g-3 mt-4">
+        <div class="col-md-3">
+            <div class="card border-primary">
+                <div class="card-body text-center">
+                    <h3 class="text-primary mb-0">{{ contratacoes_stats.total|default(0) }}</h3>
+                    <small class="text-muted">Total de Contratações</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-warning">
+                <div class="card-body text-center">
+                    <h3 class="text-warning mb-0">{{ contratacoes_stats.pendentes|default(0) }}</h3>
+                    <small class="text-muted">Pendentes</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-info">
+                <div class="card-body text-center">
+                    <h3 class="text-info mb-0">{{ contratacoes_stats.em_andamento|default(0) }}</h3>
+                    <small class="text-muted">Em Andamento</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-success">
+                <div class="card-body text-center">
+                    <h3 class="text-success mb-0">{{ contratacoes_stats.concluidas|default(0) }}</h3>
+                    <small class="text-muted">Concluídas</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 </div>
+
+{% block scripts %}
+<script>
+function cancelarContratacao(id, servicoNome) {
+    if (confirm(`Tem certeza que deseja cancelar a contratação do serviço "${servicoNome}"?\n\nEsta ação não pode ser desfeita.`)) {
+        // Enviar requisição para cancelar
+        fetch(`/cliente/contratacoes/cancelar/${id}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.reload();
+            } else {
+                alert('Erro ao cancelar contratação: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            alert('Erro ao cancelar contratação. Tente novamente.');
+        });
+    }
+}
+</script>
+{% endblock %}
 {% endblock %}

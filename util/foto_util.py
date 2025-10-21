@@ -1,6 +1,66 @@
 import os
 from PIL import Image
 from typing import List, Optional
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+# Assinaturas mágicas de arquivos de imagem (magic numbers)
+IMAGEM_SIGNATURES = {
+    'JPEG': [b'\xFF\xD8\xFF'],
+    'PNG': [b'\x89\x50\x4E\x47\x0D\x0A\x1A\x0A'],
+    'GIF': [b'\x47\x49\x46\x38\x37\x61', b'\x47\x49\x46\x38\x39\x61'],  # GIF87a, GIF89a
+    'WEBP': [b'\x52\x49\x46\x46', b'\x57\x45\x42\x50'],  # RIFF + WEBP
+}
+
+
+def validar_tipo_imagem(arquivo) -> bool:
+    """
+    Valida se o arquivo é uma imagem real verificando sua assinatura (magic number).
+    Previne ataques de upload de arquivos maliciosos com extensão falsa.
+
+    Args:
+        arquivo: Arquivo de upload (file-like object)
+
+    Returns:
+        True se for uma imagem válida, False caso contrário
+    """
+    try:
+        # Salvar posição atual
+        posicao_atual = arquivo.tell() if hasattr(arquivo, 'tell') else 0
+
+        # Ler primeiros bytes
+        if hasattr(arquivo, 'read'):
+            primeiros_bytes = arquivo.read(12)  # Ler 12 bytes suficiente para todas as assinaturas
+        else:
+            # Se for um path, abrir e ler
+            with open(arquivo, 'rb') as f:
+                primeiros_bytes = f.read(12)
+
+        # Restaurar posição
+        if hasattr(arquivo, 'seek'):
+            arquivo.seek(posicao_atual)
+
+        # Verificar contra assinaturas conhecidas
+        for tipo, signatures in IMAGEM_SIGNATURES.items():
+            for sig in signatures:
+                if primeiros_bytes.startswith(sig):
+                    logger.debug(f"Arquivo validado como {tipo}")
+                    return True
+
+        # Verificação adicional para WEBP (precisa verificar os dois marcadores)
+        if primeiros_bytes[:4] == b'\x52\x49\x46\x46' and primeiros_bytes[8:12] == b'\x57\x45\x42\x50':
+            logger.debug("Arquivo validado como WEBP")
+            return True
+
+        logger.warning(f"Tipo de arquivo não reconhecido. Primeiros bytes: {primeiros_bytes[:8].hex()}")
+        return False
+
+    except Exception as e:
+        logger.error(f"Erro ao validar tipo de imagem: {e}", exc_info=True)
+        return False
+
 
 # Funções destinadas ao Prestador 
 
@@ -23,23 +83,28 @@ def criar_diretorio_servico(servico_id: int) -> bool:
         diretorio = obter_diretorio_servico(servico_id)
         os.makedirs(diretorio, exist_ok=True)
         return True
-    except:
+    except (OSError, PermissionError) as e:
         return False
 
 
 def processar_imagem(arquivo, caminho_destino: str) -> bool:
     """
-    Processa uma imagem: corta para quadrado, redimensiona e salva como JPG
+    Processa uma imagem: valida tipo, corta para quadrado, redimensiona e salva como JPG
     """
     try:
-        # 1. Abrir a imagem
+        # 1. Validar tipo de arquivo
+        if not validar_tipo_imagem(arquivo):
+            logger.error("Arquivo rejeitado: não é uma imagem válida")
+            return False
+
+        # 2. Abrir a imagem
         img: Image.Image = Image.open(arquivo)  # type: ignore[assignment]
 
-        # 2. Converter para RGB se necessário (para salvar como JPG)
+        # 3. Converter para RGB se necessário (para salvar como JPG)
         if img.mode != 'RGB':
             img = img.convert('RGB')  # type: ignore[assignment]
 
-        # 3. Cortar para quadrado (centro da imagem)
+        # 4. Cortar para quadrado (centro da imagem)
         largura, altura = img.size
         tamanho = min(largura, altura)  # ← Usa o menor lado
 
@@ -51,18 +116,18 @@ def processar_imagem(arquivo, caminho_destino: str) -> bool:
 
         img = img.crop((left, top, right, bottom))  # type: ignore[assignment]
 
-        # 4. Redimensionar para tamanho padrão
+        # 5. Redimensionar para tamanho padrão
         img = img.resize((800, 800), Image.Resampling.LANCZOS)  # type: ignore[assignment]
 
-        # 5. Criar diretório se não existir
+        # 6. Criar diretório se não existir
         os.makedirs(os.path.dirname(caminho_destino), exist_ok=True)
 
-        # 6. Salvar como JPG com qualidade otimizada
+        # 7. Salvar como JPG com qualidade otimizada
         img.save(caminho_destino, 'JPEG', quality=85, optimize=True)
 
         return True
     except Exception as e:
-        print(f"Erro ao processar imagem: {e}")
+        logger.error(f"Erro ao processar imagem: {e}", exc_info=True)
         return False
 
 def obter_foto_principal(servico_id: int) -> Optional[str]:
@@ -111,7 +176,7 @@ def obter_proximo_numero(servico_id: int) -> int:
             try:
                 numero_str = arquivo.split('-')[1].split('.')[0]
                 numeros.append(int(numero_str))
-            except:
+            except (IndexError, ValueError):
                 continue
 
     if not numeros:
@@ -154,7 +219,7 @@ def _mover_fotos_para_frente(servico_id: int) -> None:
                 numero_str = arquivo.split('-')[1].split('.')[0]
                 numero = int(numero_str)
                 arquivos_existentes.append((numero, arquivo))
-            except:
+            except (IndexError, ValueError):
                 continue
 
     arquivos_existentes.sort(reverse=True)  # ← Ordena do maior para o menor
@@ -168,7 +233,7 @@ def _mover_fotos_para_frente(servico_id: int) -> None:
 
         try:
             os.rename(caminho_atual, caminho_novo)
-        except:
+        except (OSError, PermissionError):
             continue
 
 
@@ -183,7 +248,7 @@ def excluir_foto(servico_id: int, numero: int) -> bool:
     if os.path.exists(caminho_foto):
         try:
             os.remove(caminho_foto)
-        except:
+        except (OSError, PermissionError):
             return False
 
     # Reordenar fotos restantes para não ter gaps na numeração
@@ -207,7 +272,7 @@ def reordenar_fotos(servico_id: int, nova_ordem: List[int]) -> bool:
                 numero_str = arquivo.split('-')[1].split('.')[0]
                 numero = int(numero_str)
                 arquivos_existentes[numero] = arquivo
-            except:
+            except (IndexError, ValueError):
                 continue
 
     # Validar nova ordem
@@ -229,7 +294,7 @@ def reordenar_fotos(servico_id: int, nova_ordem: List[int]) -> bool:
         try:
             os.rename(caminho_original, caminho_temp)
             temp_files[i] = caminho_temp
-        except:
+        except (OSError, PermissionError):
             return False
 
     # Etapa 2: Renomear para a sequência final
@@ -240,7 +305,7 @@ def reordenar_fotos(servico_id: int, nova_ordem: List[int]) -> bool:
 
         try:
             os.rename(caminho_temp, caminho_final)
-        except:
+        except (OSError, PermissionError):
             return False
 
     return True

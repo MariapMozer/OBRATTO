@@ -1,0 +1,123 @@
+{#
+    Componente: Data Table
+    Descrição: Tabela de dados responsiva e estilizada
+
+    Parâmetros:
+    - headers: Lista de cabeçalhos [{'label': 'Nome', 'key': 'nome', 'sortable': True}]
+    - rows: Lista de objetos/dicionários com dados
+    - actions: Mostrar coluna de ações - padrão: False
+    - action_buttons: Lista de botões de ação [{'icon': 'pencil', 'label': 'Editar', 'class': 'btn-primary', 'url_key': 'edit_url'}]
+    - table_class: Classes CSS adicionais - padrão: ''
+    - striped: Linhas zebradas - padrão: True
+    - hover: Efeito hover - padrão: True
+    - bordered: Bordas - padrão: False
+    - responsive: Wrapper responsivo - padrão: True
+
+    Uso:
+    {% from 'components/data_table.html' import data_table %}
+
+    {{ data_table(
+        headers=[
+            {'label': 'ID', 'key': 'id'},
+            {'label': 'Nome', 'key': 'nome'},
+            {'label': 'Email', 'key': 'email'}
+        ],
+        rows=usuarios,
+        actions=True,
+        action_buttons=[
+            {'icon': 'pencil', 'label': 'Editar', 'class': 'btn-sm btn-primary', 'url': '/users/edit/'}
+        ]
+    ) }}
+#}
+
+{% macro data_table(
+    headers,
+    rows,
+    actions=False,
+    action_buttons=[],
+    table_class='',
+    striped=True,
+    hover=True,
+    bordered=False,
+    responsive=True
+) %}
+{% if responsive %}
+<div class="table-responsive">
+{% endif %}
+    <table class="table {{ table_class }} {% if striped %}table-striped{% endif %} {% if hover %}table-hover{% endif %} {% if bordered %}table-bordered{% endif %}">
+        <thead>
+            <tr>
+                {% for header in headers %}
+                <th scope="col">
+                    {{ header.label if header is mapping else header }}
+                    {% if header is mapping and header.sortable %}
+                    <i class="bi bi-arrow-down-up ms-1 text-muted" style="font-size: 0.8rem; cursor: pointer;"></i>
+                    {% endif %}
+                </th>
+                {% endfor %}
+                {% if actions %}
+                <th scope="col" class="text-center">Ações</th>
+                {% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% if rows %}
+                {% for row in rows %}
+                <tr>
+                    {% for header in headers %}
+                        {% set key = header.key if header is mapping else header %}
+                        <td>
+                            {% if row is mapping %}
+                                {{ row[key] if row[key] is not none else '-' }}
+                            {% else %}
+                                {{ row[key] if row[key] is defined and row[key] is not none else '-' }}
+                            {% endif %}
+                        </td>
+                    {% endfor %}
+                    {% if actions %}
+                    <td class="text-center">
+                        <div class="btn-group btn-group-sm" role="group">
+                            {% for button in action_buttons %}
+                                {% if button.url_key %}
+                                    {% set url = row[button.url_key] if row is mapping else row[button.url_key] %}
+                                {% elif button.url %}
+                                    {% set url = button.url + (row.id|string if row is mapping and row.id else row.id|string) %}
+                                {% else %}
+                                    {% set url = '#' %}
+                                {% endif %}
+
+                                {% if button.onclick %}
+                                <button type="button"
+                                        class="btn {{ button.class|default('btn-secondary') }}"
+                                        onclick="{{ button.onclick }}">
+                                    {% if button.icon %}<i class="bi bi-{{ button.icon }}"></i>{% endif %}
+                                    {% if button.label %}<span class="d-none d-md-inline ms-1">{{ button.label }}</span>{% endif %}
+                                </button>
+                                {% else %}
+                                <a href="{{ url }}"
+                                   class="btn {{ button.class|default('btn-secondary') }}"
+                                   {% if button.title %}title="{{ button.title }}"{% endif %}>
+                                    {% if button.icon %}<i class="bi bi-{{ button.icon }}"></i>{% endif %}
+                                    {% if button.label %}<span class="d-none d-md-inline ms-1">{{ button.label }}</span>{% endif %}
+                                </a>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="{{ headers|length + (1 if actions else 0) }}" class="text-center text-muted py-4">
+                        <i class="bi bi-inbox display-6 d-block mb-2"></i>
+                        Nenhum registro encontrado
+                    </td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+{% if responsive %}
+</div>
+{% endif %}
+{% endmacro %}

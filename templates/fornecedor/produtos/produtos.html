@@ -1,411 +1,138 @@
-{% extends "publico/base2.html" %}
-{% block css %} <link rel="stylesheet" href="/static/css/fornecedor_produtos_listar.css"> {% endblock %}
-{% block titulo %}Fornecedor{% endblock %}
-{% block menu %}
-<div class="navbar-nav ms-auto">
-    <div class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle d-flex align-items-center text-accent" href="/publico/perfil/editar/{id}" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="bi bi-person-circle fs-5 me-2"></i>
-            Fornecedor
+{% extends "fornecedor/base.html" %}
+
+{#
+    Template: Listagem de Produtos do Fornecedor
+    Descrição: Página para listar e gerenciar produtos do fornecedor
+    Estende: fornecedor/base.html
+#}
+
+{% from 'components/product_card.html' import product_card %}
+{% from 'components/confirmation_modal.html' import confirmation_modal %}
+{% from 'components/search_form.html' import search_form %}
+{% from 'components/empty_state.html' import empty_state %}
+{% from 'components/breadcrumbs.html' import breadcrumbs %}
+
+{% block fornecedor_titulo %}Meus Produtos{% endblock %}
+{% block sidebar_active %}produtos{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="/static/css/fornecedor_produtos_listar.css">
+{% endblock %}
+
+{% block fornecedor_conteudo %}
+<div class="container-fluid px-4">
+    <!-- Breadcrumbs -->
+    {{ breadcrumbs([
+        {'label': 'Home', 'url': '/fornecedor/home'},
+        {'label': 'Meus Produtos'}
+    ]) }}
+
+    <!-- Header da página -->
+    <section class="page-header mb-4">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="page-title">Meus Produtos</h1>
+                <p class="page-subtitle">Gerencie todos os seus produtos cadastrados</p>
+            </div>
+            <div class="col-lg-4 text-end">
+                <div class="stats-container">
+                    <div class="stat-item">
+                        <span class="stat-number">{{ produtos|length if produtos else 0 }}</span>
+                        <span class="stat-label">Total</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Busca -->
+    <section class="search-section mb-4">
+        {{ search_form(
+            action='/fornecedor/produtos/buscar',
+            fields=[
+                {'name': 'id', 'type': 'number', 'label': 'Buscar por ID', 'placeholder': 'Digite o ID do produto'},
+                {'name': 'nome', 'type': 'text', 'label': 'Buscar por Nome', 'placeholder': 'Digite o nome do produto'}
+            ],
+            clear_url='/fornecedor/produtos/listar'
+        ) }}
+    </section>
+
+    <!-- Botão Cadastrar Novo Produto -->
+    <section class="action-section mb-4">
+        <a href="/fornecedor/produtos/inserir" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-2"></i> Cadastrar Novo Produto
         </a>
-        <ul class="dropdown-menu dropdown-menu-end">
-            <li><a class="dropdown-item" href="/publico/perfil/editar/{id}"><i class="bi bi-person me-2"></i>Perfil</a></li>
-            <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Configurações</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item text-danger" href="/"><i class="bi bi-box-arrow-right me-2"></i>Sair</a></li>
-        </ul>
-    </div>
+    </section>
+
+    <!-- Lista de Produtos -->
+    <section class="products-section">
+        {% if produtos %}
+        <div class="products-grid" id="productsContainer">
+            {% for produto in produtos %}
+                {{ product_card(produto, show_actions=True) }}
+            {% endfor %}
+        </div>
+        {% else %}
+        {{ empty_state(
+            icon='box-seam',
+            title='Nenhum produto encontrado',
+            description='Você ainda não cadastrou nenhum produto ou a busca não retornou resultados.',
+            action_url='/fornecedor/produtos/inserir',
+            action_text='Cadastrar Primeiro Produto',
+            action_icon='plus-circle'
+        ) }}
+        {% endif %}
+    </section>
 </div>
+
+<!-- Modais -->
+{{ confirmation_modal(
+    modal_id='deleteModal',
+    title='Confirmar Exclusão',
+    icon='trash',
+    icon_class='text-danger',
+    message='<p>Tem certeza que deseja excluir o produto <strong id="productNameToDelete"></strong>?</p><p class="text-muted">Esta ação não pode ser desfeita.</p>',
+    confirm_text='Excluir',
+    confirm_class='btn-danger'
+) }}
 {% endblock %}
-{% block conteudo %}
-<input type="checkbox" id="toggleSidebar" hidden>
 
-    <aside class="sidebar" id="sidebarMenu">
-        <div class="sidebar-header">
-            <h2 class="logo">Nome da Loja</h2>
-            <label for="toggleSidebar" class="toggle-btn">
-            <i class="bi bi-list"></i>
-            </label>
-        </div>
+{% block fornecedor_scripts %}
+<script>
+    // Função para confirmar exclusão de produto
+    function confirmDelete(productId, productName) {
+        const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+        document.getElementById('productNameToDelete').textContent = productName;
 
-        <nav class="sidebar-nav">
-            <a href="/fornecedor/solicitacoes_recebidas" class="sidebar-item">
-                <i class="bi bi-inbox"></i><span>Solicitações</span>
-            </a>
-            <a href="/fornecedor/produtos/inserir" class="sidebar-item">
-                <i class="bi bi-plus-square"></i><span>Cadastrar produtos</span>
-            </a>
-            <a href="/fornecedor/produtos/listar" class="sidebar-item active">
-                <i class="bi bi-box-seam"></i><span>Meus Produtos</span>
-            </a>
-            <a href="#" class="sidebar-item">
-                <i class="bi bi-chat-dots"></i><span>Chats</span>
-            </a>
-            <a href="/fornecedor/promocao/listar" class="sidebar-item">
-                <i class="bi bi-tag"></i><span>Cadastrar promoção</span>
-            </a>
-            <a href="#" class="sidebar-item">
-                <i class="bi bi-star"></i><span>Avaliações Recebidas</span>
-            </a>
-            <a href="fornecedor/perfil_publico/{id}" class="sidebar-item">
-                <i class="bi bi-person"></i><span>Perfil</span>
-            </a>
-            <a href="/fornecedor/conta/{id}" class="sidebar-item">
-                <i class="bi bi-gear"></i><span>Conta</span>
-            </a>
-        </nav>
-    </aside>
+        const confirmBtn = document.getElementById('deleteModalConfirmBtn');
+        confirmBtn.onclick = function() {
+            deleteProduct(productId);
+        };
 
-    <div class="page-content">
-        <div class="main-content">
-            <div class="container-fluid px-4">
-                <!-- Header da página -->
-                <section class="page-header mb-4">
-                    <div class="row align-items-center">
-                        <div class="col-lg-8">
-                            <h1 class="page-title">Meus Produtos</h1>
-                            <p class="page-subtitle">Gerencie todos os seus produtos cadastrados</p>
-                        </div>
-                        <div class="col-lg-4 text-end">
-                            <div class="stats-container">
-                                <div class="stat-item">
-                                    <span class="stat-number">{{ produtos|length if produtos else 0 }}</span>
-                                    <span class="stat-label">Total</span>
-                                </div>
-                                <div class="stat-item">
-                                    <span class="stat-number">12</span>
-                                    <span class="stat-label">Ativos</span>
-                                </div>
-                                <div class="stat-item">
-                                    <span class="stat-number">3</span>
-                                    <span class="stat-label">Promoção</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
+        modal.show();
+    }
 
-                <section class="search-section mb-4">
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="search-container">
-                                <form method="GET" action="/fornecedor/produtos/buscar" class="search-form">
-                                    <div class="search-group">
-                                        <div class="search-field">
-                                            <label class="search-label">Buscar por ID:</label>
-                                            <input type="number" name="id" class="search-input" placeholder="Digite o ID do produto">
-                                        </div>
-                                        <div class="search-field">
-                                            <label class="search-label">Buscar por Nome:</label>
-                                            <input type="text" name="nome" class="search-input" placeholder="Digite o nome do produto">
-                                        </div>
-                                        <div class="search-actions">
-                                            <button type="submit" class="btn-search">
-                                                <i class="bi bi-search"></i> Buscar
-                                            </button>
-                                            <a href="/fornecedor/produtos/listar" class="btn-clear">
-                                                <i class="bi bi-arrow-clockwise"></i> Limpar
-                                            </a>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <section class="quick-actions mb-4">
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="actions-container">
-                                <a href="/fornecedor/produtos/inserir" class="action-card">
-                                    <div class="action-icon">
-                                        <i class="bi bi-plus-circle"></i>
-                                    </div>
-                                    <div class="action-content">
-                                        <h5>Cadastrar Produto</h5>
-                                        <p>Adicione um novo produto ao seu catálogo</p>
-                                    </div>
-                                </a>
-                                
-                                <a href="/fornecedor/produtos" class="action-card">
-                                    <div class="action-icon">
-                                        <i class="bi bi-gear"></i>
-                                    </div>
-                                    <div class="action-content">
-                                        <h5>Atualizar Produtos</h5>
-                                        <p>Gerencie todos os seus produtos</p>
-                                    </div>
-                                </a>
-                                
-                                <a href="/fornecedor/produtos" class="action-card">
-                                    <div class="action-icon">
-                                        <i class="bi bi-trash3"></i>
-                                    </div>
-                                    <div class="action-content">
-                                        <h5>Eliminar Produtos</h5>
-                                        <p>Elimine os produtos fora de estoque</p>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <section class="products-section">
-                    <div class="section-header d-flex justify-content-between align-items-center mb-4">
-                        <h2 class="section-title">
-                            {% if produtos %}
-                                Produtos Encontrados ({{ produtos|length }})
-                            {% else %}
-                                Seus Produtos
-                            {% endif %}
-                        </h2>
-                        <div class="view-options">
-                            <button class="view-btn active" data-view="grid">
-                                <i class="bi bi-grid-3x3-gap"></i>
-                            </button>
-                            <button class="view-btn" data-view="list">
-                                <i class="bi bi-list-ul"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    {% if mensagem %}
-                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        <i class="bi bi-check-circle me-2"></i>{{ mensagem }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                    {% endif %}
-
-                    {% if produtos %}
-                    <div class="products-grid" id="productsContainer">
-                        {% for produto in produtos %}
-                        <div class="product-card" data-product-id="{{ produto.id }}">
-                            <div class="product-header">
-                                <div class="product-id">ID: {{ produto.id }}</div>
-                                <div class="product-status">
-                                    <span class="status-badge status-active">Ativo</span>
-                                </div>
-                            </div>
-                            
-                            <div class="product-image">
-                                {% if produto.foto %}
-                                    <img src="{{ produto.foto }}" alt="{{ produto.nome }}" class="product-img">
-                                {% else %}
-                                    <i class="bi bi-box-seam product-icon"></i>
-                                {% endif %}
-                            </div>
-                            
-                            <div class="product-info">
-                                <h5 class="product-name">{{ produto.nome }}</h5>
-                                <p class="product-description">{{ produto.descricao }}</p>
-                                <div class="product-details">
-                                    <div class="detail-row">
-                                        <span class="detail-label">Preço:</span>
-                                        <span class="detail-value price">R$ {{ "%.2f"|format(produto.preco) }}</span>
-                                    </div>
-                                    <div class="detail-row">
-                                        <span class="detail-label">Estoque:</span>
-                                        <span class="detail-value quantity">{{ produto.quantidade }} unidades</span>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="product-actions">
-                                <button class="btn-action btn-view" 
-                                        data-product-id="{{ produto.id }}" 
-                                        title="Visualizar">
-                                    <i class="bi bi-eye"></i>
-                                </button>
-                                <button class="btn-action btn-edit" onclick="location.href='/fornecedor/produtos/atualizar/{{ produto.id }}'" title="Editar">
-                                    <i class="bi bi-pencil"></i>
-                                </button>
-                                <button class="btn-action btn-delete" onclick="confirmDelete('{{ produto.id }}', '{{ produto.nome }}')" title="Excluir">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                                <div class="dropdown">
-                                    <button class="btn-action btn-more" data-bs-toggle="dropdown" title="Mais opções">
-                                        <i class="bi bi-three-dots"></i>
-                                    </button>
-                                    <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" href="#"><i class="bi bi-copy"></i> Duplicar</a></li>
-                                        <li><a class="dropdown-item" href="#"><i class="bi bi-tag"></i> Adicionar à Promoção</a></li>
-                                        <li><a class="dropdown-item" href="#"><i class="bi bi-eye-slash"></i> Desativar</a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
-                    {% else %}
-                    <div class="empty-state">
-                        <div class="empty-icon">
-                            <i class="bi bi-box-seam"></i>
-                        </div>
-                        <h3>Nenhum produto encontrado</h3>
-                        <p>Você ainda não cadastrou nenhum produto ou a busca não retornou resultados.</p>
-                    </div>
-                    {% endif %}
-                </section>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="deleteModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">
-                        <i class="bi bi-exclamation-triangle text-warning me-2"></i>
-                        Confirmar Exclusão
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Tem certeza que deseja excluir o produto <strong id="productNameToDelete"></strong>?</p>
-                    <p class="text-muted">Esta ação não pode ser desfeita.</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
-                        <i class="bi bi-trash"></i> Excluir
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="viewProductModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">
-                        <i class="bi bi-eye me-2"></i>
-                        Detalhes do Produto
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="product-details-view">
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="product-image-large">
-                                    <img id="modalProductImage" src="" alt="Produto" class="product-img" style="display: none;">
-                                    <i class="bi bi-box-seam" id="modalProductIcon"></i>
-                                </div>
-                            </div>
-                            <div class="col-md-8">
-                                <div class="product-info-detailed">
-                                    <h4 id="modalProductName">Nome do Produto</h4>
-                                    <p id="modalProductDescription">Descrição do produto...</p>
-                                    
-                                    <div class="info-grid">
-                                        <div class="info-item">
-                                            <label>ID:</label>
-                                            <span id="modalProductId">-</span>
-                                        </div>
-                                        <div class="info-item">
-                                            <label>Preço:</label>
-                                            <span id="modalProductPrice">R$ 0,00</span>
-                                        </div>
-                                        <div class="info-item">
-                                            <label>Estoque:</label>
-                                            <span id="modalProductQuantity">0 unidades</span>
-                                        </div>
-                                        <div class="info-item">
-                                            <label>Status:</label>
-                                            <span class="status-badge status-active">Ativo</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-                    <button type="button" class="btn btn-primary" id="editFromModal">
-                        <i class="bi bi-pencil"></i> Editar
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="bulkActionsModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">
-                        <i class="bi bi-gear me-2"></i>
-                        Ações em Lote
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Selecione uma ação para aplicar a múltiplos produtos:</p>
-                    <div class="bulk-actions-list">
-                        <button class="bulk-action-btn">
-                            <i class="bi bi-tag"></i>
-                            <span>Adicionar à Promoção</span>
-                        </button>
-                        <button class="bulk-action-btn">
-                            <i class="bi bi-eye-slash"></i>
-                            <span>Desativar Produtos</span>
-                        </button>
-                        <button class="bulk-action-btn">
-                            <i class="bi bi-pencil"></i>
-                            <span>Editar Preços</span>
-                        </button>
-                        <button class="bulk-action-btn">
-                            <i class="bi bi-trash"></i>
-                            <span>Excluir Produtos</span>
-                        </button>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="modal fade" id="exportModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">
-                        <i class="bi bi-download me-2"></i>
-                        Exportar Produtos
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Escolha o formato para exportar seus produtos:</p>
-                    <div class="export-options">
-                        <button class="export-option-btn">
-                            <i class="bi bi-file-earmark-excel"></i>
-                            <span>Excel (.xlsx)</span>
-                        </button>
-                        <button class="export-option-btn">
-                            <i class="bi bi-file-earmark-pdf"></i>
-                            <span>PDF</span>
-                        </button>
-                        <button class="export-option-btn">
-                            <i class="bi bi-filetype-csv"></i>
-                            <span>CSV</span>
-                        </button>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-{% block scripts %} 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/static/js/fornecedor_produtos_listar.js"></script>
-{% endblock %}
+    // Função para deletar produto
+    function deleteProduct(productId) {
+        fetch(`/fornecedor/produtos/deletar/${productId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Recarregar página ou remover elemento do DOM
+                location.reload();
+            } else {
+                alert('Erro ao excluir produto: ' + (data.message || 'Erro desconhecido'));
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            alert('Erro ao excluir produto');
+        });
+    }
+</script>
 {% endblock %}

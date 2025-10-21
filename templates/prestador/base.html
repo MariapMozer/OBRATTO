@@ -1,150 +1,49 @@
-<!DOCTYPE html>
-<html lang="pt-br">
+{% extends "base_authenticated.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="/static/css/home.css">
-    <link rel="stylesheet" href="/static/css/toasts.css">
-    <style>
-        .navbar .dropdown-menu {
-            border: none;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
-        }
+{#
+    Template: Base Prestador
+    Descrição: Template base para páginas do prestador
+    Estende: base_authenticated.html
+#}
 
-        .navbar .dropdown-item {
-            padding: 10px 20px;
-            transition: all 0.3s ease;
-        }
+{% from 'components/user_dropdown.html' import user_dropdown %}
 
-        .navbar .dropdown-item:hover {
-            background-color: #E1DEE3;
-            color: #171370;
-        }
+{% block titulo %}{% block prestador_titulo %}Prestador{% endblock %}{% endblock %}
 
-        .navbar .dropdown-item.text-danger:hover {
-            background-color: #dc3545;
-            color: white;
-        }
-    </style>
-    {% block css %}{% endblock %}
-    <title>Obratto :: {% block titulo %}Principal{% endblock %}</title>
-</head>
+{% block navbar_search %}
+<form class="d-flex ms-auto align-items-center" role="search">
+    <input class="form-control me-2 rounded rounded-4" type="text"
+        placeholder="Busque pelos melhores serviços" aria-label="Search">
+    <a href="#" class="text-white me-3">
+        <i class="bi bi-search"></i>
+    </a>
+</form>
+{% endblock %}
 
-<body class="d-flex flex-column min-vh-100">
-    <header>
-        <nav class="navbar navbar-expand-lg navbar-dark fundo-azul">
-            <div class="container">
-                <a class="navbar-brand py-3" href="#">
-                    <img src="./static/img/logo_branca.png" alt="Logo" height="50">
-                </a>
-                <form class="d-flex ms-auto align-items-center" role="search">
-                    <input class="form-control me-2 rounded rounded-4" type="text"
-                        placeholder="Busque pelos melhores serviços" aria-label="Search">
-                    <a href="#" class="text-white me-3">
-                        <i class="bi bi-search"></i>
-                    </a>
-                </form>
-                <div class="navbar-nav">
-                    <div class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle text-white d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            {% if usuario_logado and usuario_logado.foto %}
-                            <img src="/static/img/{{ usuario_logado.foto }}" alt="{{ usuario_logado.nome }}" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover;">
-                            {% else %}
-                            <img src="/static/img/user.jpg" alt="Prestador" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover;">
-                            {% endif %}
-                            {% if usuario_logado and usuario_logado.nome %}
-                            {{ usuario_logado.nome }}
-                            {% else %}
-                            Prestador
-                            {% endif %}
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="/prestador/perfil"><i class="bi bi-person me-2"></i>Perfil</a></li>
-                            <li><a class="dropdown-item" href="/prestador/home"><i class="bi bi-house me-2"></i>Home</a></li>
-                            <li><a class="dropdown-item" href="/prestador/servicos"><i class="bi bi-tools me-2"></i>Meus Serviços</a></li>
-                            <li><a class="dropdown-item" href="/prestador/contratacoes"><i class="bi bi-briefcase me-2"></i>Minhas Contratações</a></li>
-                            <li><a class="dropdown-item" href="/prestador/solicitacoes"><i class="bi bi-list-check me-2"></i>Solicitações</a></li>
-                            <li><a class="dropdown-item" href="/prestador/agenda"><i class="bi bi-calendar me-2"></i>Agenda</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-danger" href="/logout"><i class="bi bi-box-arrow-right me-2"></i>Sair</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </nav>
-    </header>
-    {% block conteudo %}
-    {% endblock %}
-    <footer class="bg-dark text-white p-3 mt-auto">
-        <div class="container">
-            <div class="row row-cols-1 row-cols-md-4">
-                <div class="col">
-                    <div class="mb-4">
-                        <h3 class="fw-bold mb-3">Obratto</h3>
-                        <p>Transformando a forma como a construção civil conecta profissionais, fornecedores e clientes.
-                        </p>
-                        <img src="./static/img/logo_branca.png" alt="Obratto Logo" height="80px" class="mt-3">
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="mb-4">
-                        <h3 class="fw-bold mb-3">Links Rápidos</h3>
-                        <ul class="list-unstyled">
-                            <li><a href="#header" class="text-white text-decoration-none">Home</a></li>
-                            <li><a href="#servicos" class="text-white text-decoration-none">Serviços</a></li>
-                            <li><a href="#planos_title" class="text-white text-decoration-none">Planos</a></li>
-                            <li><a href="#categorias_title" class="text-white text-decoration-none">Sobre nós</a></li>
-                            <li><a href="#rodapé" class="text-white text-decoration-none">Contato</a></li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="mb-4">
-                        <h3 class="fw-bold mb-3">Serviços</h3>
-                        <ul class="list-unstyled">
-                            <li><a href="#" class="text-white text-decoration-none">Aluguel de Maquinário</a></li>
-                            <li><a href="#" class="text-white text-decoration-none">Reformas</a></li>
-                            <li><a href="#" class="text-white text-decoration-none">Para a Casa</a></li>
-                            <li><a href="#" class="text-white text-decoration-none">Construção</a></li>
-                            <li><a href="#" class="text-white text-decoration-none">Fornecedores</a></li>
-                            <li><a href="#" class="text-white text-decoration-none">Outros Serviços</a></li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="mb-4">
-                        <h3 class="fw-bold mb-3">Newsletter <i class="bi bi-envelope"></i></h3>
-                        <p>Inscreva-se para receber nossas novidades e ofertas exclusivas.</p>
-                        <form class="d-flex flex-column newsletter-form">
-                            <input type="email" class="form-control mb-2" placeholder="Seu e-mail">
-                            <button type="submit" class="btn btn-primary">Enviar</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-            <hr class="my-4">
-            <div class="text-center text-white">
-                <p class="mb-0">&copy; 2025 Obratto. Todos os direitos reservados.</p>
-            </div>
-        </div>
-    </footer>
+{% block navbar_menu %}
+{% if usuario_logado %}
+    {% set menu_prestador = [
+        {'url': '/prestador/perfil', 'icon': 'person', 'label': 'Perfil'},
+        {'url': '/prestador/home', 'icon': 'house', 'label': 'Home'},
+        {'url': '/prestador/servicos', 'icon': 'tools', 'label': 'Meus Serviços'},
+        {'url': '/prestador/contratacoes', 'icon': 'briefcase', 'label': 'Minhas Contratações'},
+        {'url': '/prestador/solicitacoes', 'icon': 'list-check', 'label': 'Solicitações'},
+        {'url': '/prestador/agenda', 'icon': 'calendar', 'label': 'Agenda'},
+        {'divider': True},
+        {'url': '/logout', 'icon': 'box-arrow-right', 'label': 'Sair', 'danger': True}
+    ] %}
+    {{ user_dropdown(usuario_logado, menu_prestador, default_label='Prestador') }}
+{% else %}
+    <a href="/login" class="text-white">
+        <h5><strong>ENTRAR</strong></h5>
+    </a>
+{% endif %}
+{% endblock %}
 
-    <!-- Container para Toasts -->
-    <div id="toast-container" class="toast-container position-fixed bottom-0 end-0 p-4 toast-offset"></div>
+{% block conteudo %}
+{% block prestador_conteudo %}{% endblock %}
+{% endblock %}
 
-    <!-- Dados de mensagens flash (hidden) -->
-    <script id="mensagens-data" type="application/json">
-        {{ get_flashed_messages(request) | tojson }}
-    </script>
-
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/static/js/toasts.js"></script>
-    {% block scripts %}{% endblock %}
-</body>
-
-</html>
+{% block scripts %}
+{% block prestador_scripts %}{% endblock %}
+{% endblock %}

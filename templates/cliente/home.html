@@ -1,12 +1,113 @@
 {% extends "cliente/base.html" %}
+
+{#
+    Template: Home Cliente
+    Descrição: Página inicial do cliente
+    Estende: cliente/base.html
+#}
+
+{% from 'components/stats_card.html' import stats_card, stats_row %}
+
 {% block titulo %}Painel do Cliente{% endblock %}
 
 {% block conteudo %}
-<div class="p-5 mb-4 bg-white rounded-3">
-    <div class="container-fluid py-5">
-        <h1 class="display-5 fw-bold">Bem-vindo(a) à sua área, Cliente!</h1>
-        <p class="col-md-8 fs-4">Aqui você pode gerenciar suas contratações e solicitações de serviço de forma simples e rápida.</p>
-        <a href="{{ url_for('catalogo_prestadores') }}" class="btn btn-primary btn-lg">Buscar Novos Prestadores</a>
+<div class="container-fluid px-4 py-4">
+    <!-- Welcome Banner -->
+    <div class="p-5 mb-4 bg-white rounded-3 shadow-sm">
+        <div class="container-fluid py-3">
+            <h1 class="display-5 fw-bold text-primary">Bem-vindo(a) à sua área, Cliente!</h1>
+            <p class="col-md-8 fs-5 text-muted">
+                Aqui você pode gerenciar suas contratações e solicitações de serviço de forma simples e rápida.
+            </p>
+            <div class="d-flex gap-3 mt-4">
+                <a href="{{ url_for('catalogo_prestadores') }}" class="btn btn-primary btn-lg">
+                    <i class="bi bi-search me-2"></i>Buscar Prestadores
+                </a>
+                <a href="/cliente/contratacoes/solicitar" class="btn btn-outline-primary btn-lg">
+                    <i class="bi bi-plus-circle me-2"></i>Nova Solicitação
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Row (se houver dados disponíveis) -->
+    {% if mostrar_stats %}
+    {% call stats_row() %}
+        {{ stats_card(
+            title='Contratações Ativas',
+            value=total_contratacoes|default('0'),
+            icon='briefcase',
+            icon_class='text-success',
+            link_url='/cliente/contratacoes'
+        ) }}
+
+        {{ stats_card(
+            title='Solicitações Pendentes',
+            value=total_solicitacoes|default('0'),
+            icon='clock-history',
+            icon_class='text-warning',
+            link_url='/cliente/solicitacoes'
+        ) }}
+
+        {{ stats_card(
+            title='Orçamentos Recebidos',
+            value=total_orcamentos|default('0'),
+            icon='file-earmark-text',
+            icon_class='text-info'
+        ) }}
+    {% endcall %}
+    {% endif %}
+
+    <!-- Quick Actions -->
+    <div class="row g-4 mt-2">
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm hover-shadow">
+                <div class="card-body text-center">
+                    <i class="bi bi-people display-4 text-primary mb-3"></i>
+                    <h5 class="card-title">Prestadores</h5>
+                    <p class="card-text text-muted">Encontre profissionais qualificados</p>
+                    <a href="{{ url_for('catalogo_prestadores') }}" class="btn btn-outline-primary">
+                        Ver Catálogo
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm hover-shadow">
+                <div class="card-body text-center">
+                    <i class="bi bi-list-check display-4 text-success mb-3"></i>
+                    <h5 class="card-title">Minhas Contratações</h5>
+                    <p class="card-text text-muted">Acompanhe seus serviços</p>
+                    <a href="/cliente/contratacoes" class="btn btn-outline-success">
+                        Ver Contratações
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm hover-shadow">
+                <div class="card-body text-center">
+                    <i class="bi bi-person-circle display-4 text-info mb-3"></i>
+                    <h5 class="card-title">Meu Perfil</h5>
+                    <p class="card-text text-muted">Gerencie suas informações</p>
+                    <a href="/cliente/perfil" class="btn btn-outline-info">
+                        Ver Perfil
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
+<style>
+.hover-shadow {
+    transition: all 0.3s ease;
+}
+.hover-shadow:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+</style>
 {% endblock %}

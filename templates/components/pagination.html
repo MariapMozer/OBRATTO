@@ -1,0 +1,81 @@
+{#
+    Componente: Paginação
+    Descrição: Componente de paginação reutilizável
+
+    Parâmetros:
+    - current_page: Página atual
+    - total_pages: Total de páginas
+    - base_url: URL base (será adicionado ?page=N)
+    - show_ends: Mostrar primeira e última página - padrão: True
+    - max_pages: Máximo de páginas a exibir - padrão: 5
+
+    Uso:
+    {% from 'components/pagination.html' import pagination %}
+
+    {{ pagination(
+        current_page=3,
+        total_pages=10,
+        base_url='/produtos'
+    ) }}
+#}
+
+{% macro pagination(
+    current_page,
+    total_pages,
+    base_url,
+    show_ends=True,
+    max_pages=5
+) %}
+{% if total_pages > 1 %}
+<nav aria-label="Navegação de página">
+    <ul class="pagination justify-content-center">
+        {# Botão Anterior #}
+        <li class="page-item {% if current_page == 1 %}disabled{% endif %}">
+            <a class="page-link" href="{{ base_url }}?page={{ current_page - 1 }}" aria-label="Anterior">
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>
+
+        {# Primeira página #}
+        {% if show_ends and current_page > 3 %}
+        <li class="page-item">
+            <a class="page-link" href="{{ base_url }}?page=1">1</a>
+        </li>
+        {% if current_page > 4 %}
+        <li class="page-item disabled">
+            <span class="page-link">...</span>
+        </li>
+        {% endif %}
+        {% endif %}
+
+        {# Páginas do meio #}
+        {% set start = [1, current_page - 2]|max %}
+        {% set end = [total_pages, current_page + 2]|min %}
+        {% for page in range(start, end + 1) %}
+        <li class="page-item {% if page == current_page %}active{% endif %}">
+            <a class="page-link" href="{{ base_url }}?page={{ page }}">{{ page }}</a>
+        </li>
+        {% endfor %}
+
+        {# Última página #}
+        {% if show_ends and current_page < total_pages - 2 %}
+        {% if current_page < total_pages - 3 %}
+        <li class="page-item disabled">
+            <span class="page-link">...</span>
+        </li>
+        {% endif %}
+        <li class="page-item">
+            <a class="page-link" href="{{ base_url }}?page={{ total_pages }}">{{ total_pages }}</a>
+        </li>
+        {% endif %}
+
+        {# Botão Próximo #}
+        <li class="page-item {% if current_page == total_pages %}disabled{% endif %}">
+            <a class="page-link" href="{{ base_url }}?page={{ current_page + 1 }}" aria-label="Próximo">
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>
+    </ul>
+</nav>
+{% endif %}
+{% endmacro %}

@@ -1,4 +1,395 @@
-{% set titulo = "Solicitar Contratação" %}
-{% set descricao = "Formalize a contratação de um profissional ou fornecedor após aprovação do orçamento." %}
-{% set icone = "bi-check-circle" %}
-{% include "cliente/em_construcao.html" %}
+{% extends "cliente/base.html" %}
+
+{#
+    Template: Solicitar Contratação (Cliente)
+    Descrição: Formulário para solicitar uma nova contratação de serviço
+    Estende: cliente/base.html
+#}
+
+{% from 'components/form_input.html' import form_input, form_textarea, form_select, form_file, form_checkbox %}
+{% from 'components/breadcrumbs.html' import breadcrumbs %}
+{% from 'components/alert.html' import alert %}
+
+{% block titulo %}Solicitar Contratação{% endblock %}
+
+{% block conteudo %}
+<div class="container-fluid px-4 py-4">
+    <!-- Breadcrumbs -->
+    {{ breadcrumbs(items=[
+        {'text': 'Home', 'url': '/cliente/home'},
+        {'text': 'Contratações', 'url': '/cliente/contratacoes'},
+        {'text': 'Nova Solicitação', 'active': True}
+    ]) }}
+
+    <!-- Page Header -->
+    <div class="mb-4">
+        <h1 class="h3 mb-1">
+            <i class="bi bi-plus-circle text-primary me-2"></i>
+            Nova Solicitação de Serviço
+        </h1>
+        <p class="text-muted mb-0">Preencha o formulário abaixo para solicitar um serviço</p>
+    </div>
+
+    <!-- Info Alert -->
+    {{ alert(
+        type='info',
+        icon='info-circle',
+        message='Descreva detalhadamente o serviço que você precisa. Quanto mais informações você fornecer, melhores serão as propostas que receberá dos prestadores.',
+        dismissible=False
+    ) }}
+
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Main Form -->
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <form method="POST" action="/cliente/contratacoes/solicitar" enctype="multipart/form-data" id="solicitacaoForm">
+                        <!-- CSRF Token (se usar) -->
+                        {% if csrf_token %}
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                        {% endif %}
+
+                        <!-- Tipo de Solicitação -->
+                        <div class="mb-4">
+                            <h5 class="border-bottom pb-2 mb-3">
+                                <i class="bi bi-1-circle text-primary me-2"></i>
+                                Tipo de Solicitação
+                            </h5>
+
+                            {{ form_select(
+                                name='tipo_solicitacao',
+                                label='Selecione o tipo',
+                                options=[
+                                    {'value': '', 'text': 'Escolha uma opção...'},
+                                    {'value': 'servico_especifico', 'text': 'Serviço Específico (escolher prestador)'},
+                                    {'value': 'aberta', 'text': 'Solicitação Aberta (receber propostas)'}
+                                ],
+                                required=True,
+                                help_text='Escolha se deseja contratar um prestador específico ou receber propostas de vários prestadores'
+                            ) }}
+                        </div>
+
+                        <!-- Prestador (mostrado apenas se "servico_especifico") -->
+                        <div class="mb-4" id="prestadorSection" style="display: none;">
+                            {{ form_select(
+                                name='prestador_id',
+                                label='Prestador',
+                                options=prestadores|default([{'value': '', 'text': 'Selecione um prestador...'}]),
+                                help_text='Selecione o prestador que deseja contratar'
+                            ) }}
+                        </div>
+
+                        <!-- Categoria do Serviço -->
+                        <div class="mb-4">
+                            <h5 class="border-bottom pb-2 mb-3">
+                                <i class="bi bi-2-circle text-primary me-2"></i>
+                                Detalhes do Serviço
+                            </h5>
+
+                            {{ form_select(
+                                name='categoria_id',
+                                label='Categoria do Serviço',
+                                options=categorias|default([
+                                    {'value': '', 'text': 'Selecione uma categoria...'},
+                                    {'value': '1', 'text': 'Reparos Domésticos'},
+                                    {'value': '2', 'text': 'Limpeza'},
+                                    {'value': '3', 'text': 'Jardinagem'},
+                                    {'value': '4', 'text': 'Elétrica'},
+                                    {'value': '5', 'text': 'Encanamento'},
+                                    {'value': '6', 'text': 'Pintura'},
+                                    {'value': '7', 'text': 'Outros'}
+                                ]),
+                                required=True
+                            ) }}
+                        </div>
+
+                        <!-- Título da Solicitação -->
+                        <div class="mb-3">
+                            {{ form_input(
+                                name='titulo',
+                                label='Título da Solicitação',
+                                type='text',
+                                placeholder='Ex: Conserto de torneira com vazamento',
+                                required=True,
+                                max_length=100,
+                                help_text='Resuma em poucas palavras o serviço que você precisa'
+                            ) }}
+                        </div>
+
+                        <!-- Descrição Detalhada -->
+                        <div class="mb-3">
+                            {{ form_textarea(
+                                name='descricao',
+                                label='Descrição Detalhada',
+                                placeholder='Descreva detalhadamente o serviço que você precisa, incluindo local, urgência, materiais necessários, etc.',
+                                rows=6,
+                                required=True,
+                                max_length=1000,
+                                help_text='Seja o mais específico possível para receber propostas adequadas'
+                            ) }}
+                        </div>
+
+                        <!-- Local e Data -->
+                        <div class="mb-4">
+                            <h5 class="border-bottom pb-2 mb-3">
+                                <i class="bi bi-3-circle text-primary me-2"></i>
+                                Local e Prazo
+                            </h5>
+
+                            <div class="row">
+                                <div class="col-md-8 mb-3">
+                                    {{ form_input(
+                                        name='endereco',
+                                        label='Endereço',
+                                        type='text',
+                                        placeholder='Rua, número, bairro',
+                                        required=True
+                                    ) }}
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    {{ form_input(
+                                        name='cep',
+                                        label='CEP',
+                                        type='text',
+                                        placeholder='00000-000',
+                                        pattern='[0-9]{5}-?[0-9]{3}',
+                                        max_length=9
+                                    ) }}
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    {{ form_input(
+                                        name='cidade',
+                                        label='Cidade',
+                                        type='text',
+                                        required=True
+                                    ) }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form_select(
+                                        name='estado',
+                                        label='Estado',
+                                        options=[
+                                            {'value': '', 'text': 'Selecione...'},
+                                            {'value': 'AC', 'text': 'Acre'},
+                                            {'value': 'AL', 'text': 'Alagoas'},
+                                            {'value': 'AP', 'text': 'Amapá'},
+                                            {'value': 'AM', 'text': 'Amazonas'},
+                                            {'value': 'BA', 'text': 'Bahia'},
+                                            {'value': 'CE', 'text': 'Ceará'},
+                                            {'value': 'DF', 'text': 'Distrito Federal'},
+                                            {'value': 'ES', 'text': 'Espírito Santo'},
+                                            {'value': 'GO', 'text': 'Goiás'},
+                                            {'value': 'MA', 'text': 'Maranhão'},
+                                            {'value': 'MT', 'text': 'Mato Grosso'},
+                                            {'value': 'MS', 'text': 'Mato Grosso do Sul'},
+                                            {'value': 'MG', 'text': 'Minas Gerais'},
+                                            {'value': 'PA', 'text': 'Pará'},
+                                            {'value': 'PB', 'text': 'Paraíba'},
+                                            {'value': 'PR', 'text': 'Paraná'},
+                                            {'value': 'PE', 'text': 'Pernambuco'},
+                                            {'value': 'PI', 'text': 'Piauí'},
+                                            {'value': 'RJ', 'text': 'Rio de Janeiro'},
+                                            {'value': 'RN', 'text': 'Rio Grande do Norte'},
+                                            {'value': 'RS', 'text': 'Rio Grande do Sul'},
+                                            {'value': 'RO', 'text': 'Rondônia'},
+                                            {'value': 'RR', 'text': 'Roraima'},
+                                            {'value': 'SC', 'text': 'Santa Catarina'},
+                                            {'value': 'SP', 'text': 'São Paulo'},
+                                            {'value': 'SE', 'text': 'Sergipe'},
+                                            {'value': 'TO', 'text': 'Tocantins'}
+                                        ],
+                                        required=True
+                                    ) }}
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    {{ form_input(
+                                        name='data_desejada',
+                                        label='Data Desejada',
+                                        type='date',
+                                        required=True,
+                                        help_text='Quando você precisa do serviço?'
+                                    ) }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form_select(
+                                        name='periodo',
+                                        label='Período',
+                                        options=[
+                                            {'value': 'manha', 'text': 'Manhã (08:00 - 12:00)'},
+                                            {'value': 'tarde', 'text': 'Tarde (13:00 - 18:00)'},
+                                            {'value': 'noite', 'text': 'Noite (18:00 - 22:00)'},
+                                            {'value': 'flexivel', 'text': 'Flexível'}
+                                        ]
+                                    ) }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Orçamento -->
+                        <div class="mb-4">
+                            <h5 class="border-bottom pb-2 mb-3">
+                                <i class="bi bi-4-circle text-primary me-2"></i>
+                                Orçamento
+                            </h5>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    {{ form_input(
+                                        name='orcamento_minimo',
+                                        label='Orçamento Mínimo (R$)',
+                                        type='number',
+                                        placeholder='0.00',
+                                        step='0.01',
+                                        min='0',
+                                        help_text='Valor mínimo que você espera pagar'
+                                    ) }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form_input(
+                                        name='orcamento_maximo',
+                                        label='Orçamento Máximo (R$)',
+                                        type='number',
+                                        placeholder='0.00',
+                                        step='0.01',
+                                        min='0',
+                                        help_text='Valor máximo que você pode pagar'
+                                    ) }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Anexos -->
+                        <div class="mb-4">
+                            <h5 class="border-bottom pb-2 mb-3">
+                                <i class="bi bi-5-circle text-primary me-2"></i>
+                                Anexos (Opcional)
+                            </h5>
+
+                            {{ form_file(
+                                name='anexos',
+                                label='Fotos ou Documentos',
+                                accept='image/*,.pdf',
+                                multiple=True,
+                                help_text='Envie fotos do local ou documentos relevantes (máx 5MB por arquivo)'
+                            ) }}
+                        </div>
+
+                        <!-- Termos -->
+                        <div class="mb-4">
+                            {{ form_checkbox(
+                                name='aceitar_termos',
+                                label='Aceito os termos de uso e política de privacidade',
+                                required=True
+                            ) }}
+                        </div>
+
+                        <!-- Botões -->
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-send me-2"></i>Enviar Solicitação
+                            </button>
+                            <a href="/cliente/solicitacoes" class="btn btn-outline-secondary btn-lg">
+                                <i class="bi bi-x-circle me-2"></i>Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar com Dicas -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-lightbulb text-warning me-2"></i>
+                        Dicas para uma boa solicitação
+                    </h5>
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            Seja específico na descrição
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            Inclua fotos quando possível
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            Informe prazos realistas
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            Defina um orçamento justo
+                        </li>
+                        <li class="mb-0">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            Responda rapidamente às propostas
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card shadow-sm border-info">
+                <div class="card-body">
+                    <h6 class="card-title text-info">
+                        <i class="bi bi-info-circle me-2"></i>
+                        O que acontece depois?
+                    </h6>
+                    <ol class="small mb-0 ps-3">
+                        <li class="mb-2">Sua solicitação será publicada</li>
+                        <li class="mb-2">Prestadores enviarão propostas</li>
+                        <li class="mb-2">Você avalia e escolhe a melhor</li>
+                        <li class="mb-0">Contrata e acompanha o serviço</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+// Mostrar/ocultar seção de prestador baseado no tipo de solicitação
+document.querySelector('select[name="tipo_solicitacao"]').addEventListener('change', function() {
+    const prestadorSection = document.getElementById('prestadorSection');
+    const prestadorSelect = document.querySelector('select[name="prestador_id"]');
+
+    if (this.value === 'servico_especifico') {
+        prestadorSection.style.display = 'block';
+        prestadorSelect.setAttribute('required', 'required');
+    } else {
+        prestadorSection.style.display = 'none';
+        prestadorSelect.removeAttribute('required');
+    }
+});
+
+// Validação de orçamento
+document.getElementById('solicitacaoForm').addEventListener('submit', function(e) {
+    const orcMin = parseFloat(document.querySelector('input[name="orcamento_minimo"]').value) || 0;
+    const orcMax = parseFloat(document.querySelector('input[name="orcamento_maximo"]').value) || 0;
+
+    if (orcMin > 0 && orcMax > 0 && orcMin > orcMax) {
+        e.preventDefault();
+        alert('O orçamento mínimo não pode ser maior que o orçamento máximo!');
+        return false;
+    }
+});
+
+// Máscara para CEP
+document.querySelector('input[name="cep"]').addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\D/g, '');
+    if (value.length > 5) {
+        value = value.substring(0, 5) + '-' + value.substring(5, 8);
+    }
+    e.target.value = value;
+});
+</script>
+{% endblock %}
+{% endblock %}

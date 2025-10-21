@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 
-from routes.publico import publico_routes
+from routes.publico import router as publico_router
 from routes.publico import test_toasts
 from routes.fornecedor import fornecedor_pagamento
 from routes.fornecedor import fornecedor_produtos
@@ -57,7 +57,12 @@ try:
     logger.info(f"{APP_NAME} v{VERSION} iniciando...")
 except ImportError:
     # Fallback se configuração ainda não existir
-    SECRET_KEY = os.getenv("SECRET_KEY", "sua-chave-secreta-aqui")
+    SECRET_KEY = os.getenv("SECRET_KEY")
+    if not SECRET_KEY:
+        raise ValueError(
+            "SECRET_KEY não configurada! "
+            "Defina a variável de ambiente SECRET_KEY antes de iniciar a aplicação."
+        )
     SESSION_MAX_AGE = 3600
     import logging
 
@@ -93,7 +98,7 @@ async def _generic_exception_handler(request: Request, exc: Exception):
 logger.info("Exception handlers registrados")
 
 # PÚBLICO
-app.include_router(publico_routes.router)
+app.include_router(publico_router)
 app.include_router(test_toasts.router)  # Rota de teste para toasts
 
 # FORNECEDOR

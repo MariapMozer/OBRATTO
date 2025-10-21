@@ -1,0 +1,60 @@
+{#
+    Componente: User Dropdown
+    Descrição: Dropdown de usuário com foto, nome e menu personalizado
+
+    Parâmetros:
+    - user: Objeto do usuário logado (deve ter .nome e .foto)
+    - menu_items: Lista de items do menu [{'url': '/path', 'icon': 'bi-icon', 'label': 'Texto', 'divider': False, 'danger': False}]
+    - default_avatar: Caminho para avatar padrão (opcional, padrão: '/static/img/user.jpg')
+    - default_label: Texto padrão quando não há usuário (opcional, padrão: 'Usuário')
+
+    Uso:
+    {% from 'components/user_dropdown.html' import user_dropdown %}
+    {% set menu = [
+        {'url': '/perfil', 'icon': 'person', 'label': 'Perfil'},
+        {'divider': True},
+        {'url': '/logout', 'icon': 'box-arrow-right', 'label': 'Sair', 'danger': True}
+    ] %}
+    {{ user_dropdown(usuario_logado, menu) }}
+#}
+
+{% macro user_dropdown(user, menu_items, default_avatar='/static/img/user.jpg', default_label='Usuário') %}
+<div class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle d-flex align-items-center"
+       href="#"
+       role="button"
+       data-bs-toggle="dropdown"
+       aria-expanded="false">
+        {% if user and user.foto %}
+        <img src="/static/img/{{ user.foto }}"
+             alt="{{ user.nome }}"
+             class="avatar-sm rounded-circle me-2">
+        {% else %}
+        <img src="{{ default_avatar }}"
+             alt="{{ default_label }}"
+             class="avatar-sm rounded-circle me-2">
+        {% endif %}
+
+        {% if user and user.nome %}
+        {{ user.nome }}
+        {% else %}
+        {{ default_label }}
+        {% endif %}
+    </a>
+
+    <ul class="dropdown-menu dropdown-menu-end">
+        {% for item in menu_items %}
+            {% if item.divider %}
+            <li><hr class="dropdown-divider"></li>
+            {% else %}
+            <li>
+                <a class="dropdown-item {% if item.danger %}text-danger{% endif %}"
+                   href="{{ item.url }}">
+                    <i class="bi bi-{{ item.icon }} me-2"></i>{{ item.label }}
+                </a>
+            </li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+</div>
+{% endmacro %}

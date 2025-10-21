@@ -234,7 +234,7 @@ def validar_valor_monetario(valor: Any, campo: str = "Valor", obrigatorio: bool 
 
     try:
         valor_decimal = Decimal(str(valor))
-    except:
+    except (ValueError, TypeError, ArithmeticError):
         raise ValidacaoError(f'{campo} deve ser um número válido')
 
     if valor_decimal < min_valor:
@@ -279,7 +279,7 @@ def validar_numero(numero: Any, campo: str = "Número", obrigatorio: bool = True
 
     try:
         numero_int = int(numero)
-    except:
+    except (ValueError, TypeError):
         raise ValidacaoError(f'{campo} deve ser um número inteiro válido')
 
     if numero_int < min_valor:

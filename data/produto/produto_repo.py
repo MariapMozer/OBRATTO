@@ -67,56 +67,20 @@ def obter_produto_por_id(id: int) -> Optional[Produto]:
         cursor = conn.execute(OBTER_PRODUTO_POR_ID, (id,))
         row = cursor.fetchone()
         if row:
-            return Produto(
-                id=row[0],
-                nome=row[1],
-                descricao=row[2],
-                preco=row[3],
-                quantidade=row[4],
-                em_promocao=bool(row[5]),
-                desconto=row[6],
-                foto=row[7] if len(row) > 7 else None,
-                fornecedor_id=row[8] if len(row) > 8 else None,
-            )
+            return Produto.from_row(row)
         return None
 
 
 def obter_produto_por_pagina(limit: int, offset: int) -> List[Produto]:
     with open_connection() as conn:
         cursor = conn.execute(OBTER_PRODUTO_POR_PAGINA, (limit, offset))
-        return [
-            Produto(
-                id=row[0],
-                nome=row[1],
-                descricao=row[2],
-                preco=row[3],
-                quantidade=row[4],
-                em_promocao=bool(row[5]),
-                desconto=row[6],
-                foto=row[7] if len(row) > 7 else None,
-                fornecedor_id=row[8] if len(row) > 8 else None,
-            )
-            for row in cursor.fetchall()
-        ]
+        return [Produto.from_row(row) for row in cursor.fetchall()]
 
 
 def obter_produto_por_nome(nome: str) -> List[Produto]:
     with open_connection() as conn:
         cursor = conn.execute(OBTER_PRODUTO_POR_NOME, (f"%{nome}%",))
-        return [
-            Produto(
-                id=row[0],
-                nome=row[1],
-                descricao=row[2],
-                preco=row[3],
-                quantidade=row[4],
-                em_promocao=bool(row[5]),
-                desconto=row[6],
-                foto=row[7] if len(row) > 7 else None,
-                fornecedor_id=row[8] if len(row) > 8 else None,
-            )
-            for row in cursor.fetchall()
-        ]
+        return [Produto.from_row(row) for row in cursor.fetchall()]
 
 
 def obter_produtos_por_fornecedor(
@@ -126,20 +90,7 @@ def obter_produtos_por_fornecedor(
         cursor = conn.execute(
             OBTER_PRODUTOS_POR_FORNECEDOR, (fornecedor_id, limit, offset)
         )
-        return [
-            Produto(
-                id=row[0],
-                nome=row[1],
-                descricao=row[2],
-                preco=row[3],
-                quantidade=row[4],
-                em_promocao=bool(row[5]),
-                desconto=row[6],
-                foto=row[7] if len(row) > 7 else None,
-                fornecedor_id=row[8] if len(row) > 8 else None,
-            )
-            for row in cursor.fetchall()
-        ]
+        return [Produto.from_row(row) for row in cursor.fetchall()]
 
 
 def atualizar_produto(produto: Produto):

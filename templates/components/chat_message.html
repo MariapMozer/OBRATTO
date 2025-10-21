@@ -1,0 +1,227 @@
+{#
+    Componente: Chat Message
+    Descrição: Componente para exibição de mensagens em interfaces de chat
+
+    Parâmetros do chat_message:
+    - message: Texto da mensagem
+    - sender_name: Nome do remetente
+    - sender_avatar: URL do avatar (opcional)
+    - timestamp: Data/hora da mensagem
+    - is_own: Se true, mensagem do usuário atual (alinhada à direita)
+    - status: Status da mensagem ('sent', 'delivered', 'read') - opcional
+    - attachment: Arquivo anexado (opcional)
+    - attachment_type: Tipo do anexo ('image', 'file') - opcional
+
+    Uso:
+    {% from 'components/chat_message.html' import chat_message, chat_container %}
+
+    {% call chat_container() %}
+        {{ chat_message(
+            message='Olá, tudo bem?',
+            sender_name='João Silva',
+            sender_avatar='/static/img/user1.jpg',
+            timestamp='10:30',
+            is_own=False
+        ) }}
+        {{ chat_message(
+            message='Sim, e você?',
+            sender_name='Você',
+            timestamp='10:32',
+            is_own=True,
+            status='read'
+        ) }}
+    {% endcall %}
+#}
+
+{% macro chat_message(
+    message,
+    sender_name,
+    timestamp,
+    sender_avatar='',
+    is_own=False,
+    status='',
+    attachment='',
+    attachment_type='',
+    message_class=''
+) %}
+<div class="chat-message {{ 'chat-message-own' if is_own else 'chat-message-other' }} {{ message_class }}">
+    {% if not is_own and sender_avatar %}
+    <div class="chat-avatar">
+        <img src="{{ sender_avatar }}" alt="{{ sender_name }}" class="avatar-sm rounded-circle" loading="lazy">
+    </div>
+    {% endif %}
+
+    <div class="chat-message-content">
+        {% if not is_own %}
+        <div class="chat-sender-name">{{ sender_name }}</div>
+        {% endif %}
+
+        <div class="chat-bubble {{ 'chat-bubble-own' if is_own else 'chat-bubble-other' }}">
+            {% if attachment %}
+                {% if attachment_type == 'image' %}
+                <div class="chat-attachment-image">
+                    <img src="{{ attachment }}" alt="Imagem anexada" class="img-fluid rounded" loading="lazy">
+                </div>
+                {% else %}
+                <div class="chat-attachment-file">
+                    <i class="bi bi-file-earmark me-2"></i>
+                    <a href="{{ attachment }}" target="_blank" class="chat-attachment-link">
+                        {{ attachment.split('/')[-1] }}
+                    </a>
+                </div>
+                {% endif %}
+            {% endif %}
+
+            <div class="chat-message-text">{{ message }}</div>
+        </div>
+
+        <div class="chat-message-meta">
+            <span class="chat-timestamp">{{ timestamp }}</span>
+            {% if is_own and status %}
+            <span class="chat-status">
+                {% if status == 'sent' %}
+                <i class="bi bi-check"></i>
+                {% elif status == 'delivered' %}
+                <i class="bi bi-check-all"></i>
+                {% elif status == 'read' %}
+                <i class="bi bi-check-all text-primary"></i>
+                {% endif %}
+            </span>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if is_own and sender_avatar %}
+    <div class="chat-avatar">
+        <img src="{{ sender_avatar }}" alt="{{ sender_name }}" class="avatar-sm rounded-circle" loading="lazy">
+    </div>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{#
+    Macro: chat_container
+    Descrição: Container para mensagens de chat
+
+    Uso:
+    {% call chat_container(container_class='my-custom-class') %}
+        {{ chat_message(...) }}
+        {{ chat_message(...) }}
+    {% endcall %}
+#}
+
+{% macro chat_container(container_class='') %}
+<div class="chat-container {{ container_class }}">
+    <div class="chat-messages">
+        {{ caller() }}
+    </div>
+</div>
+{% endmacro %}
+
+{#
+    Macro: chat_input
+    Descrição: Campo de entrada para envio de mensagens
+
+    Parâmetros:
+    - action: URL de envio do formulário
+    - placeholder: Placeholder do input
+    - show_attachment: Mostrar botão de anexo - padrão: True
+    - show_emoji: Mostrar botão de emoji - padrão: False
+
+    Uso:
+    {% from 'components/chat_message.html' import chat_input %}
+
+    {{ chat_input(
+        action='/mensagens/enviar',
+        placeholder='Digite sua mensagem...',
+        show_attachment=True
+    ) }}
+#}
+
+{% macro chat_input(
+    action='',
+    placeholder='Digite sua mensagem...',
+    show_attachment=True,
+    show_emoji=False,
+    input_name='mensagem'
+) %}
+<div class="chat-input-container">
+    <form action="{{ action }}" method="POST" class="chat-input-form" enctype="multipart/form-data">
+        <div class="chat-input-wrapper">
+            {% if show_attachment %}
+            <button type="button" class="btn btn-link chat-input-btn" onclick="document.getElementById('chatFileInput').click()">
+                <i class="bi bi-paperclip"></i>
+            </button>
+            <input type="file" id="chatFileInput" name="arquivo" class="d-none">
+            {% endif %}
+
+            <input type="text"
+                   class="form-control chat-input"
+                   name="{{ input_name }}"
+                   placeholder="{{ placeholder }}"
+                   autocomplete="off"
+                   required>
+
+            {% if show_emoji %}
+            <button type="button" class="btn btn-link chat-input-btn">
+                <i class="bi bi-emoji-smile"></i>
+            </button>
+            {% endif %}
+
+            <button type="submit" class="btn btn-primary chat-send-btn">
+                <i class="bi bi-send-fill"></i>
+            </button>
+        </div>
+    </form>
+</div>
+{% endmacro %}
+
+{#
+    Macro: typing_indicator
+    Descrição: Indicador de digitação
+
+    Uso:
+    {% from 'components/chat_message.html' import typing_indicator %}
+
+    {{ typing_indicator(sender_name='João Silva') }}
+#}
+
+{% macro typing_indicator(sender_name='', sender_avatar='') %}
+<div class="chat-message chat-message-other typing-indicator">
+    {% if sender_avatar %}
+    <div class="chat-avatar">
+        <img src="{{ sender_avatar }}" alt="{{ sender_name }}" class="avatar-sm rounded-circle" loading="lazy">
+    </div>
+    {% endif %}
+
+    <div class="chat-message-content">
+        {% if sender_name %}
+        <div class="chat-sender-name">{{ sender_name }}</div>
+        {% endif %}
+
+        <div class="chat-bubble chat-bubble-other">
+            <div class="typing-dots">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endmacro %}
+
+{#
+    Macro: chat_date_separator
+    Descrição: Separador de data entre mensagens
+
+    Uso:
+    {% from 'components/chat_message.html' import chat_date_separator %}
+
+    {{ chat_date_separator(date='Hoje') }}
+#}
+
+{% macro chat_date_separator(date) %}
+<div class="chat-date-separator">
+    <span class="chat-date-label">{{ date }}</span>
+</div>
+{% endmacro %}

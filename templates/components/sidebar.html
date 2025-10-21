@@ -1,0 +1,43 @@
+{#
+    Componente: Sidebar
+    Descrição: Sidebar de navegação lateral com suporte a múltiplos itens
+
+    Parâmetros:
+    - items: Lista de items do menu [{'id': 'identificador', 'url': '/path', 'icon': 'bi-icon', 'label': 'Texto'}]
+    - active_item: ID do item ativo (opcional)
+    - logo_text: Texto do logo (opcional)
+    - logo_url: URL do logo (opcional, padrão: '/')
+
+    Uso:
+    {% from 'components/sidebar.html' import sidebar %}
+    {% set menu_items = [
+        {'id': 'home', 'url': '/home', 'icon': 'house', 'label': 'Home'},
+        {'id': 'produtos', 'url': '/produtos', 'icon': 'box-seam', 'label': 'Produtos'}
+    ] %}
+    {{ sidebar(menu_items, active_item='home', logo_text='LOJA VIRTUAL') }}
+#}
+
+{% macro sidebar(items, active_item='', logo_text='', logo_url='/') %}
+<aside class="sidebar" id="sidebarMenu">
+    <div class="sidebar-header">
+        {% if logo_text %}
+        <a href="{{ logo_url }}" class="logo-link">
+            <h2 class="logo">{{ logo_text }}</h2>
+        </a>
+        {% endif %}
+        <label for="toggleSidebar" class="toggle-btn">
+            <i class="bi bi-list"></i>
+        </label>
+    </div>
+
+    <nav class="sidebar-nav">
+        {% for item in items %}
+        <a href="{{ item.url }}"
+           class="sidebar-item {% if item.id == active_item %}active{% endif %}">
+            <i class="bi bi-{{ item.icon }}"></i>
+            <span>{{ item.label }}</span>
+        </a>
+        {% endfor %}
+    </nav>
+</aside>
+{% endmacro %}

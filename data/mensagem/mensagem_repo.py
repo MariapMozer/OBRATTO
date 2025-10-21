@@ -5,6 +5,10 @@ from data.mensagem.mensagem_model import Mensagem
 from data.mensagem.mensagem_sql import *
 from util.db import open_connection
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 def criar_tabela_mensagem() -> bool:
     with open_connection() as conn:
@@ -58,7 +62,7 @@ def obter_mensagem_por_id(id_mensagem):
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM mensagem WHERE id_mensagem = ?", (id_mensagem,))
         row = cursor.fetchone()
-        print("Linha obtida do DB:", row)
+        logger.debug("Linha obtida do DB: %s", row)
         if row:
             return Mensagem(
                 id_mensagem=row[0],

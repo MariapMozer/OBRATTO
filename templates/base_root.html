@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- PWA Configuration -->
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#0d6efd">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Obratto">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+    <!-- Toast CSS -->
+    <link rel="stylesheet" href="/static/css/toasts.css">
+
+    <!-- Components CSS -->
+    <link rel="stylesheet" href="/static/css/components.css">
+
+    <!-- Page-specific CSS -->
+    {% block css %}{% endblock %}
+
+    <title>Obratto :: {% block titulo %}{% endblock %}</title>
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+    {% block body_content %}
+    <!-- Header -->
+    {% block header %}
+    <header>
+        {% block navbar %}{% endblock %}
+    </header>
+    {% endblock %}
+
+    <!-- Main Content -->
+    <main class="flex-grow-1">
+        {% block conteudo %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    {% block footer %}{% endblock %}
+    {% endblock %}
+
+    <!-- Container para Toasts -->
+    <div id="toast-container" class="toast-container position-fixed bottom-0 end-0 p-4 toast-offset"></div>
+
+    <!-- Dados de mensagens flash (hidden) -->
+    <script id="mensagens-data" type="application/json">
+        {{ get_flashed_messages(request) | tojson }}
+    </script>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Toast Handler -->
+    <script src="/static/js/toasts.js"></script>
+
+    <!-- Lazy Loading -->
+    <script src="/static/js/lazy-load.js"></script>
+
+    <!-- Service Worker Registration (PWA + Cache) -->
+    <script src="/static/js/sw-register.js"></script>
+
+    <!-- Page-specific Scripts -->
+    {% block scripts %}{% endblock %}
+</body>
+</html>

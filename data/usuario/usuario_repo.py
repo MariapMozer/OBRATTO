@@ -3,6 +3,9 @@ from typing import Optional, List
 from data.usuario.usuario_model import Usuario
 from data.usuario.usuario_sql import *
 from util.db import open_connection
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def criar_tabela_usuario() -> bool:
@@ -12,7 +15,7 @@ def criar_tabela_usuario() -> bool:
             cursor.execute(CRIAR_TABELA_USUARIO)
             return True
     except Exception as e:
-        print(f"Erro ao criar tabela de usuário: {e}")
+        logger.error(f"Erro ao criar tabela de usuário: {e}", exc_info=True)
         return False
 
 
@@ -53,26 +56,7 @@ def obter_usuario_por_email(email: str) -> Optional[Usuario]:
         cursor.execute(OBTER_USUARIO_POR_EMAIL, (email,))
         row = cursor.fetchone()
         if row:
-            return Usuario(
-                id=row["id"],
-                nome=row["nome"],
-                email=row["email"],
-                senha=row["senha"],
-                cpf_cnpj=row["cpf_cnpj"],
-                telefone=row["telefone"],
-                cep=row["cep"],
-                rua=row["rua"],
-                numero=row["numero"],
-                complemento=row["complemento"],
-                bairro=row["bairro"],
-                cidade=row["cidade"],
-                estado=row["estado"],
-                data_cadastro=row["data_cadastro"],
-                foto=row["foto"],
-                token_redefinicao=row["token_redefinicao"],
-                data_token=row["data_token"],
-                tipo_usuario=row["tipo_usuario"],
-            )
+            return Usuario.from_row(row)
     return None
 
 
@@ -82,26 +66,7 @@ def obter_usuario_por_id(id: int) -> Optional[Usuario]:
         cursor.execute(OBTER_USUARIO_POR_ID, (id,))
         row = cursor.fetchone()
         if row:
-            return Usuario(
-                id=row["id"],
-                nome=row["nome"],
-                email=row["email"],
-                senha=row["senha"],
-                cpf_cnpj=row["cpf_cnpj"],
-                telefone=row["telefone"],
-                cep=row["cep"],
-                rua=row["rua"],
-                numero=row["numero"],
-                complemento=row["complemento"],
-                bairro=row["bairro"],
-                cidade=row["cidade"],
-                estado=row["estado"],
-                data_cadastro=row["data_cadastro"],
-                foto=row["foto"],
-                token_redefinicao=row["token_redefinicao"],
-                data_token=row["data_token"],
-                tipo_usuario=row["tipo_usuario"],
-            )
+            return Usuario.from_row(row)
     return None
 
 
@@ -111,26 +76,7 @@ def obter_usuario_por_token(token: str) -> Optional[Usuario]:
         cursor.execute(OBTER_USUARIO_POR_TOKEN, (token,))
         row = cursor.fetchone()
         if row:
-            return Usuario(
-                id=row["id"],
-                nome=row["nome"],
-                email=row["email"],
-                senha=row["senha"],
-                cpf_cnpj=row["cpf_cnpj"],
-                telefone=row["telefone"],
-                cep=row["cep"],
-                rua=row["rua"],
-                numero=row["numero"],
-                complemento=row["complemento"],
-                bairro=row["bairro"],
-                cidade=row["cidade"],
-                estado=row["estado"],
-                data_cadastro=row["data_cadastro"],
-                foto=row["foto"],
-                token_redefinicao=row["token_redefinicao"],
-                data_token=row["data_token"],
-                tipo_usuario=row["tipo_usuario"],
-            )
+            return Usuario.from_row(row)
     return None
 
 
@@ -142,32 +88,9 @@ def obter_usuarios_por_pagina(pg_num: int, pg_size: int) -> List[Usuario]:
             cursor = conn.cursor()
             cursor.execute(OBTER_USUARIO_POR_PAGINA, (limit, offset))
             rows = cursor.fetchall()
-            usuarios = [
-                Usuario(
-                    id=row["id"],
-                    nome=row["nome"],
-                    email=row["email"],
-                    senha=row["senha"],
-                    cpf_cnpj=row["cpf_cnpj"],
-                    telefone=row["telefone"],
-                    cep=row["cep"],
-                    rua=row["rua"],
-                    numero=row["numero"],
-                    complemento=row["complemento"],
-                    bairro=row["bairro"],
-                    cidade=row["cidade"],
-                    estado=row["estado"],
-                    data_cadastro=row["data_cadastro"],
-                    foto=row["foto"],
-                    token_redefinicao=row["token_redefinicao"],
-                    data_token=row["data_token"],
-                    tipo_usuario=row["tipo_usuario"],
-                )
-                for row in rows
-            ]
-            return usuarios
+            return [Usuario.from_row(row) for row in rows]
     except Exception as e:
-        print(f"Erro ao obter usuários por página: {e}")
+        logger.error(f"Erro ao obter usuários por página: {e}", exc_info=True)
         return []
 
 
@@ -178,32 +101,9 @@ def obter_todos_por_perfil(tipo_usuario: str) -> List[Usuario]:
             cursor = conn.cursor()
             cursor.execute(OBTER_USUARIOS_POR_PERFIL, (tipo_usuario,))
             rows = cursor.fetchall()
-            usuarios = [
-                Usuario(
-                    id=row["id"],
-                    nome=row["nome"],
-                    email=row["email"],
-                    senha=row["senha"],
-                    cpf_cnpj=row["cpf_cnpj"],
-                    telefone=row["telefone"],
-                    cep=row["cep"],
-                    rua=row["rua"],
-                    numero=row["numero"],
-                    complemento=row["complemento"],
-                    bairro=row["bairro"],
-                    cidade=row["cidade"],
-                    estado=row["estado"],
-                    data_cadastro=row["data_cadastro"],
-                    foto=row["foto"],
-                    token_redefinicao=row["token_redefinicao"],
-                    data_token=row["data_token"],
-                    tipo_usuario=row["tipo_usuario"],
-                )
-                for row in rows
-            ]
-        return usuarios
+            return [Usuario.from_row(row) for row in rows]
     except Exception as e:
-        print(f"Erro ao obter usuários por perfil: {e}")
+        logger.error(f"Erro ao obter usuários por perfil: {e}", exc_info=True)
         return []
 
 

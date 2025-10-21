@@ -1,0 +1,56 @@
+{% extends "base_root.html" %}
+
+{#
+    Template: Base Authenticated
+    Descrição: Template base para páginas autenticadas
+    Estende: base_root.html
+    Usado por: base_cliente.html, base_prestador.html, base_fornecedor.html, base_admin.html
+#}
+
+{% from 'components/user_dropdown.html' import user_dropdown %}
+
+{% block css %}
+<link rel="stylesheet" href="/static/css/home.css">
+{% block auth_css %}{% endblock %}
+{% endblock %}
+
+{% block navbar %}
+<nav class="navbar navbar-expand-lg navbar-dark {% block navbar_class %}fundo-azul{% endblock %}">
+    <div class="container">
+        <a class="navbar-brand py-2" href="{% block navbar_home_url %}/{% endblock %}">
+            {% block navbar_logo %}
+            <img src="/static/img/logo_casinha_azul.png" height="40" alt="Obratto">
+            <img src="/static/img/logo_nome_azul.png" height="30" alt="">
+            {% endblock %}
+        </a>
+
+        {% block navbar_search %}{% endblock %}
+
+        <div class="navbar-nav ms-auto">
+            {% block navbar_menu %}
+            {% if usuario_logado %}
+                {{ user_dropdown(usuario_logado, self.get_user_menu()) }}
+            {% else %}
+                <a href="/login" class="text-white">
+                    <h5><strong>ENTRAR</strong></h5>
+                </a>
+            {% endif %}
+            {% endblock %}
+        </div>
+    </div>
+</nav>
+{% endblock %}
+
+{% block footer %}
+{% include 'components/footer.html' %}
+{% endblock %}
+
+{#
+    Método que deve ser sobrescrito pelos templates filhos
+    para definir o menu específico do usuário
+#}
+{% block get_user_menu %}
+{% set menu_items = [
+    {'url': '/logout', 'icon': 'box-arrow-right', 'label': 'Sair', 'danger': True}
+] %}
+{% endblock %}

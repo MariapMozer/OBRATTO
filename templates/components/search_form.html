@@ -1,0 +1,60 @@
+{#
+    Componente: Formulário de Busca
+    Descrição: Formulário reutilizável para busca com múltiplos campos
+
+    Parâmetros:
+    - action: URL de ação do formulário
+    - fields: Lista de campos [{'name': 'campo', 'type': 'text', 'label': 'Label', 'placeholder': 'Placeholder'}]
+    - submit_text: Texto do botão submit - padrão: 'Buscar'
+    - clear_url: URL para limpar busca (opcional)
+    - method: Método HTTP - padrão: 'GET'
+
+    Uso:
+    {% from 'components/search_form.html' import search_form %}
+
+    {{ search_form(
+        action='/produtos/buscar',
+        fields=[
+            {'name': 'id', 'type': 'number', 'label': 'ID', 'placeholder': 'Digite o ID'},
+            {'name': 'nome', 'type': 'text', 'label': 'Nome', 'placeholder': 'Digite o nome'}
+        ],
+        clear_url='/produtos'
+    ) }}
+#}
+
+{% macro search_form(
+    action,
+    fields,
+    submit_text='Buscar',
+    clear_url=None,
+    method='GET'
+) %}
+<div class="search-container mb-4">
+    <form method="{{ method }}" action="{{ action }}" class="search-form">
+        <div class="row g-3">
+            {% for field in fields %}
+            <div class="col-md-{{ (12 // fields|length)|int if fields|length <= 4 else 3 }}">
+                <label for="{{ field.name }}" class="form-label">{{ field.label }}</label>
+                <input type="{{ field.type|default('text') }}"
+                       id="{{ field.name }}"
+                       name="{{ field.name }}"
+                       class="form-control"
+                       placeholder="{{ field.placeholder }}"
+                       {% if field.value %}value="{{ field.value }}"{% endif %}>
+            </div>
+            {% endfor %}
+
+            <div class="col-md-12 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-search me-1"></i> {{ submit_text }}
+                </button>
+                {% if clear_url %}
+                <a href="{{ clear_url }}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-clockwise me-1"></i> Limpar
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </form>
+</div>
+{% endmacro %}
