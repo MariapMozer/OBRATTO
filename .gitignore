@@ -60,6 +60,8 @@ venv.bak/
 *.sqlite3
 obratto.db
 test_obratto.db
+*.db-shm
+*.db-wal
 
 # ============================================
 # Logs
