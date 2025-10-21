@@ -89,7 +89,7 @@ async def processar_novo_servico(
 @requer_autenticacao(["prestador"])
 async def editar_servicos(request: Request, id_servico: int):
     return templates.TemplateResponse(
-        "prestador/servicos/editar_servico.html",
+        "prestador/servicos/editar.html",
         {"request": request, "id_servico": id_servico},
     )
 
@@ -108,7 +108,7 @@ async def processar_edicao_servico(
     nome_prestador: str = Form(...),
 ):
     return templates.TemplateResponse(
-        "prestador/servicos/editar_servico.html", {"request": request}
+        "prestador/servicos/editar.html", {"request": request}
     )
 
 

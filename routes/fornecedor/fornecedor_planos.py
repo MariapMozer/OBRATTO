@@ -51,7 +51,7 @@ async def mostrar_meu_plano(request: Request, id_fornecedor: int = 1):
 async def listar_planos(request: Request):
     planos = plano_repo.obter_plano_por_pagina(pagina=1, tamanho_pagina=10)
     return templates.TemplateResponse(
-        "fornecedor/planos/listar_planos.html", {"request": request, "planos": planos}
+        "fornecedor/planos/listar.html", {"request": request, "planos": planos}
     )
 
 
@@ -69,7 +69,7 @@ async def mostrar_alterar_plano(request: Request, id_fornecedor: int = 1):
 
     planos = plano_repo.obter_plano_por_pagina(pagina=1, tamanho_pagina=20)
     return templates.TemplateResponse(
-        "fornecedor/planos/alterar_plano.html",
+        "fornecedor/planos/alterar.html",
         {
             "request": request,
             "planos": planos,
@@ -90,7 +90,7 @@ async def alterar_plano(request: Request, id_plano: int = Form(...)):
     if not assinatura_ativa:
         planos = plano_repo.obter_plano_por_pagina(pagina=1, tamanho_pagina=20)
         return templates.TemplateResponse(
-            "fornecedor/planos/alterar_plano.html",
+            "fornecedor/planos/alterar.html",
             {
                 "request": request,
                 "planos": planos,
@@ -124,7 +124,7 @@ async def alterar_plano(request: Request, id_plano: int = Form(...)):
 
     planos = plano_repo.obter_plano_por_pagina(pagina=1, tamanho_pagina=20)
     return templates.TemplateResponse(
-        "fornecedor/planos/alterar_plano.html",
+        "fornecedor/planos/alterar.html",
         {"request": request, "planos": planos, "mensagem": "Erro ao alterar plano."},
     )
 
@@ -142,7 +142,7 @@ async def mostrar_cancelar_plano(request: Request, id_fornecedor: int = 1):
         plano_atual = plano_repo.obter_plano_por_id(assinatura_ativa.id_plano)
 
     return templates.TemplateResponse(
-        "fornecedor/planos/cancelar_plano.html",
+        "fornecedor/planos/cancelar.html",
         {
             "request": request,
             "plano_atual": plano_atual,
@@ -160,7 +160,7 @@ async def cancelar_plano(request: Request, id_fornecedor: int = Form(...)):
     )
     if not assinatura_ativa:
         return templates.TemplateResponse(
-            "fornecedor/planos/cancelar_plano.html",
+            "fornecedor/planos/cancelar.html",
             {
                 "request": request,
                 "mensagem": "Você não possui assinatura ativa para cancelar.",
@@ -169,7 +169,7 @@ async def cancelar_plano(request: Request, id_fornecedor: int = Form(...)):
 
     plano_atual = plano_repo.obter_plano_por_id(assinatura_ativa.id_plano)
     return templates.TemplateResponse(
-        "fornecedor/planos/confirmacao_cancelamento_plano.html",
+        "fornecedor/planos/confirmar_cancelamento.html",
         {
             "request": request,
             "plano_atual": plano_atual,
@@ -189,7 +189,7 @@ async def confirmar_cancelamento_plano(
     )
     if not assinatura_ativa:
         return templates.TemplateResponse(
-            "fornecedor/planos/cancelar_plano.html",
+            "fornecedor/planos/cancelar.html",
             {
                 "request": request,
                 "mensagem": "Você não possui assinatura ativa para cancelar.",
@@ -216,7 +216,7 @@ async def mostrar_renovar_plano(request: Request, id_fornecedor: int = 1):
         plano_atual = plano_repo.obter_plano_por_id(assinatura_ativa.id_plano)
 
     return templates.TemplateResponse(
-        "fornecedor/planos/renovar_plano.html",
+        "fornecedor/planos/renovar.html",
         {
             "request": request,
             "plano_atual": plano_atual,
@@ -234,7 +234,7 @@ async def renovar_plano(request: Request, id_fornecedor: int = Form(...)):
     )
     if not assinatura_ativa:
         return templates.TemplateResponse(
-            "fornecedor/planos/renovar_plano.html",
+            "fornecedor/planos/renovar.html",
             {
                 "request": request,
                 "mensagem": "Você não possui assinatura ativa para renovar.",
@@ -251,7 +251,7 @@ async def renovar_plano(request: Request, id_fornecedor: int = Form(...)):
         return response
 
     return templates.TemplateResponse(
-        "fornecedor/planos/renovar_plano.html",
+        "fornecedor/planos/renovar.html",
         {"request": request, "mensagem": "Erro ao renovar plano."},
     )
 
@@ -262,7 +262,7 @@ async def renovar_plano(request: Request, id_fornecedor: int = Form(...)):
 async def mostrar_assinar_plano(request: Request):
     planos_disponiveis = plano_repo.obter_plano_por_pagina(pagina=1, tamanho_pagina=20)
     return templates.TemplateResponse(
-        "fornecedor/planos/assinar_plano.html",
+        "fornecedor/planos/assinar.html",
         {"request": request, "planos_disponiveis": planos_disponiveis},
     )
 
@@ -281,7 +281,7 @@ async def assinar_plano(
             pagina=1, tamanho_pagina=20
         )
         return templates.TemplateResponse(
-            "fornecedor/planos/assinar_plano.html",
+            "fornecedor/planos/assinar.html",
             {
                 "request": request,
                 "planos_disponiveis": planos_disponiveis,
@@ -295,7 +295,7 @@ async def assinar_plano(
             pagina=1, tamanho_pagina=20
         )
         return templates.TemplateResponse(
-            "fornecedor/planos/assinar_plano.html",
+            "fornecedor/planos/assinar.html",
             {
                 "request": request,
                 "planos_disponiveis": planos_disponiveis,

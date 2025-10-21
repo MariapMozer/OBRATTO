@@ -12,5 +12,5 @@ router = APIRouter()
 async def catalogo_prestadores(request: Request):
     usuario_logado = obter_usuario_logado(request)
     return templates.TemplateResponse(
-        "prestador/catalogo/catalogo_prestadores.html", {"request": request, "usuario_logado": usuario_logado}
+        "prestador/catalogo/listar.html", {"request": request, "usuario_logado": usuario_logado}
     )

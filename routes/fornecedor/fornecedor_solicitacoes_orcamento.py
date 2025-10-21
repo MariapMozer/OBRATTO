@@ -14,7 +14,7 @@ async def solicitacoes_recebidas(
     request: Request, usuario_logado: Optional[dict] = None
 ):
     return templates.TemplateResponse(
-        "fornecedor/orcamentos/solicitacoes_recebidas.html", {"request": request}
+        "fornecedor/orcamentos/recebidas.html", {"request": request}
     )
 
 

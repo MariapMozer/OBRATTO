@@ -202,7 +202,7 @@ async def visualizar_avaliacoes_recebidas(
     assert usuario_logado is not None
     avaliacoes = avaliacao_repo.obter_avaliacao_por_id(usuario_logado["id"])
     return templates.TemplateResponse(
-        "fornecedor/avaliacoes_recebidas.html",
+        "fornecedor/avaliacoes/recebidas.html",
         {"request": request, "avaliacoes": avaliacoes},
     )
 

@@ -57,7 +57,7 @@ async def exibir_conversa(request: Request, contato_id: int, usuario_logado: Opt
     mensagens_conversa.sort(key=lambda x: x.data_hora)
 
     return templates.TemplateResponse(
-        "publico/mensagens/mensagens.html",
+        "public/mensagens/mensagens.html",
         {
             "request": request,
             "usuario": usuario_logado,
@@ -79,7 +79,7 @@ async def exibir_nova_mensagem(request: Request, usuario_logado: Optional[dict] 
     )
 
     return templates.TemplateResponse(
-        "publico/mensagens/mensagens.html",
+        "public/mensagens/mensagens.html",
         {
             "request": request,
             "usuario": usuario_logado,

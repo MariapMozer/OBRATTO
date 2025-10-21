@@ -23,7 +23,7 @@ async def listar_promocoes(request: Request):
 @requer_autenticacao(["fornecedor"])
 async def cadastrar_promocao(request: Request):
     return templates.TemplateResponse(
-        "fornecedor/promocao/cadastrar_promocoes.html", {"request": request}
+        "fornecedor/promocoes/cadastrar.html", {"request": request}
     )
 
 
@@ -51,7 +51,7 @@ async def cadastrar_promocao_post(request: Request):
     else:
         mensagem = "Produto não encontrado."
     return templates.TemplateResponse(
-        "fornecedor/promocao/cadastrar_promocoes.html",
+        "fornecedor/promocoes/cadastrar.html",
         {"request": request, "mensagem": mensagem},
     )
 
@@ -61,7 +61,7 @@ async def cadastrar_promocao_post(request: Request):
 @requer_autenticacao(["fornecedor"])
 async def alterar_promocao(request: Request):
     return templates.TemplateResponse(
-        "fornecedor/promocao/alterar_promocoes.html", {"request": request}
+        "fornecedor/promocoes/alterar.html", {"request": request}
     )
 
 
@@ -89,7 +89,7 @@ async def alterar_promocao_post(request: Request):
     else:
         mensagem = "Produto não encontrado."
     return templates.TemplateResponse(
-        "fornecedor/promocao/alterar_promocoes.html",
+        "fornecedor/promocoes/alterar.html",
         {"request": request, "mensagem": mensagem},
     )
 
@@ -117,7 +117,7 @@ async def confirmar_exclusao_promocao(request: Request):
         except Exception:
             produto = None
     return templates.TemplateResponse(
-        "fornecedor/promocao/confirmar_exclusao_promocao.html",
+        "fornecedor/promocoes/confirmar_exclusao.html",
         {"request": request, "id": id_promocao, "produto": produto},
     )
 
@@ -143,6 +143,6 @@ async def confirmar_exclusao_promocao_post(request: Request):
     else:
         mensagem = "Produto não encontrado."
     return templates.TemplateResponse(
-        "fornecedor/promocao/confirmar_exclusao_promocao.html",
+        "fornecedor/promocoes/confirmar_exclusao.html",
         {"request": request, "mensagem": mensagem},
     )

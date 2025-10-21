@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OBRATTO - Alterar Plano</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .nav-bar {
+            background-color: #333;
+            padding: 15px 0;
+            margin: -30px -30px 30px -30px;
+            border-radius: 8px 8px 0 0;
+        }
+        .nav-bar ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+        .nav-bar li {
+            display: inline-block;
+            margin: 0 15px;
+        }
+        .nav-bar a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        .nav-bar a:hover, .nav-bar .active {
+            background-color: #555;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .message {
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .current-plan {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #007bff;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+        select, input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        select:focus, input:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+        .plano-option {
+            padding: 15px;
+            margin: 10px 0;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .plano-option:hover {
+            border-color: #007bff;
+            background-color: #f8f9fa;
+        }
+        .plano-option.selected {
+            border-color: #28a745;
+            background-color: #f8fff9;
+        }
+        .plano-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .plano-info h4 {
+            margin: 0 0 5px 0;
+            color: #333;
+        }
+        .plano-info p {
+            margin: 0;
+            color: #666;
+            font-size: 14px;
+        }
+        .plano-preco {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+            transition: background-color 0.3s;
+        }
+        .btn-warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+        .btn-warning:hover {
+            background-color: #e0a800;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background-color: #545b62;
+        }
+        .form-actions {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .required {
+            color: red;
+        }
+        .warning-box {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="nav-bar">
+            <ul>
+                <li><a href="/fornecedor">🏪 Home</a></li>
+                <li><a href="/fornecedor/produtos/listar">📦 Produtos</a></li>
+                <li><a href="/fornecedor/planos/listar">💳 Planos</a></li>
+                
+            </ul>
+        </nav>
+
+        <h1>🔄 Alterar Plano</h1>
+        
+        {% if mensagem %}
+        <div class="message">{{ mensagem }}</div>
+        {% endif %}
+        
+        {% if plano_atual %}
+        <div class="current-plan">
+            <h3>📋 Plano Atual</h3>
+            <p><strong>Nome:</strong> {{ plano_atual.nome_plano }}</p>
+            <p><strong>Valor:</strong> R$ {{ "%.2f"|format(plano_atual.valor_mensal) }}/mês</p>
+            <p><strong>Tipo:</strong> {{ plano_atual.tipo_plano }}</p>
+        </div>
+        {% endif %}
+        
+        <div class="warning-box">
+            ⚠️ <strong>Atenção:</strong> A alteração do plano entrará em vigor imediatamente. 
+            Mudanças para planos com menor limite podem afetar seus serviços ativos.
+        </div>
+        
+        <form method="post" action="/fornecedor/planos/alterar">
+            <input type="hidden" name="id_fornecedor" value="{{ id_fornecedor or 1 }}">
+            
+            <div class="form-group">
+                <label>Selecione o Novo Plano <span class="required">*</span></label>
+                
+                {% if planos %}
+                    {% for plano in planos %}
+                    <div class="plano-option" data-plano-id="{{ plano.id_plano }}">
+                        <input type="radio" name="id_plano" value="{{ plano.id_plano }}" id="plano_{{ plano.id_plano }}" style="display: none;" required>
+                        <div class="plano-details">
+                            <div class="plano-info">
+                                <h4>{{ plano.nome_plano }}</h4>
+                                <p>{{ plano.descricao or "Sem descrição" }}</p>
+                                <p><strong>Limite de serviços:</strong> {{ plano.limite_servico or "Ilimitado" }}</p>
+                                <p><strong>Tipo:</strong> {{ plano.tipo_plano or "Padrão" }}</p>
+                            </div>
+                            <div class="plano-preco">
+                                R$ {{ "%.2f"|format(plano.valor_mensal or 0) }}
+                                <small style="font-size: 0.6em; color: #666;">/mês</small>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p style="color: #666; text-align: center; padding: 20px;">
+                        Nenhum plano disponível no momento.
+                    </p>
+                {% endif %}
+            </div>
+            
+            {% if planos %}
+            <div class="form-actions">
+                <button type="submit" class="btn btn-warning">🔄 Alterar Plano</button>
+                <a href="/fornecedor/planos/listar" class="btn btn-secondary">❌ Cancelar</a>
+            </div>
+            {% endif %}
+        </form>
+    </div>
+
+    <script>
+        function selectPlan(element) {
+            const planoId = element.getAttribute('data-plano-id');
+            
+            // Remove seleção anterior
+            document.querySelectorAll('.plano-option').forEach(function(el) {
+                el.classList.remove('selected');
+            });
+            
+            // Adiciona seleção ao elemento clicado
+            element.classList.add('selected');
+            
+            // Marca o radio button correspondente
+            const radioInput = document.getElementById('plano_' + planoId);
+            if (radioInput) {
+                radioInput.checked = true;
+            }
+        }
+
+        // Adiciona event listeners quando a página carrega
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.plano-option').forEach(function(element) {
+                element.addEventListener('click', function() {
+                    selectPlan(this);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+{% extends "base_authenticated.html" %}
+
+{#
+    Template: Base Cliente
+    Descrição: Template base para páginas do cliente
+    Estende: base_authenticated.html
+#}
+
+{% from 'components/user_dropdown.html' import user_dropdown %}
+
+{% block titulo %}{% block cliente_titulo %}Cliente{% endblock %}{% endblock %}
+
+{% block navbar_search %}
+<form class="d-flex ms-auto align-items-center" role="search">
+    <input class="form-control me-2 rounded rounded-4" type="text"
+        placeholder="Busque pelos melhores serviços" aria-label="Search">
+    <a href="#" class="text-white me-3">
+        <i class="bi bi-search"></i>
+    </a>
+</form>
+{% endblock %}
+
+{% block navbar_menu %}
+{% if usuario_logado %}
+    {% set menu_cliente = [
+        {'url': '/cliente/perfil', 'icon': 'person', 'label': 'Perfil'},
+        {'url': '/cliente/home', 'icon': 'house', 'label': 'Home'},
+        {'url': '/cliente/contratacoes', 'icon': 'briefcase', 'label': 'Minhas Contratações'},
+        {'url': '/cliente/solicitacoes', 'icon': 'list-check', 'label': 'Minhas Solicitações'},
+        {'divider': True},
+        {'url': '/logout', 'icon': 'box-arrow-right', 'label': 'Sair', 'danger': True}
+    ] %}
+    {{ user_dropdown(usuario_logado, menu_cliente, default_label='Cliente') }}
+{% else %}
+    <a href="/login" class="text-white">
+        <h5><strong>ENTRAR</strong></h5>
+    </a>
+{% endif %}
+{% endblock %}
+
+{% block conteudo %}
+{% block cliente_conteudo %}{% endblock %}
+{% endblock %}
+
+{% block scripts %}
+{% block cliente_scripts %}{% endblock %}
+{% endblock %}

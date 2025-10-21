@@ -37,7 +37,7 @@ templates = criar_templates("templates")
 async def exibir_cadastro_prestador(request: Request):
     usuario_logado = obter_usuario_logado(request)
     return templates.TemplateResponse(
-        "publico/prestador/prestador_cadastro.html", {"request": request, "dados": None, "usuario_logado": usuario_logado}
+        "public/cadastro/prestador.html", {"request": request, "dados": None, "usuario_logado": usuario_logado}
     )
 
 
@@ -105,7 +105,7 @@ async def processar_cadastro_prestador(
         # Verificar se email já existe APÓS a validação do DTO
         if prestador_repo.obter_prestador_por_email(dados_dto.email):
             return templates.TemplateResponse(
-                "publico/prestador/prestador_cadastro.html",
+                "public/cadastro/prestador.html",
                 {
                     "request": request,
                     "erro": "Email já cadastrado",
@@ -145,7 +145,7 @@ async def processar_cadastro_prestador(
         prestador_id = prestador_repo.inserir_prestador(prestador)
         if not prestador_id:
             return templates.TemplateResponse(
-                "publico/prestador/prestador_cadastro.html",
+                "public/cadastro/prestador.html",
                 {
                     "request": request,
                     "erro": "Erro ao cadastrar prestador. Tente novamente.",
@@ -177,7 +177,7 @@ async def processar_cadastro_prestador(
 
         # Retornar template com dados preservados e erro
         return templates.TemplateResponse(
-            "publico/prestador/prestador_cadastro.html",
+            "public/cadastro/prestador.html",
             {
                 "request": request,
                 "erro": erro_msg,
@@ -189,7 +189,7 @@ async def processar_cadastro_prestador(
         # logger.error(f"Erro ao processar cadastro de prestador: {e}")
 
         return templates.TemplateResponse(
-            "publico/prestador/prestador_cadastro.html",
+            "public/cadastro/prestador.html",
             {
                 "request": request,
                 "erro": "Erro ao processar cadastro. Tente novamente.",
@@ -279,7 +279,7 @@ async def post_cadastro(
         # Verificar se email já existe APÓS a validação do DTO
         if cliente_repo.obter_cliente_por_email(dados_dto.email):
             return templates.TemplateResponse(
-                "publico/cliente/cadastro_cliente.html",
+                "public/cadastro/cliente.html",
                 {
                     "request": request,
                     "erro": "Email já cadastrado",
@@ -318,7 +318,7 @@ async def post_cadastro(
         cliente_id = cliente_repo.inserir_cliente(cliente)
         if not cliente_id:
             return templates.TemplateResponse(
-                "publico/cliente/cadastro_cliente.html",
+                "public/cadastro/cliente.html",
                 {
                     "request": request,
                     "erro": "Erro ao cadastrar cliente. Tente novamente.",
@@ -349,7 +349,7 @@ async def post_cadastro(
 
         # Retornar template com dados preservados e erro
         return templates.TemplateResponse(
-            "publico/cliente/cadastro_cliente.html",
+            "public/cadastro/cliente.html",
             {
                 "request": request,
                 "erro": erro_msg,
@@ -361,7 +361,7 @@ async def post_cadastro(
         # logger.error(f"Erro ao processar cadastro de prestador: {e}")
 
         return templates.TemplateResponse(
-            "publico/cliente/cadastro_cliente.html",
+            "public/cadastro/cliente.html",
             {
                 "request": request,
                 "erro": "Erro ao processar cadastro. Tente novamente.",
@@ -375,7 +375,7 @@ async def post_cadastro(
 async def exibir_cadastro_fornecedor(request: Request):
     usuario_logado = obter_usuario_logado(request)
     return templates.TemplateResponse(
-        "publico/fornecedor2/cadastro_fornecedor.html", {"request": request, "usuario_logado": usuario_logado}
+        "public/cadastro/fornecedor.html", {"request": request, "usuario_logado": usuario_logado}
     )
 
 
@@ -453,7 +453,7 @@ async def processar_cadastro_fornecedor(
             or not fornecedor_dto.cpf_cnpj
         ):
             return templates.TemplateResponse(
-                "publico/fornecedor2/cadastro_fornecedor.html",
+                "public/cadastro/fornecedor.html",
                 {
                     "request": request,
                     "erro": "Preencha todos os campos.",
@@ -465,7 +465,7 @@ async def processar_cadastro_fornecedor(
         # Verificar se senhas coincidem (usar valores do DTO)
         if fornecedor_dto.senha != fornecedor_dto.confirmar_senha:
             return templates.TemplateResponse(
-                "publico/fornecedor2/cadastro_fornecedor.html",
+                "public/cadastro/fornecedor.html",
                 {
                     "request": request,
                     "erro": "As senhas não coincidem.",
@@ -477,7 +477,7 @@ async def processar_cadastro_fornecedor(
         # Verificar se email já existe (usar email validado pelo DTO)
         if fornecedor_repo.obter_fornecedor_por_email(fornecedor_dto.email):
             return templates.TemplateResponse(
-                "publico/fornecedor2/cadastro_fornecedor.html",
+                "public/cadastro/fornecedor.html",
                 {
                     "request": request,
                     "erro": "Email já cadastrado. Tente fazer login ou use outro email.",
@@ -503,7 +503,7 @@ async def processar_cadastro_fornecedor(
             tipos_permitidos = ["image/jpeg", "image/png", "image/jpg"]
             if foto.content_type not in tipos_permitidos:
                 return templates.TemplateResponse(
-                    "publico/fornecedor2/cadastro_fornecedor.html",
+                    "public/cadastro/fornecedor.html",
                     {
                         "request": request,
                         "erro": "Tipo de arquivo de foto inválido. Use apenas JPG, JPEG ou PNG.",
@@ -549,7 +549,7 @@ async def processar_cadastro_fornecedor(
         fornecedor_id = fornecedor_repo.inserir_fornecedor(fornecedor)
         if not fornecedor_id:
             return templates.TemplateResponse(
-                "publico/fornecedor2/cadastro_fornecedor.html",
+                "public/cadastro/fornecedor.html",
                 {
                     "request": request,
                     "erro": "Erro ao cadastrar fornecedor. Tente novamente.",
@@ -587,7 +587,7 @@ async def processar_cadastro_fornecedor(
 
         # Retornar template com dados preservados e detalhes por campo
         return templates.TemplateResponse(
-            "publico/fornecedor2/cadastro_fornecedor.html",
+            "public/cadastro/fornecedor.html",
             {
                 "request": request,
                 "erro": erro_msg,
@@ -601,7 +601,7 @@ async def processar_cadastro_fornecedor(
         logger.error(f"Erro ao processar cadastro de fornecedor: {e}")
 
         return templates.TemplateResponse(
-            "publico/fornecedor2/cadastro_fornecedor.html",
+            "public/cadastro/fornecedor.html",
             {
                 "request": request,
                 "erro": "Erro ao processar cadastro. Tente novamente.",

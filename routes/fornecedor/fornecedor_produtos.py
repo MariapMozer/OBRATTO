@@ -24,7 +24,7 @@ async def home_adm(request: Request, usuario_logado: Optional[dict] = None):
         usuario_logado["id"], limit=10, offset=0
     )
     return templates.TemplateResponse(
-        "fornecedor/home_fornecedor.html", {"request": request, "produtos": produtos}
+        "fornecedor/home.html", {"request": request, "produtos": produtos}
     )
 
 
@@ -80,7 +80,7 @@ async def listar_produtos(request: Request, usuario_logado: Optional[dict] = Non
 @requer_autenticacao(["fornecedor"])
 async def mostrar_formulario_produto(request: Request):
     response = templates.TemplateResponse(
-        "fornecedor/produtos/cadastrar_produtos.html", {"request": request}
+        "fornecedor/produtos/cadastrar.html", {"request": request}
     )
     return response
 
@@ -124,7 +124,7 @@ async def cadastrar_produto(
                     request, "Tipo de arquivo de foto inválido. Use JPG, PNG ou WEBP."
                 )
                 return templates.TemplateResponse(
-                    "fornecedor/produtos/cadastrar_produtos.html",
+                    "fornecedor/produtos/cadastrar.html",
                     {
                         "request": request,
                         "dados": {"nome": nome, "descricao": descricao},
@@ -165,13 +165,13 @@ async def cadastrar_produto(
         erros = [erro["msg"] for erro in e.errors()]
         informar_erro(request, " | ".join(erros))
         return templates.TemplateResponse(
-            "fornecedor/produtos/cadastrar_produtos.html",
+            "fornecedor/produtos/cadastrar.html",
             {"request": request, "dados": {"nome": nome, "descricao": descricao}},
         )
     except Exception as e:
         informar_erro(request, f"Erro ao cadastrar produto: {str(e)}")
         return templates.TemplateResponse(
-            "fornecedor/produtos/cadastrar_produtos.html",
+            "fornecedor/produtos/cadastrar.html",
             {"request": request, "dados": {"nome": nome, "descricao": descricao}},
         )
 
@@ -185,7 +185,7 @@ async def mostrar_formulario_atualizar_produto(
     produto = produto_repo.obter_produto_por_id(id)
     if produto and produto.fornecedor_id == usuario_logado["id"]:
         response = templates.TemplateResponse(
-            "fornecedor/produtos/alterar_produtos.html",
+            "fornecedor/produtos/alterar.html",
             {"request": request, "produto": produto},
         )
     else:
@@ -335,7 +335,7 @@ async def confi_exclusao_produto(
     produto = produto_repo.obter_produto_por_id(id)
     if produto and produto.fornecedor_id == usuario_logado["id"]:
         return templates.TemplateResponse(
-            "fornecedor/produtos/excluir_produtos.html",
+            "fornecedor/produtos/excluir.html",
             {"request": request, "produto": produto},
         )
     else:

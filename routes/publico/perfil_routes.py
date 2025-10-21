@@ -37,7 +37,7 @@ templates = criar_templates("templates")
 async def exibir_perfil_publico_prestador(request: Request):
     usuario_logado = obter_usuario_logado(request)
     return templates.TemplateResponse(
-        "publico/prestador/perfil_publico.html", {"request": request, "usuario_logado": usuario_logado}
+        "public/perfil/prestador.html", {"request": request, "usuario_logado": usuario_logado}
     )
 
 
@@ -46,7 +46,7 @@ async def exibir_perfil_publico_prestador(request: Request):
 async def exibir_perfil_publico_cliente(request: Request):
     usuario_logado = obter_usuario_logado(request)
     return templates.TemplateResponse(
-        "publico/cliente/perfil_publico.html", {"request": request, "usuario_logado": usuario_logado}
+        "public/perfil/cliente.html", {"request": request, "usuario_logado": usuario_logado}
     )
 
 
@@ -55,7 +55,7 @@ async def exibir_perfil_publico_cliente(request: Request):
 async def exibir_perfil_publico_fornecedor(request: Request):
     usuario_logado = obter_usuario_logado(request)
     return templates.TemplateResponse(
-        "publico/perfil_publico_fornecedor.html", {"request": request, "usuario_logado": usuario_logado}
+        "public/perfil/fornecedor.html", {"request": request, "usuario_logado": usuario_logado}
     )
 
 

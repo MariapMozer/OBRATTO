@@ -32,13 +32,13 @@ async def mostrar_login(request: Request, mensagem: Optional[str] = None):
         TemplateResponse: Página HTML do formulário de login
 
     Template:
-        publico/login_cadastro/login.html
+        auth/login.html
     """
     usuario_logado = obter_usuario_logado(request)
     context: dict = {"request": request, "usuario_logado": usuario_logado}
     if mensagem:
         context["sucesso"] = mensagem
-    return templates.TemplateResponse("publico/login_cadastro/login.html", context)
+    return templates.TemplateResponse("auth/login.html", context)
 
 
 @router.post("/login")
@@ -78,7 +78,7 @@ async def processar_login(request: Request, email: str = Form(), senha: str = Fo
         - 429: Rate limit excedido (muitas tentativas)
 
     Template:
-        publico/login_cadastro/login.html
+        auth/login.html
     """
     dados_formulario = {"email": email}
     try:
@@ -86,7 +86,7 @@ async def processar_login(request: Request, email: str = Form(), senha: str = Fo
 
         if not email or not senha:
             return templates.TemplateResponse(
-                "publico/login_cadastro/login.html",
+                "auth/login.html",
                 {"request": request, "erro": "Preencha todos os campos."},
                 status_code=status.HTTP_400_BAD_REQUEST,
             )
@@ -96,7 +96,7 @@ async def processar_login(request: Request, email: str = Form(), senha: str = Fo
 
         if not usuario or not verificar_senha(login_dto.senha, usuario.senha):
             return templates.TemplateResponse(
-                "publico/login_cadastro/login.html",
+                "auth/login.html",
                 {"request": request, "erro": "Email ou senha inválidos"},
                 status_code=status.HTTP_401_UNAUTHORIZED,
             )
@@ -145,7 +145,7 @@ async def processar_login(request: Request, email: str = Form(), senha: str = Fo
 
         # Retornar template com dados preservados e erro
         return templates.TemplateResponse(
-            "publico/login_cadastro/login.html",
+            "auth/login.html",
             {
                 "request": request,
                 "erro": erro_msg,
@@ -157,7 +157,7 @@ async def processar_login(request: Request, email: str = Form(), senha: str = Fo
         logger.error(f"Erro ao processar login: {e}", exc_info=True)
 
         return templates.TemplateResponse(
-            "publico/login_cadastro/login.html",
+            "auth/login.html",
             {
                 "request": request,
                 "erro": "Erro ao processar login. Tente novamente.",
@@ -198,11 +198,11 @@ async def recuperar_senha_get(request: Request):
         TemplateResponse: Página HTML do formulário de recuperação
 
     Template:
-        publico/login_cadastro/recuperar_senha.html
+        auth/recuperar_senha.html
     """
     usuario_logado = obter_usuario_logado(request)
     return templates.TemplateResponse(
-        "publico/login_cadastro/recuperar_senha.html",
+        "auth/recuperar_senha.html",
         {"request": request, "usuario_logado": usuario_logado}
     )
 
@@ -230,7 +230,7 @@ async def recuperar_senha_post(request: Request, email: str = Form(...)):
         - 200: Requisição processada (sempre retorna 200)
 
     Template:
-        publico/login_cadastro/recuperar_senha.html
+        auth/recuperar_senha.html
 
     TODO: Implementar envio de email real em produção
     """
@@ -246,7 +246,7 @@ async def recuperar_senha_post(request: Request, email: str = Form(...)):
     else:
         mensagem = "E-mail não encontrado."
     return templates.TemplateResponse(
-        "publico/login_cadastro/recuperar_senha.html",
+        "auth/recuperar_senha.html",
         {"request": request, "mensagem": mensagem}
     )
 
@@ -264,10 +264,10 @@ async def resetar_senha_get(request: Request, token: str):
         TemplateResponse: Formulário para definir nova senha
 
     Template:
-        publico/login_cadastro/redefinir_senha.html
+        auth/redefinir_senha.html
     """
     return templates.TemplateResponse(
-        "publico/login_cadastro/redefinir_senha.html",
+        "auth/redefinir_senha.html",
         {"request": request, "token": token},
     )
 
@@ -300,7 +300,7 @@ async def resetar_senha_post(
         - 200: Token inválido (mostra formulário com erro)
 
     Template:
-        publico/login_cadastro/redefinir_senha.html
+        auth/redefinir_senha.html
     """
     usuario = usuario_repo.obter_usuario_por_token(token)
     if usuario:
@@ -311,6 +311,6 @@ async def resetar_senha_post(
     else:
         mensagem = "Token inválido ou expirado."
         return templates.TemplateResponse(
-            "publico/login_cadastro/redefinir_senha.html",
+            "auth/redefinir_senha.html",
             {"request": request, "mensagem": mensagem, "token": token},
         )

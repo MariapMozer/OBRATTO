@@ -1,0 +1,70 @@
+{% extends "/publico/base2.html" %}
+{% block titulo%}Minhas Solicitações{% endblock %}
+{% block css %} <link rel="stylesheet" href="/static/css/fornecedor_solicitacoes_recebidas.css">{% endblock %}
+{% block menu %} 
+
+<main class="container-fluid p-0">
+    <section class="solicitacoes-section">
+        <div class="container">
+            <h2 class="section-title">Solicitações Recebidas</h2>
+            <div class="row g-4">
+                
+                <!-- Card de Solicitação -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="solicitacao-card">
+                        <div class="solicitacao-header d-flex align-items-center">
+                            <img src="/static/img/cliente1.jpg" alt="Cliente" class="cliente-img">
+                            <div class="ms-3">
+                                <h3 class="cliente-nome">João da Silva</h3>
+                                <p class="produto-nome">Produto solicitado: <strong>Cimento CP-II</strong></p>
+                            </div>
+                        </div>
+                        <div class="solicitacao-body">
+                            <p><strong>Mensagem:</strong> Preciso de 100 sacos de cimento para obra residencial.</p>
+                            <p><strong>Data:</strong> 02/09/2025</p>
+                        </div>
+                        <div class="solicitacao-actions">
+                            <a href="#" class="btn-acao bg-primary-custom">Ver Perfil</a>
+                            <a href="#" class="btn-acao bg-secondary-custom">Abrir Chat</a>
+                            <a href="#" class="btn-acao btn-outline">Enviar Orçamento</a>
+                        </div>
+                        <div class="solicitacao-footer">
+                            <button class="btn-acao-sm aprovar">✔ Aprovar</button>
+                            <button class="btn-acao-sm negar">✖ Negar</button>
+                            <button class="btn-acao-sm denunciar">🚩 Denunciar</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mais cards podem ser repetidos -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="solicitacao-card">
+                        <div class="solicitacao-header d-flex align-items-center">
+                            <img src="/static/img/cliente2.jpg" alt="Cliente" class="cliente-img">
+                            <div class="ms-3">
+                                <h3 class="cliente-nome">Maria Oliveira</h3>
+                                <p class="produto-nome">Produto solicitado: <strong>Telha Colonial</strong></p>
+                            </div>
+                        </div>
+                        <div class="solicitacao-body">
+                            <p><strong>Mensagem:</strong> Solicito orçamento de 500 telhas com entrega.</p>
+                            <p><strong>Data:</strong> 01/09/2025</p>
+                        </div>
+                        <div class="solicitacao-actions">
+                            <a href="#" class="btn-acao bg-primary-custom">Ver Perfil</a>
+                            <a href="#" class="btn-acao bg-secondary-custom">Abrir Chat</a>
+                            <a href="#" class="btn-acao btn-outline">Enviar Orçamento</a>
+                        </div>
+                        <div class="solicitacao-footer">
+                            <button class="btn-acao-sm aprovar">✔ Aprovar</button>
+                            <button class="btn-acao-sm negar">✖ Negar</button>
+                            <button class="btn-acao-sm denunciar">🚩 Denunciar</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}

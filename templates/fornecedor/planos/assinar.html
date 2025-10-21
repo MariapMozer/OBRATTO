@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assinar Plano - OBRATTO Fornecedor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .navbar {
+            background-color: #28a745;
+            padding: 1rem 2rem;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .navbar h1 {
+            font-size: 1.5rem;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+        
+        .card-header {
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .card-header h2 {
+            margin: 0;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .card-header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .card-body {
+            padding: 2rem;
+        }
+        
+        .welcome-box {
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            border: 1px solid #2196f3;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border-left: 5px solid #2196f3;
+        }
+        
+        .welcome-box h3 {
+            color: #1976d2;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+        
+        .welcome-box ul {
+            color: #1976d2;
+            margin-left: 1.5rem;
+        }
+        
+        .welcome-box li {
+            margin-bottom: 0.7rem;
+            font-weight: 500;
+        }
+        
+        .plans-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .plan-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .plan-card:hover {
+            border-color: #007bff;
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,123,255,0.15);
+        }
+        
+        .plan-card.selected {
+            border-color: #28a745;
+            background-color: #f8fff9;
+            box-shadow: 0 4px 15px rgba(40,167,69,0.2);
+        }
+        
+        .plan-card.popular {
+            border-color: #ffc107;
+            background-color: #fffef7;
+        }
+        
+        .plan-card.popular::before {
+            content: "⭐ Mais Popular";
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #ffc107;
+            color: #212529;
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .plan-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 1rem;
+        }
+        
+        .plan-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+        
+        .plan-price {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 0.3rem;
+        }
+        
+        .plan-period {
+            color: #666;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .plan-description {
+            color: #777;
+            font-style: italic;
+            font-size: 0.9rem;
+        }
+        
+        .plan-features {
+            list-style: none;
+            margin: 1.5rem 0;
+        }
+        
+        .plan-features li {
+            padding: 0.7rem 0;
+            border-bottom: 1px solid #f5f5f5;
+            display: flex;
+            align-items: center;
+            font-size: 0.95rem;
+        }
+        
+        .plan-features li:last-child {
+            border-bottom: none;
+        }
+        
+        .plan-features li::before {
+            content: "✅";
+            margin-right: 0.7rem;
+            font-size: 1rem;
+        }
+        
+        .plan-highlight {
+            background-color: #e7f3ff;
+            border-radius: 6px;
+            padding: 0.3rem 0.5rem;
+            color: #007bff;
+            font-weight: bold;
+        }
+        
+        .selection-form {
+            margin-top: 2rem;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+            border: 2px solid #dee2e6;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            background-color: white;
+        }
+        
+        .form-group select:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+        }
+        
+        .plan-summary {
+            background-color: white;
+            border: 2px solid #28a745;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            display: none;
+        }
+        
+        .plan-summary h4 {
+            color: #28a745;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+        
+        .summary-details {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .summary-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .summary-info strong {
+            color: #28a745;
+            margin-bottom: 0.3rem;
+        }
+        
+        .summary-price {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #28a745;
+            text-align: right;
+        }
+        
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            transition: all 0.3s;
+            font-weight: bold;
+            width: 100%;
+            margin-top: 1rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            color: white;
+            box-shadow: 0 4px 15px rgba(0,123,255,0.3);
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(45deg, #0056b3, #004085);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,123,255,0.4);
+        }
+        
+        .btn-success {
+            background: linear-gradient(45deg, #28a745, #1e7e34);
+            color: white;
+            box-shadow: 0 4px 15px rgba(40,167,69,0.3);
+        }
+        
+        .btn-success:hover {
+            background: linear-gradient(45deg, #1e7e34, #155724);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(40,167,69,0.4);
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            transform: translateY(-2px);
+        }
+        
+        .btn:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .message {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+        
+        .message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .pricing-note {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+            text-align: center;
+        }
+        
+        .pricing-note strong {
+            color: #856404;
+        }
+        
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .plans-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .summary-details {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            
+            .summary-price {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <h1>🏪 OBRATTO - Fornecedor</h1>
+        <div class="nav-links">
+            <a href="/fornecedor">🏠 Início</a>
+            <a href="/fornecedor/produtos">📦 Produtos</a>
+            <a href="/fornecedor/planos/listar">💳 Planos</a>
+            <a href="/admin">⚙️ Admin</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        {% if mensagem %}
+        <div class="message {{ 'success' if 'sucesso' in mensagem.lower() else 'error' }}">
+            {{ mensagem }}
+        </div>
+        {% endif %}
+
+        <div class="card">
+            <div class="card-header">
+                <h2>🎯 Assinar Plano</h2>
+                <p>Escolha o plano ideal para o seu negócio</p>
+            </div>
+            <div class="card-body">
+                <div class="welcome-box">
+                    <h3>🚀 Bem-vindo ao OBRATTO!</h3>
+                    <ul>
+                        <li>Aumente sua visibilidade e alcance mais clientes</li>
+                        <li>Gerencie seus serviços de forma profissional</li>
+                        <li>Receba avaliações e construa sua reputação</li>
+                        <li>Acesso a ferramentas de gestão avançadas</li>
+                        <li>Suporte dedicado para o crescimento do seu negócio</li>
+                    </ul>
+                </div>
+
+                {% if planos_disponiveis %}
+                <div class="plans-grid">
+                    {% for plano in planos_disponiveis %}
+                    <div class="plan-card {% if loop.index == 2 %}popular{% endif %}" 
+                         data-plano-id="{{ plano.id_plano }}"
+                         data-plano-nome="{{ plano.nome_plano }}"
+                         data-plano-valor="{{ plano.valor_mensal }}"
+                         data-plano-descricao="{{ plano.descricao or '' }}"
+                         data-plano-limite="{{ plano.limite_servico }}"
+                         onclick="selectPlanFromCard(this)">>
+                        <div class="plan-header">
+                            <div class="plan-name">{{ plano.nome_plano }}</div>
+                            <div class="plan-price">R$ {{ "%.2f"|format(plano.valor_mensal) }}</div>
+                            <div class="plan-period">por mês</div>
+                            {% if plano.descricao %}
+                            <div class="plan-description">{{ plano.descricao }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <ul class="plan-features">
+                            <li>
+                                {% if plano.limite_servico == 999 %}
+                                <span class="plan-highlight">Serviços Ilimitados</span>
+                                {% else %}
+                                Até <span class="plan-highlight">{{ plano.limite_servico }} serviços</span>
+                                {% endif %}
+                            </li>
+                            <li>Painel de controle completo</li>
+                            <li>Gerenciamento de clientes</li>
+                            <li>Sistema de avaliações</li>
+                            <li>Relatórios detalhados</li>
+                            <li>Suporte técnico por email</li>
+                            {% if loop.index >= 2 %}
+                            <li>Suporte prioritário</li>
+                            <li>Analytics avançados</li>
+                            {% endif %}
+                            {% if loop.index >= 3 %}
+                            <li>Suporte telefônico 24/7</li>
+                            <li>Gerente de conta dedicado</li>
+                            <li>Integração com sistemas externos</li>
+                            {% endif %}
+                        </ul>
+                        
+                        <button type="button" class="btn btn-primary" 
+                                onclick="event.stopPropagation(); selectPlanFromCard(this.closest('.plan-card'))">
+                            🎯 Escolher Este Plano
+                        </button>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <form method="POST" id="signupForm" class="selection-form" style="display: none;">
+                    <input type="hidden" name="plano_id" id="plano_id" required>
+
+                    <div id="planSummary" class="plan-summary">
+                        <h4>📋 Resumo da Assinatura</h4>
+                        <div class="summary-details">
+                            <div class="summary-info">
+                                <strong>Plano:</strong>
+                                <span id="summaryName">-</span>
+                                
+                                <strong>Recursos:</strong>
+                                <span id="summaryLimit">-</span>
+                                
+                                <strong>Descrição:</strong>
+                                <span id="summaryDescription">-</span>
+                            </div>
+                            <div class="summary-price" id="summaryPrice">R$ 0,00/mês</div>
+                        </div>
+                        
+                        <div class="pricing-note">
+                            <strong>💡 Primeira cobrança:</strong> Será processada imediatamente após a confirmação.
+                            <br>
+                            <strong>🔄 Renovação automática:</strong> Todo mês na mesma data.
+                        </div>
+                        
+                        <button type="submit" class="btn btn-success" id="submitBtn">
+                            🎉 Confirmar Assinatura
+                        </button>
+                    </div>
+                </form>
+
+                <div style="text-align: center; margin-top: 2rem;">
+                    <a href="/fornecedor/planos/listar" class="btn btn-secondary" style="width: auto;">
+                        ↩️ Voltar aos Planos
+                    </a>
+                </div>
+                
+                {% else %}
+                <div style="text-align: center; padding: 3rem;">
+                    <h3 style="color: #666; margin-bottom: 1rem;">
+                        😔 Nenhum plano disponível no momento
+                    </h3>
+                    <p style="color: #777; margin-bottom: 2rem;">
+                        Entre em contato conosco para mais informações sobre nossos planos.
+                    </p>
+                    <a href="/fornecedor/planos/listar" class="btn btn-primary">
+                        🔄 Atualizar Página
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Dados do servidor para JavaScript -->
+    <div id="serverData" style="display: none;"></div>
+
+    <script>
+        function selectPlanFromCard(cardElement) {
+            // Obtém dados do plano do card
+            const planId = cardElement.dataset.planoId;
+            const planName = cardElement.dataset.planoNome;
+            const planPrice = parseFloat(cardElement.dataset.planoValor);
+            const planDescription = cardElement.dataset.planoDescricao;
+            const planLimit = cardElement.dataset.planoLimite;
+            
+            // Remove seleção anterior
+            document.querySelectorAll('.plan-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Adiciona seleção atual
+            cardElement.classList.add('selected');
+            
+            // Atualiza o hidden input
+            document.getElementById('plano_id').value = planId;
+            
+            // Atualiza resumo
+            updatePlanSummary(planName, planPrice, planLimit, planDescription);
+            
+            // Mostra o formulário
+            const form = document.getElementById('signupForm');
+            form.style.display = 'block';
+            
+            // Scroll suave para o formulário
+            form.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
+        }
+        
+        function updatePlanSummary(planName, planPrice, planLimit, planDescription) {
+            // Atualiza informações do resumo
+            document.getElementById('summaryName').textContent = planName;
+            document.getElementById('summaryPrice').textContent = `R$ ${planPrice.toFixed(2)}/mês`;
+            document.getElementById('summaryLimit').textContent = 
+                planLimit == 999 ? 'Serviços Ilimitados' : `Até ${planLimit} serviços`;
+            document.getElementById('summaryDescription').textContent = 
+                planDescription || 'Plano completo com todos os recursos essenciais';
+            
+            document.getElementById('planSummary').style.display = 'block';
+        }
+
+        // Confirmação antes do envio
+        document.getElementById('signupForm').addEventListener('submit', function(e) {
+            const select = document.getElementById('plano_id');
+            if (select.selectedOptions.length > 0) {
+                const planName = select.selectedOptions[0].dataset.nome;
+                const planPrice = parseFloat(select.selectedOptions[0].dataset.valor);
+                const confirmed = confirm(
+                    `🎯 Confirmar Assinatura\n\n` +
+                    `Plano: ${planName}\n` +
+                    `Valor: R$ ${planPrice.toFixed(2)}/mês\n\n` +
+                    `Deseja continuar com a assinatura?`
+                );
+                if (!confirmed) {
+                    e.preventDefault();
+                }
+            } else {
+                alert('Por favor, selecione um plano antes de continuar.');
+                e.preventDefault();
+            }
+        });
+
+        // Inicializa resumo se já houver seleção
+        window.addEventListener('load', function() {
+            updatePlanSummary();
+        });
+    </script>
+</body>
+</html>

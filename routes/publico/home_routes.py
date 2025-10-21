@@ -14,7 +14,7 @@ async def get_root(request: Request):
     """Página inicial do site"""
     usuario_logado = obter_usuario_logado(request)
     return templates.TemplateResponse(
-        "publico/home.html",
+        "public/home.html",
         {"request": request, "usuario_logado": usuario_logado}
     )
 
@@ -24,6 +24,6 @@ async def mostrar_escolha_cadastro(request: Request):
     """Página de escolha do tipo de cadastro"""
     usuario_logado = obter_usuario_logado(request)
     return templates.TemplateResponse(
-        "publico/login_cadastro/escolha_cadastro.html",
+        "auth/escolha_cadastro.html",
         {"request": request, "usuario_logado": usuario_logado}
     )

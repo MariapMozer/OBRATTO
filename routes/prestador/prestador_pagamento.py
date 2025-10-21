@@ -42,7 +42,7 @@ async def mostrar_formulario_pagamento(
     assert plano_id is not None
     plano = plano_repo.obter_plano_por_id(plano_id)
     return templates.TemplateResponse(
-        "publico/pagamento-prestador/dados_pagamento.html",
+        "prestador/pagamento/dados.html",
         {
             "request": request,
             "plano": plano,
@@ -55,7 +55,7 @@ async def mostrar_formulario_pagamento(
 @router.get("/prestador/pagamento")
 async def exibir_pagamento(request: Request):
     return templates.TemplateResponse(
-        "publico/pagamento-prestador/dados_pagamento.html", {"request": request}
+        "prestador/pagamento/dados.html", {"request": request}
     )
 
 
@@ -83,7 +83,7 @@ async def processar_pagamento(
         if not numero_cartao or not validade or not cvv or not nome_cartao:
             plano = plano_repo.obter_plano_por_id(plano_id)
             return templates.TemplateResponse(
-                "publico/pagamento-prestador/dados_pagamento.html",
+                "prestador/pagamento/dados.html",
                 {
                     "request": request,
                     "plano": plano,
@@ -112,7 +112,7 @@ async def processar_pagamento(
     if result["success"]:
         if result["status"] == "approved":
             return templates.TemplateResponse(
-                "publico/pagamento-prestador/pagamento_sucesso.html",
+                "prestador/pagamento/sucesso.html",
                 {
                     "request": request,
                     "plano": plano_repo.obter_plano_por_id(plano_id),
@@ -123,7 +123,7 @@ async def processar_pagamento(
             )
         elif result["status"] == "pending":
             return templates.TemplateResponse(
-                "publico/pagamento-prestador/pagamento_pendente.html",
+                "prestador/pagamento/pendente.html",
                 {
                     "request": request,
                     "plano": plano_repo.obter_plano_por_id(plano_id),
@@ -134,7 +134,7 @@ async def processar_pagamento(
             )
         else:
             return templates.TemplateResponse(
-                "publico/pagamento-prestador/pagamento_erro.html",
+                "prestador/pagamento/erro.html",
                 {
                     "request": request,
                     "tipo_operacao": tipo_operacao,
@@ -144,7 +144,7 @@ async def processar_pagamento(
     else:
         plano = plano_repo.obter_plano_por_id(plano_id)
         return templates.TemplateResponse(
-            "publico/pagamento-prestador/dados_pagamento.html",
+            "prestador/pagamento/dados.html",
             {
                 "request": request,
                 "plano": plano,

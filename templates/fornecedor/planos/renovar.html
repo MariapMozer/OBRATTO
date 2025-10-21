@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Renovar Plano - OBRATTO Fornecedor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .navbar {
+            background-color: #28a745;
+            padding: 1rem 2rem;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .navbar h1 {
+            font-size: 1.5rem;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+        
+        .container {
+            max-width: 700px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .card-header h2 {
+            margin: 0;
+            font-size: 2rem;
+        }
+        
+        .card-header p {
+            margin: 0.5rem 0 0 0;
+            opacity: 0.9;
+        }
+        
+        .card-body {
+            padding: 2rem;
+        }
+        
+        .current-plan {
+            background-color: #e8f5e8;
+            border: 1px solid #c3e6c3;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        
+        .current-plan h3 {
+            color: #28a745;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+        
+        .plan-detail {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            padding: 0.25rem 0;
+        }
+        
+        .plan-detail:last-child {
+            margin-bottom: 0;
+            font-weight: bold;
+            border-top: 1px solid #c3e6c3;
+            padding-top: 0.75rem;
+            margin-top: 0.75rem;
+        }
+        
+        .renewal-info {
+            background-color: #e7f3ff;
+            border: 1px solid #b8daff;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-left: 5px solid #007bff;
+        }
+        
+        .renewal-info h4 {
+            color: #004085;
+            margin-bottom: 1rem;
+        }
+        
+        .renewal-info p {
+            color: #004085;
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s;
+            min-width: 120px;
+        }
+        
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #218838;
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            transform: translateY(-1px);
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+        }
+        
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                margin: 1rem;
+                padding: 0 0.5rem;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+            
+            .plan-detail {
+                flex-direction: column;
+                gap: 0.25rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>🏢 OBRATTO - Renovar Plano</h1>
+        <div class="nav-links">
+            <a href="/fornecedor/planos/listar">💳 Planos</a>
+            <a href="/fornecedor/planos/meu_plano">👤 Meu Plano</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h2>🔄 Renovar Assinatura</h2>
+                <p>Estenda seu plano atual por mais um mês</p>
+            </div>
+            
+            <div class="card-body">
+                {% if mensagem %}
+                    <div class="alert alert-error">
+                        {{ mensagem }}
+                    </div>
+                {% endif %}
+
+                {% if plano_atual %}
+                    <div class="current-plan">
+                        <h3>📦 Plano Atual para Renovar</h3>
+                        <div class="plan-detail">
+                            <span><strong>Nome:</strong></span>
+                            <span>{{ plano_atual.nome_plano }}</span>
+                        </div>
+                        <div class="plan-detail">
+                            <span><strong>Tipo:</strong></span>
+                            <span>{{ plano_atual.tipo_plano.title() }}</span>
+                        </div>
+                        <div class="plan-detail">
+                            <span><strong>Limite de Serviços:</strong></span>
+                            <span>
+                                {% if plano_atual.limite_servico == 999 %}
+                                    Ilimitado
+                                {% else %}
+                                    {{ plano_atual.limite_servico }} por mês
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="plan-detail">
+                            <span><strong>Descrição:</strong></span>
+                            <span>{{ plano_atual.descricao or 'Plano completo com recursos essenciais' }}</span>
+                        </div>
+                        <div class="plan-detail">
+                            <span><strong>Valor da Renovação:</strong></span>
+                            <span>R$ {{ "%.2f"|format(plano_atual.valor_mensal) }}</span>
+                        </div>
+                    </div>
+
+                    <div class="renewal-info">
+                        <h4>ℹ️ Informações sobre a renovação:</h4>
+                        <p>• A renovação estende seu plano atual por mais 30 dias</p>
+                        <p>• Todos os recursos e limites permanecem os mesmos</p>
+                        <p>• O pagamento será processado imediatamente (simulado)</p>
+                        <p>• Você não perderá nenhum benefício durante a renovação</p>
+                        <p>• A cobrança será de R$ {{ "%.2f"|format(plano_atual.valor_mensal) }}</p>
+                    </div>
+
+                    <div class="form-actions">
+                        <form method="post" action="/fornecedor/planos/renovar" style="display: inline;">
+                            <input type="hidden" name="id_fornecedor" value="{{ id_fornecedor }}">
+                            <button type="submit" class="btn btn-success">
+                                🔄 Confirmar Renovação
+                            </button>
+                        </form>
+                        
+                        <a href="/fornecedor/planos/listar" class="btn btn-secondary">
+                            ↩️ Voltar aos Planos
+                        </a>
+                    </div>
+                {% else %}
+                    <div class="alert alert-error">
+                        <strong>Erro:</strong> Você não possui um plano ativo para renovar. 
+                        <a href="/fornecedor/planos/assinar">Assine um plano primeiro</a> ou 
+                        <a href="/fornecedor/planos/listar">veja os planos disponíveis</a>.
+                    </div>
+                    
+                    <div class="form-actions">
+                        <a href="/fornecedor/planos/assinar" class="btn btn-success">
+                            🎯 Assinar um Plano
+                        </a>
+                        <a href="/fornecedor/planos/listar" class="btn btn-secondary">
+                            📋 Ver Planos Disponíveis
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>

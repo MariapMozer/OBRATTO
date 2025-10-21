@@ -40,7 +40,7 @@ async def painel_prestador(request: Request):
 @requer_autenticacao(["prestador"])
 async def exibir_perfil_prestador(request: Request):
     return templates.TemplateResponse(
-        "prestador/perfil/perfil.html", {"request": request}
+        "prestador/perfil/visualizar.html", {"request": request}
     )
 
 
@@ -123,7 +123,7 @@ async def processar_edicao_perfil_prestador(
 @requer_autenticacao(["prestador"])
 async def mostrar_alterar_foto(request: Request, usuario_logado: Optional[dict] = None):
     return templates.TemplateResponse(
-        "prestador/perfil/foto/dados.html",
+        "prestador/perfil/editar_fotos.html",
         {"request": request, "usuario": usuario_logado},
     )
 

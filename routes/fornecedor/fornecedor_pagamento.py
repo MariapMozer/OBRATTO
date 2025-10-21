@@ -37,7 +37,7 @@ async def mostrar_formulario_pagamento(
         plano = plano_repo.obter_plano_por_id(plano_id)
 
     return templates.TemplateResponse(
-        "publico/pagamento/dados_pagamento.html",
+        "fornecedor/pagamento/dados.html",
         {
             "request": request,
             "plano": plano,
@@ -72,7 +72,7 @@ async def processar_pagamento(
     plano = plano_repo.obter_plano_por_id(plano_id)
     if not plano:
         return templates.TemplateResponse(
-            "publico/pagamento/dados_pagamento.html",
+            "fornecedor/pagamento/dados.html",
             {
                 "request": request,
                 "mensagem": "Plano não encontrado.",
@@ -84,7 +84,7 @@ async def processar_pagamento(
     if metodo_pagamento == "cartao":
         if not numero_cartao or not validade or not cvv or not nome_cartao:
             return templates.TemplateResponse(
-                "publico/pagamento/dados_pagamento.html",
+                "fornecedor/pagamento/dados.html",
                 {
                     "request": request,
                     "plano": plano,
@@ -100,7 +100,7 @@ async def processar_pagamento(
     )
     if assinatura_ativa:
         return templates.TemplateResponse(
-            "publico/pagamento/dados_pagamento.html",
+            "fornecedor/pagamento/dados.html",
             {
                 "request": request,
                 "plano": plano,
@@ -139,7 +139,7 @@ async def processar_pagamento(
     pagamento_inserido = pagamento_repo.inserir_pagamento(pagamento)
     if pagamento_inserido:
         return templates.TemplateResponse(
-            "publico/pagamento/pagamento_sucesso.html",
+            "fornecedor/pagamento/sucesso.html",
             {
                 "request": request,
                 "plano": plano,
@@ -150,7 +150,7 @@ async def processar_pagamento(
         )
 
     return templates.TemplateResponse(
-        "publico/pagamento/pagamento_erro.html",
+        "fornecedor/pagamento/erro.html",
         {
             "request": request,
             "tipo_operacao": tipo_operacao,
@@ -177,7 +177,7 @@ async def pagamento_sucesso(
                 metodo_pagamento=payment_info.get("payment_method_id"),
             )
             return templates.TemplateResponse(
-                "publico/pagamento/pagamento_sucesso.html",
+                "fornecedor/pagamento/sucesso.html",
                 {
                     "request": request,
                     "payment_info": payment_info,
@@ -185,7 +185,7 @@ async def pagamento_sucesso(
                 },
             )
     return templates.TemplateResponse(
-        "publico/pagamento/pagamento_sucesso.html",
+        "fornecedor/pagamento/sucesso.html",
         {"request": request, "mensagem": "Pagamento processado com sucesso!"},
     )
 
@@ -195,7 +195,7 @@ async def pagamento_sucesso(
 @requer_autenticacao(["fornecedor"])
 async def pagamento_falha(request: Request):
     return templates.TemplateResponse(
-        "publico/pagamento/pagamento_erro.html",
+        "fornecedor/pagamento/erro.html",
         {
             "request": request,
             "mensagem": "Pagamento rejeitado ou cancelado. Tente novamente.",
@@ -208,7 +208,7 @@ async def pagamento_falha(request: Request):
 @requer_autenticacao(["fornecedor"])
 async def pagamento_pendente(request: Request):
     return templates.TemplateResponse(
-        "publico/pagamento/pagamento_pendente.html",
+        "fornecedor/pagamento/pendente.html",
         {
             "request": request,
             "mensagem": "Pagamento pendente de aprovação. Aguarde a confirmação.",

@@ -38,7 +38,7 @@ async def exibir_aluguel_maquinario(request: Request):
     """Página em construção - Aluguel de Maquinário"""
     usuario_logado = obter_usuario_logado(request)
     return templates.TemplateResponse(
-        "publico/em_construcao.html",
+        "public/em_construcao.html",
         {
             "request": request,
             "usuario_logado": usuario_logado,
@@ -54,7 +54,7 @@ async def exibir_reformas(request: Request):
     """Página em construção - Reformas"""
     usuario_logado = obter_usuario_logado(request)
     return templates.TemplateResponse(
-        "publico/em_construcao.html",
+        "public/em_construcao.html",
         {
             "request": request,
             "usuario_logado": usuario_logado,
@@ -70,7 +70,7 @@ async def exibir_para_casa(request: Request):
     """Página em construção - Para a Casa"""
     usuario_logado = obter_usuario_logado(request)
     return templates.TemplateResponse(
-        "publico/em_construcao.html",
+        "public/em_construcao.html",
         {
             "request": request,
             "usuario_logado": usuario_logado,
@@ -86,7 +86,7 @@ async def exibir_construcao(request: Request):
     """Página em construção - Construção"""
     usuario_logado = obter_usuario_logado(request)
     return templates.TemplateResponse(
-        "publico/em_construcao.html",
+        "public/em_construcao.html",
         {
             "request": request,
             "usuario_logado": usuario_logado,
@@ -102,7 +102,7 @@ async def exibir_fornecedores(request: Request):
     """Página em construção - Fornecedores"""
     usuario_logado = obter_usuario_logado(request)
     return templates.TemplateResponse(
-        "publico/em_construcao.html",
+        "public/em_construcao.html",
         {
             "request": request,
             "usuario_logado": usuario_logado,
@@ -118,7 +118,7 @@ async def exibir_outros_servicos(request: Request):
     """Página em construção - Outros Serviços"""
     usuario_logado = obter_usuario_logado(request)
     return templates.TemplateResponse(
-        "publico/em_construcao.html",
+        "public/em_construcao.html",
         {
             "request": request,
             "usuario_logado": usuario_logado,

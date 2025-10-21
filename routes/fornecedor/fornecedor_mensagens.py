@@ -18,7 +18,7 @@ async def listar_mensagens_recebidas(
     assert usuario_logado is not None
     mensagens = mensagem_repo.obter_mensagem(usuario_logado["id"])
     return templates.TemplateResponse(
-        "fornecedor/mensagens/mensagens_recebidas.html",
+        "fornecedor/mensagens/recebidas.html",
         {"request": request, "mensagens": mensagens},
     )
 

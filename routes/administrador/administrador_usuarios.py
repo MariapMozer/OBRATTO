@@ -32,7 +32,7 @@ administrador_usuarios = APIRouter()
 @requer_autenticacao(["administrador"])
 async def get_home_adm(request: Request, usuario_logado: Optional[dict] = None):
     return templates.TemplateResponse(
-        "administrador/home_adm.html", {"request": request, "usuario_logado": usuario_logado}
+        "admin/dashboard.html", {"request": request, "usuario_logado": usuario_logado}
     )
 
 
@@ -45,7 +45,7 @@ async def exibir_cadastro_administrador(
     request: Request, usuario_logado: Optional[dict] = None
 ):
     return templates.TemplateResponse(
-        "administrador/moderar_adm/cadastrar_adm.html", {"request": request, "usuario_logado": usuario_logado}
+        "admin/usuarios/administradores/cadastrar.html", {"request": request, "usuario_logado": usuario_logado}
     )
 
 
@@ -114,7 +114,7 @@ async def cadastrar_administrador(
         if usuario_existente:
             logger.warning(f"Email já cadastrado: {admin_dto.email}")
             return templates.TemplateResponse(
-                "administrador/moderar_adm/cadastrar_adm.html",
+                "admin/usuarios/administradores/cadastrar.html",
                 {
                     "request": request,
                     "erro": "Email já cadastrado no sistema.",
@@ -156,7 +156,7 @@ async def cadastrar_administrador(
 
         if not id_usuario:
             return templates.TemplateResponse(
-                "administrador/moderar_adm/cadastrar_adm.html",
+                "admin/usuarios/administradores/cadastrar.html",
                 {
                     "request": request,
                     "erro": "Erro ao criar usuário. Tente novamente.",
@@ -172,7 +172,7 @@ async def cadastrar_administrador(
             # Se falhar, remover usuário criado (rollback manual)
             usuario_repo.deletar_usuario(id_usuario)
             return templates.TemplateResponse(
-                "administrador/moderar_adm/cadastrar_adm.html",
+                "admin/usuarios/administradores/cadastrar.html",
                 {
                     "request": request,
                     "erro": "Erro ao criar administrador. Tente novamente.",
@@ -188,7 +188,7 @@ async def cadastrar_administrador(
 
         # Redirecionar com mensagem de sucesso
         return templates.TemplateResponse(
-            "administrador/moderar_adm/cadastrar_adm.html",
+            "admin/usuarios/administradores/cadastrar.html",
             {
                 "request": request,
                 "sucesso": f"Administrador {admin_dto.nome} cadastrado com sucesso!",
@@ -217,7 +217,7 @@ async def cadastrar_administrador(
 
         # Retornar template com dados preservados e erros
         return templates.TemplateResponse(
-            "administrador/moderar_adm/cadastrar_adm.html",
+            "admin/usuarios/administradores/cadastrar.html",
             {
                 "request": request,
                 "erro": erro_msg,
@@ -234,7 +234,7 @@ async def cadastrar_administrador(
         logger.error(f"Traceback: {traceback.format_exc()}")
 
         return templates.TemplateResponse(
-            "administrador/moderar_adm/cadastrar_adm.html",
+            "admin/usuarios/administradores/cadastrar.html",
             {
                 "request": request,
                 "erro": "Erro ao processar cadastro. Tente novamente.",
@@ -247,7 +247,7 @@ async def cadastrar_administrador(
 @requer_autenticacao(["administrador"])
 async def get_lista_adm(request: Request, usuario_logado: Optional[dict] = None):
     return templates.TemplateResponse(
-        "administrador/lista.html", {"request": request}
+        "admin/usuarios/administradores/listar.html", {"request": request}
     )
 
 
@@ -273,7 +273,7 @@ async def post_editar_adm(
             usuario.senha = criar_hash_senha(senha)
         usuario_repo.atualizar_usuario(usuario)
     return templates.TemplateResponse(
-        "administrador/moderar_adm/editar_adm.html", {"request": request}
+        "admin/usuarios/administradores/editar.html", {"request": request}
     )
 
 
@@ -284,7 +284,7 @@ async def post_excluir_adm(
 ):
     administrador_repo.deletar_administrador(id)
     return templates.TemplateResponse(
-        "administrador/moderar_adm/remover_adm.html", {"request": request}
+        "admin/usuarios/administradores/remover.html", {"request": request}
     )
 
 
@@ -304,7 +304,7 @@ async def get_administrador(request: Request, id: int, usuario_logado: Optional[
 async def get_listar_prestador(request: Request, usuario_logado: Optional[dict] = None):
     prestadores = prestador_repo.obter_prestador()
     return templates.TemplateResponse(
-        "administrador/listar_prestador.html",
+        "admin/usuarios/prestadores/listar.html",
         {"request": request, "prestadores": prestadores},
     )
 
@@ -325,7 +325,7 @@ async def post_editar_prestador(
         usuario.email = email
         usuario_repo.atualizar_usuario(usuario)
     return templates.TemplateResponse(
-        "administrador/listar_prestador.html", {"request": request}
+        "admin/usuarios/prestadores/listar.html", {"request": request}
     )
 
 
@@ -336,7 +336,7 @@ async def post_excluir_prestador(
 ):
     prestador_repo.deletar_prestador_repo(id)
     return templates.TemplateResponse(
-        "administrador/listar_prestador.html", {"request": request}
+        "admin/usuarios/prestadores/listar.html", {"request": request}
     )
 
 
@@ -361,7 +361,7 @@ async def get_listar_fornecedor(
 ):
     fornecedores = fornecedor_repo.obter_fornecedor()
     return templates.TemplateResponse(
-        "administrador/listar_fornecedor.html",
+        "admin/usuarios/fornecedores/listar.html",
         {"request": request, "fornecedores": fornecedores},
     )
 
@@ -382,7 +382,7 @@ async def post_editar_fornecedor(
         usuario.email = email
         usuario_repo.atualizar_usuario(usuario)
     return templates.TemplateResponse(
-        "administrador/listar_fornecedor.html", {"request": request}
+        "admin/usuarios/fornecedores/listar.html", {"request": request}
     )
 
 
@@ -393,7 +393,7 @@ async def post_excluir_fornecedor(
 ):
     fornecedor_repo.deletar_fornecedor(id)
     return templates.TemplateResponse(
-        "administrador/listar_fornecedor.html", {"request": request}
+        "admin/usuarios/fornecedores/listar.html", {"request": request}
     )
 
 
@@ -420,7 +420,7 @@ async def get_fornecedor_por_id(
 async def get_listar_cliente(request: Request, usuario_logado: Optional[dict] = None):
     clientes = cliente_repo.obter_cliente()
     return templates.TemplateResponse(
-        "administrador/listar_cliente.html", {"request": request, "clientes": clientes}
+        "admin/usuarios/clientes/listar.html", {"request": request, "clientes": clientes}
     )
 
 
@@ -440,7 +440,7 @@ async def post_editar_cliente(
         usuario.email = email
         usuario_repo.atualizar_usuario(usuario)
     return templates.TemplateResponse(
-        "administrador/listar_cliente.html", {"request": request}
+        "admin/usuarios/clientes/listar.html", {"request": request}
     )
 
 
@@ -451,7 +451,7 @@ async def post_excluir_cliente(
 ):
     cliente_repo.deletar_cliente(id)
     return templates.TemplateResponse(
-        "administrador/listar_cliente.html", {"request": request}
+        "admin/usuarios/clientes/listar.html", {"request": request}
     )
 
 
@@ -489,7 +489,7 @@ async def listar_usuarios_aguardando_selo(
         pass
 
     return templates.TemplateResponse(
-        "administrador/verificacao_usuario.html",
+        "admin/verificacao_usuario.html",
         {"request": request, "fornecedores": fornecedores, "prestadores": prestadores},
     )
 
@@ -528,7 +528,7 @@ async def get_editar_perfil_administrador(
     assert usuario_logado is not None
     adm = administrador_repo.obter_administrador_por_id(usuario_logado["id"])
     return templates.TemplateResponse(
-        "administrador/perfil_editar.html", {"request": request, "administrador": adm}
+        "admin/perfil_editar.html", {"request": request, "administrador": adm}
     )
 
 
@@ -550,13 +550,13 @@ async def post_editar_perfil_administrador(
     # Verifica senha atual
     if adm is None:
         return templates.TemplateResponse(
-            "administrador/perfil_editar.html",
+            "admin/perfil_editar.html",
             {"request": request, "erro": "Administrador não encontrado."},
         )
 
     if not verificar_senha(senha_atual, adm.senha):
         return templates.TemplateResponse(
-            "administrador/perfil_editar.html",
+            "admin/perfil_editar.html",
             {
                 "request": request,
                 "administrador": adm,
@@ -582,7 +582,7 @@ async def post_editar_perfil_administrador(
 
     criar_sessao(request, usuario_logado)
     return templates.TemplateResponse(
-        "administrador/perfil_editar.html",
+        "admin/perfil_editar.html",
         {
             "request": request,
             "administrador": adm,
@@ -661,7 +661,7 @@ async def upload_foto_perfil_administrador(
 @requer_autenticacao(["administrador"])
 async def get_aprovar_profissionais(request: Request, usuario_logado: Optional[dict] = None):
     return templates.TemplateResponse(
-        "administrador/aprovar_profissionais.html", {"request": request}
+        "admin/moderacao/aprovar_profissionais.html", {"request": request}
     )
 
 
@@ -669,7 +669,7 @@ async def get_aprovar_profissionais(request: Request, usuario_logado: Optional[d
 @requer_autenticacao(["administrador"])
 async def get_avaliar_profissionais(request: Request, usuario_logado: Optional[dict] = None):
     return templates.TemplateResponse(
-        "administrador/avaliar_profissionais.html", {"request": request}
+        "admin/moderacao/avaliar_profissionais.html", {"request": request}
     )
 
 
@@ -678,7 +678,7 @@ async def get_avaliar_profissionais(request: Request, usuario_logado: Optional[d
 @requer_autenticacao(["administrador"])
 async def get_moderar_avaliacoes(request: Request, usuario_logado: Optional[dict] = None):
     return templates.TemplateResponse(
-        "administrador/moderar_avaliacoes.html", {"request": request}
+        "admin/moderacao/avaliacoes.html", {"request": request}
     )
 
 
@@ -686,7 +686,7 @@ async def get_moderar_avaliacoes(request: Request, usuario_logado: Optional[dict
 @requer_autenticacao(["administrador"])
 async def get_remover_avaliacoes(request: Request, usuario_logado: Optional[dict] = None):
     return templates.TemplateResponse(
-        "administrador/remover_avaliacoes.html", {"request": request}
+        "admin/moderacao/remover_avaliacoes.html", {"request": request}
     )
 
 
@@ -695,7 +695,7 @@ async def get_remover_avaliacoes(request: Request, usuario_logado: Optional[dict
 @requer_autenticacao(["administrador"])
 async def get_visualizar_relatorios(request: Request, usuario_logado: Optional[dict] = None):
     return templates.TemplateResponse(
-        "administrador/visualizar_relatorios.html", {"request": request}
+        "admin/relatorios/visualizar.html", {"request": request}
     )
 
 
@@ -703,7 +703,7 @@ async def get_visualizar_relatorios(request: Request, usuario_logado: Optional[d
 @requer_autenticacao(["administrador"])
 async def get_exportar_relatorios(request: Request, usuario_logado: Optional[dict] = None):
     return templates.TemplateResponse(
-        "administrador/exportar_relatorios.html", {"request": request}
+        "admin/relatorios/exportar.html", {"request": request}
     )
 
 
@@ -712,7 +712,7 @@ async def get_exportar_relatorios(request: Request, usuario_logado: Optional[dic
 @requer_autenticacao(["administrador"])
 async def get_ajustar_configuracoes(request: Request, usuario_logado: Optional[dict] = None):
     return templates.TemplateResponse(
-        "administrador/ajustar_configuracoes.html", {"request": request}
+        "admin/configuracoes/ajustar.html", {"request": request}
     )
 
 
@@ -720,5 +720,5 @@ async def get_ajustar_configuracoes(request: Request, usuario_logado: Optional[d
 @requer_autenticacao(["administrador"])
 async def get_configurar_seguranca(request: Request, usuario_logado: Optional[dict] = None):
     return templates.TemplateResponse(
-        "administrador/configurar_seguranca.html", {"request": request}
+        "admin/configuracoes/seguranca.html", {"request": request}
     )

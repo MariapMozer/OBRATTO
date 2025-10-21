@@ -12,7 +12,7 @@ router = APIRouter()
 @requer_autenticacao(["prestador"])
 async def agenda_prestador(request: Request):
     return templates.TemplateResponse(
-        "prestador/agenda/agenda.html", {"request": request}
+        "prestador/agenda/calendario.html", {"request": request}
     )
 
 

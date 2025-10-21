@@ -11,7 +11,7 @@ templates = criar_templates("templates")
 @requer_autenticacao(["administrador"])
 async def moderar_anuncios(request: Request, usuario_logado: Optional[dict] = None):
     return templates.TemplateResponse(
-        "administrador/moderar_anuncios.html", {"request": request, "usuario_logado": usuario_logado}
+        "admin/moderacao/anuncios.html", {"request": request, "usuario_logado": usuario_logado}
     )
 
 
@@ -19,5 +19,5 @@ async def moderar_anuncios(request: Request, usuario_logado: Optional[dict] = No
 @requer_autenticacao(["administrador"])
 async def relatorios_anuncios(request: Request, usuario_logado: Optional[dict] = None):
     return templates.TemplateResponse(
-        "administrador/relatorios_anuncios.html", {"request": request, "usuario_logado": usuario_logado}
+        "admin/relatorios/anuncios.html", {"request": request, "usuario_logado": usuario_logado}
     )

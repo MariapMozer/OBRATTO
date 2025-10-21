@@ -1,0 +1,95 @@
+{% extends "base_authenticated.html" %}
+
+{#
+    Template: Base Fornecedor
+    Descrição: Template base para páginas do fornecedor com sidebar de navegação
+    Estende: base_authenticated.html
+#}
+
+{% from 'components/sidebar.html' import sidebar %}
+{% from 'components/user_dropdown.html' import user_dropdown %}
+
+{% block titulo %}{% block fornecedor_titulo %}Fornecedor{% endblock %}{% endblock %}
+
+{% block navbar_menu %}
+{% if usuario_logado %}
+    {% set menu_fornecedor = [
+        {'url': '/fornecedor/perfil', 'icon': 'person', 'label': 'Perfil'},
+        {'url': '/fornecedor/home', 'icon': 'house', 'label': 'Home'},
+        {'url': '/fornecedor/conta', 'icon': 'gear', 'label': 'Conta'},
+        {'divider': True},
+        {'url': '/logout', 'icon': 'box-arrow-right', 'label': 'Sair', 'danger': True}
+    ] %}
+    {{ user_dropdown(usuario_logado, menu_fornecedor, default_label='Fornecedor') }}
+{% else %}
+    <a href="/login" class="text-white">
+        <h5><strong>ENTRAR</strong></h5>
+    </a>
+{% endif %}
+{% endblock %}
+
+{% block body_content %}
+<input type="checkbox" id="toggleSidebar" hidden>
+
+<!-- Sidebar -->
+{% set menu_items = [
+    {'id': 'home', 'url': '/fornecedor/home', 'icon': 'house', 'label': 'Home'},
+    {'id': 'solicitacoes', 'url': '/fornecedor/solicitacoes_recebidas', 'icon': 'inbox', 'label': 'Solicitações'},
+    {'id': 'cadastrar', 'url': '/fornecedor/produtos/inserir', 'icon': 'plus-square', 'label': 'Cadastrar Produtos'},
+    {'id': 'produtos', 'url': '/fornecedor/produtos/listar', 'icon': 'box-seam', 'label': 'Meus Produtos'},
+    {'id': 'mensagens', 'url': '/fornecedor/mensagens/recebidas', 'icon': 'chat-dots', 'label': 'Mensagens'},
+    {'id': 'promocoes', 'url': '/fornecedor/promocao/cadastrar', 'icon': 'tag', 'label': 'Cadastrar Promoção'},
+    {'id': 'avaliacoes', 'url': '/fornecedor/avaliacoes', 'icon': 'star', 'label': 'Avaliações'},
+    {'id': 'perfil', 'url': '/fornecedor/perfil', 'icon': 'person', 'label': 'Perfil'},
+    {'id': 'conta', 'url': '/fornecedor/conta', 'icon': 'gear', 'label': 'Conta'}
+] %}
+
+{{ sidebar(menu_items, active_item=self.sidebar_active(), logo_text='LOJA VIRTUAL') }}
+
+<!-- Conteúdo Principal -->
+<div class="page-content">
+    {% block header %}
+    <header>
+        {% block navbar %}
+        <nav class="navbar navbar-expand-lg navbar-dark fundo-azul mb-4">
+            <div class="container-fluid">
+                <label for="toggleSidebar" class="navbar-brand toggle-btn d-md-none">
+                    <i class="bi bi-list"></i>
+                </label>
+                <div class="navbar-nav ms-auto">
+                    {% block navbar_menu_override %}
+                    {% if usuario_logado %}
+                        {% set menu_fornecedor = [
+                            {'url': '/fornecedor/perfil', 'icon': 'person', 'label': 'Perfil'},
+                            {'url': '/fornecedor/home', 'icon': 'house', 'label': 'Home'},
+                            {'url': '/fornecedor/conta', 'icon': 'gear', 'label': 'Conta'},
+                            {'divider': True},
+                            {'url': '/logout', 'icon': 'box-arrow-right', 'label': 'Sair', 'danger': True}
+                        ] %}
+                        {{ user_dropdown(usuario_logado, menu_fornecedor, default_label='Fornecedor') }}
+                    {% endif %}
+                    {% endblock %}
+                </div>
+            </div>
+        </nav>
+        {% endblock %}
+    </header>
+    {% endblock %}
+
+    <div class="main-content">
+        {% block fornecedor_conteudo %}{% endblock %}
+    </div>
+</div>
+
+<!-- Footer -->
+{% block footer %}
+{% include 'components/footer.html' %}
+{% endblock %}
+{% endblock %}
+
+{# Bloco para definir o item ativo da sidebar #}
+{% block sidebar_active %}home{% endblock %}
+
+{% block scripts %}
+{% block fornecedor_scripts %}{% endblock %}
+{% endblock %}

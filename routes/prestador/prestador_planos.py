@@ -24,7 +24,7 @@ async def exibir_meu_plano(request: Request):
 @requer_autenticacao(["prestador"])
 async def planos_prestador(request: Request):
     return templates.TemplateResponse(
-        "prestador/planos/planos.html", {"request": request}
+        "prestador/planos/listar.html", {"request": request}
     )
 
 
