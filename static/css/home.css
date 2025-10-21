@@ -10,8 +10,14 @@ body {
     color: #333333;
 }
 
+/* Navbar branco para páginas internas */
 .fundo-azul {
-    background: white;
+    background: white !important;
+}
+
+/* Navbar azul para home page */
+.navbar.fundo-azul-home {
+    background: #171370 !important;
 }
 
 .navbar-brand img {
@@ -35,15 +41,29 @@ body {
     box-shadow: 0 0 0 0.2rem rgba(232, 137, 75, 0.25);
 }
 
-.navbar .text-white{
+/* Texto do navbar para páginas internas (branco) */
+.navbar.fundo-azul .text-white{
     color: #171370 !important;
     font-weight: 600;
     text-decoration: none;
     transition: transform 0.3s ease;
 }
 
-.navbar .text-white:hover {
-    color: black !important;
+.navbar.fundo-azul .text-white:hover {
+    color: #E8894B !important;
+    transform: scale(1.05);
+}
+
+/* Texto do navbar para home (azul escuro) */
+.navbar.fundo-azul-home .text-white{
+    color: white !important;
+    font-weight: 600;
+    text-decoration: none;
+    transition: transform 0.3s ease;
+}
+
+.navbar.fundo-azul-home .text-white:hover {
+    color: #E8894B !important;
     transform: scale(1.05);
 }
 

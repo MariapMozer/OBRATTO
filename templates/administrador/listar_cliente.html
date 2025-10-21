@@ -14,9 +14,89 @@
                         <p class="lead text-muted mb-4">
                             Esta funcionalidade ainda está sendo desenvolvida pelos alunos.
                         </p>
-                        <div class="alert alert-info" role="alert">
-                            <i class="bi bi-info-circle me-2"></i>
-                            <strong>TODO ALUNO:</strong> Implementar a listagem de clientes com paginação, busca e filtros.
+                        <div class="alert alert-info text-start" role="alert">
+                            <h5 class="alert-heading"><i class="bi bi-info-circle me-2"></i><strong>TODO ALUNO:</strong> Implementar Sistema de Listagem de Clientes</h5>
+                            <hr>
+                            <p class="mb-2"><strong>Descrição:</strong></p>
+                            <p>Esta página deve exibir uma lista completa de todos os clientes cadastrados na plataforma, permitindo ao administrador visualizar, filtrar e gerenciar os usuários do tipo cliente.</p>
+
+                            <p class="mb-2 mt-3"><strong>Funcionalidades a implementar:</strong></p>
+                            <ul class="text-start">
+                                <li><strong>Listagem Completa:</strong>
+                                    <ul>
+                                        <li>Tabela responsiva com dados dos clientes</li>
+                                        <li>Colunas: ID, Nome, Email, Telefone, Cidade/Estado, Data Cadastro, Status</li>
+                                        <li>Indicador visual de status (ativo/inativo/suspenso)</li>
+                                        <li>Avatar ou foto do perfil quando disponível</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Paginação:</strong>
+                                    <ul>
+                                        <li>Exibir 10, 25, 50 ou 100 registros por página</li>
+                                        <li>Navegação entre páginas (primeira, anterior, próxima, última)</li>
+                                        <li>Indicador de total de registros e página atual</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Busca e Filtros:</strong>
+                                    <ul>
+                                        <li>Campo de busca por nome, email ou telefone</li>
+                                        <li>Filtro por status (ativo, inativo, suspenso)</li>
+                                        <li>Filtro por período de cadastro (data início e fim)</li>
+                                        <li>Filtro por localização (estado/cidade)</li>
+                                        <li>Botão "Limpar filtros"</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Ações por Cliente:</strong>
+                                    <ul>
+                                        <li>Visualizar detalhes completos do perfil</li>
+                                        <li>Editar informações básicas</li>
+                                        <li>Ativar/Desativar conta</li>
+                                        <li>Suspender temporariamente (com motivo)</li>
+                                        <li>Ver histórico de contratações</li>
+                                        <li>Ver avaliações feitas/recebidas</li>
+                                        <li>Excluir conta (com confirmação dupla)</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Ações em Massa:</strong>
+                                    <ul>
+                                        <li>Checkbox para selecionar múltiplos clientes</li>
+                                        <li>Exportar selecionados (CSV, Excel)</li>
+                                        <li>Enviar notificação em massa</li>
+                                        <li>Ativar/Desativar em lote</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Ordenação:</strong>
+                                    <ul>
+                                        <li>Ordenar por qualquer coluna (crescente/decrescente)</li>
+                                        <li>Indicador visual da coluna ordenada</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Estatísticas Rápidas:</strong>
+                                    <ul>
+                                        <li>Total de clientes cadastrados</li>
+                                        <li>Clientes ativos vs inativos</li>
+                                        <li>Novos cadastros no mês</li>
+                                        <li>Taxa de retenção</li>
+                                    </ul>
+                                </li>
+                            </ul>
+
+                            <p class="mb-2 mt-3"><strong>Validações e Segurança:</strong></p>
+                            <ul class="text-start">
+                                <li>Confirmar ações críticas (suspender, excluir) com modal</li>
+                                <li>Registrar log de todas as ações administrativas</li>
+                                <li>Não permitir excluir cliente com contratações ativas</li>
+                                <li>Validar permissões do administrador</li>
+                            </ul>
+
+                            <p class="mb-2 mt-3"><strong>Arquivos relacionados:</strong></p>
+                            <ul class="text-start">
+                                <li><code>routes/administrador/administrador_usuarios.py</code> - Implementar rota GET e ações</li>
+                                <li><code>data/cliente/cliente_repo.py</code> - Métodos de listagem com filtros</li>
+                                <li><code>dtos/admin/filtro_usuario_dto.py</code> - DTO para filtros</li>
+                            </ul>
+
+                            <p class="mb-0 mt-3"><strong>Dica:</strong> Use DataTables ou biblioteca similar para facilitar paginação, busca e ordenação no front-end. Implemente filtros no back-end para melhor performance.</p>
                         </div>
                         <a href="/administrador/home" class="btn btn-primary btn-lg mt-3">
                             <i class="bi bi-arrow-left me-2"></i>Voltar para Home

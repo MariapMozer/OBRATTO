@@ -14,9 +14,132 @@
                         <p class="lead text-muted mb-4">
                             Esta funcionalidade ainda está sendo desenvolvida pelos alunos.
                         </p>
-                        <div class="alert alert-info" role="alert">
-                            <i class="bi bi-info-circle me-2"></i>
-                            <strong>TODO ALUNO:</strong> Implementar a listagem de fornecedores com aprovação de selo de confiança.
+                        <div class="alert alert-info text-start" role="alert">
+                            <h5 class="alert-heading"><i class="bi bi-info-circle me-2"></i><strong>TODO ALUNO:</strong> Implementar Sistema de Gestão de Fornecedores</h5>
+                            <hr>
+                            <p class="mb-2"><strong>Descrição:</strong></p>
+                            <p>Esta página gerencia fornecedores de materiais de construção e equipamentos, incluindo aprovação de cadastros, concessão de selo de confiança e gestão de catálogo de produtos.</p>
+
+                            <p class="mb-2 mt-3"><strong>Funcionalidades a implementar:</strong></p>
+                            <ul class="text-start">
+                                <li><strong>Listagem Completa:</strong>
+                                    <ul>
+                                        <li>Tabela responsiva com dados dos fornecedores</li>
+                                        <li>Colunas: ID, Razão Social, Nome Fantasia, CNPJ, Email, Telefone, Cidade/Estado, Qtd Produtos, Avaliação, Selo, Status</li>
+                                        <li>Badge para selo de fornecedor verificado</li>
+                                        <li>Indicador de status (ativo/pendente/suspenso/reprovado)</li>
+                                        <li>Contador de produtos ativos no catálogo</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Sistema de Selo de Fornecedor Verificado:</strong>
+                                    <ul>
+                                        <li>Botão "Conceder Selo" para fornecedores qualificados</li>
+                                        <li>Critérios de verificação:
+                                            <ul>
+                                                <li>CNPJ válido e ativo na Receita Federal</li>
+                                                <li>Documentação fiscal completa</li>
+                                                <li>Mínimo de 20 produtos cadastrados</li>
+                                                <li>Pelo menos 15 avaliações com média ≥ 4.0</li>
+                                                <li>Tempo mínimo de 6 meses na plataforma</li>
+                                                <li>Certificações de qualidade (ISO, INMETRO, etc.)</li>
+                                                <li>Apólice de seguro empresarial</li>
+                                            </ul>
+                                        </li>
+                                        <li>Selo especial "Fornecedor Premium" para destaque</li>
+                                        <li>Histórico de concessão/revogação</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Aprovação de Cadastros:</strong>
+                                    <ul>
+                                        <li>Filtro "Pendentes de Aprovação"</li>
+                                        <li>Validar CNPJ automaticamente via API Receita Federal</li>
+                                        <li>Verificar documentos fiscais enviados</li>
+                                        <li>Aprovar/Reprovar com feedback detalhado</li>
+                                        <li>Solicitar documentação complementar</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Busca e Filtros:</strong>
+                                    <ul>
+                                        <li>Busca por razão social, nome fantasia, CNPJ ou email</li>
+                                        <li>Filtro por tipo de produtos (categorias)</li>
+                                        <li>Filtro por selo (verificado / não verificado)</li>
+                                        <li>Filtro por status (ativo/pendente/suspenso/reprovado)</li>
+                                        <li>Filtro por faixa de avaliação</li>
+                                        <li>Filtro por quantidade de produtos (range)</li>
+                                        <li>Filtro por localização (estado/cidade)</li>
+                                        <li>Filtro por data de cadastro</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Ações por Fornecedor:</strong>
+                                    <ul>
+                                        <li>Visualizar perfil público completo</li>
+                                        <li>Ver catálogo de produtos</li>
+                                        <li>Ver avaliações recebidas</li>
+                                        <li>Ver histórico de vendas/transações</li>
+                                        <li>Editar dados cadastrais</li>
+                                        <li>Aprovar/Reprovar cadastro</li>
+                                        <li>Conceder/Revogar selo verificado</li>
+                                        <li>Promover a "Fornecedor Premium"</li>
+                                        <li>Moderar produtos (aprovar/rejeitar)</li>
+                                        <li>Ativar/Desativar/Suspender conta</li>
+                                        <li>Ver denúncias recebidas</li>
+                                        <li>Excluir conta (verificar produtos ativos)</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Gestão de Catálogo:</strong>
+                                    <ul>
+                                        <li>Ver produtos aguardando aprovação</li>
+                                        <li>Aprovar/Reprovar produtos em lote</li>
+                                        <li>Remover produtos irregulares</li>
+                                        <li>Verificar preços abusivos ou suspeitos</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Paginação e Ordenação:</strong>
+                                    <ul>
+                                        <li>10, 25, 50 ou 100 registros por página</li>
+                                        <li>Ordenar por: nome, avaliação, qtd produtos, data cadastro</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Estatísticas:</strong>
+                                    <ul>
+                                        <li>Total de fornecedores cadastrados</li>
+                                        <li>Fornecedores com selo vs sem selo</li>
+                                        <li>Cadastros pendentes de aprovação</li>
+                                        <li>Total de produtos no catálogo</li>
+                                        <li>Fornecedores mais bem avaliados (Top 5)</li>
+                                        <li>Categorias de produtos mais populares</li>
+                                    </ul>
+                                </li>
+                            </ul>
+
+                            <p class="mb-2 mt-3"><strong>Validações e Regras de Negócio:</strong></p>
+                            <ul class="text-start">
+                                <li>Validar CNPJ obrigatoriamente (não aceitar CPF)</li>
+                                <li>Verificar situação cadastral do CNPJ online</li>
+                                <li>Apenas administradores master concedem selo Premium</li>
+                                <li>Notificar fornecedor por email em todas as ações</li>
+                                <li>Bloquear exclusão se houver pedidos em andamento</li>
+                                <li>Log completo de ações administrativas</li>
+                                <li>Alertar se fornecedor cadastrar produtos duplicados</li>
+                            </ul>
+
+                            <p class="mb-2 mt-3"><strong>Integrações Recomendadas:</strong></p>
+                            <ul class="text-start">
+                                <li>API Receita Federal - Validação de CNPJ</li>
+                                <li>Consulta de situação cadastral automática</li>
+                                <li>Sistema de e-mail para notificações</li>
+                            </ul>
+
+                            <p class="mb-2 mt-3"><strong>Arquivos relacionados:</strong></p>
+                            <ul class="text-start">
+                                <li><code>routes/administrador/administrador_usuarios.py</code> - Rotas de gestão</li>
+                                <li><code>data/fornecedor/fornecedor_repo.py</code> - Métodos de consulta</li>
+                                <li><code>data/fornecedor/fornecedor_model.py</code> - Campo 'selo_verificado'</li>
+                                <li><code>util/cnpj_validator.py</code> - Validação de CNPJ</li>
+                                <li><code>util/receita_federal_api.py</code> - Integração API RF</li>
+                            </ul>
+
+                            <p class="mb-0 mt-3"><strong>Dica:</strong> Implemente verificação automática de CNPJ usando a API da Receita Federal para agilizar aprovações. Considere criar diferentes níveis de selo (Bronze, Prata, Ouro).</p>
                         </div>
                         <a href="/administrador/home" class="btn btn-primary btn-lg mt-3">
                             <i class="bi bi-arrow-left me-2"></i>Voltar para Home

@@ -14,9 +14,108 @@
                         <p class="lead text-muted mb-4">
                             Esta funcionalidade ainda está sendo desenvolvida pelos alunos.
                         </p>
-                        <div class="alert alert-info" role="alert">
-                            <i class="bi bi-info-circle me-2"></i>
-                            <strong>TODO ALUNO:</strong> Implementar a listagem de prestadores com aprovação de selo de confiança.
+                        <div class="alert alert-info text-start" role="alert">
+                            <h5 class="alert-heading"><i class="bi bi-info-circle me-2"></i><strong>TODO ALUNO:</strong> Implementar Sistema de Gestão de Prestadores</h5>
+                            <hr>
+                            <p class="mb-2"><strong>Descrição:</strong></p>
+                            <p>Esta página gerencia prestadores de serviços (pedreiros, eletricistas, encanadores, etc.), incluindo aprovação de cadastros, concessão de selo de confiança e moderação de perfis.</p>
+
+                            <p class="mb-2 mt-3"><strong>Funcionalidades a implementar:</strong></p>
+                            <ul class="text-start">
+                                <li><strong>Listagem Completa:</strong>
+                                    <ul>
+                                        <li>Tabela responsiva com dados dos prestadores</li>
+                                        <li>Colunas: ID, Nome, Área de Atuação, Email, Telefone, Cidade/Estado, Avaliação Média, Selo, Status, Data Cadastro</li>
+                                        <li>Badge visual para selo de confiança (verificado/não verificado)</li>
+                                        <li>Indicador de status (ativo/pendente/suspenso/reprovado)</li>
+                                        <li>Estrelas para avaliação média (0-5)</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Sistema de Selo de Confiança:</strong>
+                                    <ul>
+                                        <li>Botão "Conceder Selo" para prestadores qualificados</li>
+                                        <li>Modal com critérios de verificação:
+                                            <ul>
+                                                <li>Documentação completa (CPF/CNPJ, RG, comprovante residência)</li>
+                                                <li>Mínimo de 10 avaliações com média ≥ 4.0</li>
+                                                <li>Nenhuma denúncia procedente</li>
+                                                <li>Pelo menos 3 meses na plataforma</li>
+                                                <li>Certificados profissionais (se aplicável)</li>
+                                            </ul>
+                                        </li>
+                                        <li>Possibilidade de revogar selo (com justificativa)</li>
+                                        <li>Histórico de concessão/revogação do selo</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Aprovação de Cadastros:</strong>
+                                    <ul>
+                                        <li>Filtro específico para "Pendentes de Aprovação"</li>
+                                        <li>Visualizar documentos enviados</li>
+                                        <li>Aprovar ou reprovar cadastro</li>
+                                        <li>Enviar mensagem ao prestador (aprovação/rejeição)</li>
+                                        <li>Solicitar documentação adicional</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Busca e Filtros:</strong>
+                                    <ul>
+                                        <li>Busca por nome, email, telefone ou área de atuação</li>
+                                        <li>Filtro por área de atuação (dropdown multi-seleção)</li>
+                                        <li>Filtro por selo (com selo / sem selo)</li>
+                                        <li>Filtro por status (ativo/pendente/suspenso/reprovado)</li>
+                                        <li>Filtro por faixa de avaliação (1-5 estrelas)</li>
+                                        <li>Filtro por localização (estado/cidade)</li>
+                                        <li>Filtro por data de cadastro</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Ações por Prestador:</strong>
+                                    <ul>
+                                        <li>Visualizar perfil completo público</li>
+                                        <li>Ver portfólio de trabalhos</li>
+                                        <li>Ver avaliações recebidas</li>
+                                        <li>Ver histórico de contratações</li>
+                                        <li>Editar dados cadastrais</li>
+                                        <li>Aprovar/Reprovar cadastro</li>
+                                        <li>Conceder/Revogar selo de confiança</li>
+                                        <li>Ativar/Desativar/Suspender conta</li>
+                                        <li>Ver denúncias recebidas</li>
+                                        <li>Excluir conta (com confirmação dupla)</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Paginação e Ordenação:</strong>
+                                    <ul>
+                                        <li>10, 25, 50 ou 100 registros por página</li>
+                                        <li>Ordenar por: nome, avaliação, data cadastro, área, cidade</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Estatísticas:</strong>
+                                    <ul>
+                                        <li>Total de prestadores cadastrados</li>
+                                        <li>Prestadores com selo vs sem selo</li>
+                                        <li>Cadastros pendentes de aprovação</li>
+                                        <li>Avaliação média geral da plataforma</li>
+                                        <li>Top 3 áreas de atuação mais populares</li>
+                                    </ul>
+                                </li>
+                            </ul>
+
+                            <p class="mb-2 mt-3"><strong>Validações e Regras de Negócio:</strong></p>
+                            <ul class="text-start">
+                                <li>Apenas administradores master podem conceder/revogar selo</li>
+                                <li>Registrar motivo ao reprovar cadastro ou revogar selo</li>
+                                <li>Notificar prestador por email em todas as ações</li>
+                                <li>Não permitir excluir prestador com contratações ativas</li>
+                                <li>Log completo de todas as ações administrativas</li>
+                            </ul>
+
+                            <p class="mb-2 mt-3"><strong>Arquivos relacionados:</strong></p>
+                            <ul class="text-start">
+                                <li><code>routes/administrador/administrador_usuarios.py</code> - Rotas de listagem e ações</li>
+                                <li><code>data/prestador/prestador_repo.py</code> - Métodos de consulta e atualização</li>
+                                <li><code>data/prestador/prestador_model.py</code> - Campo 'selo_confianca'</li>
+                                <li><code>util/email_util.py</code> - Notificações automáticas</li>
+                            </ul>
+
+                            <p class="mb-0 mt-3"><strong>Dica:</strong> Implemente um sistema de pontuação automática para sugerir prestadores elegíveis ao selo. Considere criar um workflow de aprovação em etapas.</p>
                         </div>
                         <a href="/administrador/home" class="btn btn-primary btn-lg mt-3">
                             <i class="bi bi-arrow-left me-2"></i>Voltar para Home

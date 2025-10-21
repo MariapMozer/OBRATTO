@@ -1,5 +1,10 @@
 {% extends "publico/base.html" %}
 {% block css %} <link rel="stylesheet" href="/static/css/home.css"> {% endblock %}
+{% block navbar_class %}fundo-azul-home{% endblock %}
+{% block navbar_logo %}
+<img src="/static/img/logo_branca_casinha.png" height="40">
+<img src="/static/img/logo_branca_nome.png" height="30" alt="">
+{% endblock %}
 {% block titulo %}Principal{% endblock %}
 {% block conteudo %}
     <main class="container-fluid p-0">     
@@ -194,7 +199,7 @@
                                 <li>Limite de 10 publicações</li>
                             </ul>
                         </div>
-                        <a href="/entrar" class="btn-plano">Começar Grátis</a>
+                        <a href="/login" class="btn-plano">Começar Grátis</a>
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6">
@@ -212,7 +217,7 @@
                                 <li>Limite de 20 publicações</li>
                             </ul>
                         </div>
-                        <a href="/entrar" class="btn-plano">Assinar Pro</a>
+                        <a href="/login" class="btn-plano">Assinar Pro</a>
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6">
@@ -232,7 +237,7 @@
                                 <li>Selo de verificação</li>
                             </ul>
                         </div>
-                        <a href="/entrar" class="btn-plano">Assinar Pro Max</a>
+                        <a href="/login" class="btn-plano">Assinar Pro Max</a>
                     </div>
                 </div>
             </div>

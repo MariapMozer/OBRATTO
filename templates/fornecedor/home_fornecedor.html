@@ -1,18 +1,29 @@
 {% extends "publico/base2.html" %}
 {% block css %} <link rel="stylesheet" href="/static/css/home_fornecedor.css"> {% endblock %}
 {% block titulo %}Fornecedor{% endblock %}
-{% block menu %} 
+{% block menu %}
 <div class="navbar-nav ms-auto">
     <div class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle text-dark-blue d-flex align-items-center" href="/publico/perfil/editar/{id}" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="bi bi-person-circle fs-5 me-2"></i>
+        <a class="nav-link dropdown-toggle text-dark-blue d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            {% if usuario_logado and usuario_logado.foto %}
+            <img src="/static/img/{{ usuario_logado.foto }}" alt="{{ usuario_logado.nome }}" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover;">
+            {% else %}
+            <img src="/static/img/user.jpg" alt="Fornecedor" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover;">
+            {% endif %}
+            {% if usuario_logado and usuario_logado.nome %}
+            {{ usuario_logado.nome }}
+            {% else %}
             Fornecedor
+            {% endif %}
         </a>
         <ul class="dropdown-menu dropdown-menu-end">
-            <li><a class="dropdown-item" href="/publico/perfil/editar/{id}"><i class="bi bi-person me-2"></i>Perfil</a></li>
-            <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Configurações</a></li>
+            <li><a class="dropdown-item" href="/fornecedor/perfil"><i class="bi bi-person me-2"></i>Perfil</a></li>
+            <li><a class="dropdown-item" href="/fornecedor/home"><i class="bi bi-house me-2"></i>Home</a></li>
+            <li><a class="dropdown-item" href="/fornecedor/produtos/listar"><i class="bi bi-box-seam me-2"></i>Produtos</a></li>
+            <li><a class="dropdown-item" href="/fornecedor/promocao/listar"><i class="bi bi-tag me-2"></i>Promoções</a></li>
+            <li><a class="dropdown-item" href="/fornecedor/planos"><i class="bi bi-card-list me-2"></i>Planos</a></li>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="/"><i class="bi bi-box-arrow-right me-2"></i>Sair</a></li>
+            <li><a class="dropdown-item text-danger" href="/logout"><i class="bi bi-box-arrow-right me-2"></i>Sair</a></li>
         </ul>
     </div>
 </div>

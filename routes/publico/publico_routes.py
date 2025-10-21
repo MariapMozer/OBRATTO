@@ -46,8 +46,9 @@ async def get_root(request: Request):
 
 @router.get("/escolha_cadastro")
 async def mostrar_escolha_cadastro(request: Request):
+    usuario_logado = obter_usuario_logado(request)
     return templates.TemplateResponse(
-        "publico/login_cadastro/escolha_cadastro.html", {"request": request}
+        "publico/login_cadastro/escolha_cadastro.html", {"request": request, "usuario_logado": usuario_logado}
     )
 
 
@@ -57,8 +58,9 @@ async def mostrar_escolha_cadastro(request: Request):
 # Cadastro do prestador
 @router.get("/cadastro/prestador")
 async def exibir_cadastro_prestador(request: Request):
+    usuario_logado = obter_usuario_logado(request)
     return templates.TemplateResponse(
-        "publico/prestador/prestador_cadastro.html", {"request": request, "dados": None}
+        "publico/prestador/prestador_cadastro.html", {"request": request, "dados": None, "usuario_logado": usuario_logado}
     )
 
 
@@ -221,8 +223,9 @@ async def processar_cadastro_prestador(
 # Rota para cadastro de cliente
 @router.get("/cadastro/cliente")
 async def get_page(request: Request):
+    usuario_logado = obter_usuario_logado(request)
     return templates.TemplateResponse(
-        "publico/login_cadastro/cadastro.html", {"request": request, "dados": None}
+        "publico/login_cadastro/cadastro.html", {"request": request, "dados": None, "usuario_logado": usuario_logado}
     )
 
 
@@ -391,8 +394,9 @@ async def post_cadastro(
 # Rota para cadastro de fornecedor
 @router.get("/cadastro/fornecedor")
 async def exibir_cadastro_fornecedor(request: Request):
+    usuario_logado = obter_usuario_logado(request)
     return templates.TemplateResponse(
-        "publico/fornecedor2/cadastro_fornecedor.html", {"request": request}
+        "publico/fornecedor2/cadastro_fornecedor.html", {"request": request, "usuario_logado": usuario_logado}
     )
 
 
@@ -633,7 +637,8 @@ async def processar_cadastro_fornecedor(
 
 @router.get("/login")
 async def mostrar_login(request: Request, mensagem: Optional[str] = None):
-    context: dict = {"request": request}
+    usuario_logado = obter_usuario_logado(request)
+    context: dict = {"request": request, "usuario_logado": usuario_logado}
     if mensagem:
         context["sucesso"] = mensagem
     return templates.TemplateResponse("publico/login_cadastro/login.html", context)
@@ -740,8 +745,9 @@ async def logout(request: Request):
 
 @router.get("/recuperar-senha")
 async def recuperar_senha_get(request: Request):
+    usuario_logado = obter_usuario_logado(request)
     return templates.TemplateResponse(
-        "publico/login_cadastro/recuperar_senha.html", {"request": request}
+        "publico/login_cadastro/recuperar_senha.html", {"request": request, "usuario_logado": usuario_logado}
     )
 
 
@@ -796,24 +802,27 @@ async def resetar_senha_post(
 # Rota para perfil público do prestador
 @router.get("/prestador/perfil_publico")
 async def exibir_perfil_publico_prestador(request: Request):
+    usuario_logado = obter_usuario_logado(request)
     return templates.TemplateResponse(
-        "publico/prestador/perfil_publico.html", {"request": request}
+        "publico/prestador/perfil_publico.html", {"request": request, "usuario_logado": usuario_logado}
     )
 
 
 # Rota para perfil público do cliente
 @router.get("/cliente/perfil_publico")
 async def exibir_perfil_publico_cliente(request: Request):
+    usuario_logado = obter_usuario_logado(request)
     return templates.TemplateResponse(
-        "publico/cliente/perfil_publico.html", {"request": request}
+        "publico/cliente/perfil_publico.html", {"request": request, "usuario_logado": usuario_logado}
     )
 
 
 # Rota para perfil público do fornecedor
 @router.get("/fornecedor/perfil_publico")
 async def exibir_perfil_publico_fornecedor(request: Request):
+    usuario_logado = obter_usuario_logado(request)
     return templates.TemplateResponse(
-        "publico/perfil_publico_fornecedor.html", {"request": request}
+        "publico/perfil_publico_fornecedor.html", {"request": request, "usuario_logado": usuario_logado}
     )
 
 
@@ -971,6 +980,107 @@ async def processar_envio_mensagem(
 
     except Exception as e:
         return RedirectResponse("/mensagens", status_code=status.HTTP_303_SEE_OTHER)
+
+
+# -----------------------------------------------------
+# ------------- PÁGINAS EM CONSTRUÇÃO ----------------
+# -----------------------------------------------------
+
+
+@router.get("/servicos/aluguel-maquinario")
+async def exibir_aluguel_maquinario(request: Request):
+    """Página em construção - Aluguel de Maquinário"""
+    usuario_logado = obter_usuario_logado(request)
+    return templates.TemplateResponse(
+        "publico/em_construcao.html",
+        {
+            "request": request,
+            "usuario_logado": usuario_logado,
+            "titulo": "Aluguel de Maquinário",
+            "descricao": "Plataforma de aluguel de equipamentos e máquinas para construção civil: betoneiras, andaimes, compactadores, etc.",
+            "icone": "bi-truck",
+        },
+    )
+
+
+@router.get("/servicos/reformas")
+async def exibir_reformas(request: Request):
+    """Página em construção - Reformas"""
+    usuario_logado = obter_usuario_logado(request)
+    return templates.TemplateResponse(
+        "publico/em_construcao.html",
+        {
+            "request": request,
+            "usuario_logado": usuario_logado,
+            "titulo": "Reformas",
+            "descricao": "Sistema de orçamentos e contratação de serviços de reformas residenciais e comerciais completas.",
+            "icone": "bi-hammer",
+        },
+    )
+
+
+@router.get("/servicos/para-casa")
+async def exibir_para_casa(request: Request):
+    """Página em construção - Para a Casa"""
+    usuario_logado = obter_usuario_logado(request)
+    return templates.TemplateResponse(
+        "publico/em_construcao.html",
+        {
+            "request": request,
+            "usuario_logado": usuario_logado,
+            "titulo": "Para a Casa",
+            "descricao": "Serviços domésticos e manutenção residencial: chaveiro, jardinagem, limpeza, pequenos reparos.",
+            "icone": "bi-house-heart",
+        },
+    )
+
+
+@router.get("/servicos/construcao")
+async def exibir_construcao(request: Request):
+    """Página em construção - Construção"""
+    usuario_logado = obter_usuario_logado(request)
+    return templates.TemplateResponse(
+        "publico/em_construcao.html",
+        {
+            "request": request,
+            "usuario_logado": usuario_logado,
+            "titulo": "Construção",
+            "descricao": "Gestão de projetos de construção civil: orçamentos, cronogramas, acompanhamento de obras.",
+            "icone": "bi-building",
+        },
+    )
+
+
+@router.get("/servicos/fornecedores")
+async def exibir_fornecedores(request: Request):
+    """Página em construção - Fornecedores"""
+    usuario_logado = obter_usuario_logado(request)
+    return templates.TemplateResponse(
+        "publico/em_construcao.html",
+        {
+            "request": request,
+            "usuario_logado": usuario_logado,
+            "titulo": "Fornecedores",
+            "descricao": "Catálogo de materiais de construção e fornecedores parceiros com cotações online.",
+            "icone": "bi-shop",
+        },
+    )
+
+
+@router.get("/servicos/outros-servicos")
+async def exibir_outros_servicos(request: Request):
+    """Página em construção - Outros Serviços"""
+    usuario_logado = obter_usuario_logado(request)
+    return templates.TemplateResponse(
+        "publico/em_construcao.html",
+        {
+            "request": request,
+            "usuario_logado": usuario_logado,
+            "titulo": "Outros Serviços",
+            "descricao": "Serviços especializados diversos: paisagismo, automação residencial, energia solar, etc.",
+            "icone": "bi-grid-3x3-gap",
+        },
+    )
 
 
 # -----------------------------------------------------
