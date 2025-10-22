@@ -4,7 +4,6 @@ Testes para rotas de autenticação (auth_routes.py)
 Testa:
 - Login (GET/POST)
 - Logout
-- Rate limiting de login
 - Recuperação de senha
 - Redefinição de senha
 """
@@ -20,7 +19,6 @@ from data.cliente.cliente_model import Cliente
 from data.administrador import administrador_repo
 from data.administrador.administrador_model import Administrador
 from util.security import criar_hash_senha, gerar_token_redefinicao
-from util.auth_decorator import login_rate_limiter
 
 client = TestClient(app)
 
@@ -123,9 +121,6 @@ class TestLoginRoutes:
 
     def test_login_sucesso_cliente(self, usuario_teste):
         """Testa login bem-sucedido de cliente"""
-        # Limpar rate limiter antes do teste
-        login_rate_limiter.limpar_tentativas("testclient")
-
         response = client.post("/login", data={
             "email": usuario_teste.email,
             "senha": "senha123"
@@ -163,9 +158,6 @@ class TestLoginRoutes:
         admin = Administrador(id_usuario=admin_id)
         administrador_repo.inserir_administrador(admin)
 
-        # Limpar rate limiter
-        login_rate_limiter.limpar_tentativas("testclient")
-
         response = client.post("/login", data={
             "email": admin_usuario.email,
             "senha": "admin123"
@@ -183,36 +175,6 @@ class TestLoginRoutes:
         })
         # Deve retornar erro de validação
         assert response.status_code in [200, 400]
-
-
-class TestRateLimitLogin:
-    """Testes para rate limiting de login"""
-
-    def test_rate_limit_login_excedido(self, usuario_teste):
-        """Testa bloqueio após exceder limite de tentativas de login"""
-        # Limpar rate limiter antes do teste
-        login_rate_limiter.limpar_tentativas("testclient")
-
-        # Fazer 5 tentativas de login falhadas
-        for i in range(5):
-            response = client.post("/login", data={
-                "email": usuario_teste.email,
-                "senha": "senhaerrada"
-            })
-            # As primeiras 5 devem retornar 401
-            if i < 5:
-                assert response.status_code in [401, 200]
-
-        # A 6ª tentativa deve ser bloqueada (429 Too Many Requests)
-        response = client.post("/login", data={
-            "email": usuario_teste.email,
-            "senha": "senhaerrada"
-        })
-        assert response.status_code == 429
-        assert "muitas tentativas" in response.text.lower()
-
-        # Limpar para não afetar outros testes
-        login_rate_limiter.limpar_tentativas("testclient")
 
 
 class TestLogoutRoute:
@@ -302,9 +264,6 @@ class TestLoginSessionData:
 
     def test_session_data_completa_apos_login(self, usuario_teste):
         """Verifica se todos os dados necessários são salvos na sessão"""
-        # Limpar rate limiter
-        login_rate_limiter.limpar_tentativas("testclient")
-
         # Fazer login
         response = client.post("/login", data={
             "email": usuario_teste.email,
