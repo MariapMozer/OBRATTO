@@ -51,11 +51,10 @@ function validarSecao(secao) {
     return valido;
 }
 
-// máscara para CPF
+// máscara para CPF/CNPJ
 
-document.getElementById('cpf').addEventListener('input', function (e) {
-    console.log('e.target.value',);
-    let value = e.target.value
+document.getElementById('documento').addEventListener('input', function (e) {
+    let value = e.target.value;
     if (!value) return;
     if (value.length > 14) value = value.slice(0, 14);
     value = value.replace(/\D/g, '');
@@ -63,25 +62,6 @@ document.getElementById('cpf').addEventListener('input', function (e) {
     value = value.replace(/(\d{3})(\d)/, '$1.$2');
     value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
     e.target.value = value;
-
-    if (value.length >= 14) {
-        console.log('e.target.value', e.target.value);
-
-        fetch(`/api/verifica_cadastro_cliente/${e.target.value.replace('.', '').replace('.', '').replace('-', '')}`, {
-            method: 'GET'
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.erro) {
-                    alert('CPF já existe!');
-                    return;
-                }
-            })
-            .catch(err => {
-                console.error('Erro ao consultar CPF:', JSON.stringify(err));
-                alert('Erro ao consultar CPF.');
-            });
-    }
 })
 
 // Máscara para telefone
@@ -100,7 +80,7 @@ document.getElementById('telefone').addEventListener('input', function (e) {
 // Validação de confirmação de senha
 
 
-document.getElementById('confirmarSenha').addEventListener('input', function (e) {
+document.getElementById('confirmar_senha').addEventListener('input', function (e) {
     const senha = document.getElementById('senha').value;
     const confirmarSenha = e.target.value;
 
@@ -155,16 +135,7 @@ document.getElementById('cep').addEventListener('blur', function () {
 
 
 // Submissão do formulário
-
-<<<<<<< HEAD
-document.getElementById('cadastroForm').addEventListener('submit', function(e) {
-=======
-
 document.getElementById('cadastroForm').addEventListener('submit', function (e) {
-    e.preventDefault();
-
-
->>>>>>> f79f98939b6e8ac17354a36ea34b4fcf04d626ed
     if (!validarSecao(3)) {
         e.preventDefault();
         alert('Preencha todos os campos obrigatórios!');

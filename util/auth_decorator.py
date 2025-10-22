@@ -1,21 +1,20 @@
 """
 Decorator para proteger rotas com autenticação e autorização.
 
-Melhorias v2.0:
-- Rate limiting por IP integrado
-- Logging detalhado de acessos
-- Validação robusta de perfis
-- Flash messages informativos
+Funções principais:
+- Verificação de autenticação (usuário logado)
+- Verificação de autorização (perfis permitidos)
+- Gerenciamento de sessão
 """
 
 from functools import wraps
 from typing import List, Optional
 from fastapi import Request, HTTPException, status
 from fastapi.responses import RedirectResponse
-from collections import defaultdict
-from datetime import datetime, timedelta
 from util.logger_config import logger
 from util.flash_messages import informar_erro
+import asyncio
+import inspect
 
 
 def obter_usuario_logado(request: Request) -> Optional[dict]:
@@ -75,12 +74,6 @@ def destruir_sessao(request: Request) -> None:
 def requer_autenticacao(perfis_autorizados: Optional[List[str]] = None):
     """
     Decorator para proteger rotas que requerem autenticação e autorização
-
-    MELHORIAS v2.0:
-    - Logging detalhado de acessos negados
-    - Flash messages para feedback ao usuário
-    - Validação case-insensitive de perfis
-    - Preservação do destino original após login
 
     Args:
         perfis_autorizados: Lista de perfis autorizados a acessar a rota.
@@ -173,8 +166,6 @@ def requer_autenticacao(perfis_autorizados: Optional[List[str]] = None):
             )
 
             # Adiciona o usuário aos kwargs apenas se a função aceita esse parâmetro
-            import inspect
-
             sig = inspect.signature(func)
             if "usuario_logado" in sig.parameters:
                 kwargs["usuario_logado"] = usuario
@@ -186,155 +177,4 @@ def requer_autenticacao(perfis_autorizados: Optional[List[str]] = None):
 
         return wrapper
 
-    return decorator
-
-
-# ============================================================
-# RATE LIMITER SIMPLES (Proteção contra Força Bruta)
-# ============================================================
-
-
-class SimpleRateLimiter:
-    """
-    Rate limiter simples baseado em IP e janela de tempo
-
-    Uso:
-        limiter = SimpleRateLimiter(max_tentativas=5, janela_minutos=5)
-        if not limiter.verificar(ip_address):
-            return erro("Muitas tentativas")
-    """
-
-    def __init__(self, max_tentativas: int = 5, janela_minutos: int = 5):
-        self.max_tentativas = max_tentativas
-        self.janela = timedelta(minutes=janela_minutos)
-        self.tentativas: defaultdict[str, list[datetime]] = defaultdict(list)
-
-    def verificar(self, identificador: str) -> bool:
-        """
-        Verifica se o identificador está dentro do limite de rate
-
-        Args:
-            identificador: Geralmente IP do cliente
-
-        Returns:
-            True se dentro do limite, False se excedeu
-        """
-        agora = datetime.now()
-
-        # Limpar tentativas antigas
-        self.tentativas[identificador] = [
-            t for t in self.tentativas[identificador] if agora - t < self.janela
-        ]
-
-        # Verificar se excedeu limite
-        if len(self.tentativas[identificador]) >= self.max_tentativas:
-            logger.warning(
-                f"Rate limit excedido para {identificador}: "
-                f"{len(self.tentativas[identificador])} tentativas em "
-                f"{self.janela.total_seconds() / 60:.0f} minutos"
-            )
-            return False
-
-        # Registrar tentativa
-        self.tentativas[identificador].append(agora)
-        return True
-
-    def limpar_tentativas(self, identificador: str) -> None:
-        """Limpa tentativas de um identificador (útil após login bem-sucedido)"""
-        if identificador in self.tentativas:
-            del self.tentativas[identificador]
-            logger.debug(f"Tentativas de rate limit limpas para {identificador}")
-
-
-# Importação necessária para funções assíncronas
-import asyncio
-
-
-# ============================================
-# INSTÂNCIAS GLOBAIS DE RATE LIMITERS
-# ============================================
-
-# Rate limiter para login (5 tentativas por 5 minutos)
-login_rate_limiter = SimpleRateLimiter(max_tentativas=5, janela_minutos=5)
-
-# Rate limiter para cadastros (3 tentativas por hora)
-cadastro_rate_limiter = SimpleRateLimiter(max_tentativas=3, janela_minutos=60)
-
-
-# ============================================
-# DECORADORES DE RATE LIMITING
-# ============================================
-
-def aplicar_rate_limit_login():
-    """
-    Decorator para aplicar rate limiting em rotas de login.
-
-    Limita a 5 tentativas por 5 minutos por IP.
-
-    Uso:
-        @router.post("/login")
-        @aplicar_rate_limit_login()
-        async def login(request: Request, ...):
-            ...
-    """
-    def decorator(func):
-        @wraps(func)
-        async def wrapper(request: Request, *args, **kwargs):
-            # Obter IP do cliente
-            client_ip = request.client.host if request.client else "unknown"
-
-            # Verificar rate limit
-            if not login_rate_limiter.verificar(client_ip):
-                logger.warning(f"Rate limit de login excedido para IP: {client_ip}")
-                raise HTTPException(
-                    status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-                    detail="Muitas tentativas de login. Tente novamente em alguns minutos."
-                )
-
-            # Executar função original
-            response = await func(request, *args, **kwargs)
-
-            # Se login bem-sucedido (redirect ou status 200), limpar tentativas
-            if isinstance(response, RedirectResponse) or (
-                hasattr(response, 'status_code') and response.status_code == 200
-            ):
-                login_rate_limiter.limpar_tentativas(client_ip)
-                logger.debug(f"Login bem-sucedido, rate limit limpo para {client_ip}")
-
-            return response
-
-        return wrapper
-    return decorator
-
-
-def aplicar_rate_limit_cadastro():
-    """
-    Decorator para aplicar rate limiting em rotas de cadastro.
-
-    Limita a 3 cadastros por hora por IP.
-
-    Uso:
-        @router.post("/cadastro/cliente")
-        @aplicar_rate_limit_cadastro()
-        async def cadastrar_cliente(request: Request, ...):
-            ...
-    """
-    def decorator(func):
-        @wraps(func)
-        async def wrapper(request: Request, *args, **kwargs):
-            # Obter IP do cliente
-            client_ip = request.client.host if request.client else "unknown"
-
-            # Verificar rate limit
-            if not cadastro_rate_limiter.verificar(client_ip):
-                logger.warning(f"Rate limit de cadastro excedido para IP: {client_ip}")
-                raise HTTPException(
-                    status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-                    detail="Muitas tentativas de cadastro. Tente novamente em 1 hora."
-                )
-
-            # Executar função original
-            return await func(request, *args, **kwargs)
-
-        return wrapper
     return decorator

@@ -9,7 +9,7 @@ from pydantic import ValidationError
 
 from data.usuario import usuario_repo
 from dtos.usuario.login_dto import LoginDTO
-from util.auth_decorator import obter_usuario_logado, aplicar_rate_limit_login
+from util.auth_decorator import obter_usuario_logado
 from util.security import criar_hash_senha, gerar_token_redefinicao, verificar_senha
 from util.template_util import criar_templates
 
@@ -42,7 +42,6 @@ async def mostrar_login(request: Request, mensagem: Optional[str] = None):
 
 
 @router.post("/login")
-@aplicar_rate_limit_login()
 async def processar_login(request: Request, email: str = Form(), senha: str = Form()):
     """
     Processa o login do usuário

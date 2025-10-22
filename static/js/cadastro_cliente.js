@@ -54,8 +54,7 @@ function validarSecao(secao) {
 // máscara para CPF
 
 document.getElementById('cpf').addEventListener('input', function (e) {
-    console.log('e.target.value',);
-    let value = e.target.value
+    let value = e.target.value;
     if (!value) return;
     if (value.length > 14) value = value.slice(0, 14);
     value = value.replace(/\D/g, '');
@@ -63,26 +62,7 @@ document.getElementById('cpf').addEventListener('input', function (e) {
     value = value.replace(/(\d{3})(\d)/, '$1.$2');
     value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
     e.target.value = value;
-
-    if (value.length >= 14) {
-        console.log('e.target.value', e.target.value);
-
-        fetch(`/api/verifica_cadastro_cliente/${e.target.value.replace('.', '').replace('.', '').replace('-', '')}`, {
-            method: 'GET'
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.erro) {
-                    alert('CPF já existe!');
-                    return;
-                }
-            })
-            .catch(err => {
-                console.error('Erro ao consultar CPF:', JSON.stringify(err));
-                alert('Erro ao consultar CPF.');
-            });
-    }
-})
+});
 
 // Máscara para telefone
 
@@ -124,7 +104,6 @@ document.getElementById('cep').addEventListener('blur', function () {
 
 
     if (cep.length !== 8) {
-        alert('CEP inválido!');
         return;
     }
 
@@ -133,7 +112,6 @@ document.getElementById('cep').addEventListener('blur', function () {
         .then(response => response.json())
         .then(data => {
             if (data.erro) {
-                alert('CEP não encontrado!');
                 document.getElementById('rua').value = '';
                 document.getElementById('bairro').value = '';
                 return;
@@ -147,7 +125,6 @@ document.getElementById('cep').addEventListener('blur', function () {
         })
         .catch(err => {
             console.error('Erro ao consultar CEP:', err);
-            alert('Erro ao consultar CEP.');
         });
 });
 
@@ -158,30 +135,13 @@ document.getElementById('cep').addEventListener('blur', function () {
 
 
 document.getElementById('cadastroForm').addEventListener('submit', function (e) {
-    e.preventDefault();
-
-
+    // Validar seção 3 antes de submeter
     if (!validarSecao(3)) {
-        alert('Preencha todos os campos obrigatórios!');
+        e.preventDefault();
         return;
     }
 
-
-    // Montar endereço completo antes de enviar
-    const estado = document.getElementById('estado').value;
-    const cidade = document.getElementById('cidade').value;
-    const bairro = document.getElementById('bairro').value;
-    const rua = document.getElementById('rua').value;
-    const numero = document.getElementById('numero').value;
-    const complemento = document.getElementById('complemento').value;
-
-
-    const enderecoCompleto = `${rua}, ${numero} ${complemento ? '- ' + complemento : ''}, ${bairro}, ${cidade} - ${estado}`;
-    document.getElementById('endereco').value = enderecoCompleto;
-
-
-    // Aqui você pode adicionar a lógica para enviar os dados via AJAX ou form submit
-    alert('Cadastro realizado com sucesso!');
+    // Permitir submissão normal do formulário
 });
 
 

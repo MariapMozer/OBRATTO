@@ -1,282 +1,232 @@
-from util.mercadopago_config import mp_config
+"""
+Serviço MOCK de Mercado Pago para ambiente acadêmico.
+
+IMPORTANTE: Este é um MOCK (simulação) do serviço de pagamento.
+Não realiza transações reais. Ideal para demonstrações e testes.
+
+Para uso em produção, seria necessário:
+- Conta Mercado Pago ativa
+- Credenciais de API (Access Token)
+- SDK do Mercado Pago instalado
+- Certificados SSL/HTTPS
+"""
+
 from typing import Dict, Any, Optional
 import logging
+import random
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
 
 class MercadoPagoService:
     """
-    Serviço para integração com Mercado Pago.
-
-    NOTA IMPORTANTE: Este serviço usa tokenização do Mercado Pago para processar
-    pagamentos de forma segura. Cartões de crédito NÃO são armazenados localmente.
-    Todo o processamento de cartões é feito através do Mercado Pago.
-
-    Para assinaturas recorrentes, o Mercado Pago gerencia os tokens dos cartões
-    e processa cobranças automáticas.
+    Mock do serviço Mercado Pago.
+    Simula pagamentos sem integração real.
     """
 
     def __init__(self):
-        self.config = mp_config
+        logger.info("🎭 Mercado Pago Mock Service inicializado (SEM integração real)")
 
     async def create_payment(self, payment_data: dict):
         """
-        Cria um pagamento no Mercado Pago.
+        MOCK: Simula criação de pagamento.
 
         Args:
             payment_data: Dados do pagamento incluindo token do cartão
 
         Returns:
-            Response do Mercado Pago com detalhes do pagamento
+            Simulação de resposta do Mercado Pago
         """
-        try:
-            assert self.config.sdk is not None
-            payment_response = self.config.sdk.payment().create(payment_data)
-            return payment_response
-        except Exception as e:
-            logger.error(f"Erro ao criar pagamento no Mercado Pago: {e}")
-            return None
+        logger.info(f"💳 MOCK: Simulando pagamento de R$ {payment_data.get('transaction_amount', 0)}")
+
+        # Simula aprovação automática
+        mock_payment_id = f"MOCK-{random.randint(10000, 99999)}"
+
+        return {
+            "status": 201,
+            "response": {
+                "id": mock_payment_id,
+                "status": "approved",
+                "status_detail": "accredited",
+                "transaction_amount": payment_data.get("transaction_amount", 0),
+                "description": payment_data.get("description", "Pagamento"),
+                "date_created": datetime.now().isoformat(),
+                "date_approved": datetime.now().isoformat(),
+                "payment_method_id": "mock_card",
+                "payment_type_id": "credit_card",
+                "mock": True
+            }
+        }
 
     async def get_payment_status(self, payment_id: str):
         """
-        Obtém o status de um pagamento específico.
+        MOCK: Simula consulta de status de pagamento.
 
         Args:
-            payment_id: ID do pagamento no Mercado Pago
+            payment_id: ID do pagamento (simulado)
 
         Returns:
-            Detalhes do pagamento incluindo status
+            Status simulado como "approved"
         """
-        try:
-            assert self.config.sdk is not None
-            payment_status = self.config.sdk.payment().get(payment_id)
-            return payment_status
-        except Exception as e:
-            logger.error(f"Erro ao obter status do pagamento no Mercado Pago: {e}")
-            return None
+        logger.info(f"🔍 MOCK: Consultando status do pagamento {payment_id}")
+
+        return {
+            "status": 200,
+            "response": {
+                "id": payment_id,
+                "status": "approved",
+                "status_detail": "accredited",
+                "mock": True
+            }
+        }
 
     async def create_card_token(self, card_data: dict) -> Optional[Dict[str, Any]]:
         """
-        Cria um token de cartão no Mercado Pago para processamento seguro.
-
-        IMPORTANTE: Tokens de cartão devem ser criados no frontend usando MercadoPago.js
-        para segurança PCI compliance. Este método é para referência.
+        MOCK: Simula criação de token de cartão.
 
         Args:
-            card_data: {
-                "cardNumber": "número do cartão",
-                "cardholderName": "nome do titular",
-                "cardExpirationMonth": "mm",
-                "cardExpirationYear": "yyyy",
-                "securityCode": "cvv",
-                "identificationType": "CPF",
-                "identificationNumber": "cpf do titular"
-            }
+            card_data: Dados do cartão (não são armazenados)
 
         Returns:
-            Token do cartão para usar em pagamentos
+            Token simulado
         """
-        try:
-            assert self.config.sdk is not None
-            token_response = self.config.sdk.card_token().create(card_data)
+        logger.info("💳 MOCK: Simulando tokenização de cartão")
 
-            if token_response["status"] == 201:
-                return {
-                    "success": True,
-                    "token": token_response["response"]["id"],
-                    "first_six_digits": token_response["response"]["first_six_digits"],
-                    "last_four_digits": token_response["response"]["last_four_digits"]
-                }
-            else:
-                logger.error(f"Erro ao criar token de cartão: {token_response}")
-                return {"success": False, "error": token_response.get("message")}
-
-        except Exception as e:
-            logger.error(f"Erro ao criar token de cartão no Mercado Pago: {e}")
-            return {"success": False, "error": str(e)}
+        return {
+            "success": True,
+            "token": f"MOCK-TOKEN-{random.randint(1000, 9999)}",
+            "first_six_digits": "123456",
+            "last_four_digits": "1234",
+            "mock": True
+        }
 
     async def create_customer(self, email: str, first_name: str, last_name: str,
                              identification_type: str = "CPF",
                              identification_number: str = "") -> Optional[Dict[str, Any]]:
         """
-        Cria um customer (pagador) no Mercado Pago para assinaturas recorrentes.
+        MOCK: Simula criação de customer.
 
         Args:
             email: Email do cliente
             first_name: Primeiro nome
             last_name: Sobrenome
-            identification_type: Tipo de documento (CPF, CNPJ, etc)
+            identification_type: Tipo de documento
             identification_number: Número do documento
 
         Returns:
-            Customer ID e detalhes
+            Customer ID simulado
         """
-        try:
-            assert self.config.sdk is not None
-            customer_data = {
-                "email": email,
-                "first_name": first_name,
-                "last_name": last_name,
-                "identification": {
-                    "type": identification_type,
-                    "number": identification_number
-                }
-            }
+        logger.info(f"👤 MOCK: Criando customer para {email}")
 
-            customer_response = self.config.sdk.customer().create(customer_data)
-
-            if customer_response["status"] == 201:
-                return {
-                    "success": True,
-                    "customer_id": customer_response["response"]["id"],
-                    "email": customer_response["response"]["email"]
-                }
-            else:
-                logger.error(f"Erro ao criar customer: {customer_response}")
-                return {"success": False, "error": customer_response.get("message")}
-
-        except Exception as e:
-            logger.error(f"Erro ao criar customer no Mercado Pago: {e}")
-            return {"success": False, "error": str(e)}
+        return {
+            "success": True,
+            "customer_id": f"MOCK-CUSTOMER-{random.randint(1000, 9999)}",
+            "email": email,
+            "mock": True
+        }
 
     async def save_card_to_customer(self, customer_id: str, card_token: str) -> Optional[Dict[str, Any]]:
         """
-        Salva um cartão tokenizado para um customer (usado em assinaturas recorrentes).
-        O cartão fica armazenado no Mercado Pago, não no nosso sistema.
+        MOCK: Simula salvamento de cartão para customer.
 
         Args:
-            customer_id: ID do customer no Mercado Pago
-            card_token: Token do cartão criado previamente
+            customer_id: ID do customer (simulado)
+            card_token: Token do cartão (simulado)
 
         Returns:
-            Card ID no Mercado Pago
+            Card ID simulado
         """
-        try:
-            assert self.config.sdk is not None
-            card_data = {"token": card_token}
+        logger.info(f"💾 MOCK: Salvando cartão para customer {customer_id}")
 
-            card_response = self.config.sdk.card().create(customer_id, card_data)
-
-            if card_response["status"] == 201:
-                return {
-                    "success": True,
-                    "card_id": card_response["response"]["id"],
-                    "last_four_digits": card_response["response"]["last_four_digits"],
-                    "payment_method": card_response["response"]["payment_method"]["id"]
-                }
-            else:
-                logger.error(f"Erro ao salvar cartão: {card_response}")
-                return {"success": False, "error": card_response.get("message")}
-
-        except Exception as e:
-            logger.error(f"Erro ao salvar cartão no Mercado Pago: {e}")
-            return {"success": False, "error": str(e)}
+        return {
+            "success": True,
+            "card_id": f"MOCK-CARD-{random.randint(1000, 9999)}",
+            "last_four_digits": "1234",
+            "payment_method": "mock_card",
+            "mock": True
+        }
 
     async def create_subscription(self, customer_id: str, card_id: str,
                                   plan_value: float, plan_name: str,
                                   external_reference: str) -> Optional[Dict[str, Any]]:
         """
-        Cria uma assinatura recorrente no Mercado Pago.
+        MOCK: Simula criação de assinatura recorrente.
 
         Args:
-            customer_id: ID do customer no MP
-            card_id: ID do cartão salvo no MP
+            customer_id: ID do customer
+            card_id: ID do cartão
             plan_value: Valor do plano
             plan_name: Nome do plano
-            external_reference: Referência externa para identificação
+            external_reference: Referência externa
 
         Returns:
-            Subscription ID e detalhes
+            Subscription ID simulado
         """
-        try:
-            assert self.config.sdk is not None
+        logger.info(f"🔄 MOCK: Criando assinatura {plan_name} - R$ {plan_value}/mês")
 
-            subscription_data = {
-                "payer_id": customer_id,
-                "card_id": card_id,
-                "transaction_amount": float(plan_value),
-                "description": f"Assinatura {plan_name}",
-                "external_reference": external_reference,
-                "reason": plan_name,
-                "auto_recurring": {
-                    "frequency": 1,
-                    "frequency_type": "months",
-                    "transaction_amount": float(plan_value),
-                    "currency_id": "BRL"
-                }
-            }
-
-            subscription_response = self.config.sdk.subscription().create(subscription_data)
-
-            if subscription_response["status"] in [200, 201]:
-                return {
-                    "success": True,
-                    "subscription_id": subscription_response["response"]["id"],
-                    "status": subscription_response["response"]["status"]
-                }
-            else:
-                logger.error(f"Erro ao criar assinatura: {subscription_response}")
-                return {"success": False, "error": subscription_response.get("message")}
-
-        except Exception as e:
-            logger.error(f"Erro ao criar assinatura no Mercado Pago: {e}")
-            return {"success": False, "error": str(e)}
+        return {
+            "success": True,
+            "subscription_id": f"MOCK-SUB-{random.randint(1000, 9999)}",
+            "status": "authorized",
+            "mock": True
+        }
 
     async def cancel_subscription(self, subscription_id: str) -> Optional[Dict[str, Any]]:
         """
-        Cancela uma assinatura recorrente.
+        MOCK: Simula cancelamento de assinatura.
 
         Args:
-            subscription_id: ID da assinatura no Mercado Pago
+            subscription_id: ID da assinatura (simulado)
 
         Returns:
-            Confirmação do cancelamento
+            Confirmação simulada
         """
-        try:
-            assert self.config.sdk is not None
+        logger.info(f"❌ MOCK: Cancelando assinatura {subscription_id}")
 
-            cancel_response = self.config.sdk.subscription().update(
-                subscription_id,
-                {"status": "cancelled"}
-            )
-
-            if cancel_response["status"] == 200:
-                return {
-                    "success": True,
-                    "subscription_id": subscription_id,
-                    "status": "cancelled"
-                }
-            else:
-                logger.error(f"Erro ao cancelar assinatura: {cancel_response}")
-                return {"success": False, "error": cancel_response.get("message")}
-
-        except Exception as e:
-            logger.error(f"Erro ao cancelar assinatura no Mercado Pago: {e}")
-            return {"success": False, "error": str(e)}
+        return {
+            "success": True,
+            "subscription_id": subscription_id,
+            "status": "cancelled",
+            "mock": True
+        }
 
     async def get_subscription_status(self, subscription_id: str) -> Optional[Dict[str, Any]]:
         """
-        Obtém o status de uma assinatura.
+        MOCK: Simula consulta de status de assinatura.
 
         Args:
-            subscription_id: ID da assinatura no Mercado Pago
+            subscription_id: ID da assinatura (simulado)
 
         Returns:
-            Detalhes da assinatura
+            Status simulado
         """
-        try:
-            assert self.config.sdk is not None
-            subscription_response = self.config.sdk.subscription().get(subscription_id)
+        logger.info(f"🔍 MOCK: Consultando status da assinatura {subscription_id}")
 
-            if subscription_response["status"] == 200:
-                return {
-                    "success": True,
-                    "subscription": subscription_response["response"]
-                }
-            else:
-                return {"success": False, "error": subscription_response.get("message")}
+        return {
+            "success": True,
+            "subscription": {
+                "id": subscription_id,
+                "status": "authorized",
+                "mock": True
+            }
+        }
 
-        except Exception as e:
-            logger.error(f"Erro ao obter status da assinatura: {e}")
-            return {"success": False, "error": str(e)}
+
+# Mensagem de inicialização
+logger.info("""
+╔═══════════════════════════════════════════════════════════════╗
+║             MERCADO PAGO - MODO SIMULAÇÃO (MOCK)              ║
+╠═══════════════════════════════════════════════════════════════╣
+║ ⚠️  Este serviço está em modo MOCK (simulação)                ║
+║                                                               ║
+║ ✅ Todos os pagamentos são aprovados automaticamente          ║
+║ ✅ Não há cobranças reais                                     ║
+║ ✅ Ideal para demonstrações e ambiente acadêmico             ║
+║                                                               ║
+║ Para produção, substituir por integração real com:           ║
+║ - Conta Mercado Pago ativa                                   ║
+║ - Credenciais de API válidas                                 ║
+║ - SDK instalado: pip install mercadopago                     ║
+╚═══════════════════════════════════════════════════════════════╝
+""")

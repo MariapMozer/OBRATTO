@@ -21,7 +21,7 @@ from data.mensagem import mensagem_repo
 from dtos.cliente.cliente_dto import CriarClienteDTO
 from dtos.fornecedor.fornecedor_dto import CriarFornecedorDTO
 from dtos.prestador.prestador_dto import CriarPrestadorDTO
-from util.auth_decorator import obter_usuario_logado, requer_autenticacao, aplicar_rate_limit_cadastro
+from util.auth_decorator import obter_usuario_logado, requer_autenticacao
 from util.flash_messages import informar_sucesso
 from util.security import criar_hash_senha, gerar_token_redefinicao, verificar_senha
 from util.template_util import criar_templates
@@ -37,13 +37,17 @@ templates = criar_templates("templates")
 async def exibir_cadastro_prestador(request: Request):
     usuario_logado = obter_usuario_logado(request)
     return templates.TemplateResponse(
-        "public/cadastro/prestador.html", {"request": request, "dados": None, "usuario_logado": usuario_logado}
+        "public/cadastro/prestador.html", {
+            "request": request,
+            "dados": None,
+            "usuario_logado": usuario_logado,
+            "now": datetime.now
+        }
     )
 
 
 # Rota para processar o formulário de cadastro
 @router.post("/cadastro/prestador")
-@aplicar_rate_limit_cadastro()
 async def processar_cadastro_prestador(
     request: Request,
     nomeCompleto: str = Form(...),
@@ -110,6 +114,7 @@ async def processar_cadastro_prestador(
                     "request": request,
                     "erro": "Email já cadastrado",
                     "dados": dados_formulario,
+                    "now": datetime.now,
                 },
             )
 
@@ -150,6 +155,7 @@ async def processar_cadastro_prestador(
                     "request": request,
                     "erro": "Erro ao cadastrar prestador. Tente novamente.",
                     "dados": dados_formulario,
+                    "now": datetime.now,
                 },
             )
 
@@ -182,6 +188,7 @@ async def processar_cadastro_prestador(
                 "request": request,
                 "erro": erro_msg,
                 "dados": dados_formulario,  # Preservar dados digitados
+                "now": datetime.now,
             },
         )
 
@@ -194,6 +201,7 @@ async def processar_cadastro_prestador(
                 "request": request,
                 "erro": "Erro ao processar cadastro. Tente novamente.",
                 "dados": dados_formulario,
+                "now": datetime.now,
             },
         )
 
@@ -203,13 +211,12 @@ async def processar_cadastro_prestador(
 async def get_page(request: Request):
     usuario_logado = obter_usuario_logado(request)
     return templates.TemplateResponse(
-        "publico/login_cadastro/cadastro.html", {"request": request, "dados": None, "usuario_logado": usuario_logado}
+        "public/cadastro/cliente.html", {"request": request, "dados": None, "usuario_logado": usuario_logado}
     )
 
 
 # Rota para processar o formulário de cadastro
 @router.post("/cadastro/cliente")
-@aplicar_rate_limit_cadastro()
 async def post_cadastro(
     request: Request,
     nome: str = Form(...),
@@ -381,7 +388,6 @@ async def exibir_cadastro_fornecedor(request: Request):
 
 # Cadastro de fornecedor (POST)
 @router.post("/cadastro/fornecedor")
-@aplicar_rate_limit_cadastro()
 async def processar_cadastro_fornecedor(
     request: Request,
     nome: str = Form(...),
