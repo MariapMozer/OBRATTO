@@ -1,17 +1,11 @@
 {% extends "cliente/base.html" %}
 
-{#
-    Template: Home Cliente
-    Descrição: Página inicial do cliente
-    Estende: cliente/base.html
-#}
-
 {% from 'components/stats_card.html' import stats_card, stats_row %}
 
 {% block titulo %}Painel do Cliente{% endblock %}
 
 {% block conteudo %}
-<div class="container-fluid px-4 py-4">
+<div class="container px-4 py-4">
     <!-- Welcome Banner -->
     <div class="p-5 mb-4 bg-white rounded-3 shadow-sm">
         <div class="container-fluid py-3">

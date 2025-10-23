@@ -10,10 +10,8 @@ body {
     color: #333333;
 }
 
-/* Navbar branco para páginas internas */
-.fundo-azul {
-    background: white !important;
-}
+/* Navbar azul padrão (definido em components.css) */
+/* .fundo-azul mantém o fundo azul escuro #171370 */
 
 /* Navbar azul para home page */
 .navbar.fundo-azul-home {
@@ -41,20 +39,10 @@ body {
     box-shadow: 0 0 0 0.2rem rgba(232, 137, 75, 0.25);
 }
 
-/* Texto do navbar para páginas internas (branco) */
-.navbar.fundo-azul .text-white{
-    color: #171370 !important;
-    font-weight: 600;
-    text-decoration: none;
-    transition: transform 0.3s ease;
-}
+/* Texto do navbar com fundo azul permanece branco */
+/* .navbar.fundo-azul .text-white mantém cor branca (padrão do Bootstrap) */
 
-.navbar.fundo-azul .text-white:hover {
-    color: #E8894B !important;
-    transform: scale(1.05);
-}
-
-/* Texto do navbar para home (azul escuro) */
+/* Texto do navbar para home (branco sobre azul) */
 .navbar.fundo-azul-home .text-white{
     color: white !important;
     font-weight: 600;

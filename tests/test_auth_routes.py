@@ -18,6 +18,10 @@ from data.cliente import cliente_repo
 from data.cliente.cliente_model import Cliente
 from data.administrador import administrador_repo
 from data.administrador.administrador_model import Administrador
+from data.fornecedor import fornecedor_repo
+from data.fornecedor.fornecedor_model import Fornecedor
+from data.prestador import prestador_repo
+from data.prestador.prestador_model import Prestador
 from util.security import criar_hash_senha, gerar_token_redefinicao
 
 client = TestClient(app)
@@ -31,6 +35,8 @@ def setup_tabelas_auth(test_db):
     usuario_repo.criar_tabela_usuario()
     cliente_repo.criar_tabela_cliente()
     administrador_repo.criar_tabela_administrador()
+    fornecedor_repo.criar_tabela_fornecedor()
+    prestador_repo.criar_tabela_prestador()
     yield
 
 
@@ -166,6 +172,78 @@ class TestLoginRoutes:
         # Deve redirecionar para /administrador/home
         assert response.status_code == 303
         assert "/administrador" in response.headers.get("location", "")
+
+    def test_login_sucesso_fornecedor(self, setup_tabelas_auth, email_unico, cpf_unico):
+        """Testa login bem-sucedido de fornecedor"""
+        # Criar usuário fornecedor
+        fornecedor = Fornecedor(
+            id=0,
+            nome="Fornecedor Teste",
+            email=email_unico,
+            senha=criar_hash_senha("fornecedor123"),
+            cpf_cnpj=cpf_unico,
+            telefone="27999999999",
+            cep="29100-000",
+            rua="Rua Fornecedor",
+            numero="456",
+            complemento="",
+            bairro="Centro",
+            cidade="Vitória",
+            estado="ES",
+            tipo_usuario="fornecedor",
+            data_cadastro=datetime.now().isoformat(),
+            foto=None,
+            token_redefinicao=None,
+            data_token=None,
+            razao_social="Fornecedor Ltda"
+        )
+        fornecedor_id = fornecedor_repo.inserir_fornecedor(fornecedor)
+
+        response = client.post("/login", data={
+            "email": fornecedor.email,
+            "senha": "fornecedor123"
+        }, follow_redirects=False)
+
+        # Deve redirecionar para /fornecedor
+        assert response.status_code == 303
+        assert "/fornecedor" in response.headers.get("location", "")
+
+    def test_login_sucesso_prestador(self, setup_tabelas_auth, email_unico, cpf_unico):
+        """Testa login bem-sucedido de prestador"""
+        # Criar usuário prestador
+        prestador = Prestador(
+            id=0,
+            nome="Prestador Teste",
+            email=email_unico,
+            senha=criar_hash_senha("prestador123"),
+            cpf_cnpj=cpf_unico,
+            telefone="27988888888",
+            cep="29100-000",
+            rua="Rua Prestador",
+            numero="789",
+            complemento="",
+            bairro="Centro",
+            cidade="Vitória",
+            estado="ES",
+            tipo_usuario="prestador",
+            data_cadastro=datetime.now().isoformat(),
+            foto=None,
+            token_redefinicao=None,
+            data_token=None,
+            area_atuacao="TI",
+            razao_social="Prestador Ltda",
+            descricao_servicos="Serviços de TI"
+        )
+        prestador_id = prestador_repo.inserir_prestador(prestador)
+
+        response = client.post("/login", data={
+            "email": prestador.email,
+            "senha": "prestador123"
+        }, follow_redirects=False)
+
+        # Deve redirecionar para /prestador
+        assert response.status_code == 303
+        assert "/prestador" in response.headers.get("location", "")
 
     def test_login_validacao_erro_pydantic(self, setup_tabelas_auth):
         """Testa erro de validação do Pydantic (email inválido)"""

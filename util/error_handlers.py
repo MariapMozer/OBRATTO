@@ -6,12 +6,13 @@ import functools
 import logging
 from typing import Callable, Optional
 from fastapi import Request
-from fastapi.templating import Jinja2Templates
 from pydantic import ValidationError
 from util.exceptions import ValidacaoError, RecursoNaoEncontradoError, ObrattoError
 from util.flash_messages import informar_erro, informar_sucesso
+from util.template_util import criar_templates
 
 logger = logging.getLogger(__name__)
+templates = criar_templates("templates")
 
 
 def tratar_erro_rota(
@@ -45,7 +46,6 @@ def tratar_erro_rota(
                 )
 
                 if template_erro:
-                    templates = Jinja2Templates(directory="templates")
                     return templates.TemplateResponse(
                         template_erro, {"request": request, "erro": error_msg}
                     )
@@ -57,7 +57,6 @@ def tratar_erro_rota(
                 informar_erro(request, f"Dados inválidos: {e.mensagem}")
 
                 if template_erro:
-                    templates = Jinja2Templates(directory="templates")
                     return templates.TemplateResponse(
                         template_erro, {"request": request, "erro": e.mensagem}
                     )
@@ -80,7 +79,6 @@ def tratar_erro_rota(
 
                 return RedirectResponse(redirect_erro)
             elif template_erro:
-                templates = Jinja2Templates(directory="templates")
                 return templates.TemplateResponse(
                     template_erro,
                     {"request": request, "erro": "Ocorreu um erro. Tente novamente."},

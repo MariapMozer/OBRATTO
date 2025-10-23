@@ -15,7 +15,7 @@
 {% if usuario_logado %}
     {% set menu_fornecedor = [
         {'url': '/fornecedor/perfil', 'icon': 'person', 'label': 'Perfil'},
-        {'url': '/fornecedor/home', 'icon': 'house', 'label': 'Home'},
+        {'url': '/fornecedor', 'icon': 'house', 'label': 'Home'},
         {'url': '/fornecedor/conta', 'icon': 'gear', 'label': 'Conta'},
         {'divider': True},
         {'url': '/logout', 'icon': 'box-arrow-right', 'label': 'Sair', 'danger': True}
@@ -33,7 +33,7 @@
 
 <!-- Sidebar -->
 {% set menu_items = [
-    {'id': 'home', 'url': '/fornecedor/home', 'icon': 'house', 'label': 'Home'},
+    {'id': 'home', 'url': '/fornecedor', 'icon': 'house', 'label': 'Home'},
     {'id': 'solicitacoes', 'url': '/fornecedor/solicitacoes_recebidas', 'icon': 'inbox', 'label': 'Solicitações'},
     {'id': 'cadastrar', 'url': '/fornecedor/produtos/inserir', 'icon': 'plus-square', 'label': 'Cadastrar Produtos'},
     {'id': 'produtos', 'url': '/fornecedor/produtos/listar', 'icon': 'box-seam', 'label': 'Meus Produtos'},
@@ -61,7 +61,7 @@
                     {% if usuario_logado %}
                         {% set menu_fornecedor = [
                             {'url': '/fornecedor/perfil', 'icon': 'person', 'label': 'Perfil'},
-                            {'url': '/fornecedor/home', 'icon': 'house', 'label': 'Home'},
+                            {'url': '/fornecedor', 'icon': 'house', 'label': 'Home'},
                             {'url': '/fornecedor/conta', 'icon': 'gear', 'label': 'Conta'},
                             {'divider': True},
                             {'url': '/logout', 'icon': 'box-arrow-right', 'label': 'Sair', 'danger': True}

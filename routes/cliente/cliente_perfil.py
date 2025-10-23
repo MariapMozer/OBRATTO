@@ -20,24 +20,24 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 @router.get("/")
 @requer_autenticacao(["cliente"])
 async def get_page(request: Request, usuario_logado: Optional[dict] = None):
-    return templates.TemplateResponse("cliente/home.html", {"request": request})
+    return templates.TemplateResponse("cliente/home.html", {"request": request, "usuario_logado": usuario_logado})
 
 
 # Visualizar perfil do cliente
 @router.get("/perfil")
 @requer_autenticacao(["cliente"])
-async def exibir_perfil_cliente(request: Request):
+async def exibir_perfil_cliente(request: Request, usuario_logado: Optional[dict] = None):
     return templates.TemplateResponse(
-        "cliente/perfil/perfil.html", {"request": request}
+        "cliente/perfil/perfil.html", {"request": request, "usuario_logado": usuario_logado}
     )
 
 
 # Editar dados do perfil
 @router.get("/editar/dados")
 @requer_autenticacao(["cliente"])
-async def editar_perfil_cliente(request: Request):
+async def editar_perfil_cliente(request: Request, usuario_logado: Optional[dict] = None):
     return templates.TemplateResponse(
-        "cliente/perfil/editar_dados.html", {"request": request}
+        "cliente/perfil/editar_dados.html", {"request": request, "usuario_logado": usuario_logado}
     )
 
 
@@ -160,8 +160,8 @@ async def alterar_foto(
 # Excluir perfil
 @router.get("/excluir")
 @requer_autenticacao(["cliente"])
-async def excluir_perfil_cliente(request: Request):
-    return templates.TemplateResponse("cliente/excluir.html", {"request": request})
+async def excluir_perfil_cliente(request: Request, usuario_logado: Optional[dict] = None):
+    return templates.TemplateResponse("cliente/excluir.html", {"request": request, "usuario_logado": usuario_logado})
 
 
 # Rota para processar a exclusão do perfil
