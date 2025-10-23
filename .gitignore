@@ -51,6 +51,7 @@ venv.bak/
 .env
 .env.local
 .env.*.local
+.claude
 
 # ============================================
 # Database
