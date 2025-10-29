@@ -1,5 +1,4 @@
 from datetime import datetime
-from math import e
 from typing import Optional
 import logging
 from fastapi import APIRouter, Form, Request, status, UploadFile, File
@@ -9,22 +8,21 @@ from pydantic import ValidationError
 from data.cliente import cliente_repo
 from data.cliente.cliente_model import Cliente
 from data.fornecedor import fornecedor_repo
-from data.fornecedor import fornecedor_sql
 from data.fornecedor.fornecedor_model import Fornecedor
 from data.prestador import prestador_repo
 from data.prestador.prestador_model import Prestador
 from data.usuario import usuario_repo
-from data.usuario.usuario_model import Usuario
 from data.mensagem.mensagem_model import Mensagem
 from data.mensagem import mensagem_repo
+from data.usuario.usuario_model import Usuario
 from dtos.cliente.cliente_dto import CriarClienteDTO
 from dtos.usuario.login_dto import LoginDTO
 from dtos.fornecedor.fornecedor_dto import CriarFornecedorDTO
 from dtos.prestador.prestador_dto import CriarPrestadorDTO
 from utils.auth_decorator import obter_usuario_logado
-# from utils.security import verificar_autenticacao
+from utils.email_service import email_service
 import os
-import uuid
+
 
 from utils.flash_messages import informar_sucesso
 from utils.security import criar_hash_senha, gerar_token_redefinicao, verificar_senha
@@ -162,9 +160,7 @@ async def processar_cadastro_prestador(
                     "dados": dados_formulario
                 }
             )
-
-        # Sucesso - Redirecionar com mensagem flash
-        informar_sucesso(request, f"Cadastro de prestador realizado com sucesso! Bem-vindo(a), {nomeCompleto}!")
+        email_service.enviar_boas_vindas(para_email=Usuario.email, para_nome=Usuario.nome)
         return RedirectResponse("/login", status_code=status.HTTP_303_SEE_OTHER)
 
     except ValidationError as e:
@@ -301,8 +297,8 @@ async def post_cadastro(
                 }
             )
 
-        # Sucesso - Redirecionar com mensagem flash
-        informar_sucesso(request, f"Cadastro de cliente realizado com sucesso! Bem-vindo(a), {nome}!")
+        
+        email_service.enviar_boas_vindas(para_email=Usuario.email, para_nome=Usuario.nome)
         return RedirectResponse("/login", status_code=status.HTTP_303_SEE_OTHER)
 
     except ValidationError as e:
@@ -359,6 +355,9 @@ async def processar_cadastro_fornecedor(
     cep: Optional[str] = Form(None),
     foto: UploadFile = File(None)
 ):
+    email_service.enviar_boas_vindas(para_email=email, para_nome=nome)
+    return RedirectResponse("/login", status_code=status.HTTP_303_SEE_OTHER)
+
     # Preservar dados do formulário (exceto senhas por segurança)
     dados_formulario = {
         "nome": nome,
@@ -503,7 +502,7 @@ async def processar_cadastro_fornecedor(
             )
 
         # Cadastro realizado com sucesso - redirecionar para login
-        logger.info(f"Fornecedor cadastrado com sucesso: {fornecedor_dto.email}")
+        email_service.enviar_boas_vindas(para_email=fornecedor.email, para_nome=fornecedor.nome)
         return RedirectResponse(
             url="/login?mensagem=Cadastro realizado com sucesso! Faça seu login.", 
             status_code=status.HTTP_303_SEE_OTHER
