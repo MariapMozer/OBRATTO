@@ -1,12 +1,137 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OBRATTO</title>
-</head>
-<body>
-    <h1>Todas as promoções do fornecedor</h1>
-    <hr>
-</body>
-</html>
+{% extends "fornecedor/base.html" %}
+
+{#
+    Template: Promoções (Fornecedor)
+    Descrição: Lista de produtos em promoção
+    Estende: fornecedor/base.html
+#}
+
+{% from 'components/product_card.html' import product_card %}
+{% from 'components/breadcrumbs.html' import breadcrumbs %}
+{% from 'components/search_form.html' import search_form %}
+{% from 'components/empty_state.html' import empty_state %}
+{% from 'components/pagination.html' import pagination %}
+
+{% block fornecedor_titulo %}Promoções{% endblock %}
+{% block sidebar_active %}promocoes{% endblock %}
+
+{% block fornecedor_conteudo %}
+<div class="container-fluid px-4 py-4">
+    {{ breadcrumbs(items=[
+        {'text': 'Home', 'url': '/fornecedor/home'},
+        {'text': 'Promoções', 'active': True}
+    ]) }}
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-1">Promoções Ativas</h1>
+            <p class="text-muted mb-0">Gerencie produtos em promoção</p>
+        </div>
+        <a href="/fornecedor/produtos/inserir" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-2"></i>Novo Produto
+        </a>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            {{ search_form(
+                action_url='/fornecedor/promocao/listar',
+                placeholder='Buscar produtos em promoção...',
+                show_filters=True,
+                filters=[
+                    {
+                        'name': 'desconto_min',
+                        'label': 'Desconto Mínimo (%)',
+                        'type': 'number',
+                        'placeholder': '0'
+                    },
+                    {
+                        'name': 'ordenar',
+                        'label': 'Ordenar por',
+                        'type': 'select',
+                        'options': [
+                            {'value': 'desconto', 'text': 'Maior Desconto'},
+                            {'value': 'preco', 'text': 'Menor Preço'},
+                            {'value': 'nome', 'text': 'Nome A-Z'}
+                        ]
+                    }
+                ]
+            ) }}
+        </div>
+    </div>
+
+    {% if promocoes and promocoes|length > 0 %}
+    <div class="row g-4 mb-4">
+        {% for produto in promocoes %}
+        <div class="col-lg-4 col-md-6">
+            {{ product_card(
+                produto=produto,
+                show_actions=True,
+                edit_url='/fornecedor/produtos/atualizar/' ~ produto.id,
+                delete_handler='confirmDeleteProduct',
+                card_class='h-100'
+            ) }}
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if total_pages and total_pages > 1 %}
+    {{ pagination(
+        current_page=current_page|default(1),
+        total_pages=total_pages,
+        base_url='/fornecedor/promocao/listar'
+    ) }}
+    {% endif %}
+
+    {% else %}
+    {{ empty_state(
+        icon='tag',
+        title='Nenhuma promoção ativa',
+        message='Você não possui produtos em promoção no momento. Configure descontos nos seus produtos para criar promoções!',
+        action_url='/fornecedor/produtos/listar',
+        action_text='Ver Produtos',
+        action_icon='box-seam'
+    ) }}
+    {% endif %}
+
+    <!-- Stats Cards -->
+    {% if promocoes_stats %}
+    <div class="row g-3 mt-4">
+        <div class="col-md-4">
+            <div class="card border-danger">
+                <div class="card-body text-center">
+                    <h3 class="text-danger mb-0">{{ promocoes_stats.total|default(0) }}</h3>
+                    <small class="text-muted">Produtos em Promoção</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-warning">
+                <div class="card-body text-center">
+                    <h3 class="text-warning mb-0">{{ promocoes_stats.desconto_medio|default('0') }}%</h3>
+                    <small class="text-muted">Desconto Médio</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-success">
+                <div class="card-body text-center">
+                    <h3 class="text-success mb-0">{{ promocoes_stats.economia_total|default('0') }}</h3>
+                    <small class="text-muted">Economia Total (R$)</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% block fornecedor_scripts %}
+<script>
+function confirmDeleteProduct(produtoId, produtoNome) {
+    if (confirm(`Tem certeza que deseja excluir o produto "${produtoNome}"?`)) {
+        window.location.href = `/fornecedor/produtos/excluir/${produtoId}`;
+    }
+}
+</script>
+{% endblock %}
+{% endblock %}

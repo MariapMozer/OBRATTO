@@ -55,6 +55,7 @@ class TestNotificacaoRepo:
 
         id_notificacao = inserir_notificacao(notificacao)
         print(f"ID inserido: {id_notificacao}")
+        assert id_notificacao is not None
 
         notificacao_db = obter_notificacao_por_id(id_notificacao)
         print(f"Notificação obtida do DB: {notificacao_db}")
@@ -86,6 +87,7 @@ class TestNotificacaoRepo:
         )
         id_notificacao = inserir_notificacao(notificacao)
         print("ID inserido:", id_notificacao)
+        assert id_notificacao is not None
         notificacao_db = obter_notificacao_por_id(id_notificacao)
         print("Notificação obtida:", notificacao_db)
         assert notificacao_db is not None, "A notificação obtida não deve ser None"
@@ -136,7 +138,9 @@ class TestNotificacaoRepo:
         )
         # Act
         id_notificacao = inserir_notificacao(notificacao)
+        assert id_notificacao is not None
         notificacao_atualizada = obter_notificacao_por_id(id_notificacao)
+        assert notificacao_atualizada is not None
         notificacao_atualizada.mensagem = "Notificação atualizada"
         resultado = atualizar_notificacao(notificacao_atualizada)
         # Assert
@@ -156,6 +160,7 @@ class TestNotificacaoRepo:
             visualizar=False
         )
         id_notificacao = inserir_notificacao(notificacao)
+        assert id_notificacao is not None
         resultado = deletar(id_notificacao)
         # Assert
         assert resultado is True

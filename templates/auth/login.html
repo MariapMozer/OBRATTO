@@ -1,0 +1,123 @@
+{% extends "base_root.html" %}
+
+{% block titulo %}Login{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="/static/css/login.css">
+{% endblock %}
+
+{% block body_content %}
+    <main class="login-main">
+        <div class="login-container fade-in-up">
+            <!-- Lado esquerdo - Informações -->
+            <div class="login-info">
+                <div class="login-info-content">
+                    <img src="/static/img/logo_branca.png" alt="Obratto Logo" class="login-logo">
+                    <h2>Bem-vindo de volta!</h2>
+                    <p>Acesse sua conta e continue aproveitando todos os recursos da nossa plataforma de construção
+                        civil.</p>
+
+                    <ul class="login-benefits">
+                        <li>
+                            <i class="bi bi-check-circle-fill"></i>
+                            Acesso rápido e seguro
+                        </li>
+                        <li>
+                            <i class="bi bi-check-circle-fill"></i>
+                            Seus projetos salvos
+                        </li>
+                        <li>
+                            <i class="bi bi-check-circle-fill"></i>
+                            Histórico de atividades
+                        </li>
+                        <li>
+                            <i class="bi bi-check-circle-fill"></i>
+                            Suporte personalizado
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Lado direito - Formulário de Login -->
+            <div class="login-form-container">
+                <div class="login-form-header">
+                    <h1>Entrar</h1>
+                    <p>Digite suas credenciais para acessar</p>
+                </div>
+
+                <!-- Formulário de Login -->
+                <form id="loginForm" method="post" action="/login" novalidate>
+                    {% if erros and "GERAL" in erros.keys(): %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ erros["GERAL"] }}
+                    </div>
+                    {% endif %}
+                    <div class="form-group">
+                        <label for="usuario" class="form-label">Nome de usuário ou E-mail *</label>
+                        <div class="input-group">
+                            <span class="input-group-icon">
+                                <i class="bi bi-person-fill"></i>
+                            </span>
+                            <input type="text"
+                                class="form-control {% if erros and 'EMAIL' in erros.keys() %}is-invalid{% endif %}"
+                                id="email" name="email" placeholder="Digite seu e-mail" required
+                                value="{{ dados.email if dados and dados.email }}">
+                        </div>
+                        {% if erros and 'EMAIL' in erros.keys() %}
+                        <div class="invalid-feedback">
+                            {{ erros['EMAIL'] }}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="senha" class="form-label">Senha *</label>
+                        <div class="input-group">
+                            <span class="input-group-icon">
+                                <i class="bi bi-lock-fill"></i>
+                            </span>
+                            <input type="password" class="form-control {% if erros and 'SENHA' in erros.keys() %}is-invalid{% endif %}" id="senha" name="senha"
+                                placeholder="Digite sua senha" required>
+                            <button type="button" class="input-group-toggle" id="toggleSenha">
+                                <i class="bi bi-eye-fill"></i>
+                            </button>
+                        </div>
+                        {% if erros and 'SENHA' in erros.keys() %}
+                        <div class="invalid-feedback">
+                            {{ erros['SENHA'] }}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Opções adicionais -->
+                    <div class="form-options">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="lembrarMe" name="lembrarMe">
+                            <label class="form-check-label" for="lembrarMe">
+                                Lembrar de mim
+                            </label>
+                        </div>
+                        <a href="/recuperar-senha" class="forgot-password">Esqueceu a senha?</a>
+                    </div>
+
+                    <!-- Botão de login -->
+                    <button type="submit" class="btn-login">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>
+                        Entrar
+                    </button>
+                </form>
+
+                <!-- Link para cadastro -->
+                <div class="text-center mt-4">
+                    <p class="mb-0 small">Não tem uma conta? <a href="/escolha_cadastro"
+                            class="text-primary-custom fw-bold">Cadastre-se</a></p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+{% endblock %}
+
+{% block scripts %}
+    <script src="/static/js/login.js?v=2"></script>
+{% endblock %}

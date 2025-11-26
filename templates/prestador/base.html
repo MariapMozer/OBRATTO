@@ -1,91 +1,49 @@
-<!DOCTYPE html>
-<html lang="pt-br">
+{% extends "base_authenticated.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="/static/css/home.css">
-    <title>Obratto :: {% block titulo %}Principal{% endblock %}</title>
-</head>
+{#
+    Template: Base Prestador
+    Descrição: Template base para páginas do prestador
+    Estende: base_authenticated.html
+#}
 
-<body class="d-flex flex-column min-vh-100">
-    <header>
-        <nav class="navbar navbar-expand-lg navbar-dark fundo-azul">
-            <div class="container">
-                <a class="navbar-brand py-3" href="#">
-                    <img src="./static/img/logo_branca.png" alt="Logo" height="50">
-                </a>
-                <form class="d-flex ms-auto align-items-center" role="search">
-                    <input class="form-control me-2 rounded rounded-4" type="text"
-                        placeholder="Busque pelos melhores serviços" aria-label="Search">
-                    <a href="#" class="text-white me-3">
-                        <i class="bi bi-search"></i>
-                    </a>
-                    <a href="#" class="text-white">
-                        <i class="bi bi-person fs-5"></i>
-                    </a>
-                </form>
-            </div>
-        </nav>
-    </header>
-    {% block conteudo %}
-    {% endblock %}
-    <footer class="bg-dark text-white p-3 mt-auto">
-        <div class="container">
-            <div class="row row-cols-1 row-cols-md-4">
-                <div class="col">
-                    <div class="mb-4">
-                        <h3 class="fw-bold mb-3">Obratto</h3>
-                        <p>Transformando a forma como a construção civil conecta profissionais, fornecedores e clientes.
-                        </p>
-                        <img src="./static/img/logo_branca.png" alt="Obratto Logo" height="80px" class="mt-3">
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="mb-4">
-                        <h3 class="fw-bold mb-3">Links Rápidos</h3>
-                        <ul class="list-unstyled">
-                            <li><a href="#header" class="text-white text-decoration-none">Home</a></li>
-                            <li><a href="#servicos" class="text-white text-decoration-none">Serviços</a></li>
-                            <li><a href="#planos_title" class="text-white text-decoration-none">Planos</a></li>
-                            <li><a href="#categorias_title" class="text-white text-decoration-none">Sobre nós</a></li>
-                            <li><a href="#rodapé" class="text-white text-decoration-none">Contato</a></li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="mb-4">
-                        <h3 class="fw-bold mb-3">Serviços</h3>
-                        <ul class="list-unstyled">
-                            <li><a href="#" class="text-white text-decoration-none">Aluguel de Maquinário</a></li>
-                            <li><a href="#" class="text-white text-decoration-none">Reformas</a></li>
-                            <li><a href="#" class="text-white text-decoration-none">Para a Casa</a></li>
-                            <li><a href="#" class="text-white text-decoration-none">Construção</a></li>
-                            <li><a href="#" class="text-white text-decoration-none">Fornecedores</a></li>
-                            <li><a href="#" class="text-white text-decoration-none">Outros Serviços</a></li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="mb-4">
-                        <h3 class="fw-bold mb-3">Newsletter <i class="bi bi-envelope"></i></h3>
-                        <p>Inscreva-se para receber nossas novidades e ofertas exclusivas.</p>
-                        <form class="d-flex flex-column newsletter-form">
-                            <input type="email" class="form-control mb-2" placeholder="Seu e-mail">
-                            <button type="submit" class="btn btn-primary">Enviar</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-            <hr class="my-4">
-            <div class="text-center text-white">
-                <p class="mb-0">&copy; 2025 Obratto. Todos os direitos reservados.</p>
-            </div>
-        </div>
-    </footer>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+{% from 'components/user_dropdown.html' import user_dropdown %}
 
-</html>
+{% block titulo %}{% block prestador_titulo %}Prestador{% endblock %}{% endblock %}
+
+{% block navbar_search %}
+<form class="d-flex ms-auto align-items-center" role="search">
+    <input class="form-control me-2 rounded rounded-4" type="text"
+        placeholder="Busque pelos melhores serviços" aria-label="Search">
+    <a href="#" class="text-white me-3">
+        <i class="bi bi-search"></i>
+    </a>
+</form>
+{% endblock %}
+
+{% block navbar_menu %}
+{% if usuario_logado %}
+    {% set menu_prestador = [
+        {'url': '/prestador/perfil', 'icon': 'person', 'label': 'Perfil'},
+        {'url': '/prestador', 'icon': 'house', 'label': 'Home'},
+        {'url': '/prestador/servicos', 'icon': 'tools', 'label': 'Meus Serviços'},
+        {'url': '/prestador/contratacoes', 'icon': 'briefcase', 'label': 'Minhas Contratações'},
+        {'url': '/prestador/solicitacoes', 'icon': 'list-check', 'label': 'Solicitações'},
+        {'url': '/prestador/agenda', 'icon': 'calendar', 'label': 'Agenda'},
+        {'divider': True},
+        {'url': '/logout', 'icon': 'box-arrow-right', 'label': 'Sair', 'danger': True}
+    ] %}
+    {{ user_dropdown(usuario_logado, menu_prestador, default_label='Prestador') }}
+{% else %}
+    <a href="/login" class="text-white">
+        <h5><strong>ENTRAR</strong></h5>
+    </a>
+{% endif %}
+{% endblock %}
+
+{% block conteudo %}
+{% block prestador_conteudo %}{% endblock %}
+{% endblock %}
+
+{% block scripts %}
+{% block prestador_scripts %}{% endblock %}
+{% endblock %}

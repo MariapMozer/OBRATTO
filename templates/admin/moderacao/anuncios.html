@@ -1,0 +1,320 @@
+{% extends "administrador/base_admin.html" %}
+{% block admin_css %}<link rel="stylesheet" href="/static/css/moderar_anuncio.css">{% endblock %}
+{% block admin_titulo %}Moderação de Anúncios{% endblock %}
+{% block admin_conteudo %}
+<main class="container-fluid p-0">
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="text-center">
+                <h1 class="hero-title">
+                    <i class="bi bi-shield-check me-3"></i>
+                    Moderação de Anúncios
+                </h1>
+                <p class="hero-subtitle">Gerencie e modere todos os anúncios da plataforma</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Estatísticas -->
+    <section class="container">
+        <div class="estatisticas">
+            <div class="row">
+                <div class="col-lg-3 col-md-6">
+                    <div class="estatistica-item">
+                        <span class="estatistica-numero" id="totalAnuncios">127</span>
+                        <span class="estatistica-label">Total de Anúncios</span>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="estatistica-item">
+                        <span class="estatistica-numero text-warning" id="pendentes">23</span>
+                        <span class="estatistica-label">Pendentes</span>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="estatistica-item">
+                        <span class="estatistica-numero text-success" id="aprovados">89</span>
+                        <span class="estatistica-label">Aprovados</span>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="estatistica-item">
+                        <span class="estatistica-numero text-danger" id="rejeitados">15</span>
+                        <span class="estatistica-label">Rejeitados</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Filtros -->
+    <section class="filtros-section">
+        <div class="container">
+            <div class="search-container">
+                <div class="row g-3">
+                    <div class="col-lg-4">
+                        <input type="text" class="search-input" id="buscarAnuncio" placeholder="Buscar por título, descrição ou usuário...">
+                    </div>
+                    <div class="col-lg-2">
+                        <select class="filtro-select form-select" id="filtroStatus">
+                            <option value="">Todos os Status</option>
+                            <option value="pendente">Pendentes</option>
+                            <option value="aprovado">Aprovados</option>
+                            <option value="rejeitado">Rejeitados</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-2">
+                        <select class="filtro-select form-select" id="filtroTipo">
+                            <option value="">Todos os Tipos</option>
+                            <option value="prestador">Prestador</option>
+                            <option value="fornecedor">Fornecedor</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-2">
+                        <select class="filtro-select form-select" id="filtroData">
+                            <option value="">Todas as Datas</option>
+                            <option value="hoje">Hoje</option>
+                            <option value="semana">Esta Semana</option>
+                            <option value="mes">Este Mês</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-2">
+                        <button class="btn btn-primary w-100" onclick="aplicarFiltros()">
+                            <i class="bi bi-funnel me-2"></i>Filtrar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Lista de Anúncios -->
+    <section class="anuncios-section">
+        <div class="container">
+            <div id="listaAnuncios">
+                <!-- Anúncio Pendente -->
+                <div class="anuncio-card pendente" data-status="pendente" data-tipo="prestador">
+                    <div class="anuncio-header">
+                        <h3 class="anuncio-titulo">Serviços de Pedreiro Especializado</h3>
+                        <span class="anuncio-status status-pendente">Pendente</span>
+                    </div>
+                    <div class="anuncio-info">
+                        <div class="info-item">
+                            <i class="bi bi-person"></i>
+                            <span>João Silva (Prestador)</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="bi bi-calendar"></i>
+                            <span>28/01/2025</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="bi bi-geo-alt"></i>
+                            <span>São Paulo, SP</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="bi bi-tag"></i>
+                            <span>Construção</span>
+                        </div>
+                    </div>
+                    <div class="anuncio-descricao">
+                        Oferecemos serviços completos de pedreiro com mais de 15 anos de experiência. Especializado em alvenaria, acabamentos, reformas residenciais e comerciais. Orçamento gratuito e garantia de qualidade.
+                    </div>
+                    <div class="anuncio-acoes">
+                        <button class="btn btn-detalhes" onclick="verDetalhes(1)">
+                            <i class="bi bi-eye me-1"></i>Detalhes
+                        </button>
+                        <button class="btn btn-aprovar" onclick="aprovarAnuncio(1)">
+                            <i class="bi bi-check-lg me-1"></i>Aprovar
+                        </button>
+                        <button class="btn btn-rejeitar" onclick="rejeitarAnuncio(1)">
+                            <i class="bi bi-x-lg me-1"></i>Rejeitar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Anúncio Aprovado -->
+                <div class="anuncio-card aprovado" data-status="aprovado" data-tipo="fornecedor">
+                    <div class="anuncio-header">
+                        <h3 class="anuncio-titulo">Materiais de Construção - Preços Especiais</h3>
+                        <span class="anuncio-status status-aprovado">Aprovado</span>
+                    </div>
+                    <div class="anuncio-info">
+                        <div class="info-item">
+                            <i class="bi bi-building"></i>
+                            <span>Construmax Ltda (Fornecedor)</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="bi bi-calendar"></i>
+                            <span>27/01/2025</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="bi bi-geo-alt"></i>
+                            <span>Rio de Janeiro, RJ</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="bi bi-tag"></i>
+                            <span>Materiais</span>
+                        </div>
+                    </div>
+                    <div class="anuncio-descricao">
+                        Fornecemos materiais de construção com os melhores preços da região. Cimento, areia, brita, tijolos, telhas e muito mais. Entrega rápida e atendimento especializado.
+                    </div>
+                    <div class="anuncio-acoes">
+                        <button class="btn btn-detalhes" onclick="verDetalhes(2)">
+                            <i class="bi bi-eye me-1"></i>Detalhes
+                        </button>
+                        <button class="btn btn-rejeitar" onclick="rejeitarAnuncio(2)">
+                            <i class="bi bi-x-lg me-1"></i>Remover
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Anúncio Pendente -->
+                <div class="anuncio-card pendente" data-status="pendente" data-tipo="prestador">
+                    <div class="anuncio-header">
+                        <h3 class="anuncio-titulo">Eletricista Residencial e Comercial</h3>
+                        <span class="anuncio-status status-pendente">Pendente</span>
+                    </div>
+                    <div class="anuncio-info">
+                        <div class="info-item">
+                            <i class="bi bi-person"></i>
+                            <span>Carlos Mendes (Prestador)</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="bi bi-calendar"></i>
+                            <span>28/01/2025</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="bi bi-geo-alt"></i>
+                            <span>Belo Horizonte, MG</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="bi bi-tag"></i>
+                            <span>Elétrica</span>
+                        </div>
+                    </div>
+                    <div class="anuncio-descricao">
+                        Eletricista com certificação técnica oferece serviços de instalação, manutenção e reparo de sistemas elétricos. Atendimento 24h para emergências.
+                    </div>
+                    <div class="anuncio-acoes">
+                        <button class="btn btn-detalhes" onclick="verDetalhes(3)">
+                            <i class="bi bi-eye me-1"></i>Detalhes
+                        </button>
+                        <button class="btn btn-aprovar" onclick="aprovarAnuncio(3)">
+                            <i class="bi bi-check-lg me-1"></i>Aprovar
+                        </button>
+                        <button class="btn btn-rejeitar" onclick="rejeitarAnuncio(3)">
+                            <i class="bi bi-x-lg me-1"></i>Rejeitar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Anúncio Rejeitado -->
+                <div class="anuncio-card rejeitado" data-status="rejeitado" data-tipo="prestador">
+                    <div class="anuncio-header">
+                        <h3 class="anuncio-titulo">Serviços Diversos - Contato WhatsApp</h3>
+                        <span class="anuncio-status status-rejeitado">Rejeitado</span>
+                    </div>
+                    <div class="anuncio-info">
+                        <div class="info-item">
+                            <i class="bi bi-person"></i>
+                            <span>Usuário Anônimo (Prestador)</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="bi bi-calendar"></i>
+                            <span>26/01/2025</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="bi bi-geo-alt"></i>
+                            <span>Não informado</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="bi bi-exclamation-triangle text-danger"></i>
+                            <span>Violação de normas</span>
+                        </div>
+                    </div>
+                    <div class="anuncio-descricao">
+                        Faço qualquer serviço, chama no WhatsApp 11999999999. Preços baixos e sem nota fiscal.
+                    </div>
+                    <div class="anuncio-acoes">
+                        <button class="btn btn-detalhes" onclick="verDetalhes(4)">
+                            <i class="bi bi-eye me-1"></i>Detalhes
+                        </button>
+                        <small class="text-muted">Rejeitado por: Informações inadequadas</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Paginação -->
+            <nav class="paginacao">
+                <ul class="pagination">
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1">Anterior</a>
+                    </li>
+                    <li class="page-item active">
+                        <a class="page-link" href="#">1</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">2</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">3</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">Próximo</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </section>
+</main>
+
+<!-- Modal de Detalhes -->
+<div class="modal fade" id="modalDetalhes" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-info-circle me-2"></i>
+                    Detalhes do Anúncio
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="modalDetalhesContent">
+                <!-- Conteúdo será carregado dinamicamente -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                <button type="button" class="btn btn-success" id="btnAprovarModal">
+                    <i class="bi bi-check-lg me-1"></i>Aprovar
+                </button>
+                <button type="button" class="btn btn-danger" id="btnRejeitarModal">
+                    <i class="bi bi-x-lg me-1"></i>Rejeitar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmação -->
+<div class="modal fade" id="modalConfirmacao" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalConfirmacaoTitulo">Confirmar Ação</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="modalConfirmacaoTexto">
+                <!-- Texto será definido dinamicamente -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btnConfirmarAcao">Confirmar</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% block admin_scripts %}<script src="/static/js/moderar_anuncios.js"></script>{% endblock %}
+{% endblock %}
+

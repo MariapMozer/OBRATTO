@@ -1,0 +1,52 @@
+{% extends "base_root.html" %}
+
+{#
+    Template: Base Público Simplificado (Base2)
+    Descrição: Template base simplificado para páginas públicas sem footer completo
+    Estende: base_root.html
+    Usado por: administrador/base_admin.html e páginas simples
+#}
+
+{% block titulo %}{% block base2_titulo %}Obratto{% endblock %}{% endblock %}
+
+{% block navbar %}
+<nav class="navbar navbar-expand-lg navbar-dark fundo-azul">
+    <div class="container">
+        <a class="navbar-brand d-flex align-items-center py-3 logo" href="/">
+            <img src="/static/img/logo_casinha_azul.png" alt="Logo" height="40" class="me-2">
+            <img src="/static/img/logo_nome_azul.png" alt="Logo" height="40" class="me-2">
+        </a>
+        {% block menu %}{% endblock %}
+    </div>
+</nav>
+{% endblock %}
+
+{% block conteudo %}
+{% block base2_conteudo %}{% endblock %}
+{% endblock %}
+
+{% block footer %}
+<footer id="rodapé" class="text-white py-4">
+    <div class="container text-center">
+        <div class="logo-footer mb-3">
+            <img src="/static/img/logo_branca.png" alt="Obratto Logo" id="logo-footer" height="80">
+        </div>
+        <p class="mb-2">Transformando a forma como a construção civil conecta profissionais, fornecedores e clientes.</p>
+
+        <nav class="mb-3">
+            <a href="/" class="text-white text-decoration-none mx-2">Home</a> |
+            <a href="/servicos" class="text-white text-decoration-none mx-2">Serviços</a> |
+            <a href="/" class="text-white text-decoration-none mx-2">Sobre nós</a> |
+            <a href="/" class="text-white text-decoration-none mx-2">Contato</a>
+        </nav>
+
+        <hr class="border-light">
+
+        <p class="mb-0 text-muted">&copy; 2025 Obratto. Todos os direitos reservados.</p>
+    </div>
+</footer>
+{% endblock %}
+
+{% block scripts %}
+{% block base2_scripts %}{% endblock %}
+{% endblock %}

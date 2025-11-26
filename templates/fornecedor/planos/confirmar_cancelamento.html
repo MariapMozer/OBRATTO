@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmar Cancelamento - OBRATTO</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .navbar {
+            background-color: #dc3545;
+            padding: 1rem 2rem;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .navbar h1 {
+            font-size: 1.5rem;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 2rem auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 2rem;
+        }
+        
+        .warning-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .warning-icon {
+            font-size: 4rem;
+            color: #dc3545;
+            margin-bottom: 1rem;
+        }
+        
+        .warning-title {
+            color: #dc3545;
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .warning-subtitle {
+            color: #666;
+            font-size: 1rem;
+        }
+        
+        .plan-info {
+            background-color: #f8f9fa;
+            border-left: 4px solid #dc3545;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .plan-info h3 {
+            color: #dc3545;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+        
+        .plan-detail {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            padding: 0.25rem 0;
+        }
+        
+        .plan-detail:last-child {
+            margin-bottom: 0;
+            font-weight: bold;
+            border-top: 1px solid #dee2e6;
+            padding-top: 0.75rem;
+            margin-top: 0.75rem;
+        }
+        
+        .consequences {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .consequences h4 {
+            color: #856404;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+        
+        .consequences ul {
+            color: #856404;
+            margin-left: 1.5rem;
+        }
+        
+        .consequences li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s;
+            min-width: 120px;
+        }
+        
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c82333;
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            transform: translateY(-1px);
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+        }
+        
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>🏢 OBRATTO - Cancelar Plano</h1>
+        <div class="nav-links">
+            <a href="/fornecedor/planos/listar">💳 Planos</a>
+            <a href="/fornecedor/planos/meu_plano">👤 Meu Plano</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="warning-header">
+            <div class="warning-icon">⚠️</div>
+            <h1 class="warning-title">Confirmar Cancelamento</h1>
+            <p class="warning-subtitle">Você está prestes a cancelar sua assinatura</p>
+        </div>
+
+        {% if mensagem %}
+            <div class="alert alert-error">
+                {{ mensagem }}
+            </div>
+        {% endif %}
+
+        {% if plano_atual %}
+            <div class="plan-info">
+                <h3>📋 Plano que será cancelado:</h3>
+                <div class="plan-detail">
+                    <span><strong>Nome:</strong></span>
+                    <span>{{ plano_atual.nome_plano }}</span>
+                </div>
+                <div class="plan-detail">
+                    <span><strong>Tipo:</strong></span>
+                    <span>{{ plano_atual.tipo_plano.title() }}</span>
+                </div>
+                <div class="plan-detail">
+                    <span><strong>Limite de Serviços:</strong></span>
+                    <span>{{ plano_atual.limite_servico }} por mês</span>
+                </div>
+                <div class="plan-detail">
+                    <span><strong>Valor Mensal:</strong></span>
+                    <span>R$ {{ "%.2f"|format(plano_atual.valor_mensal) }}</span>
+                </div>
+            </div>
+
+            <div class="consequences">
+                <h4>⚠️ Consequências do cancelamento:</h4>
+                <ul>
+                    <li>Você perderá acesso imediato a todos os benefícios do plano</li>
+                    <li>Seus serviços ativos podem ser suspensos</li>
+                    <li>Não haverá reembolso do período já pago</li>
+                    <li>Para reativar, será necessário fazer uma nova assinatura</li>
+                    <li>Seus dados serão mantidos por 30 dias para eventual reativação</li>
+                </ul>
+            </div>
+
+            <div class="form-actions">
+                <form method="post" action="/fornecedor/planos/confirmar_cancelamento" style="display: inline;">
+                    <input type="hidden" name="id_fornecedor" value="{{ id_fornecedor }}">
+                    <button type="submit" class="btn btn-danger" 
+                            onclick="return confirm('Tem certeza absoluta que deseja cancelar? Esta ação não pode ser desfeita!')">
+                        ❌ Sim, Cancelar Definitivamente
+                    </button>
+                </form>
+                
+                <a href="/fornecedor/planos/cancelar" class="btn btn-secondary">
+                    ↩️ Voltar
+                </a>
+            </div>
+        {% else %}
+            <div class="alert alert-error">
+                <strong>Erro:</strong> Não foi possível encontrar seu plano atual. 
+                <a href="/fornecedor/planos/listar">Voltar aos planos</a>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>

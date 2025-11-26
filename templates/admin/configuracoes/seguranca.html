@@ -1,0 +1,144 @@
+{% extends "administrador/base_admin.html" %}
+{% block admin_titulo %}Configurar Segurança{% endblock %}
+{% block admin_conteudo %}
+<main class="flex-grow-1">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 text-center">
+                <div class="card shadow-lg border-0 rounded-4">
+                    <div class="card-body p-5">
+                        <div class="mb-4">
+                            <i class="bi bi-tools display-1 text-warning"></i>
+                        </div>
+                        <h1 class="display-4 mb-3">Em Construção</h1>
+                        <p class="lead text-muted mb-4">
+                            Esta funcionalidade ainda está sendo desenvolvida pelos alunos.
+                        </p>
+
+                        <div class="alert alert-info text-start" role="alert">
+                            <h5 class="alert-heading"><i class="bi bi-info-circle me-2"></i><strong>TODO ALUNO:</strong> Implementar Painel de Configurações de Segurança</h5>
+                            <hr>
+                            <p class="mb-2"><strong>Descrição:</strong></p>
+                            <p>Esta página deve permitir que administradores configurem políticas de segurança da plataforma, gerenciem permissões e monitorem atividades suspeitas para proteger dados e usuários.</p>
+
+                            <p class="mb-2 mt-3"><strong>Funcionalidades a implementar:</strong></p>
+                            <ul class="text-start">
+                                <li><strong>Políticas de Senha:</strong>
+                                    <ul>
+                                        <li>Tamanho mínimo de senha</li>
+                                        <li>Exigir caracteres especiais</li>
+                                        <li>Exigir números e letras maiúsculas</li>
+                                        <li>Tempo de expiração de senha (forçar troca)</li>
+                                        <li>Histórico de senhas (impedir reutilização)</li>
+                                        <li>Bloqueio após X tentativas falhas</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Autenticação:</strong>
+                                    <ul>
+                                        <li>Habilitar autenticação de dois fatores (2FA)</li>
+                                        <li>Tempo de expiração de sessão</li>
+                                        <li>Permitir múltiplas sessões simultâneas</li>
+                                        <li>Logout automático por inatividade</li>
+                                        <li>Confirmar localização em novos dispositivos</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Controle de Acesso:</strong>
+                                    <ul>
+                                        <li>Gerenciar permissões de administradores</li>
+                                        <li>Criar perfis de acesso (admin total, moderador, suporte)</li>
+                                        <li>Definir recursos acessíveis por perfil</li>
+                                        <li>Log de acessos administrativos</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Rate Limiting:</strong>
+                                    <ul>
+                                        <li>Limitar requisições por IP</li>
+                                        <li>Limitar tentativas de login</li>
+                                        <li>Limitar criação de contas por IP/dia</li>
+                                        <li>Limitar upload de arquivos</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Bloqueios e Banimentos:</strong>
+                                    <ul>
+                                        <li>Lista de IPs bloqueados</li>
+                                        <li>Lista de emails bloqueados</li>
+                                        <li>Bloquear domínios temporários (10minutemail, etc.)</li>
+                                        <li>Gerenciar usuários banidos</li>
+                                        <li>Motivo e duração do banimento</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Monitoramento de Segurança:</strong>
+                                    <ul>
+                                        <li>Log de tentativas de login falhadas</li>
+                                        <li>Log de acessos suspeitos (localizações incomuns)</li>
+                                        <li>Alertas de atividades anormais</li>
+                                        <li>Dashboard de segurança:
+                                            <ul>
+                                                <li>IPs mais ativos</li>
+                                                <li>Tentativas de invasão</li>
+                                                <li>Contas comprometidas</li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li><strong>Proteção de Dados:</strong>
+                                    <ul>
+                                        <li>Habilitar HTTPS obrigatório</li>
+                                        <li>Configurar CORS (origens permitidas)</li>
+                                        <li>Headers de segurança (CSP, X-Frame-Options, etc.)</li>
+                                        <li>Criptografia de dados sensíveis</li>
+                                        <li>Backup automático do banco de dados</li>
+                                    </ul>
+                                </li>
+                                <li><strong>LGPD/GDPR:</strong>
+                                    <ul>
+                                        <li>Consentimento de coleta de dados</li>
+                                        <li>Exportar dados de usuário (direito de portabilidade)</li>
+                                        <li>Excluir dados de usuário (direito ao esquecimento)</li>
+                                        <li>Log de consentimentos</li>
+                                        <li>Política de privacidade e termos de uso</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Firewall de Aplicação (WAF):</strong>
+                                    <ul>
+                                        <li>Bloquear padrões de SQL Injection</li>
+                                        <li>Bloquear padrões de XSS</li>
+                                        <li>Validação de entrada de dados</li>
+                                        <li>Sanitização automática</li>
+                                    </ul>
+                                </li>
+                            </ul>
+
+                            <p class="mb-2 mt-3"><strong>Alertas e Notificações:</strong></p>
+                            <ul class="text-start">
+                                <li>Email imediato para administradores em caso de:
+                                    <ul>
+                                        <li>Múltiplas tentativas de login falhadas</li>
+                                        <li>Acesso de localização suspeita</li>
+                                        <li>Mudança de configurações críticas</li>
+                                    </ul>
+                                </li>
+                            </ul>
+
+                            <p class="mb-2 mt-3"><strong>Arquivos relacionados:</strong></p>
+                            <ul class="text-start">
+                                <li><code>routes/administrador/administrador_usuarios.py</code> (linha 719) - Rota GET</li>
+                                <li><code>util/security.py</code> - Funções de segurança</li>
+                                <li><code>util/rate_limiter.py</code> - Criar limitador de requisições</li>
+                                <li><code>data/auditoria/</code> - Logs de segurança</li>
+                                <li><code>middleware/security_middleware.py</code> - Criar middleware de segurança</li>
+                            </ul>
+
+                            <p class="mb-0 mt-3"><strong>IMPORTANTE:</strong> Segurança é crítica! Teste todas as configurações em ambiente de desenvolvimento antes de aplicar em produção. Mantenha backups frequentes.</p>
+                        </div>
+
+                        <a href="/administrador/home" class="btn btn-primary btn-lg mt-3">
+                            <i class="bi bi-arrow-left me-2"></i>Voltar para Home
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}

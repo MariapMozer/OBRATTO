@@ -1,0 +1,273 @@
+{#
+    Componente: Form Input
+    Descrição: Componentes de formulário reutilizáveis com validação Bootstrap
+
+    Macros disponíveis:
+    - text_input: Input de texto/email/number/etc
+    - textarea_input: Textarea
+    - select_input: Select dropdown
+    - checkbox_input: Checkbox
+    - radio_input: Radio button
+    - file_input: Input de arquivo
+
+    Uso:
+    {% from 'components/form_input.html' import text_input, textarea_input, select_input %}
+    {{ text_input('nome', 'Nome Completo', placeholder='Digite seu nome', required=True) }}
+#}
+
+{# Text Input (text, email, number, password, etc) #}
+{% macro text_input(
+    name,
+    label,
+    type='text',
+    value='',
+    placeholder='',
+    required=False,
+    readonly=False,
+    disabled=False,
+    help_text='',
+    error='',
+    input_class='',
+    icon=None
+) %}
+<div class="mb-3">
+    <label for="{{ name }}" class="form-label">
+        {{ label }}
+        {% if required %}<span class="text-danger">*</span>{% endif %}
+    </label>
+
+    {% if icon %}
+    <div class="input-group">
+        <span class="input-group-text"><i class="bi bi-{{ icon }}"></i></span>
+    {% endif %}
+
+        <input type="{{ type }}"
+               class="form-control {{ input_class }} {% if error %}is-invalid{% endif %}"
+               id="{{ name }}"
+               name="{{ name }}"
+               value="{{ value }}"
+               placeholder="{{ placeholder }}"
+               {% if required %}required{% endif %}
+               {% if readonly %}readonly{% endif %}
+               {% if disabled %}disabled{% endif %}>
+
+    {% if icon %}
+    </div>
+    {% endif %}
+
+    {% if help_text %}
+    <div class="form-text">{{ help_text }}</div>
+    {% endif %}
+
+    {% if error %}
+    <div class="invalid-feedback">{{ error }}</div>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{# Textarea Input #}
+{% macro textarea_input(
+    name,
+    label,
+    value='',
+    rows=3,
+    placeholder='',
+    required=False,
+    readonly=False,
+    disabled=False,
+    help_text='',
+    error='',
+    maxlength=None
+) %}
+<div class="mb-3">
+    <label for="{{ name }}" class="form-label">
+        {{ label }}
+        {% if required %}<span class="text-danger">*</span>{% endif %}
+    </label>
+
+    <textarea class="form-control {% if error %}is-invalid{% endif %}"
+              id="{{ name }}"
+              name="{{ name }}"
+              rows="{{ rows }}"
+              placeholder="{{ placeholder }}"
+              {% if required %}required{% endif %}
+              {% if readonly %}readonly{% endif %}
+              {% if disabled %}disabled{% endif %}
+              {% if maxlength %}maxlength="{{ maxlength }}"{% endif %}>{{ value }}</textarea>
+
+    {% if help_text %}
+    <div class="form-text">{{ help_text }}</div>
+    {% endif %}
+
+    {% if error %}
+    <div class="invalid-feedback">{{ error }}</div>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{# Select Input #}
+{% macro select_input(
+    name,
+    label,
+    options,
+    selected='',
+    required=False,
+    disabled=False,
+    help_text='',
+    error='',
+    placeholder='Selecione...'
+) %}
+<div class="mb-3">
+    <label for="{{ name }}" class="form-label">
+        {{ label }}
+        {% if required %}<span class="text-danger">*</span>{% endif %}
+    </label>
+
+    <select class="form-select {% if error %}is-invalid{% endif %}"
+            id="{{ name }}"
+            name="{{ name }}"
+            {% if required %}required{% endif %}
+            {% if disabled %}disabled{% endif %}>
+        <option value="">{{ placeholder }}</option>
+        {% for option in options %}
+            {% if option is mapping %}
+            <option value="{{ option.value }}" {% if option.value == selected %}selected{% endif %}>
+                {{ option.label }}
+            </option>
+            {% else %}
+            <option value="{{ option }}" {% if option == selected %}selected{% endif %}>
+                {{ option }}
+            </option>
+            {% endif %}
+        {% endfor %}
+    </select>
+
+    {% if help_text %}
+    <div class="form-text">{{ help_text }}</div>
+    {% endif %}
+
+    {% if error %}
+    <div class="invalid-feedback">{{ error }}</div>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{# Checkbox Input #}
+{% macro checkbox_input(
+    name,
+    label,
+    checked=False,
+    value='1',
+    disabled=False,
+    help_text='',
+    error=''
+) %}
+<div class="mb-3">
+    <div class="form-check">
+        <input class="form-check-input {% if error %}is-invalid{% endif %}"
+               type="checkbox"
+               id="{{ name }}"
+               name="{{ name }}"
+               value="{{ value }}"
+               {% if checked %}checked{% endif %}
+               {% if disabled %}disabled{% endif %}>
+        <label class="form-check-label" for="{{ name }}">
+            {{ label }}
+        </label>
+    </div>
+
+    {% if help_text %}
+    <div class="form-text">{{ help_text }}</div>
+    {% endif %}
+
+    {% if error %}
+    <div class="invalid-feedback d-block">{{ error }}</div>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{# Radio Input #}
+{% macro radio_input(
+    name,
+    label,
+    options,
+    selected='',
+    inline=False,
+    disabled=False,
+    help_text='',
+    error=''
+) %}
+<div class="mb-3">
+    <label class="form-label">{{ label }}</label>
+
+    {% for option in options %}
+    <div class="form-check {% if inline %}form-check-inline{% endif %}">
+        {% if option is mapping %}
+        <input class="form-check-input {% if error %}is-invalid{% endif %}"
+               type="radio"
+               id="{{ name }}_{{ loop.index }}"
+               name="{{ name }}"
+               value="{{ option.value }}"
+               {% if option.value == selected %}checked{% endif %}
+               {% if disabled %}disabled{% endif %}>
+        <label class="form-check-label" for="{{ name }}_{{ loop.index }}">
+            {{ option.label }}
+        </label>
+        {% else %}
+        <input class="form-check-input {% if error %}is-invalid{% endif %}"
+               type="radio"
+               id="{{ name }}_{{ loop.index }}"
+               name="{{ name }}"
+               value="{{ option }}"
+               {% if option == selected %}checked{% endif %}
+               {% if disabled %}disabled{% endif %}>
+        <label class="form-check-label" for="{{ name }}_{{ loop.index }}">
+            {{ option }}
+        </label>
+        {% endif %}
+    </div>
+    {% endfor %}
+
+    {% if help_text %}
+    <div class="form-text">{{ help_text }}</div>
+    {% endif %}
+
+    {% if error %}
+    <div class="invalid-feedback d-block">{{ error }}</div>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{# File Input #}
+{% macro file_input(
+    name,
+    label,
+    required=False,
+    accept='',
+    help_text='',
+    error='',
+    multiple=False
+) %}
+<div class="mb-3">
+    <label for="{{ name }}" class="form-label">
+        {{ label }}
+        {% if required %}<span class="text-danger">*</span>{% endif %}
+    </label>
+
+    <input class="form-control {% if error %}is-invalid{% endif %}"
+           type="file"
+           id="{{ name }}"
+           name="{{ name }}"
+           {% if required %}required{% endif %}
+           {% if accept %}accept="{{ accept }}"{% endif %}
+           {% if multiple %}multiple{% endif %}>
+
+    {% if help_text %}
+    <div class="form-text">{{ help_text }}</div>
+    {% endif %}
+
+    {% if error %}
+    <div class="invalid-feedback">{{ error }}</div>
+    {% endif %}
+</div>
+{% endmacro %}

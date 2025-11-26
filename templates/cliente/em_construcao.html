@@ -1,0 +1,38 @@
+{% extends "cliente/base.html" %}
+{% block titulo %}{{ titulo | default('Em Construção') }}{% endblock %}
+{% block conteudo %}
+<main class="flex-grow-1 py-5">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <div class="card shadow-lg border-0 rounded-4">
+                    <div class="card-body p-5">
+                        <div class="mb-4">
+                            <i class="bi {{ icone | default('bi-tools') }} display-1 text-warning"></i>
+                        </div>
+                        <h1 class="display-4 mb-3">{{ titulo | default('Em Construção') }}</h1>
+                        <p class="lead text-muted mb-4">
+                            Esta funcionalidade ainda está sendo desenvolvida.
+                        </p>
+                        {% if descricao %}
+                        <div class="alert alert-info" role="alert">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <strong>Em breve:</strong> {{ descricao }}
+                        </div>
+                        {% endif %}
+                        <div class="mt-4">
+                            <p class="text-muted small">
+                                <i class="bi bi-lightbulb me-2"></i>
+                                Estamos trabalhando para trazer esta funcionalidade o mais rápido possível!
+                            </p>
+                        </div>
+                        <a href="/cliente" class="btn btn-primary btn-lg mt-3">
+                            <i class="bi bi-arrow-left me-2"></i>Voltar para Home
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}

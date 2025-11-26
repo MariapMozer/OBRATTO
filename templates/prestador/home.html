@@ -1,180 +1,176 @@
-{% extends "publico/base2.html" %}
-{% block css %} <link rel="stylesheet" href="/static/css/home_prestador.css"> {% endblock %}
-{% block titulo %}Fornecedor{% endblock %}
-{% block menu %} 
-<div class="navbar-nav ms-auto">
-    <div class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle text-dark-blue d-flex align-items-center" href="/publico/perfil/editar/{id}" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="bi bi-person-circle fs-5 me-2"></i>
-            Prestador
-        </a>
-        <ul class="dropdown-menu dropdown-menu-end">
-            <li><a class="dropdown-item" href="/publico/perfil/editar/{id}"><i class="bi bi-person me-2"></i>Perfil</a></li>
-            <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Configurações</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="/"><i class="bi bi-box-arrow-right me-2"></i>Sair</a></li>
-        </ul>
-    </div>
+{% extends "prestador/base.html" %}
+
+{#
+    Template: Home Prestador
+    Descrição: Página inicial do prestador de serviços
+    Estende: prestador/base.html
+#}
+
+{% from 'components/service_card.html' import service_card %}
+{% from 'components/stats_card.html' import stats_card, stats_row %}
+
+{% block css %}
+<link rel="stylesheet" href="/static/css/home_prestador.css">
+{% endblock %}
+
+{% block prestador_titulo %}Home - Prestador{% endblock %}
+
+{% block prestador_conteudo %}
+<div class="container-fluid px-4 py-4">
+    <!-- Stats Row -->
+    {% if mostrar_stats %}
+    {% call stats_row() %}
+        {{ stats_card(
+            title='Serviços Ativos',
+            value=total_servicos|default('0'),
+            icon='tools',
+            icon_class='text-primary',
+            link_url='/prestador/servicos'
+        ) }}
+
+        {{ stats_card(
+            title='Solicitações',
+            value=total_solicitacoes|default('0'),
+            icon='inbox',
+            icon_class='text-info',
+            link_url='/prestador/solicitacoes'
+        ) }}
+
+        {{ stats_card(
+            title='Contratações',
+            value=total_contratacoes|default('0'),
+            icon='briefcase',
+            icon_class='text-success',
+            link_url='/prestador/contratacoes'
+        ) }}
+
+        {{ stats_card(
+            title='Avaliação',
+            value=avaliacao_media|default('0.0'),
+            icon='star-fill',
+            icon_class='text-warning'
+        ) }}
+    {% endcall %}
+    {% endif %}
+
+    <!-- Seção de Serviços em Destaque -->
+    {% if servicos_destaque %}
+    <section class="services-section mb-5">
+        <div class="section-header d-flex justify-content-between align-items-center mb-4">
+            <h2 class="section-title">SERVIÇOS EM DESTAQUE</h2>
+            <a href="/prestador/servicos" class="view-all-btn">
+                Ver todos <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+        </div>
+
+        <div class="row g-4">
+            {% for servico in servicos_destaque[:3] %}
+            <div class="col-lg-4 col-md-6">
+                {{ service_card(
+                    servico=servico,
+                    show_actions=True,
+                    edit_url='/prestador/servicos/editar/' ~ servico.id,
+                    card_class='h-100'
+                ) }}
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- Seção de Meus Serviços -->
+    <section class="services-section mb-5">
+        <div class="section-header d-flex justify-content-between align-items-center mb-4">
+            <h2 class="section-title">MEUS SERVIÇOS</h2>
+            <a href="/prestador/servicos/novo" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-2"></i>Novo Serviço
+            </a>
+        </div>
+
+        {% if servicos %}
+        <div id="servicesCarousel" class="carousel slide" data-bs-ride="false">
+            <div class="carousel-inner">
+                {% for i in range(0, servicos|length, 3) %}
+                <div class="carousel-item {% if i == 0 %}active{% endif %}">
+                    <div class="row g-4">
+                        {% for servico in servicos[i:i+3] %}
+                        <div class="col-lg-4 col-md-6">
+                            {{ service_card(
+                                servico=servico,
+                                show_actions=True,
+                                edit_url='/prestador/servicos/editar/' ~ servico.id,
+                                delete_handler='confirmDeleteService',
+                                card_class='h-100'
+                            ) }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            {% if servicos|length > 3 %}
+            <button class="carousel-control-prev" type="button" data-bs-target="#servicesCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Anterior</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#servicesCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Próximo</span>
+            </button>
+            {% endif %}
+        </div>
+        {% else %}
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle me-2"></i>
+            Você ainda não cadastrou nenhum serviço.
+            <a href="/prestador/servicos/novo" class="alert-link">Cadastre seu primeiro serviço</a>.
+        </div>
+        {% endif %}
+    </section>
+
+    <!-- Seção de Solicitações Recentes -->
+    {% if solicitacoes_recentes %}
+    <section class="recent-section mb-5">
+        <div class="section-header d-flex justify-content-between align-items-center mb-4">
+            <h2 class="section-title">SOLICITAÇÕES RECENTES</h2>
+            <a href="/prestador/solicitacoes" class="view-all-btn">
+                Ver todas <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+        </div>
+
+        <div class="list-group">
+            {% for solicitacao in solicitacoes_recentes[:5] %}
+            <a href="/prestador/solicitacoes/detalhes/{{ solicitacao.id }}"
+               class="list-group-item list-group-item-action">
+                <div class="d-flex w-100 justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-1">{{ solicitacao.servico_nome }}</h6>
+                        <p class="mb-1 text-muted small">{{ solicitacao.cliente_nome }}</p>
+                    </div>
+                    <div class="text-end">
+                        <span class="badge bg-{{ 'success' if solicitacao.status == 'aprovada' else 'warning' if solicitacao.status == 'pendente' else 'secondary' }}">
+                            {{ solicitacao.status|title }}
+                        </span>
+                        <small class="d-block text-muted mt-1">{{ solicitacao.data }}</small>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
 </div>
 {% endblock %}
-{% block conteudo %}
-    <main>
-        <input type="checkbox" id="toggleSidebar" hidden>
 
-        <!-- Botão do menu -->
-        <label for="toggleSidebar" class="toggle-btn-fixed">
-            <i class="bi bi-list"></i>
-        </label>
+{% block prestador_scripts %}
+<script src="/static/js/home_prestador.js"></script>
 
-        <!-- Sidebar -->
-        <aside class="sidebar" id="sidebarMenu">
-            <div class="sidebar-header">
-                <h2 class="logo">LOJA VIRTUAL</h2>
-            </div>
-
-            <nav class="sidebar-nav">
-                <a href="/fornecedor/solicitacoes_recebidas" class="sidebar-item">
-                    <i class="bi bi-inbox"></i><span>Solicitações</span>
-                </a>
-                <a href="/fornecedor/produtos/inserir" class="sidebar-item">
-                    <i class="bi bi-plus-square"></i><span>Cadastrar produtos</span>
-                </a>
-                <a href="/fornecedor/mensagens/recebidas" class="sidebar-item">
-                    <i class="bi bi-chat-dots"></i><span>Mensagens</span>
-                </a>
-                <a href="/fornecedor/promocao/cadastrar" class="sidebar-item">
-                    <i class="bi bi-tag"></i><span>Cadastrar promoção</span>
-                </a>
-                <a href="/fornecedor/produtos/listar" class="sidebar-item">
-                    <i class="bi bi-list-task"></i><span>Produtos</span>
-                </a>
-                <a href="/fornecedor/avaliacoes" class="sidebar-item">
-                    <i class="bi bi-star"></i><span>Avaliações Recebidas</span>
-                </a>
-                <a href="/fornecedor/perfil" class="sidebar-item">
-                    <i class="bi bi-person"></i><span>Perfil</span>
-                </a>
-                <a href="/fornecedor/conta" class="sidebar-item">
-                    <i class="bi bi-gear"></i><span>Conta</span>
-                </a>
-            </nav>
-        </aside>
-
-        <div class="page-content">
-            <div class="main-content">
-                <div class="container-fluid px-4">
-                    <section class="promotions-section mb-5">
-                        <div class="section-header d-flex justify-content-between align-items-center mb-4">
-                            <h2 class="section-title">PROMOÇÕES</h2>
-                            <a href="#" class="view-all-btn">Ver todos <i class="bi bi-arrow-right"></i></a>
-                        </div>
-                        
-                        <div id="promotionsCarousel" class="carousel slide" data-bs-ride="false">
-                            <div class="carousel-inner">
-                                <div class="carousel-item active">
-                                    <div class="row g-4">
-                                        {% for produto in produtos %}
-                                        <div class="col-lg-4 col-md-6">
-                                            <div class="product-card">
-                                                <div class="product-image">
-                                                    <i class="bi bi-hammer product-icon"></i>
-                                                </div>
-                                                <div class="product-info">
-                                                    <h6 class="product-name">{{ produto.nome }}</h6>
-                                                    {% if produto.preco_antigo %}
-                                                    <p class="product-detail">
-                                                        <span class="old-price">R$ {{ produto.preco_antigo }}</span>
-                                                    </p>
-                                                    {% endif %}
-                                                    <p class="product-detail">
-                                                        <span class="new-price">R$ {{ produto.preco }}</span>
-                                                    </p>
-                                                    <p class="product-description">{{ produto.descricao }}</p>
-                                                </div>
-                                                <div class="product-actions">
-                                                    <button class="btn action-btn alter-btn" onclick="location.href='/fornecedor/produtos/atualizar/{{ produto.id }}'">
-                                                        <i class="bi bi-pencil-square me-1"></i> Alterar
-                                                    </button>
-                                                    <button class="btn action-btn delete-btn" onclick="location.href='/fornecedor/produtos/excluir/{{ produto.id }}'">
-                                                        <i class="bi bi-trash me-1"></i> Excluir
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        {% endfor %}
-                                    </div>
-                                </div>
-                            </div>
-                            <button class="carousel-control-prev" type="button" data-bs-target="#promotionsCarousel" data-bs-slide="prev">
-                                <span class="carousel-control-prev-icon"></span>
-                            </button>
-                            <button class="carousel-control-next" type="button" data-bs-target="#promotionsCarousel" data-bs-slide="next">
-                                <span class="carousel-control-next-icon"></span>
-                            </button>
-                        </div>
-                    </section>
-
-                    <section class="products-section mb-5">
-                        <div class="section-header d-flex justify-content-between align-items-center mb-4">
-                            <h2 class="section-title">PRODUTOS</h2>
-                            <a href="#" class="view-all-btn">Ver todos <i class="bi bi-arrow-right"></i></a>
-                        </div>
-                        
-                        <div id="promotionsCarousel" class="carousel slide" data-bs-ride="false">
-                            <div class="carousel-inner">
-                                {% for i in range(0, produtos|length, 3) %}
-                                <div class="carousel-item {% if i == 0 %}active{% endif %}">
-                                    <div class="row g-4">
-                                        {% for produto in produtos[i:i+3] %}
-                                        <div class="col-lg-4 col-md-6">
-                                            <div class="product-card">
-                                                <div class="product-image">
-                                                    <i class="bi bi-hammer product-icon"></i>
-                                                </div>
-                                                <div class="product-info">
-                                                    <h6 class="product-name">{{ produto.nome }}</h6>
-                                                    {% if produto.preco_antigo %}
-                                                    <p class="product-detail">
-                                                        <span class="old-price">R$ {{ produto.preco_antigo }}</span>
-                                                    </p>
-                                                    {% endif %}
-                                                    <p class="product-detail">
-                                                        <span class="new-price">R$ {{ produto.preco }}</span>
-                                                    </p>
-                                                    <p class="product-description">{{ produto.descricao }}</p>
-                                                </div>
-                                                <div class="product-actions">
-                                                    <button class="btn action-btn alter-btn" onclick="location.href='/fornecedor/produtos/atualizar/{{ produto.id }}'">
-                                                        <i class="bi bi-pencil-square me-1"></i> Alterar
-                                                    </button>
-                                                    <button class="btn action-btn delete-btn" onclick="location.href='/fornecedor/produtos/excluir/{{ produto.id }}'">
-                                                        <i class="bi bi-trash me-1"></i> Excluir
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        {% endfor %}
-                                    </div>
-                                </div>
-                                {% endfor %}
-                            </div>
-
-                            {% if produtos|length > 3 %}
-                            <button class="carousel-control-prev" type="button" data-bs-target="#promotionsCarousel" data-bs-slide="prev">
-                                <span class="carousel-control-prev-icon"></span>
-                            </button>
-                            <button class="carousel-control-next" type="button" data-bs-target="#promotionsCarousel" data-bs-slide="next">
-                                <span class="carousel-control-next-icon"></span>
-                            </button>
-                            {% endif %}
-                        </div>
-                    </section>
-                </div>
-            </div>
-        </div>
-    </main>
-{% block scripts %} 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/static/js/home_fornecedor.js"></script>
-{% endblock %}
+<script>
+function confirmDeleteService(servicoId, servicoNome) {
+    if (confirm(`Tem certeza que deseja excluir o serviço "${servicoNome}"?`)) {
+        window.location.href = `/prestador/servicos/excluir/${servicoId}`;
+    }
+}
+</script>
 {% endblock %}

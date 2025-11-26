@@ -1,8 +1,9 @@
 import sqlite3
+import uuid
 from data.servico.servico_repo import (
     criar_tabela_servico,
     inserir_servico,
-    obter_servico,      
+    obter_servico,
     obter_servico_por_id,
     atualizar_servico,
     deletar_servico,
@@ -18,37 +19,29 @@ from datetime import datetime
 
 class TestServicoRepo:
 
-    
-    def criar_usuario_prestador(self):
+
+    def criar_usuario_prestador(self, email_unico, cpf_unico):
         criar_tabela_usuario()
         criar_tabela_prestador()
 
-        usuario = Usuario(
+        # inserir_prestador já cria o usuário internamente, então só precisamos criar o objeto Prestador
+        prestador = Prestador(
             id=0,
             nome="Prestador Teste",
-            email="teste@teste.com",
+            email=email_unico,
             senha="123456",
-            cpf_cnpj="12345678900",
+            cpf_cnpj=cpf_unico,
             telefone="999999999",
-            endereco="Rua Exemplo, 123",
-            tipo_usuario="prestador", 
-            data_cadastro=datetime.now().isoformat()
-        )
-
-        id_usuario = inserir_usuario(usuario)
-
-        prestador = Prestador(
-            id=id_usuario, 
-            nome=usuario.nome,
-            email=usuario.email,
-            senha=usuario.senha,
-            cpf_cnpj=usuario.cpf_cnpj,
-            telefone=usuario.telefone,
-            data_cadastro=usuario.data_cadastro,
-            endereco=usuario.endereco,
-            tipo_usuario=usuario.tipo_usuario,
+            cep="88888-888",
+            rua="Rua Teste",
+            numero="123",
+            complemento="",
+            bairro="Centro",
+            cidade="Vitória",
+            estado="ES",
+            data_cadastro=datetime.now().isoformat(),
+            tipo_usuario="prestador",
             area_atuacao="TI",
-            tipo_pessoa="Física",
             razao_social=None,
             descricao_servicos=None
         )
@@ -62,11 +55,11 @@ class TestServicoRepo:
         resultado = criar_tabela_servico()
         assert resultado is True, "A criação da tabela servico deveria retornar True"
     
-    def test_inserir_servico(self, test_db):
+    def test_inserir_servico(self, test_db, email_unico, cpf_unico):
         criar_tabela_usuario()
         criar_tabela_prestador()
         criar_tabela_servico()
-        id_prestador = self.criar_usuario_prestador()
+        id_prestador = self.criar_usuario_prestador(email_unico, cpf_unico)
 
         servico = Servico(
             id_servico=0,
@@ -78,6 +71,7 @@ class TestServicoRepo:
         )
 
         id_inserido = inserir_servico(servico)
+        assert id_inserido is not None
         servico_db = obter_servico_por_id(id_inserido)
 
         print("ID inserido:", id_inserido)
@@ -87,11 +81,11 @@ class TestServicoRepo:
         assert servico_db.titulo == "Serviço Teste"
         assert servico_db.valor_base == 150.0
 
-    def test_obter_servico(self, test_db):
+    def test_obter_servico(self, test_db, email_unico, cpf_unico):
         criar_tabela_usuario()
         criar_tabela_prestador()
         criar_tabela_servico()
-        id_prestador = self.criar_usuario_prestador()
+        id_prestador = self.criar_usuario_prestador(email_unico, cpf_unico)
 
         servico = Servico(
             id_servico=0,
@@ -107,11 +101,11 @@ class TestServicoRepo:
         assert len(lista) > 0
         assert any(s.titulo == "Serviço Lista" for s in lista)
 
-    def test_obter_servico_por_id(self, test_db):
+    def test_obter_servico_por_id(self, test_db, email_unico, cpf_unico):
         criar_tabela_usuario()
         criar_tabela_prestador()
         criar_tabela_servico()
-        id_prestador = self.criar_usuario_prestador()
+        id_prestador = self.criar_usuario_prestador(email_unico, cpf_unico)
 
         servico = Servico(
             id_servico=0,
@@ -122,18 +116,19 @@ class TestServicoRepo:
             valor_base=120.0
         )
         id_inserido = inserir_servico(servico)
+        assert id_inserido is not None
         resultado = obter_servico_por_id(id_inserido)
 
         assert resultado is not None
         assert resultado.titulo == "Serviço Único"
         assert resultado.valor_base == 120.0
 
-    def test_obter_servico_por_pagina(self, test_db):
+    def test_obter_servico_por_pagina(self, test_db, email_unico, cpf_unico):
         # Arrange
         criar_tabela_usuario()
         criar_tabela_servico()
         criar_tabela_prestador()
-        id_prestador = self.criar_usuario_prestador()
+        id_prestador = self.criar_usuario_prestador(email_unico, cpf_unico)
 
         for i in range(15):
             servico = Servico(
@@ -161,11 +156,11 @@ class TestServicoRepo:
         assert ids_pagina_1.isdisjoint(ids_pagina_2), "Os serviços da página 1 não devem se repetir na página 2"
         assert id_prestador is not None
 
-    def test_atualizar_servico(self, test_db):
+    def test_atualizar_servico(self, test_db, email_unico, cpf_unico):
         criar_tabela_usuario()
         criar_tabela_prestador()
         criar_tabela_servico()
-        id_prestador = self.criar_usuario_prestador()
+        id_prestador = self.criar_usuario_prestador(email_unico, cpf_unico)
 
         servico = Servico(
             id_servico=0,
@@ -176,6 +171,7 @@ class TestServicoRepo:
             valor_base=100.0
         )
         id_servico = inserir_servico(servico)
+        assert id_servico is not None
 
         servico_atualizado = Servico(
             id_servico=id_servico,
@@ -189,15 +185,17 @@ class TestServicoRepo:
         resultado = atualizar_servico(servico_atualizado)
         assert resultado is True
 
+        assert id_servico is not None
         atualizado = obter_servico_por_id(id_servico)
+        assert atualizado is not None
         assert atualizado.titulo == "Serviço Novo"
         assert atualizado.valor_base == 300.0
 
-    def test_deletar_servico(self, test_db):
+    def test_deletar_servico(self, test_db, email_unico, cpf_unico):
         criar_tabela_usuario()
         criar_tabela_prestador()
         criar_tabela_servico()
-        id_prestador = self.criar_usuario_prestador()
+        id_prestador = self.criar_usuario_prestador(email_unico, cpf_unico)
 
         servico = Servico(
             id_servico=0,
@@ -208,9 +206,11 @@ class TestServicoRepo:
             valor_base=90.0
         )
         id_servico = inserir_servico(servico)
+        assert id_servico is not None
 
         resultado = deletar_servico(id_servico)
         assert resultado is True
 
+        assert id_servico is not None
         apagado = obter_servico_por_id(id_servico)
         assert apagado is None

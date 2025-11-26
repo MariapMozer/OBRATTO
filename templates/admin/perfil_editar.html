@@ -1,0 +1,174 @@
+{% extends "administrador/base_admin.html" %}
+{% block admin_titulo %}Editar Perfil{% endblock %}
+{% block admin_conteudo %}
+<main class="flex-grow-1">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <div class="card shadow-lg border-0 rounded-4">
+                    <div class="card-body p-5">
+                        <div class="mb-4">
+                            <i class="bi bi-tools display-1 text-warning"></i>
+                        </div>
+                        <h1 class="display-4 mb-3">Em Construção</h1>
+                        <p class="lead text-muted mb-4">
+                            Esta funcionalidade ainda está sendo desenvolvida pelos alunos.
+                        </p>
+                        <div class="alert alert-info text-start" role="alert">
+                            <h5 class="alert-heading"><i class="bi bi-info-circle me-2"></i><strong>TODO ALUNO:</strong> Implementar Edição de Perfil do Administrador</h5>
+                            <hr>
+                            <p class="mb-2"><strong>Descrição:</strong></p>
+                            <p>Esta página permite que o administrador edite suas próprias informações pessoais, foto de perfil, preferências e configurações de segurança da conta.</p>
+
+                            <p class="mb-2 mt-3"><strong>Funcionalidades a implementar:</strong></p>
+                            <ul class="text-start">
+                                <li><strong>Dados Pessoais (Tab 1):</strong>
+                                    <ul>
+                                        <li>Campo Nome (obrigatório, 3-100 caracteres)</li>
+                                        <li>Campo Email (obrigatório, único, validar formato)</li>
+                                        <li>Campo Telefone (máscara (XX) XXXXX-XXXX)</li>
+                                        <li>Campo CPF (somente leitura após cadastro)</li>
+                                        <li>Campo Data de Nascimento (opcional)</li>
+                                        <li>Botão "Salvar Alterações"</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Foto de Perfil (Tab 2):</strong>
+                                    <ul>
+                                        <li>Preview da foto atual (circular, 150x150px)</li>
+                                        <li>Botão "Escolher Nova Foto"</li>
+                                        <li>Upload com drag-and-drop</li>
+                                        <li>Validações:
+                                            <ul>
+                                                <li>Formatos permitidos: JPG, PNG, WEBP</li>
+                                                <li>Tamanho máximo: 2MB</li>
+                                                <li>Dimensões mínimas: 200x200px</li>
+                                            </ul>
+                                        </li>
+                                        <li>Editor de crop/redimensionamento antes do upload</li>
+                                        <li>Opção "Remover Foto" (voltar ao avatar padrão)</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Segurança (Tab 3):</strong>
+                                    <ul>
+                                        <li>Alterar Senha:
+                                            <ul>
+                                                <li>Campo Senha Atual (obrigatório)</li>
+                                                <li>Campo Nova Senha (validar força)</li>
+                                                <li>Campo Confirmar Nova Senha (deve coincidir)</li>
+                                                <li>Indicador visual de força da senha</li>
+                                                <li>Requisitos: 8+ caracteres, 1 maiúscula, 1 número, 1 especial</li>
+                                            </ul>
+                                        </li>
+                                        <li>Autenticação de Dois Fatores (2FA):
+                                            <ul>
+                                                <li>Toggle para ativar/desativar 2FA</li>
+                                                <li>QR Code para configurar app autenticador</li>
+                                                <li>Códigos de backup (10 códigos únicos)</li>
+                                            </ul>
+                                        </li>
+                                        <li>Sessões Ativas:
+                                            <ul>
+                                                <li>Lista de dispositivos logados</li>
+                                                <li>Informações: dispositivo, navegador, IP, última atividade</li>
+                                                <li>Botão "Encerrar Sessão" para cada dispositivo</li>
+                                                <li>Botão "Encerrar Todas (exceto atual)"</li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li><strong>Preferências (Tab 4):</strong>
+                                    <ul>
+                                        <li>Tema da interface (claro/escuro/automático)</li>
+                                        <li>Idioma (pt-BR, en-US, es-ES)</li>
+                                        <li>Fuso horário</li>
+                                        <li>Notificações por email:
+                                            <ul>
+                                                <li>Novos usuários cadastrados</li>
+                                                <li>Denúncias recebidas</li>
+                                                <li>Relatórios semanais</li>
+                                                <li>Atualizações do sistema</li>
+                                            </ul>
+                                        </li>
+                                        <li>Itens por página em listagens (10, 25, 50, 100)</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Histórico de Atividades (Tab 5):</strong>
+                                    <ul>
+                                        <li>Timeline das últimas 50 ações administrativas</li>
+                                        <li>Filtro por tipo de ação</li>
+                                        <li>Filtro por data (última semana, mês, ano)</li>
+                                        <li>Exportar histórico completo (CSV)</li>
+                                    </ul>
+                                </li>
+                            </ul>
+
+                            <p class="mb-2 mt-3"><strong>Validações e Regras de Negócio:</strong></p>
+                            <ul class="text-start">
+                                <li>Email único: verificar se já existe outro admin com mesmo email</li>
+                                <li>Senha atual obrigatória para qualquer alteração de dados sensíveis</li>
+                                <li>Confirmação por email ao alterar email principal</li>
+                                <li>Não permitir deixar nome em branco</li>
+                                <li>Sanitizar campos de texto (prevenir XSS)</li>
+                                <li>Upload de foto: validar tipo MIME real (não apenas extensão)</li>
+                                <li>Gerar thumbnail da foto automaticamente</li>
+                                <li>Manter histórico de fotos antigas (max 5)</li>
+                            </ul>
+
+                            <p class="mb-2 mt-3"><strong>Feedback e UX:</strong></p>
+                            <ul class="text-start">
+                                <li>Toast de sucesso após salvar alterações</li>
+                                <li>Avisos de "dados não salvos" ao sair da página</li>
+                                <li>Loading spinner durante upload de foto</li>
+                                <li>Preview em tempo real das alterações</li>
+                                <li>Validação em tempo real (mostrar erros antes de submit)</li>
+                                <li>Desabilitar botão "Salvar" se não houver mudanças</li>
+                                <li>Mensagens de erro específicas e acionáveis</li>
+                            </ul>
+
+                            <p class="mb-2 mt-3"><strong>Segurança Adicional:</strong></p>
+                            <ul class="text-start">
+                                <li>Log de todas as alterações de perfil</li>
+                                <li>Notificação por email ao alterar dados críticos</li>
+                                <li>Bloquear alteração de email se houver 2FA ativo (desativar 2FA primeiro)</li>
+                                <li>Rate limiting em alteração de senha (max 3 tentativas/hora)</li>
+                            </ul>
+
+                            <p class="mb-2 mt-3"><strong>Bibliotecas Sugeridas:</strong></p>
+                            <ul class="text-start">
+                                <li><code>Pillow</code> - Processamento de imagens em Python</li>
+                                <li><code>Cropper.js</code> - Editor de crop de imagens no front-end</li>
+                                <li><code>pyotp</code> - Geração de QR Code para 2FA</li>
+                                <li><code>zxcvbn</code> - Avaliação de força de senha</li>
+                            </ul>
+
+                            <p class="mb-2 mt-3"><strong>Arquivos relacionados:</strong></p>
+                            <ul class="text-start">
+                                <li><code>routes/administrador/administrador_perfil.py</code> - Rotas de perfil</li>
+                                <li><code>data/administrador/admin_repo.py</code> - Métodos de atualização</li>
+                                <li><code>util/image_processor.py</code> - Upload e processamento de fotos</li>
+                                <li><code>util/validators.py</code> - Validações customizadas</li>
+                                <li><code>static/js/perfil_editor.js</code> - Lógica do front-end</li>
+                            </ul>
+
+                            <p class="mb-0 mt-3"><strong>Dica:</strong> Implemente tabs (abas) para organizar as seções. Use AJAX para salvar cada seção independentemente. Considere implementar preview de mudanças antes de aplicar.</p>
+                        </div>
+
+                        {% if administrador %}
+                        <div class="alert alert-secondary text-start mt-4" role="alert">
+                            <h5 class="alert-heading"><i class="bi bi-info-circle me-2"></i>Dados Atuais</h5>
+                            <p class="mb-1"><strong>Nome:</strong> {{ administrador.nome }}</p>
+                            <p class="mb-1"><strong>Email:</strong> {{ administrador.email }}</p>
+                            <p class="mb-0"><strong>Telefone:</strong> {{ administrador.telefone if administrador.telefone else 'Não informado' }}</p>
+                        </div>
+                        {% endif %}
+
+                        <a href="/administrador/home" class="btn btn-primary btn-lg mt-3">
+                            <i class="bi bi-arrow-left me-2"></i>Voltar para Home
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}

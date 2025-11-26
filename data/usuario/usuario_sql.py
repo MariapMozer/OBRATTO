@@ -36,6 +36,12 @@ OBTER_USUARIO_POR_ID = """
 SELECT * FROM usuario WHERE id = ?;
 """
 
+OBTER_USUARIO_POR_TOKEN = """
+SELECT id, nome, email, senha, cpf_cnpj, telefone, cep, rua, numero, complemento, bairro, cidade, estado, data_cadastro, foto, token_redefinicao, data_token, tipo_usuario
+FROM usuario
+WHERE token_redefinicao = ?;
+"""
+
 OBTER_USUARIO_POR_PAGINA = """
 SELECT * FROM usuario
 ORDER BY id
@@ -94,14 +100,5 @@ UPDATE usuario SET foto = ? WHERE id = ?
 
 DELETAR_USUARIO = """
 DELETE FROM usuario
-WHERE id = ?
-"""
-
-ADICIONAR_COLUNA_FOTO = """
-ALTER TABLE usuario ADD COLUMN foto TEXT;
-"""
-ATUALIZAR_FOTO = """
-UPDATE usuario
-SET foto = ?
 WHERE id = ?
 """

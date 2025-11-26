@@ -1,0 +1,84 @@
+{#
+    Componente: Card de Produto
+    Descrição: Card reutilizável para exibir produtos com foto, nome, descrição, preço e ações
+
+    Parâmetros:
+    - produto: Objeto produto (deve ter .id, .nome, .descricao, .preco, .foto, .quantidade, .status)
+    - show_actions: Exibir botões de ação (editar/excluir) - padrão: True
+    - card_class: Classes CSS adicionais para o card - padrão: ''
+    - edit_url: URL para edição (opcional, padrão gerado automaticamente)
+    - delete_handler: Nome da função JS para exclusão (opcional, padrão: 'confirmDelete')
+    - show_quantity: Exibir quantidade em estoque - padrão: True
+
+    Uso:
+    {% from 'components/product_card.html' import product_card %}
+    {{ product_card(produto) }}
+    {{ product_card(produto, show_actions=False) }}
+    {{ product_card(produto, edit_url='/custom/edit/' + produto.id|string) }}
+#}
+
+{% macro product_card(
+    produto,
+    show_actions=True,
+    card_class='',
+    edit_url=None,
+    delete_handler='confirmDelete',
+    show_quantity=True
+) %}
+<div class="product-card {{ card_class }}">
+    <div class="product-header">
+        <div class="product-id">ID: {{ produto.id }}</div>
+        {% if produto.status %}
+        <div class="product-status">
+            <span class="status-badge status-{{ produto.status }}">
+                {{ produto.status|title }}
+            </span>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="product-image">
+        {% if produto.foto %}
+        <img src="{{ produto.foto if produto.foto.startswith('/') or produto.foto.startswith('http') else '/static/img/' + produto.foto }}"
+             alt="{{ produto.nome }}"
+             class="product-img"
+             loading="lazy">
+        {% else %}
+        <i class="bi bi-box-seam product-icon"></i>
+        {% endif %}
+    </div>
+
+    <div class="product-info">
+        <h5 class="product-name">{{ produto.nome }}</h5>
+        {% if produto.descricao %}
+        <p class="product-description">{{ produto.descricao }}</p>
+        {% endif %}
+
+        <div class="product-details">
+            <div class="detail-row">
+                <span class="detail-label">Preço:</span>
+                <span class="detail-value price">R$ {{ "%.2f"|format(produto.preco) }}</span>
+            </div>
+            {% if show_quantity and produto.quantidade is defined %}
+            <div class="detail-row">
+                <span class="detail-label">Estoque:</span>
+                <span class="detail-value quantity">{{ produto.quantidade }} unidades</span>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if show_actions %}
+    <div class="product-actions">
+        <button class="btn btn-sm btn-outline-primary"
+                onclick="location.href='{{ edit_url if edit_url else '/fornecedor/produtos/atualizar/' + produto.id|string }}'">
+            <i class="bi bi-pencil me-1"></i> Alterar
+        </button>
+        <button class="btn btn-sm btn-outline-danger"
+                onclick="{{ delete_handler }}('{{ produto.id }}', '{{ produto.nome }}')">
+            <i class="bi bi-trash me-1"></i> Excluir
+        </button>
+    </div>
+    {% endif %}
+</div>
+{% endmacro %}

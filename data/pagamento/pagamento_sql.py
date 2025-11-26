@@ -2,7 +2,7 @@
 SQL para tabela de pagamentos
 """
 
-SQL_CRIAR_TABELA_PAGAMENTO = """
+CRIAR_TABELA_PAGAMENTO = """
     CREATE TABLE IF NOT EXISTS pagamento (
         id_pagamento INTEGER PRIMARY KEY AUTOINCREMENT,
         plano_id INTEGER NOT NULL,
@@ -19,7 +19,7 @@ SQL_CRIAR_TABELA_PAGAMENTO = """
     )
 """
 
-SQL_INSERIR_PAGAMENTO = """
+INSERIR_PAGAMENTO = """
     INSERT INTO pagamento (
         plano_id, fornecedor_id, mp_payment_id, mp_preference_id, 
         valor, status, metodo_pagamento, data_criacao, 
@@ -27,25 +27,25 @@ SQL_INSERIR_PAGAMENTO = """
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 """
 
-SQL_OBTER_PAGAMENTO_POR_ID = """
+OBTER_PAGAMENTO_POR_ID = """
     SELECT * FROM pagamento WHERE id_pagamento = ?
 """
 
-SQL_OBTER_PAGAMENTO_POR_MP_ID = """
+OBTER_PAGAMENTO_POR_MP_ID = """
     SELECT * FROM pagamento WHERE mp_payment_id = ?
 """
 
-SQL_OBTER_PAGAMENTO_POR_PREFERENCE = """
+OBTER_PAGAMENTO_POR_PREFERENCE = """
     SELECT * FROM pagamento WHERE mp_preference_id = ?
 """
 
-SQL_ATUALIZAR_STATUS_PAGAMENTO = """
+ATUALIZAR_STATUS_PAGAMENTO = """
     UPDATE pagamento 
     SET status = ?, data_aprovacao = ?, metodo_pagamento = ?
     WHERE mp_payment_id = ?
 """
 
-SQL_OBTER_PAGAMENTOS_FORNECEDOR = """
+OBTER_PAGAMENTOS_FORNECEDOR = """
     SELECT p.*, pl.nome_plano 
     FROM pagamento p
     LEFT JOIN plano pl ON p.plano_id = pl.id_plano
@@ -53,7 +53,7 @@ SQL_OBTER_PAGAMENTOS_FORNECEDOR = """
     ORDER BY p.data_criacao DESC
 """
 
-SQL_OBTER_PAGAMENTOS_PRESTADOR = """
+OBTER_PAGAMENTOS_PRESTADOR = """
     SELECT p.*, pl.nome_plano 
     FROM pagamento p
     LEFT JOIN plano pl ON p.plano_id = pl.id_plano
@@ -61,7 +61,7 @@ SQL_OBTER_PAGAMENTOS_PRESTADOR = """
     ORDER BY p.data_criacao DESC
 """
 
-SQL_OBTER_PAGAMENTOS_POR_STATUS = """
+OBTER_PAGAMENTOS_POR_STATUS = """
     SELECT p.*, pl.nome_plano 
     FROM pagamento p
     LEFT JOIN plano pl ON p.plano_id = pl.id_plano
@@ -69,7 +69,7 @@ SQL_OBTER_PAGAMENTOS_POR_STATUS = """
     ORDER BY p.data_criacao DESC
 """
 
-SQL_ATUALIZAR_PAGAMENTO = """
+ATUALIZAR_PAGAMENTO = """
     UPDATE pagamento
     SET
         plano_id = ?,

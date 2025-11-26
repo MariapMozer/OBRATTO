@@ -1,0 +1,47 @@
+{#
+    Componente: Empty State
+    Descrição: Estado vazio reutilizável para quando não há dados
+
+    Parâmetros:
+    - icon: Ícone Bootstrap
+    - title: Título da mensagem
+    - description: Descrição da mensagem
+    - action_url: URL do botão de ação (opcional)
+    - action_text: Texto do botão de ação (opcional)
+    - action_icon: Ícone do botão de ação (opcional)
+
+    Uso:
+    {% from 'components/empty_state.html' import empty_state %}
+
+    {{ empty_state(
+        icon='box-seam',
+        title='Nenhum produto encontrado',
+        description='Você ainda não cadastrou nenhum produto.',
+        action_url='/produtos/criar',
+        action_text='Cadastrar Primeiro Produto',
+        action_icon='plus-circle'
+    ) }}
+#}
+
+{% macro empty_state(
+    icon,
+    title,
+    description,
+    action_url=None,
+    action_text=None,
+    action_icon=None
+) %}
+<div class="empty-state text-center py-5">
+    <div class="empty-icon mb-4">
+        <i class="bi bi-{{ icon }} display-1 text-muted"></i>
+    </div>
+    <h3 class="mb-3">{{ title }}</h3>
+    <p class="text-muted mb-4">{{ description }}</p>
+    {% if action_url and action_text %}
+    <a href="{{ action_url }}" class="btn btn-primary">
+        {% if action_icon %}<i class="bi bi-{{ action_icon }} me-1"></i>{% endif %}
+        {{ action_text }}
+    </a>
+    {% endif %}
+</div>
+{% endmacro %}

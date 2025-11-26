@@ -1,0 +1,96 @@
+{#
+    Componente: Stats Card
+    Descrição: Card de estatísticas para dashboards
+
+    Parâmetros:
+    - title: Título do card
+    - value: Valor principal (número, texto)
+    - icon: Ícone Bootstrap (sem 'bi-')
+    - icon_class: Classe CSS do ícone (ex: 'text-primary', 'text-success')
+    - subtitle: Subtítulo/descrição opcional
+    - trend: Tendência (número positivo/negativo) - opcional
+    - trend_label: Label da tendência - opcional
+    - card_class: Classes CSS adicionais
+    - link_url: URL para mais detalhes - opcional
+    - link_text: Texto do link - opcional
+
+    Uso:
+    {% from 'components/stats_card.html' import stats_card %}
+
+    {{ stats_card(
+        title='Total de Vendas',
+        value='R$ 12.450,00',
+        icon='currency-dollar',
+        icon_class='text-success',
+        trend=15.3,
+        trend_label='vs mês anterior'
+    ) }}
+#}
+
+{% macro stats_card(
+    title,
+    value,
+    icon,
+    icon_class='text-primary',
+    subtitle='',
+    trend=None,
+    trend_label='',
+    card_class='',
+    link_url='',
+    link_text='Ver detalhes'
+) %}
+<div class="stats-card {{ card_class }}">
+    <div class="stats-card-body">
+        <div class="stats-icon">
+            <i class="bi bi-{{ icon }} {{ icon_class }}"></i>
+        </div>
+        <div class="stats-content">
+            <h6 class="stats-title">{{ title }}</h6>
+            <div class="stats-value">{{ value }}</div>
+
+            {% if subtitle %}
+            <p class="stats-subtitle">{{ subtitle }}</p>
+            {% endif %}
+
+            {% if trend is not none %}
+            <div class="stats-trend {% if trend >= 0 %}trend-up{% else %}trend-down{% endif %}">
+                <i class="bi bi-{{ 'arrow-up' if trend >= 0 else 'arrow-down' }}"></i>
+                <span>{{ "%.1f"|format(trend|abs) }}%</span>
+                {% if trend_label %}
+                <span class="trend-label">{{ trend_label }}</span>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if link_url %}
+    <div class="stats-card-footer">
+        <a href="{{ link_url }}" class="stats-link">
+            {{ link_text }} <i class="bi bi-arrow-right ms-1"></i>
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{#
+    Macro: stats_row
+    Descrição: Linha de cards de estatísticas responsiva
+
+    Uso:
+    {% from 'components/stats_card.html' import stats_card, stats_row %}
+
+    {% call stats_row() %}
+        {{ stats_card(...) }}
+        {{ stats_card(...) }}
+        {{ stats_card(...) }}
+        {{ stats_card(...) }}
+    {% endcall %}
+#}
+
+{% macro stats_row() %}
+<div class="stats-row">
+    {{ caller() }}
+</div>
+{% endmacro %}

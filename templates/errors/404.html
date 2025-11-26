@@ -1,0 +1,77 @@
+{% extends "base_root.html" %}
+
+{% block titulo %}Página Não Encontrada{% endblock %}
+
+{% block css %}
+<style>
+    .error-container {
+        padding: 4rem 1rem;
+        text-align: center;
+    }
+
+    .error-code {
+        font-size: 8rem;
+        font-weight: 700;
+        line-height: 1;
+        margin-bottom: 0.5rem;
+        color: #0d6efd;
+    }
+
+    .error-heading {
+        font-size: 2rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+    }
+
+    .error-details {
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+    }
+
+    .error-actions {
+        margin-top: 2rem;
+    }
+
+    @media (max-width: 768px) {
+        .error-code {
+            font-size: 5rem;
+        }
+
+        .error-heading {
+            font-size: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block conteudo %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="error-container">
+                <h1 class="error-code">404</h1>
+                <h2 class="error-heading">Página Não Encontrada</h2>
+                <div class="error-details">
+                    <p class="text-muted">
+                        Desculpe, a página que você está procurando não existe ou foi movida.
+                    </p>
+                </div>
+                <div class="error-actions">
+                    <a href="/" class="btn btn-primary btn-lg me-2">
+                        <i class="bi bi-house-door"></i> Ir para Página Inicial
+                    </a>
+                    {% if request.session.get('usuario_logado') %}
+                    <a href="/usuario" class="btn btn-outline-primary btn-lg">
+                        <i class="bi bi-speedometer2"></i> Dashboard
+                    </a>
+                    {% else %}
+                    <a href="/login" class="btn btn-outline-primary btn-lg">
+                        <i class="bi bi-box-arrow-in-right"></i> Fazer Login
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

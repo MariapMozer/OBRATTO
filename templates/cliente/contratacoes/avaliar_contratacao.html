@@ -1,6 +1,418 @@
 {% extends "cliente/base.html" %}
-{% block titulo %}Avaliar contratação{% endblock %}
+
+{#
+    Template: Avaliar Contratação (Cliente)
+    Descrição: Formulário para avaliar um serviço concluído
+    Estende: cliente/base.html
+#}
+
+{% from 'components/form_input.html' import form_textarea, form_checkbox, form_radio %}
+{% from 'components/breadcrumbs.html' import breadcrumbs %}
+{% from 'components/alert.html' import alert %}
+
+{% block titulo %}Avaliar Contratação{% endblock %}
+
 {% block conteudo %}
-<h1 class="h3">Avaliar</h1>
-<p>Esta página está em construção.</p>
+<div class="container-fluid px-4 py-4">
+    <!-- Breadcrumbs -->
+    {{ breadcrumbs(items=[
+        {'text': 'Home', 'url': '/cliente/home'},
+        {'text': 'Contratações', 'url': '/cliente/contratacoes'},
+        {'text': 'Avaliar', 'active': True}
+    ]) }}
+
+    <!-- Page Header -->
+    <div class="mb-4">
+        <h1 class="h3 mb-1">
+            <i class="bi bi-star text-warning me-2"></i>
+            Avaliar Serviço
+        </h1>
+        <p class="text-muted mb-0">Compartilhe sua experiência com este serviço</p>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Informações da Contratação -->
+            {% if contratacao %}
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Informações do Serviço</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-2">
+                                <small class="text-muted">Serviço:</small>
+                                <div class="fw-semibold">{{ contratacao.servico_nome }}</div>
+                            </div>
+                            <div class="mb-2">
+                                <small class="text-muted">Data:</small>
+                                <div>{{ contratacao.data_conclusao|default(contratacao.data_contratacao) }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-2">
+                                <small class="text-muted">Prestador:</small>
+                                <div class="d-flex align-items-center">
+                                    {% if contratacao.prestador_foto %}
+                                    <img src="{{ contratacao.prestador_foto }}" alt="{{ contratacao.prestador_nome }}"
+                                         class="rounded-circle me-2" width="40" height="40">
+                                    {% endif %}
+                                    <span class="fw-semibold">{{ contratacao.prestador_nome }}</span>
+                                </div>
+                            </div>
+                            <div class="mb-2">
+                                <small class="text-muted">Valor:</small>
+                                <div class="text-primary fw-bold">R$ {{ "%.2f"|format(contratacao.valor|float) }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Formulário de Avaliação -->
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <form method="POST" action="/cliente/contratacoes/avaliar/{{ contratacao_id }}" id="avaliacaoForm">
+                        {% if csrf_token %}
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                        {% endif %}
+
+                        <!-- Avaliação Geral -->
+                        <div class="mb-4">
+                            <h5 class="border-bottom pb-2 mb-3">
+                                <i class="bi bi-star-fill text-warning me-2"></i>
+                                Avaliação Geral
+                            </h5>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">
+                                    Qual sua nota geral para este serviço?
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <div class="star-rating mb-2">
+                                    <input type="radio" name="nota_geral" value="5" id="star5" required>
+                                    <label for="star5" title="Excelente">
+                                        <i class="bi bi-star-fill"></i>
+                                    </label>
+
+                                    <input type="radio" name="nota_geral" value="4" id="star4">
+                                    <label for="star4" title="Muito Bom">
+                                        <i class="bi bi-star-fill"></i>
+                                    </label>
+
+                                    <input type="radio" name="nota_geral" value="3" id="star3">
+                                    <label for="star3" title="Bom">
+                                        <i class="bi bi-star-fill"></i>
+                                    </label>
+
+                                    <input type="radio" name="nota_geral" value="2" id="star2">
+                                    <label for="star2" title="Regular">
+                                        <i class="bi bi-star-fill"></i>
+                                    </label>
+
+                                    <input type="radio" name="nota_geral" value="1" id="star1">
+                                    <label for="star1" title="Ruim">
+                                        <i class="bi bi-star-fill"></i>
+                                    </label>
+                                </div>
+                                <div class="rating-text text-muted small"></div>
+                            </div>
+                        </div>
+
+                        <!-- Aspectos Específicos -->
+                        <div class="mb-4">
+                            <h5 class="border-bottom pb-2 mb-3">
+                                <i class="bi bi-clipboard-check text-primary me-2"></i>
+                                Aspectos Específicos
+                            </h5>
+
+                            <!-- Qualidade -->
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Qualidade do Serviço</label>
+                                <div class="d-flex gap-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="qualidade"
+                                               value="5" id="qualidade5">
+                                        <label class="form-check-label" for="qualidade5">
+                                            Excelente
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="qualidade"
+                                               value="4" id="qualidade4">
+                                        <label class="form-check-label" for="qualidade4">
+                                            Ótima
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="qualidade"
+                                               value="3" id="qualidade3" checked>
+                                        <label class="form-check-label" for="qualidade3">
+                                            Boa
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="qualidade"
+                                               value="2" id="qualidade2">
+                                        <label class="form-check-label" for="qualidade2">
+                                            Regular
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="qualidade"
+                                               value="1" id="qualidade1">
+                                        <label class="form-check-label" for="qualidade1">
+                                            Ruim
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Pontualidade -->
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Pontualidade</label>
+                                <div class="d-flex gap-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="pontualidade"
+                                               value="5" id="pont5">
+                                        <label class="form-check-label" for="pont5">Excelente</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="pontualidade"
+                                               value="4" id="pont4">
+                                        <label class="form-check-label" for="pont4">Ótima</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="pontualidade"
+                                               value="3" id="pont3" checked>
+                                        <label class="form-check-label" for="pont3">Boa</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="pontualidade"
+                                               value="2" id="pont2">
+                                        <label class="form-check-label" for="pont2">Regular</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="pontualidade"
+                                               value="1" id="pont1">
+                                        <label class="form-check-label" for="pont1">Ruim</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Comunicação -->
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Comunicação</label>
+                                <div class="d-flex gap-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="comunicacao"
+                                               value="5" id="com5">
+                                        <label class="form-check-label" for="com5">Excelente</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="comunicacao"
+                                               value="4" id="com4">
+                                        <label class="form-check-label" for="com4">Ótima</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="comunicacao"
+                                               value="3" id="com3" checked>
+                                        <label class="form-check-label" for="com3">Boa</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="comunicacao"
+                                               value="2" id="com2">
+                                        <label class="form-check-label" for="com2">Regular</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="comunicacao"
+                                               value="1" id="com1">
+                                        <label class="form-check-label" for="com1">Ruim</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Custo-Benefício -->
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Custo-Benefício</label>
+                                <div class="d-flex gap-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="custo_beneficio"
+                                               value="5" id="cb5">
+                                        <label class="form-check-label" for="cb5">Excelente</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="custo_beneficio"
+                                               value="4" id="cb4">
+                                        <label class="form-check-label" for="cb4">Ótimo</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="custo_beneficio"
+                                               value="3" id="cb3" checked>
+                                        <label class="form-check-label" for="cb3">Bom</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="custo_beneficio"
+                                               value="2" id="cb2">
+                                        <label class="form-check-label" for="cb2">Regular</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="custo_beneficio"
+                                               value="1" id="cb1">
+                                        <label class="form-check-label" for="cb1">Ruim</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Comentários -->
+                        <div class="mb-4">
+                            <h5 class="border-bottom pb-2 mb-3">
+                                <i class="bi bi-chat-left-text text-success me-2"></i>
+                                Comentários
+                            </h5>
+
+                            {{ form_textarea(
+                                name='comentario',
+                                label='Conte mais sobre sua experiência',
+                                placeholder='Descreva os pontos positivos e negativos do serviço, o que você achou do profissional, se recomendaria, etc.',
+                                rows=5,
+                                max_length=500,
+                                help_text='Seu comentário ajudará outros clientes a escolher este prestador'
+                            ) }}
+                        </div>
+
+                        <!-- Recomendação -->
+                        <div class="mb-4">
+                            {{ form_checkbox(
+                                name='recomenda',
+                                label='Eu recomendo este prestador para outras pessoas',
+                                checked=True
+                            ) }}
+                        </div>
+
+                        <!-- Botões -->
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="bi bi-check-circle me-2"></i>Enviar Avaliação
+                            </button>
+                            <a href="/cliente/contratacoes" class="btn btn-outline-secondary btn-lg">
+                                <i class="bi bi-x-circle me-2"></i>Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar com Orientações -->
+        <div class="col-lg-4">
+            {{ alert(
+                type='info',
+                icon='info-circle',
+                title='Por que avaliar?',
+                message='Sua avaliação é fundamental para manter a qualidade dos serviços na plataforma e ajudar outros usuários a fazerem boas escolhas.',
+                dismissible=False
+            ) }}
+
+            <div class="card shadow-sm border-warning mt-3">
+                <div class="card-body">
+                    <h6 class="card-title text-warning">
+                        <i class="bi bi-lightbulb me-2"></i>
+                        Dicas para uma boa avaliação
+                    </h6>
+                    <ul class="small mb-0 ps-3">
+                        <li class="mb-2">Seja honesto e construtivo</li>
+                        <li class="mb-2">Destaque pontos positivos e negativos</li>
+                        <li class="mb-2">Evite comentários ofensivos</li>
+                        <li class="mb-0">Seja específico nos detalhes</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card shadow-sm border-success mt-3">
+                <div class="card-body text-center">
+                    <i class="bi bi-shield-check text-success display-4 mb-2"></i>
+                    <h6 class="card-title">Avaliações Verificadas</h6>
+                    <p class="card-text small text-muted mb-0">
+                        Somente clientes que concluíram o serviço podem avaliar
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Star Rating Styles */
+.star-rating {
+    direction: rtl;
+    display: inline-flex;
+    gap: 5px;
+}
+
+.star-rating input[type="radio"] {
+    display: none;
+}
+
+.star-rating label {
+    cursor: pointer;
+    font-size: 2rem;
+    color: #ddd;
+    transition: color 0.2s;
+}
+
+.star-rating label:hover,
+.star-rating label:hover ~ label,
+.star-rating input[type="radio"]:checked ~ label {
+    color: #ffc107;
+}
+
+.star-rating label:hover {
+    transform: scale(1.1);
+}
+</style>
+
+{% block scripts %}
+<script>
+// Atualizar texto da avaliação baseado na nota selecionada
+const ratingTexts = {
+    '5': 'Excelente! ⭐⭐⭐⭐⭐',
+    '4': 'Muito Bom! ⭐⭐⭐⭐',
+    '3': 'Bom ⭐⭐⭐',
+    '2': 'Regular ⭐⭐',
+    '1': 'Ruim ⭐'
+};
+
+document.querySelectorAll('input[name="nota_geral"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        const ratingText = document.querySelector('.rating-text');
+        ratingText.textContent = ratingTexts[this.value];
+        ratingText.style.fontSize = '1.1rem';
+        ratingText.style.fontWeight = '600';
+
+        if (this.value >= 4) {
+            ratingText.className = 'rating-text text-success';
+        } else if (this.value >= 3) {
+            ratingText.className = 'rating-text text-primary';
+        } else if (this.value >= 2) {
+            ratingText.className = 'rating-text text-warning';
+        } else {
+            ratingText.className = 'rating-text text-danger';
+        }
+    });
+});
+
+// Validação do formulário
+document.getElementById('avaliacaoForm').addEventListener('submit', function(e) {
+    const notaGeral = document.querySelector('input[name="nota_geral"]:checked');
+
+    if (!notaGeral) {
+        e.preventDefault();
+        alert('Por favor, selecione uma nota geral para o serviço.');
+        return false;
+    }
+});
+</script>
+{% endblock %}
 {% endblock %}

@@ -1,0 +1,29 @@
+{#
+    Componente: Alert/Message Box
+    Descrição: Alert reutilizável baseado em Bootstrap
+
+    Parâmetros:
+    - message: Mensagem a ser exibida (suporta HTML)
+    - type: Tipo do alert (success, danger, warning, info) - padrão: 'info'
+    - dismissible: Se o alert pode ser fechado - padrão: True
+    - icon: Ícone Bootstrap (opcional)
+
+    Uso:
+    {% from 'components/alert.html' import alert %}
+
+    {{ alert('Operação realizada com sucesso!', type='success', icon='check-circle') }}
+    {{ alert('Erro ao processar', type='danger', icon='exclamation-triangle') }}
+    {{ alert('Atenção!', type='warning', dismissible=False) }}
+#}
+
+{% macro alert(message, type='info', dismissible=True, icon=None) %}
+<div class="alert alert-{{ type }} {% if dismissible %}alert-dismissible fade show{% endif %}" role="alert">
+    {% if icon %}
+    <i class="bi bi-{{ icon }} me-2"></i>
+    {% endif %}
+    {{ message|safe }}
+    {% if dismissible %}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+    {% endif %}
+</div>
+{% endmacro %}

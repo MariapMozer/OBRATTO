@@ -1,7 +1,7 @@
 from typing import Optional, List
 from data.orcamento.orcamento_model import Orcamento
 from data.orcamento.orcamento_sql import *
-from utils.db import open_connection
+from util.db import open_connection
 import datetime
 
 
@@ -16,15 +16,18 @@ def criar_tabela_orcamento() -> bool:
 def inserir_orcamento(orcamento: Orcamento) -> Optional[int]:
     with open_connection() as conn:
         cursor = conn.cursor()
-        cursor.execute(INSERIR_ORCAMENTO, (
-            orcamento.id_fornecedor,
-            orcamento.id_cliente,
-            orcamento.valor_estimado,
-            orcamento.data_solicitacao.isoformat(),
-            orcamento.prazo_entrega.isoformat(),
-            orcamento.status,
-            orcamento.descricao
-        ))
+        cursor.execute(
+            INSERIR_ORCAMENTO,
+            (
+                orcamento.id_fornecedor,
+                orcamento.id_cliente,
+                orcamento.valor_estimado,
+                orcamento.data_solicitacao.isoformat(),
+                orcamento.prazo_entrega.isoformat(),
+                orcamento.status,
+                orcamento.descricao,
+            ),
+        )
         conn.commit()
         return cursor.lastrowid
 
@@ -40,10 +43,12 @@ def obter_orcamento_por_id(orcamento_id: int) -> Optional[Orcamento]:
                 id_fornecedor=row["id_fornecedor"],
                 id_cliente=row["id_cliente"],
                 valor_estimado=row["valor_estimado"],
-                data_solicitacao=datetime.datetime.fromisoformat(row["data_solicitacao"]),
+                data_solicitacao=datetime.datetime.fromisoformat(
+                    row["data_solicitacao"]
+                ),
                 prazo_entrega=datetime.datetime.fromisoformat(row["prazo_entrega"]),
                 status=row["status"],
-                descricao=row["descricao"]
+                descricao=row["descricao"],
             )
         return None
 
@@ -59,13 +64,16 @@ def obter_todos_orcamentos() -> List[Orcamento]:
                 id_fornecedor=row["id_fornecedor"],
                 id_cliente=row["id_cliente"],
                 valor_estimado=row["valor_estimado"],
-                data_solicitacao=datetime.datetime.fromisoformat(row["data_solicitacao"]),
+                data_solicitacao=datetime.datetime.fromisoformat(
+                    row["data_solicitacao"]
+                ),
                 prazo_entrega=datetime.datetime.fromisoformat(row["prazo_entrega"]),
                 status=row["status"],
-                descricao=row["descricao"]
-            ) for row in rows
+                descricao=row["descricao"],
+            )
+            for row in rows
         ]
-    
+
 
 def obter_orcamentos_por_pagina(pagina: int, tamanho_pagina: int) -> List[Orcamento]:
     offset = (pagina - 1) * tamanho_pagina
@@ -79,13 +87,15 @@ def obter_orcamentos_por_pagina(pagina: int, tamanho_pagina: int) -> List[Orcame
                 id_fornecedor=row["id_fornecedor"],
                 id_cliente=row["id_cliente"],
                 valor_estimado=row["valor_estimado"],
-                data_solicitacao=datetime.datetime.fromisoformat(row["data_solicitacao"]),
+                data_solicitacao=datetime.datetime.fromisoformat(
+                    row["data_solicitacao"]
+                ),
                 prazo_entrega=datetime.datetime.fromisoformat(row["prazo_entrega"]),
                 status=row["status"],
-                descricao=row["descricao"]
-            ) for row in rows
+                descricao=row["descricao"],
+            )
+            for row in rows
         ]
-
 
 
 def atualizar_orcamento_por_id(orcamento: Orcamento) -> bool:
@@ -101,8 +111,8 @@ def atualizar_orcamento_por_id(orcamento: Orcamento) -> bool:
                 orcamento.prazo_entrega.isoformat(),
                 orcamento.status,
                 orcamento.descricao,
-                orcamento.id  # <- muito importante
-            )
+                orcamento.id,  # <- muito importante
+            ),
         )
         conn.commit()
         return cursor.rowcount > 0

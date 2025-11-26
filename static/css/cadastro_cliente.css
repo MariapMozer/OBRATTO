@@ -1,0 +1,319 @@
+/* Base */
+.cadastro-main {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background-color: #f8f9fa;
+}
+
+/* Container principal */
+.cadastro-container {
+    display: flex;
+    max-width: 1200px;
+    width: 100%;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+/* Lado esquerdo - Informações */
+.cadastro-info {
+    flex: 1;
+    padding: 3rem;
+    background: linear-gradient(135deg, #2a6f97 0%, #014f86 100%);
+    color: white;
+}
+
+.cadastro-info-content {
+    max-width: 400px;
+}
+
+.cadastro-logo {
+    max-width: 180px;
+    margin-bottom: 2rem;
+}
+
+.cadastro-info h2 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.cadastro-info p {
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+}
+
+.cadastro-benefits {
+    list-style: none;
+    padding: 0;
+}
+
+.cadastro-benefits li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+}
+
+.cadastro-benefits li i {
+    margin-right: 0.75rem;
+    font-size: 1.2rem;
+    color: #61dafb;
+}
+
+/* Lado direito - Formulário */
+.cadastro-form-container {
+    flex: 1.2;
+    padding: 3rem;
+    background: #fff;
+    overflow-y: auto;
+}
+
+.cadastro-form-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.cadastro-form-header h1 {
+    font-size: 2rem;
+    color: #1a1a1a;
+    margin-bottom: 0.5rem;
+}
+
+.cadastro-form-header p {
+    color: #666;
+    font-size: 1.1rem;
+}
+
+/* Indicador de Progresso */
+.progress-indicator {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2rem;
+    gap: 2rem;
+    position: relative;
+}
+
+.progress-indicator::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60%;
+    height: 2px;
+    background-color: #e0e0e0;
+    z-index: 0;
+}
+
+.progress-step {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: #fff;
+    border: 2px solid #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #666;
+    position: relative;
+    z-index: 1;
+}
+
+.progress-step.active {
+    border-color: #014f86;
+    background-color: #014f86;
+    color: #fff;
+}
+
+.progress-step.completed {
+    border-color: #28a745;
+    background-color: #28a745;
+    color: #fff;
+}
+
+/* Seções do Formulário */
+.form-section {
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.form-section.d-none {
+    display: none !important;
+}
+
+.section-title {
+    font-size: 1.25rem;
+    color: #1a1a1a;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.section-title i {
+    color: #014f86;
+}
+
+/* Campos do Formulário */
+.form-group {
+    margin-bottom: 1.25rem;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #333;
+}
+
+.form-control {
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 0.75rem;
+    width: 100%;
+    transition: border-color 0.2s;
+}
+
+.form-control:focus {
+    border-color: #014f86;
+    box-shadow: 0 0 0 3px rgba(1, 79, 134, 0.1);
+}
+
+.form-control.is-invalid {
+    border-color: #dc3545;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1rem;
+}
+
+.form-control.is-valid {
+    border-color: #28a745;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%2328a745' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1rem;
+}
+
+.invalid-feedback {
+    display: none;
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.invalid-feedback.d-block {
+    display: block;
+}
+
+/* Layout de duas colunas */
+.form-row.two-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+/* Botões */
+.btn-cadastrar {
+    background-color: #014f86;
+    color: #fff;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-cadastrar:hover {
+    background-color: #013a63;
+}
+
+.btn-cadastrar:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.btn-voltar {
+    background-color: transparent;
+    color: #666;
+    border: 1px solid #ddd;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-voltar:hover {
+    background-color: #f8f9fa;
+    border-color: #014f86;
+    color: #014f86;
+}
+
+/* Animações */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+/* Responsividade */
+@media (max-width: 992px) {
+    .cadastro-container {
+        flex-direction: column;
+    }
+
+    .cadastro-info {
+        padding: 2rem;
+    }
+
+    .cadastro-info-content {
+        max-width: 100%;
+        text-align: center;
+    }
+
+    .cadastro-benefits {
+        max-width: 400px;
+        margin: 0 auto;
+    }
+
+    .cadastro-form-container {
+        padding: 2rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .form-row.two-cols {
+        grid-template-columns: 1fr;
+    }
+
+    .cadastro-main {
+        padding: 1rem;
+    }
+
+    .progress-indicator {
+        gap: 1rem;
+    }
+}

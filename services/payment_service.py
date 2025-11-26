@@ -3,19 +3,51 @@ from data.pagamento.pagamento_repo import PagamentoRepository
 from data.inscricaoplano.inscricao_plano_model import InscricaoPlano
 from data.inscricaoplano import inscricao_plano_repo
 from data.plano.plano_repo import PlanoRepository
-from data.cartao.cartao_repo import CartaoRepository
 from services.mercadopago_service import MercadoPagoService
 from datetime import datetime
+from typing import Optional, Any
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class PaymentService:
+    """
+    Serviço de pagamento integrado com Mercado Pago.
+
+    NOTA IMPORTANTE: Este serviço NÃO armazena dados de cartões de crédito localmente.
+    Toda a gestão de cartões e tokenização é feita através do Mercado Pago.
+
+    Para assinaturas recorrentes, o Mercado Pago gerencia os tokens dos cartões
+    e processa cobranças automáticas.
+    """
+
     def __init__(self):
         self.pagamento_repo = PagamentoRepository()
         self.inscricao_plano_repo = inscricao_plano_repo
         self.plano_repo = PlanoRepository()
-        self.cartao_repo = CartaoRepository()
         self.mercadopago_service = MercadoPagoService()
 
-    async def process_plan_payment(self, prestador_id: int, plano_id: int, valor: float, metodo_pagamento: str, cartao_salvo_id: int = None, new_card_data: dict = None):
+    async def process_plan_payment(self, prestador_id: int, plano_id: int, valor: float,
+                                   metodo_pagamento: str, card_token: Optional[str] = None,
+                                   user_email: Optional[str] = None):
+        """
+        Processa pagamento de plano usando token de cartão do Mercado Pago.
+
+        IMPORTANTE: Este método NÃO salva dados de cartão localmente.
+        O card_token deve ser gerado no frontend usando MercadoPago.js
+
+        Args:
+            prestador_id: ID do prestador/fornecedor
+            plano_id: ID do plano sendo assinado
+            valor: Valor do pagamento
+            metodo_pagamento: Método de pagamento (ex: "credit_card")
+            card_token: Token do cartão gerado pelo Mercado Pago
+            user_email: Email do usuário para processamento
+
+        Returns:
+            Resultado do processamento do pagamento
+        """
         plano = self.plano_repo.obter_plano_por_id(plano_id)
         if not plano:
             return {"success": False, "message": "Plano não encontrado.", "status_code": 404}
@@ -25,36 +57,9 @@ class PaymentService:
         if assinatura_ativa:
             return {"success": False, "message": "Você já possui uma assinatura ativa.", "status_code": 400}
 
-        # Handle card data
-        if cartao_salvo_id:
-            cartao_usado = self.cartao_repo.obter_cartao_por_id(cartao_salvo_id)
-            if not cartao_usado or cartao_usado.id_prestador != prestador_id:
-                return {"success": False, "message": "Cartão selecionado não é válido.", "status_code": 400}
-            # Use tokenized card or reference from Mercado Pago
-            # For now, simulate with saved card
-            payment_method_id = f"saved_card_{cartao_usado.id_cartao}"
-        elif new_card_data:
-            # Here, you would tokenize the card with Mercado Pago and get a payment_method_id
-            # For now, simulate saving the card if requested
-            if new_card_data.get("salvar_cartao") == "true":
-                try:
-                    mes_vencimento, ano_vencimento = new_card_data["validade"].split("/")
-                    numero_cartao = new_card_data["numero_cartao"].replace(" ", "")
-                    self.cartao_repo.criar_cartao_from_form(
-                        id_prestador=prestador_id,
-                        numero_cartao=numero_cartao,
-                        nome_titular=new_card_data["nome_cartao"],
-                        mes_vencimento=mes_vencimento,
-                        ano_vencimento=ano_vencimento,
-                        apelido=f"Cartão •••• {numero_cartao[-4:]}",
-                        principal=False
-                    )
-                except Exception as e:
-                    print(f"Erro ao salvar cartão: {e}")
-            # Simulate payment method ID from new card
-            payment_method_id = "new_card_payment"
-        else:
-            return {"success": False, "message": "Método de pagamento inválido.", "status_code": 400}
+        # Validate card token
+        if not card_token:
+            return {"success": False, "message": "Token de cartão não fornecido.", "status_code": 400}
 
         # Create new subscription entry
         nova_inscricao = InscricaoPlano(
@@ -68,13 +73,15 @@ class PaymentService:
 
         reference = f"assinatura_plano_{plano_id}_prestador_{prestador_id}_{inscricao_id}"
 
-        # Prepare payment data for Mercado Pago
+        # Prepare payment data for Mercado Pago using token
         payment_data = {
             "transaction_amount": float(valor),
+            "token": card_token,  # Use token instead of raw card data
             "description": f"Assinatura do plano {plano.nome_plano}",
-            "payment_method_id": "visa", # This should come from tokenization or saved card
+            "installments": 1,
+            "payment_method_id": metodo_pagamento,
             "payer": {
-                "email": "test_user_123@test.com" # Replace with actual user email
+                "email": user_email or "user@obratto.com"
             },
             "external_reference": reference
         }
@@ -85,18 +92,18 @@ class PaymentService:
         if mp_response and mp_response["status"] == 201:
             mp_payment_id = mp_response["response"]["id"]
             mp_status = mp_response["response"]["status"]
-            mp_preference_id = mp_response["response"]["id"] # Assuming payment id can be used as preference id for now
+            mp_preference_id = mp_response["response"]["id"]
         else:
-            # Handle Mercado Pago error or simulation
+            # Handle Mercado Pago error or simulation mode
             mp_payment_id = f"{metodo_pagamento}_payment_{inscricao_id}_{int(datetime.now().timestamp())}"
-            mp_status = "pending" # Default to pending if MP fails or for simulation
+            mp_status = "pending"  # Default to pending if MP fails or for simulation
             mp_preference_id = f"{metodo_pagamento}_pref_{inscricao_id}_{int(datetime.now().timestamp())}"
-            print(f"Mercado Pago response error: {mp_response}")
+            logger.error(f"Mercado Pago response error: {mp_response}")
 
         pagamento = Pagamento(
             id_pagamento=0,
             plano_id=plano_id,
-            prestador_id=prestador_id,
+            fornecedor_id=prestador_id,
             mp_payment_id=str(mp_payment_id),
             mp_preference_id=str(mp_preference_id),
             valor=valor,
@@ -109,7 +116,13 @@ class PaymentService:
 
         pagamento_inserido = self.pagamento_repo.inserir_pagamento(pagamento)
         if pagamento_inserido:
-            return {"success": True, "message": "Pagamento processado com sucesso!", "status": mp_status, "status_code": 200}
+            return {
+                "success": True,
+                "message": "Pagamento processado com sucesso!",
+                "status": mp_status,
+                "payment_id": mp_payment_id,
+                "status_code": 200
+            }
         else:
             return {"success": False, "message": "Erro ao registrar pagamento no banco de dados.", "status_code": 500}
 
@@ -140,40 +153,3 @@ class PaymentService:
                 else:
                     return {"success": False, "message": f"Pagamento com MP ID {mp_payment_id} não encontrado no DB."}
         return {"success": False, "message": "Notificação de webhook inválida ou não processada."}
-
-    def add_card(self, prestador_id: int, numero_cartao: str, nome_titular: str, mes_vencimento: str, ano_vencimento: str, apelido: str, principal: bool):
-        # In a real scenario, this would involve tokenizing the card with Mercado Pago
-        # and storing the token, not the full card number.
-        # For now, it uses the existing repo method.
-        return self.cartao_repo.criar_cartao_from_form(
-            id_prestador=prestador_id,
-            numero_cartao=numero_cartao,
-            nome_titular=nome_titular,
-            mes_vencimento=mes_vencimento,
-            ano_vencimento=ano_vencimento,
-            apelido=apelido,
-            principal=principal
-        )
-
-    def update_card(self, id_cartao: int, prestador_id: int, nome_titular: str, apelido: str, principal: bool):
-        cartao = self.cartao_repo.obter_cartao_por_id(id_cartao)
-        if not cartao or cartao.id_prestador != prestador_id:
-            return False
-        cartao.nome_titular = nome_titular.strip().upper()
-        cartao.apelido = apelido.strip()
-        cartao.principal = principal
-        return self.cartao_repo.atualizar_cartao(cartao)
-
-    def delete_card(self, id_cartao: int, prestador_id: int):
-        cartao = self.cartao_repo.obter_cartao_por_id(id_cartao)
-        if not cartao or cartao.id_prestador != prestador_id:
-            return False
-        return self.cartao_repo.remover_cartao(id_cartao)
-
-    def set_main_card(self, id_cartao: int, prestador_id: int):
-        cartao = self.cartao_repo.obter_cartao_por_id(id_cartao)
-        if not cartao or cartao.id_prestador != prestador_id:
-            return False
-        self.cartao_repo.definir_todos_nao_principal(prestador_id)
-        cartao.principal = True
-        return self.cartao_repo.atualizar_cartao(cartao)

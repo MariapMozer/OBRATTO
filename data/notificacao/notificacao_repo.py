@@ -2,7 +2,7 @@ import sqlite3
 from typing import Optional, List
 from data.notificacao.notificacao_model import Notificacao
 from data.notificacao.notificacao_sql import *
-from utils.db import open_connection
+from util.db import open_connection
 
 
 def criar_tabela_notificacao() -> bool:
@@ -20,13 +20,16 @@ def inserir_notificacao(notificacao: Notificacao) -> Optional[int]:
     """
     with open_connection() as conn:
         cursor = conn.cursor()
-        cursor.execute(INSERIR_NOTIFICACAO, (
-            notificacao.id_usuario,
-            notificacao.mensagem,
-            notificacao.data_hora,
-            notificacao.tipo_notificacao,
-            int(notificacao.visualizar)
-        ))
+        cursor.execute(
+            INSERIR_NOTIFICACAO,
+            (
+                notificacao.id_usuario,
+                notificacao.mensagem,
+                notificacao.data_hora,
+                notificacao.tipo_notificacao,
+                int(notificacao.visualizar),
+            ),
+        )
         conn.commit()
         return cursor.lastrowid
 
@@ -38,14 +41,16 @@ def obter_notificacao() -> List[Notificacao]:
         rows = cursor.fetchall()
         notificacoes = []
         for row in rows:
-            notificacoes.append(Notificacao(
-                id_notificacao=row["id_notificacao"],
-                id_usuario=row["id_usuario"],
-                mensagem=row["mensagem"],
-                data_hora=row["data_hora"],
-                tipo_notificacao= row["tipo_notificacao"],
-                visualizar=bool(row["vizualizar"])
-            ))
+            notificacoes.append(
+                Notificacao(
+                    id_notificacao=row["id_notificacao"],
+                    id_usuario=row["id_usuario"],
+                    mensagem=row["mensagem"],
+                    data_hora=row["data_hora"],
+                    tipo_notificacao=row["tipo_notificacao"],
+                    visualizar=bool(row["vizualizar"]),
+                )
+            )
         return notificacoes
 
 
@@ -60,15 +65,16 @@ def obter_notificacao_por_id(id_notificacao: int) -> Optional[Notificacao]:
                 id_usuario=row["id_usuario"],
                 mensagem=row["mensagem"],
                 data_hora=row["data_hora"],
-                tipo_notificacao= row["tipo_notificacao"],
-                visualizar=bool(row["vizualizar"])
+                tipo_notificacao=row["tipo_notificacao"],
+                visualizar=bool(row["vizualizar"]),
             )
         return None
 
+
 def obter_notificacao_por_pagina(conn, limit: int, offset: int) -> list[Notificacao]:
-    conn.row_factory = sqlite3.Row 
+    conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
-    cursor.execute(OBTER_NOTIFICACAO_POR_PAGINA,(limit, offset))
+    cursor.execute(OBTER_NOTIFICACAO_POR_PAGINA, (limit, offset))
     rows = cursor.fetchall()
     return [
         Notificacao(
@@ -76,11 +82,12 @@ def obter_notificacao_por_pagina(conn, limit: int, offset: int) -> list[Notifica
             id_usuario=row["id_usuario"],
             mensagem=row["mensagem"],
             data_hora=row["data_hora"],
-            tipo_notificacao= row["tipo_notificacao"],
-            visualizar=bool(row["vizualizar"])
+            tipo_notificacao=row["tipo_notificacao"],
+            visualizar=bool(row["vizualizar"]),
         )
         for row in rows
     ]
+
 
 def atualizar_notificacao(notificacao: Notificacao) -> bool:
     """
@@ -88,14 +95,17 @@ def atualizar_notificacao(notificacao: Notificacao) -> bool:
     """
     with open_connection() as conn:
         cursor = conn.cursor()
-        cursor.execute(ATUALIZAR_NOTIFICACAO, (
-            notificacao.id_usuario,
-            notificacao.mensagem,
-            notificacao.data_hora,
-            notificacao.tipo_notificacao,
-            int(notificacao.visualizar),
-            notificacao.id_notificacao
-        ))
+        cursor.execute(
+            ATUALIZAR_NOTIFICACAO,
+            (
+                notificacao.id_usuario,
+                notificacao.mensagem,
+                notificacao.data_hora,
+                notificacao.tipo_notificacao,
+                int(notificacao.visualizar),
+                notificacao.id_notificacao,
+            ),
+        )
         conn.commit()
         return cursor.rowcount > 0
 
@@ -106,7 +116,3 @@ def deletar(id_notificacao: int) -> bool:
         cursor.execute(DELETAR_NOTIFICACAO, (id_notificacao,))
         conn.commit()
         return cursor.rowcount > 0
-
-
-
-

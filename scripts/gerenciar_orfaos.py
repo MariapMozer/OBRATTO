@@ -140,8 +140,9 @@ def main():
         limpar_arquivos_orfaos(confirmar=not args.force)
 
 if __name__ == "__main__":
+    import sys
     # Se executado sem argumentos, executa no modo interativo
-    if len(os.sys.argv) == 1:
+    if len(sys.argv) == 1:
         print("🖼️  Gerenciador de Arquivos Órfãos - OBRATTO")
         print("=" * 50)
         print("1. Verificar arquivos órfãos")

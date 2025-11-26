@@ -1,4 +1,3 @@
-
 """
 Classe base para todos os DTOs do sistema.
 Fornece configurações padrão e métodos de validação comuns.
@@ -6,7 +5,7 @@ Fornece configurações padrão e métodos de validação comuns.
 
 from pydantic import BaseModel, ConfigDict
 from typing import Dict, Any
-from utils.validacoes_dto import ValidacaoError
+from util.validacoes_dto import ValidacaoError
 
 
 class BaseDTO(BaseModel):
@@ -30,7 +29,7 @@ class BaseDTO(BaseModel):
         # Permitir population by name (útil para formulários HTML)
         populate_by_name=True,
         # Validar valores padrão também
-        validate_default=True
+        validate_default=True,
     )
 
     @classmethod
@@ -48,7 +47,9 @@ class BaseDTO(BaseModel):
         return {"exemplo": "Sobrescrever na classe filha", **overrides}
 
     @classmethod
-    def validar_campo_wrapper(cls, validador_func, campo_nome: str = ""):
+    def validar_campo_wrapper(
+        cls, validador_func, campo_nome: str = "", **validator_kwargs
+    ):
         """
         Wrapper para padronizar o tratamento de erros de validação.
         Evita repetir try/except em cada field_validator.
@@ -56,18 +57,21 @@ class BaseDTO(BaseModel):
         Args:
             validador_func: Função de validação a ser envolvida
             campo_nome: Nome do campo para mensagens de erro
+            **validator_kwargs: Argumentos adicionais para o validador (min_chars, max_chars, etc.)
 
         Returns:
             Função wrapper que trata os erros automaticamente
         """
-        def wrapper(valor, **kwargs):
+
+        def wrapper(valor):
             try:
                 if campo_nome:
-                    return validador_func(valor, campo_nome, **kwargs)
+                    return validador_func(valor, campo_nome, **validator_kwargs)
                 else:
-                    return validador_func(valor, **kwargs)
+                    return validador_func(valor, **validator_kwargs)
             except ValidacaoError as e:
                 raise ValueError(str(e))
+
         return wrapper
 
     def to_dict(self) -> dict:
@@ -105,7 +109,7 @@ class BaseDTO(BaseModel):
 
     def __str__(self) -> str:
         """Representação string melhorada do DTO"""
-        campos = ', '.join([f"{k}={v}" for k, v in self.to_dict().items()])
+        campos = ", ".join([f"{k}={v}" for k, v in self.to_dict().items()])
         return f"{self.__class__.__name__}({campos})"
 
     def __repr__(self) -> str:

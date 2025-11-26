@@ -1,5 +1,6 @@
 from datetime import datetime, date, timedelta
 import pytest
+import uuid
 
 from data.usuario.usuario_model import Usuario
 from data.usuario.usuario_repo import criar_tabela_usuario, inserir_usuario
@@ -11,9 +12,15 @@ from data.cliente.cliente_model import Cliente
 from data.cliente.cliente_repo import criar_tabela_cliente, inserir_cliente
 
 from data.orcamento.orcamento_model import Orcamento
-from data.orcamento.orcamento_repo import criar_tabela_orcamento, deletar_orcamento, inserir_orcamento, obter_orcamento_por_id, obter_orcamentos_por_pagina, obter_todos_orcamentos, atualizar_orcamento_por_id
-
-from datetime import datetime, timedelta, date
+from data.orcamento.orcamento_repo import (
+    criar_tabela_orcamento,
+    deletar_orcamento,
+    inserir_orcamento,
+    obter_orcamento_por_id,
+    obter_orcamentos_por_pagina,
+    obter_todos_orcamentos,
+    atualizar_orcamento_por_id
+)
 
 
 class Test_OrcamentoRepo:
@@ -24,73 +31,62 @@ class Test_OrcamentoRepo:
         resultado = criar_tabela_orcamento()
         assert resultado is True, "A criação da tabela deveria retornar True"
 
-    def test_inserir_orcamento(self, test_db):
+    def test_inserir_orcamento(self, test_db, email_unico, cpf_unico):
         criar_tabela_usuario()
         criar_tabela_fornecedor()
         criar_tabela_cliente()
         criar_tabela_orcamento()
 
-        usuario_fornecedor = Usuario(
-            id=0,
-            nome="Fornecedor Teste",
-            email="fornecedor@teste.com",
-            senha="senha123",
-            cpf_cnpj="12345678000199",
-            telefone="27999999999",
-            data_cadastro=datetime.now(),
-            endereco="Rua dos Fornecedores",
-            tipo_usuario="Fornecedor"
-        )
-        id_usuario_fornecedor = inserir_usuario(usuario_fornecedor)
-        assert id_usuario_fornecedor is not None, "Usuário fornecedor não inserido"
+        email_fornecedor = f"fornecedor_{uuid.uuid4().hex[:8]}@teste.com"
+        cpf_fornecedor = f"{uuid.uuid4().int % 100000000000000:014d}"
 
         fornecedor = Fornecedor(
             id=0,
             nome="Fornecedor Teste",
-            email="fornecedor@teste.com",
+            email=email_fornecedor,
             senha="senha123",
-            cpf_cnpj="12345678000199",
+            cpf_cnpj=cpf_fornecedor,
             telefone="27999999999",
-            data_cadastro=datetime.now(),
-            endereco="Rua dos Fornecedores",
+            data_cadastro=datetime.now().isoformat(),
             tipo_usuario="Fornecedor",
-            razao_social="Fornecedor LTDA"
+            razao_social="Fornecedor LTDA",
+            cep="88888-888",
+            rua="Rua Teste",
+            numero="123",
+            complemento="",
+            bairro="Centro",
+            cidade="Vitória",
+            estado="ES"
         )
         id_fornecedor = inserir_fornecedor(fornecedor)
         assert id_fornecedor is not None, "Fornecedor não inserido"
 
-        usuario_cliente = Usuario(
+        cliente = Cliente(
             id=0,
             nome="Cliente Teste",
-            email="cliente@email.com",
+            email=email_unico,
             senha="senha123",
-            cpf_cnpj="12345678900",
+            cpf_cnpj=cpf_unico,
             telefone="27988887777",
-            data_cadastro=datetime.now(),
-            endereco="Rua do Cliente, 123",
-            tipo_usuario="Cliente"
-        )
-        id_usuario_cliente = inserir_usuario(usuario_cliente)
-        assert id_usuario_cliente is not None, "Usuário cliente não inserido"
-
-        cliente = Cliente(
-            id=id_usuario_cliente,
-            nome=usuario_cliente.nome,
-            email=usuario_cliente.email,
-            senha=usuario_cliente.senha,
-            cpf_cnpj=usuario_cliente.cpf_cnpj,
-            telefone=usuario_cliente.telefone,
-            data_cadastro=usuario_cliente.data_cadastro,
-            endereco=usuario_cliente.endereco,
-            tipo_usuario=usuario_cliente.tipo_usuario,
+            data_cadastro=datetime.now().isoformat(),
+            cep="88888-888",
+            rua="Rua Teste",
+            numero="123",
+            complemento="",
+            bairro="Centro",
+            cidade="Vitória",
+            estado="ES",
+            tipo_usuario="Cliente",
             genero="feminino",
             data_nascimento=date(2000, 1, 1)
         )
         id_cliente = inserir_cliente(cliente)
         assert id_cliente is not None, "Cliente não inserido"
 
+        assert id_fornecedor is not None
+        assert id_cliente is not None
         orcamento = Orcamento(
-            id=0, 
+            id=0,
             id_fornecedor=id_fornecedor,
             id_cliente=id_cliente,
             valor_estimado=1500.00,
@@ -133,45 +129,39 @@ class Test_OrcamentoRepo:
         assert isinstance(orcamentos, list)
         assert len(orcamentos) >= 2
 
-    def test_obter_orcamento_por_id(self, test_db):
+    def test_obter_orcamento_por_id(self, test_db, email_unico, cpf_unico):
         criar_tabela_usuario()
         criar_tabela_fornecedor()
         criar_tabela_cliente()
         criar_tabela_orcamento()
 
-        usuario = Usuario(
-            id=0, nome="Usuário F", email="uf@teste.com", senha="123", cpf_cnpj="111", telefone="111",
-            data_cadastro=datetime.now(), endereco="Endereço F", tipo_usuario="Fornecedor"
-        )
-        id_usuario = inserir_usuario(usuario)
+        email_fornecedor = f"fornecedor_{uuid.uuid4().hex[:8]}@teste.com"
+        cpf_fornecedor = f"{uuid.uuid4().int % 100000000000000:014d}"
 
         fornecedor = Fornecedor(
-            id=0, nome="Fornecedor", email="uf@teste.com", senha="123", cpf_cnpj="111", telefone="111",
-            data_cadastro=datetime.now(), endereco="Endereço F", tipo_usuario="Fornecedor", razao_social="Fornecedor Ltda"
+            id=0, nome="Fornecedor", email=email_fornecedor, senha="123", cpf_cnpj=cpf_fornecedor, telefone="111",
+            data_cadastro=datetime.now().isoformat(), tipo_usuario="Fornecedor", razao_social="Fornecedor Ltda",
+            cep="88888-888", rua="Rua Teste", numero="123", complemento="", bairro="Centro", cidade="Vitória", estado="ES"
         )
         id_fornecedor = inserir_fornecedor(fornecedor)
 
-        usuario_c = Usuario(
-            id=0, nome="Usuário C", email="uc@teste.com", senha="123", cpf_cnpj="222", telefone="222",
-            data_cadastro=datetime.now(), endereco="Endereço C", tipo_usuario="Cliente"
-        )
-        id_usuario_c = inserir_usuario(usuario_c)
-
         cliente = Cliente(
-            id=id_usuario_c,
+            id=0,
             nome="Usuário C",
-            email="uc@teste.com",
+            email=email_unico,
             senha="123",
-            cpf_cnpj="222",
+            cpf_cnpj=cpf_unico,
             telefone="222",
-            data_cadastro=datetime.now(),
-            endereco="Endereço C",
+            data_cadastro=datetime.now().isoformat(),
             tipo_usuario="Cliente",
             genero="Feminino",
-            data_nascimento=date(2000, 1, 1)
+            data_nascimento=date(2000, 1, 1),
+            cep="88888-888", rua="Rua Teste", numero="123", complemento="", bairro="Centro", cidade="Vitória", estado="ES"
         )
         id_cliente = inserir_cliente(cliente)
 
+        assert id_fornecedor is not None
+        assert id_cliente is not None
         orcamento = Orcamento(
             id=0,
             id_fornecedor=id_fornecedor,
@@ -184,14 +174,12 @@ class Test_OrcamentoRepo:
         )
         id_orc = inserir_orcamento(orcamento)
 
+        assert id_orc is not None
         orc_db = obter_orcamento_por_id(id_orc)
         assert orc_db is not None
         assert orc_db.id == id_orc
         assert orc_db.descricao == "Teste de obter por ID"
         assert orc_db.status == "Em análise"
-
-    
-    from data.orcamento.orcamento_repo import obter_orcamentos_por_pagina
 
     def test_obter_orcamentos_por_pagina(self, test_db):
         criar_tabela_orcamento()
@@ -226,43 +214,45 @@ class Test_OrcamentoRepo:
 
 
 
-    def test_atualizar_orcamento_por_id(self, test_db):
+    def test_atualizar_orcamento_por_id(self, test_db, email_unico, cpf_unico):
         criar_tabela_usuario()
         criar_tabela_fornecedor()
         criar_tabela_cliente()
         criar_tabela_orcamento()
 
-        usuario_f = Usuario(
-            id=0, nome="F", email="f@f.com", senha="1", cpf_cnpj="1", telefone="1",
-            data_cadastro=datetime.now(), endereco="End", tipo_usuario="Fornecedor"
-        )
-        id_usuario_f = inserir_usuario(usuario_f)
+        email_fornecedor = f"fornecedor_{uuid.uuid4().hex[:8]}@teste.com"
+        cpf_fornecedor = f"{uuid.uuid4().int % 100000000000000:014d}"
+
         fornecedor = Fornecedor(
-            id=0, nome="F", email="f@f.com", senha="1", cpf_cnpj="1", telefone="1",
-            data_cadastro=datetime.now(), endereco="End", tipo_usuario="Fornecedor", razao_social="F LTDA"
+            id=0, nome="F", email=email_fornecedor, senha="1", cpf_cnpj=cpf_fornecedor, telefone="1",
+            data_cadastro=datetime.now().isoformat(), tipo_usuario="Fornecedor", razao_social="F LTDA",
+            cep="88888-888", rua="Rua Teste", numero="123", complemento="", bairro="Centro", cidade="Vitória", estado="ES"
         )
         id_fornecedor = inserir_fornecedor(fornecedor)
 
-        usuario_c = Usuario(
-            id=0, nome="C", email="c@c.com", senha="2", cpf_cnpj="2", telefone="2",
-            data_cadastro=datetime.now(), endereco="End", tipo_usuario="Cliente"
-        )
-        id_usuario_c = inserir_usuario(usuario_c)
         cliente = Cliente(
-            id=id_usuario_c,
-            nome=usuario_c.nome,
-            email=usuario_c.email,
-            senha=usuario_c.senha,
-            cpf_cnpj=usuario_c.cpf_cnpj,
-            telefone=usuario_c.telefone,
-            data_cadastro=usuario_c.data_cadastro,
-            endereco=usuario_c.endereco,
-            tipo_usuario=usuario_c.tipo_usuario,
+            id=0,
+            nome="C",
+            email=email_unico,
+            senha="2",
+            cpf_cnpj=cpf_unico,
+            telefone="2",
+            data_cadastro=datetime.now().isoformat(),
+            cep="88888-888",
+            rua="Rua Teste",
+            numero="123",
+            complemento="",
+            bairro="Centro",
+            cidade="Vitória",
+            estado="ES",
+            tipo_usuario="Cliente",
             genero="Feminino",
             data_nascimento=date(2000, 1, 1)
-)
+        )
         id_cliente = inserir_cliente(cliente)
 
+        assert id_fornecedor is not None
+        assert id_cliente is not None
         orcamento = Orcamento(
             id=0,
             id_fornecedor=id_fornecedor,
@@ -276,6 +266,7 @@ class Test_OrcamentoRepo:
 
         id_orcamento = inserir_orcamento(orcamento)
 
+        assert id_orcamento is not None
         orcamento_atualizado = Orcamento(
             id=id_orcamento,
             id_fornecedor=id_fornecedor,
@@ -291,6 +282,7 @@ class Test_OrcamentoRepo:
         assert sucesso is True
 
         atualizado = obter_orcamento_por_id(id_orcamento)
+        assert atualizado is not None
         assert atualizado.valor_estimado == 1200.0
         assert atualizado.status == "Aprovado"
         assert "Atualizado" in atualizado.descricao
@@ -310,6 +302,7 @@ class Test_OrcamentoRepo:
         )
         id_orc = inserir_orcamento(orcamento)
 
+        assert id_orc is not None
         sucesso = deletar_orcamento(id_orc)
         assert sucesso is True
 

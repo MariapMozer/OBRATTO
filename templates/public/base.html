@@ -1,0 +1,63 @@
+{% extends "base_authenticated.html" %}
+
+{#
+    Template: Base Público
+    Descrição: Template base para páginas públicas (com ou sem autenticação)
+    Estende: base_authenticated.html
+#}
+
+{% from 'components/user_dropdown.html' import user_dropdown %}
+
+{% block titulo %}{% block publico_titulo %}Obratto{% endblock %}{% endblock %}
+
+{% block navbar_menu %}
+{% if usuario_logado %}
+    {% set menu_usuario = [] %}
+
+    {# Menu dinâmico baseado no perfil do usuário #}
+    {% if usuario_logado.perfil == 'administrador' or usuario_logado.perfil == 'admin' %}
+        {% set menu_usuario = [
+            {'url': '/administrador/home', 'icon': 'speedometer2', 'label': 'Painel Administrativo'},
+            {'divider': True},
+            {'url': '/logout', 'icon': 'box-arrow-right', 'label': 'Sair', 'danger': True}
+        ] %}
+    {% elif usuario_logado.perfil == 'prestador' %}
+        {% set menu_usuario = [
+            {'url': '/prestador/home', 'icon': 'house', 'label': 'Minha Área'},
+            {'divider': True},
+            {'url': '/logout', 'icon': 'box-arrow-right', 'label': 'Sair', 'danger': True}
+        ] %}
+    {% elif usuario_logado.perfil == 'cliente' %}
+        {% set menu_usuario = [
+            {'url': '/cliente/home', 'icon': 'house', 'label': 'Minha Área'},
+            {'divider': True},
+            {'url': '/logout', 'icon': 'box-arrow-right', 'label': 'Sair', 'danger': True}
+        ] %}
+    {% elif usuario_logado.perfil == 'fornecedor' %}
+        {% set menu_usuario = [
+            {'url': '/fornecedor/home', 'icon': 'house', 'label': 'Minha Área'},
+            {'divider': True},
+            {'url': '/logout', 'icon': 'box-arrow-right', 'label': 'Sair', 'danger': True}
+        ] %}
+    {% endif %}
+
+    {{ user_dropdown(usuario_logado, menu_usuario) }}
+{% else %}
+    <a href="/login" class="text-white">
+        <h5><strong>ENTRAR</strong></h5>
+    </a>
+{% endif %}
+{% endblock %}
+
+{% block conteudo %}
+{% if mensagem %}
+<div class="alert alert-success" role="alert">
+    {{ mensagem }}
+</div>
+{% endif %}
+{% block publico_conteudo %}{% endblock %}
+{% endblock %}
+
+{% block scripts %}
+{% block publico_scripts %}{% endblock %}
+{% endblock %}

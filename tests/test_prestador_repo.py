@@ -1,5 +1,6 @@
 import sqlite3
 import pytest
+import uuid
 from datetime import datetime
 from data.prestador.prestador_model import Prestador
 from data.prestador.prestador_repo import (
@@ -14,21 +15,26 @@ from data.prestador.prestador_repo import (
 from data.usuario.usuario_repo import criar_tabela_usuario
 
 @pytest.fixture
-def prestador_exemplo():
+def prestador_exemplo(email_unico, cpf_unico):
     return Prestador(
         id=0,
         nome="Prestador Teste",
-        email="prestador.teste@email.com",
+        email=email_unico,
         senha="senhaSuperForte123",
-        cpf_cnpj="12345678901234",
+        cpf_cnpj=cpf_unico,
         telefone="27999887766",
-        data_cadastro=datetime.now(),
-        endereco="Rua dos Testes, 123, Bairro Python",
+        cep="88888-888",
+        rua="Rua Teste",
+        numero="123",
+        complemento="",
+        bairro="Bairro Teste",
+        cidade="Cidade Teste",
+        estado="ES",
+        tipo_usuario="prestador",
+        data_cadastro=datetime.now().isoformat(),
         area_atuacao="Tecnologia",
-        tipo_pessoa="juridica",
         razao_social="Prestadora de Serviços de Teste Ltda",
-        descricao_servicos="Desenvolvimento e testes de software.",
-        tipo_usuario="prestador"
+        descricao_servicos="Desenvolvimento e testes de software."
     )
 
 class TestPrestadorRepo:
@@ -50,6 +56,7 @@ class TestPrestadorRepo:
         # Assert
         assert id_inserido is not None
         assert id_inserido > 0
+        assert id_inserido is not None
         prestador_db = obter_prestador_por_id(id_inserido)
         assert prestador_db is not None
         assert prestador_db.nome == prestador_exemplo.nome
@@ -73,11 +80,12 @@ class TestPrestadorRepo:
         criar_tabela_prestador()
         id_inserido = inserir_prestador(prestador_exemplo)
         # Act
+        assert id_inserido is not None
         prestador_db = obter_prestador_por_id(id_inserido)
         # Assert
         assert prestador_db is not None
         assert prestador_db.id == id_inserido
-        assert prestador_db.email == "prestador.teste@email.com"
+        assert prestador_db.email == prestador_exemplo.email
 
     def test_obter_prestador_por_pagina(self, test_db):
             # Arrange
@@ -85,20 +93,27 @@ class TestPrestadorRepo:
             criar_tabela_prestador()
 
             for i in range(15):
+                email_temp = f"prestador_{i}_{uuid.uuid4().hex[:8]}@teste.com"
+                cpf_temp = f"{i:014d}"
                 prestador = Prestador(
                     id=0,
-                    nome="Prestador Teste",
-                    email="prestador@email.com",
+                    nome=f"Prestador Teste {i}",
+                    email=email_temp,
                     senha="senha123",
-                    cpf_cnpj="12345678900",
+                    cpf_cnpj=cpf_temp,
                     telefone="27999999999",
+                    cep="88888-888",
+                    rua="Rua Teste",
+                    numero="123",
+                    complemento="",
+                    bairro="Bairro Teste",
+                    cidade="Cidade Teste",
+                    estado="ES",
+                    tipo_usuario="prestador",
                     data_cadastro=datetime.now().isoformat(),
-                    endereco="Rua dos Prestadores, 123",
                     area_atuacao="Serviços",
-                    tipo_pessoa="juridica",
                     razao_social="prestador Ltda",
-                    descricao_servicos="Prestação de serviços em tecnologia.",
-                    tipo_usuario="prestador"
+                    descricao_servicos="Prestação de serviços em tecnologia."
                 )
                 inserir_prestador(prestador)
             with sqlite3.connect(test_db) as conn:
@@ -120,13 +135,16 @@ class TestPrestadorRepo:
         criar_tabela_usuario()
         criar_tabela_prestador()
         id_inserido = inserir_prestador(prestador_exemplo)
-        
+        assert id_inserido is not None
+
         prestador_para_atualizar = obter_prestador_por_id(id_inserido)
+        assert prestador_para_atualizar is not None
         prestador_para_atualizar.nome = "Nome Atualizado"
         prestador_para_atualizar.area_atuacao = "Engenharia"
         prestador_para_atualizar.descricao_servicos = "Serviços de engenharia de software."
         # Act
         sucesso = atualizar_prestador(prestador_para_atualizar)
+        assert id_inserido is not None
         prestador_atualizado_db = obter_prestador_por_id(id_inserido)
         # Assert
         assert sucesso is True
@@ -140,11 +158,14 @@ class TestPrestadorRepo:
         criar_tabela_usuario()
         criar_tabela_prestador()
         id_inserido = inserir_prestador(prestador_exemplo)
+        assert id_inserido is not None
 
         prestador_db_antes = obter_prestador_por_id(id_inserido)
         assert prestador_db_antes is not None
         # Act
+        assert id_inserido is not None
         sucesso = deletar_prestador_repo(id_inserido)
+        assert id_inserido is not None
         prestador_db_depois = obter_prestador_por_id(id_inserido)
         # Assert
         assert sucesso is True

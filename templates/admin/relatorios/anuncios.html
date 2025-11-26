@@ -1,0 +1,137 @@
+{% extends "administrador/base_admin.html" %}
+{% block admin_titulo %}Relatórios de Anúncios{% endblock %}
+{% block admin_conteudo %}
+<main class="flex-grow-1">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 text-center">
+                <div class="card shadow-lg border-0 rounded-4">
+                    <div class="card-body p-5">
+                        <div class="mb-4">
+                            <i class="bi bi-tools display-1 text-warning"></i>
+                        </div>
+                        <h1 class="display-4 mb-3">Em Construção</h1>
+                        <p class="lead text-muted mb-4">
+                            Esta funcionalidade ainda está sendo desenvolvida pelos alunos.
+                        </p>
+
+                        <div class="alert alert-info text-start" role="alert">
+                            <h5 class="alert-heading"><i class="bi bi-info-circle me-2"></i><strong>TODO ALUNO:</strong> Implementar Dashboard de Relatórios de Anúncios</h5>
+                            <hr>
+                            <p class="mb-2"><strong>Descrição:</strong></p>
+                            <p>Esta página deve exibir estatísticas detalhadas e métricas de desempenho dos anúncios publicados na plataforma, ajudando administradores a entender tendências e otimizar a plataforma.</p>
+
+                            <p class="mb-2 mt-3"><strong>Funcionalidades a implementar:</strong></p>
+                            <ul class="text-start">
+                                <li><strong>Métricas Principais (KPIs):</strong>
+                                    <ul>
+                                        <li>Total de anúncios publicados</li>
+                                        <li>Anúncios ativos vs inativos</li>
+                                        <li>Novos anúncios (hoje, semana, mês)</li>
+                                        <li>Média de anúncios por usuário</li>
+                                        <li>Taxa de conversão (visualizações → contatos)</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Análise por Categoria:</strong>
+                                    <ul>
+                                        <li>Gráfico de pizza mostrando distribuição de anúncios por categoria</li>
+                                        <li>Categorias mais populares</li>
+                                        <li>Categorias com maior taxa de conversão</li>
+                                        <li>Categorias em crescimento vs declínio</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Análise Temporal:</strong>
+                                    <ul>
+                                        <li>Gráfico de linha: evolução de publicações ao longo do tempo</li>
+                                        <li>Dias da semana com mais publicações</li>
+                                        <li>Horários de pico</li>
+                                        <li>Sazonalidade (se houver dados suficientes)</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Ranking de Anúncios:</strong>
+                                    <ul>
+                                        <li>Top 10 anúncios mais visualizados</li>
+                                        <li>Top 10 anúncios com mais contatos</li>
+                                        <li>Anúncios com melhor taxa de conversão</li>
+                                        <li>Anúncios mais favoritados/salvos</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Análise Geográfica:</strong>
+                                    <ul>
+                                        <li>Distribuição de anúncios por estado/cidade</li>
+                                        <li>Mapa de calor com concentração de anúncios</li>
+                                        <li>Regiões mais ativas</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Análise de Qualidade:</strong>
+                                    <ul>
+                                        <li>Anúncios com descrição completa vs incompleta</li>
+                                        <li>Anúncios com fotos vs sem fotos</li>
+                                        <li>Média de fotos por anúncio</li>
+                                        <li>Anúncios com informações de contato completas</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Status e Moderação:</strong>
+                                    <ul>
+                                        <li>Anúncios aguardando moderação</li>
+                                        <li>Anúncios aprovados vs rejeitados</li>
+                                        <li>Anúncios denunciados</li>
+                                        <li>Taxa de aprovação por categoria</li>
+                                        <li>Tempo médio de moderação</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Engajamento:</strong>
+                                    <ul>
+                                        <li>Total de visualizações de anúncios</li>
+                                        <li>Média de visualizações por anúncio</li>
+                                        <li>Taxa de cliques em contato</li>
+                                        <li>Anúncios favoritos/salvos</li>
+                                        <li>Compartilhamentos (se implementado)</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Filtros:</strong>
+                                    <ul>
+                                        <li>Período (última semana, mês, ano, customizado)</li>
+                                        <li>Categoria específica</li>
+                                        <li>Status (ativo, inativo, moderação)</li>
+                                        <li>Tipo de anunciante (prestador, fornecedor)</li>
+                                        <li>Localização</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Exportação:</strong>
+                                    <ul>
+                                        <li>Botão para exportar relatório em PDF</li>
+                                        <li>Botão para exportar dados em Excel</li>
+                                        <li>Incluir gráficos no PDF exportado</li>
+                                    </ul>
+                                </li>
+                            </ul>
+
+                            <p class="mb-2 mt-3"><strong>Visualizações Gráficas:</strong></p>
+                            <ul class="text-start">
+                                <li>Usar bibliotecas como Chart.js ou Plotly</li>
+                                <li>Gráficos interativos (tooltip com detalhes)</li>
+                                <li>Opção de alternar entre tipos de gráfico</li>
+                                <li>Responsivo para mobile</li>
+                            </ul>
+
+                            <p class="mb-2 mt-3"><strong>Arquivos relacionados:</strong></p>
+                            <ul class="text-start">
+                                <li><code>routes/administrador/administrador_anuncios.py</code> (linha 18) - Rota GET</li>
+                                <li><code>data/anuncio/anuncio_repo.py</code> - Queries agregadas para relatórios</li>
+                                <li><code>static/js/charts.js</code> - Scripts para renderização de gráficos</li>
+                            </ul>
+
+                            <p class="mb-0 mt-3"><strong>Dica:</strong> Implemente cache de relatórios pesados para melhorar performance. Atualize estatísticas a cada hora ou sob demanda.</p>
+                        </div>
+
+                        <a href="/administrador/home" class="btn btn-primary btn-lg mt-3">
+                            <i class="bi bi-arrow-left me-2"></i>Voltar para Home
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}

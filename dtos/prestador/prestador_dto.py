@@ -1,91 +1,88 @@
-# ...existing code...
-from pydantic import Field, field_validator
+from pydantic import EmailStr, Field, field_validator
 from typing import Optional
 from ..base_dto import BaseDTO
+from util.validacoes_dto import *
+from enum import Enum
+from datetime import date
+from ..usuario.usuario_dto import AtualizarUsuarioDTO, CriarUsuarioDTO
 
 
-class CriarPrestadorDTO(BaseDTO):
-    area_atuacao: Optional[str] = Field(None, description="Área de atuação", max_length=100)
-    razao_social: Optional[str] = Field(None, description="Razão Social", max_length=100)
-    descricao_servicos: Optional[str] = Field(None, description="Descrição dos serviços", max_length=500)
-    selo_confianca: bool = Field(default=False, description="Selo de confiança")
+class CriarPrestadorDTO(CriarUsuarioDTO):
+    area_atuacao: Optional[str] = Field(None)
+    razao_social: Optional[str] = Field(None)
+    descricao_servicos: Optional[str] = Field(None)
+    selo_confianca: bool = Field(default=False)
 
     @field_validator("area_atuacao")
     @classmethod
     def validar_area_atuacao(cls, v: Optional[str]) -> Optional[str]:
-        if v is not None and len(v) > 100:
-            raise ValueError("Área de atuação deve ter no máximo 100 caracteres.")
-        return v
+        return cls.validar_campo_wrapper(
+            lambda valor, campo: validar_texto_opcional(valor, max_chars=100),
+            "Área de atuação",
+        )(v)
 
     @field_validator("razao_social")
     @classmethod
     def validar_razao_social(cls, v: Optional[str]) -> Optional[str]:
-        if v is not None and len(v) > 100:
-            raise ValueError("Razão Social deve ter no máximo 100 caracteres.")
-        return v
+        return cls.validar_campo_wrapper(
+            lambda valor, campo: validar_texto_opcional(valor, max_chars=100),
+            "Razão Social",
+        )(v)
 
     @field_validator("descricao_servicos")
     @classmethod
     def validar_descricao_servicos(cls, v: Optional[str]) -> Optional[str]:
-        if v is not None and len(v) > 500:
-            raise ValueError("Descrição dos serviços deve ter no máximo 500 caracteres.")
-        return v
+        return cls.validar_campo_wrapper(
+            lambda valor, campo: validar_texto_opcional(valor, max_chars=500),
+            "Descrição dos serviços",
+        )(v)
 
-    @staticmethod
-    def criar_exemplo_json(**overrides) -> dict:
+    @classmethod
+    def criar_exemplo_prestador_json(cls, **overrides) -> dict:
+        """Exemplo de dados para documentação da API"""
         exemplo = {
             "area_atuacao": "Manutenção",
             "razao_social": "Prestadora de Serviços Ltda",
             "descricao_servicos": "Oferecemos serviços de manutenção residencial e comercial.",
-            "selo_confianca": True
         }
         exemplo.update(overrides)
         return exemplo
 
 
-class AtualizarPrestadorDTO(BaseDTO):
-    area_atuacao: Optional[str] = Field(None, description="Área de atuação", max_length=100)
-    razao_social: Optional[str] = Field(None, description="Razão Social", max_length=100)
-    descricao_servicos: Optional[str] = Field(None, description="Descrição dos serviços", max_length=500)
+class AtualizarPrestadorDTO(AtualizarUsuarioDTO):
+
+    area_atuacao: Optional[str] = Field(None, description="Área de atuação")
+    razao_social: Optional[str] = Field(None, description="Razão Social")
+    descricao_servicos: Optional[str] = Field(
+        None, description="Descrição dos serviços"
+    )
     selo_confianca: Optional[bool] = Field(None, description="Selo de confiança")
 
     @field_validator("area_atuacao")
     @classmethod
     def validar_area_atuacao(cls, v: Optional[str]) -> Optional[str]:
-        if v is not None and len(v) > 100:
-            raise ValueError("Área de atuação deve ter no máximo 100 caracteres.")
-        return v
+        return cls.validar_campo_wrapper(
+            lambda valor, campo: validar_texto_opcional(valor, max_chars=100),
+            "Área de atuação",
+        )(v)
 
     @field_validator("razao_social")
     @classmethod
     def validar_razao_social(cls, v: Optional[str]) -> Optional[str]:
-        if v is not None and len(v) > 100:
-            raise ValueError("Razão Social deve ter no máximo 100 caracteres.")
-        return v
+        return cls.validar_campo_wrapper(
+            lambda valor, campo: validar_texto_opcional(valor, max_chars=100),
+            "Razão Social",
+        )(v)
 
     @field_validator("descricao_servicos")
     @classmethod
     def validar_descricao_servicos(cls, v: Optional[str]) -> Optional[str]:
-        if v is not None and len(v) > 500:
-            raise ValueError("Descrição dos serviços deve ter no máximo 500 caracteres.")
-        return v
-
-    @staticmethod
-    def criar_exemplo_json(**overrides) -> dict:
-        exemplo = {
-            "area_atuacao": "Instalação elétrica",
-            "razao_social": "Eletricista Exemplo ME",
-            "descricao_servicos": "Instalação e reparos elétricos residenciais.",
-            "selo_confianca": False
-        }
-        exemplo.update(overrides)
-        return exemplo
+        return cls.validar_campo_wrapper(
+            lambda valor, campo: validar_texto_opcional(valor, max_chars=500),
+            "Descrição dos serviços",
+        )(v)
 
 
-# Configurar exemplos JSON para documentação
-CriarPrestadorDTO.model_config.update({
-    "json_schema_extra": {"example": CriarPrestadorDTO.criar_exemplo_json()}
-})
-AtualizarPrestadorDTO.model_config.update({
-    "json_schema_extra": {"example": AtualizarPrestadorDTO.criar_exemplo_json()}
-})
+CriarPrestadorDTO.model_config.update(
+    {"json_schema_extra": {"example": CriarPrestadorDTO.criar_exemplo_prestador_json()}}
+)

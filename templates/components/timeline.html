@@ -1,0 +1,143 @@
+{#
+    Componente: Timeline
+    Descrição: Linha do tempo para exibir eventos cronológicos
+
+    Parâmetros do timeline_item:
+    - title: Título do evento
+    - description: Descrição detalhada (opcional)
+    - timestamp: Data/hora do evento
+    - icon: Ícone Bootstrap (sem 'bi-')
+    - type: Tipo do evento ('success', 'info', 'warning', 'danger', 'primary', 'secondary')
+    - user: Nome do usuário responsável (opcional)
+    - user_avatar: URL do avatar do usuário (opcional)
+    - metadata: Lista de metadados adicionais [{'label': 'Status', 'value': 'Concluído'}] (opcional)
+
+    Uso:
+    {% from 'components/timeline.html' import timeline_container, timeline_item %}
+
+    {% call timeline_container() %}
+        {{ timeline_item(
+            title='Pedido Criado',
+            description='Pedido #1234 foi criado com sucesso',
+            timestamp='2024-01-15 10:30',
+            icon='cart-plus',
+            type='success',
+            user='João Silva'
+        ) }}
+        {{ timeline_item(
+            title='Pagamento Confirmado',
+            timestamp='2024-01-15 10:35',
+            icon='credit-card',
+            type='info'
+        ) }}
+    {% endcall %}
+#}
+
+{% macro timeline_item(
+    title,
+    timestamp,
+    icon,
+    type='primary',
+    description='',
+    user='',
+    user_avatar='',
+    metadata=[]
+) %}
+<div class="timeline-item timeline-{{ type }}">
+    <div class="timeline-marker">
+        <i class="bi bi-{{ icon }}"></i>
+    </div>
+    <div class="timeline-content">
+        <div class="timeline-header">
+            <h6 class="timeline-title">{{ title }}</h6>
+            <span class="timeline-timestamp">
+                <i class="bi bi-clock me-1"></i>{{ timestamp }}
+            </span>
+        </div>
+
+        {% if description %}
+        <p class="timeline-description">{{ description }}</p>
+        {% endif %}
+
+        {% if metadata %}
+        <div class="timeline-metadata">
+            {% for meta in metadata %}
+            <div class="metadata-item">
+                <span class="metadata-label">{{ meta.label }}:</span>
+                <span class="metadata-value">{{ meta.value }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if user %}
+        <div class="timeline-user">
+            {% if user_avatar %}
+            <img src="{{ user_avatar }}" alt="{{ user }}" class="timeline-avatar">
+            {% else %}
+            <i class="bi bi-person-circle me-1"></i>
+            {% endif %}
+            <span class="user-name">{{ user }}</span>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endmacro %}
+
+{#
+    Macro: timeline_container
+    Descrição: Container wrapper para a linha do tempo
+
+    Uso:
+    {% call timeline_container(title='Histórico do Pedido') %}
+        {{ timeline_item(...) }}
+        {{ timeline_item(...) }}
+    {% endcall %}
+#}
+
+{% macro timeline_container(title='', container_class='') %}
+<div class="timeline-container {{ container_class }}">
+    {% if title %}
+    <h5 class="timeline-container-title">{{ title }}</h5>
+    {% endif %}
+    <div class="timeline">
+        {{ caller() }}
+    </div>
+</div>
+{% endmacro %}
+
+{#
+    Macro: simple_timeline
+    Descrição: Timeline simplificada para eventos básicos
+
+    Parâmetros:
+    - events: Lista de eventos [{'title': 'Evento', 'time': '10:30', 'icon': 'check'}]
+    - show_line: Mostrar linha conectora - padrão: True
+
+    Uso:
+    {% from 'components/timeline.html' import simple_timeline %}
+
+    {{ simple_timeline(events=[
+        {'title': 'Pedido criado', 'time': '10:30', 'icon': 'cart', 'type': 'success'},
+        {'title': 'Em processamento', 'time': '11:00', 'icon': 'hourglass', 'type': 'info'},
+        {'title': 'Enviado', 'time': '14:30', 'icon': 'truck', 'type': 'primary'}
+    ]) }}
+#}
+
+{% macro simple_timeline(events, show_line=True, timeline_class='') %}
+<div class="simple-timeline {{ timeline_class }}">
+    {% for event in events %}
+    <div class="simple-timeline-item timeline-{{ event.type|default('primary') }}">
+        <div class="simple-timeline-marker">
+            <i class="bi bi-{{ event.icon }}"></i>
+        </div>
+        <div class="simple-timeline-content">
+            <span class="simple-timeline-title">{{ event.title }}</span>
+            {% if event.time %}
+            <span class="simple-timeline-time">{{ event.time }}</span>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endmacro %}

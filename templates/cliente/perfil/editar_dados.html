@@ -1,7 +1,380 @@
 {% extends "cliente/base.html" %}
-{% block titulo %}Editar perfil{% endblock %}
-{% block conteudo %}
-<h1 class="h3">Editar perfil</h1>
-<p>Esta página está em construção.</p>
-{% endblock %}
 
+{#
+    Template: Editar Perfil do Cliente
+    Descrição: Formulário para editar dados pessoais do cliente
+    Estende: cliente/base.html
+#}
+
+{% from 'components/form_input.html' import form_input, form_file %}
+{% from 'components/breadcrumbs.html' import breadcrumbs %}
+{% from 'components/alert.html' import alert %}
+
+{% block titulo %}Editar Perfil{% endblock %}
+
+{% block conteudo %}
+<div class="container-fluid px-4 py-4">
+    <!-- Breadcrumbs -->
+    {{ breadcrumbs(items=[
+        {'text': 'Home', 'url': '/cliente/home'},
+        {'text': 'Perfil', 'url': '/cliente/perfil'},
+        {'text': 'Editar', 'active': True}
+    ]) }}
+
+    <!-- Page Header -->
+    <div class="mb-4">
+        <h1 class="h3 mb-1">
+            <i class="bi bi-pencil-square text-primary me-2"></i>
+            Editar Meu Perfil
+        </h1>
+        <p class="text-muted mb-0">Atualize suas informações pessoais</p>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <form method="POST" action="/cliente/perfil/atualizar" enctype="multipart/form-data" id="perfilForm">
+                {% if csrf_token %}
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                {% endif %}
+
+                <!-- Foto do Perfil -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">
+                            <i class="bi bi-camera text-info me-2"></i>
+                            Foto do Perfil
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-auto text-center mb-3 mb-md-0">
+                                {% if usuario.foto %}
+                                <img src="{{ usuario.foto }}" alt="Foto atual"
+                                     class="rounded-circle border" width="100" height="100" id="previewFoto">
+                                {% else %}
+                                <div class="rounded-circle border bg-light d-inline-flex align-items-center justify-content-center"
+                                     style="width: 100px; height: 100px;" id="previewPlaceholder">
+                                    <i class="bi bi-person-fill text-secondary" style="font-size: 3rem;"></i>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md">
+                                {{ form_file(
+                                    name='foto',
+                                    label='Alterar Foto',
+                                    accept='image/*',
+                                    help_text='Formato JPG, PNG ou GIF. Tamanho máximo: 2MB'
+                                ) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Informações Pessoais -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">
+                            <i class="bi bi-person-vcard text-primary me-2"></i>
+                            Informações Pessoais
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                {{ form_input(
+                                    name='nome',
+                                    label='Nome Completo',
+                                    type='text',
+                                    value=usuario.nome,
+                                    required=True,
+                                    placeholder='Seu nome completo'
+                                ) }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form_input(
+                                    name='email',
+                                    label='Email',
+                                    type='email',
+                                    value=usuario.email,
+                                    required=True,
+                                    placeholder='seu@email.com',
+                                    help_text='Email para login e notificações'
+                                ) }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form_input(
+                                    name='telefone',
+                                    label='Telefone',
+                                    type='tel',
+                                    value=usuario.telefone,
+                                    placeholder='(00) 00000-0000',
+                                    pattern='\\([0-9]{2}\\) [0-9]{4,5}-[0-9]{4}'
+                                ) }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form_input(
+                                    name='cpf',
+                                    label='CPF',
+                                    type='text',
+                                    value=usuario.cpf,
+                                    placeholder='000.000.000-00',
+                                    pattern='[0-9]{3}\\.[0-9]{3}\\.[0-9]{3}-[0-9]{2}',
+                                    help_text='Campo não editável',
+                                    disabled=True
+                                ) }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form_input(
+                                    name='data_nascimento',
+                                    label='Data de Nascimento',
+                                    type='date',
+                                    value=usuario.data_nascimento
+                                ) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Endereço -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">
+                            <i class="bi bi-geo-alt text-danger me-2"></i>
+                            Endereço
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                {{ form_input(
+                                    name='cep',
+                                    label='CEP',
+                                    type='text',
+                                    value=usuario.endereco.cep if usuario.endereco else '',
+                                    placeholder='00000-000',
+                                    pattern='[0-9]{5}-?[0-9]{3}',
+                                    max_length=9
+                                ) }}
+                            </div>
+                            <div class="col-md-8 mb-3">
+                                {{ form_input(
+                                    name='logradouro',
+                                    label='Logradouro',
+                                    type='text',
+                                    value=usuario.endereco.logradouro if usuario.endereco else '',
+                                    placeholder='Rua, Avenida, etc.'
+                                ) }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                {{ form_input(
+                                    name='numero',
+                                    label='Número',
+                                    type='text',
+                                    value=usuario.endereco.numero if usuario.endereco else '',
+                                    placeholder='123'
+                                ) }}
+                            </div>
+                            <div class="col-md-5 mb-3">
+                                {{ form_input(
+                                    name='complemento',
+                                    label='Complemento',
+                                    type='text',
+                                    value=usuario.endereco.complemento if usuario.endereco else '',
+                                    placeholder='Apto, Bloco, etc.'
+                                ) }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                {{ form_input(
+                                    name='bairro',
+                                    label='Bairro',
+                                    type='text',
+                                    value=usuario.endereco.bairro if usuario.endereco else '',
+                                    placeholder='Nome do bairro'
+                                ) }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                {{ form_input(
+                                    name='cidade',
+                                    label='Cidade',
+                                    type='text',
+                                    value=usuario.endereco.cidade if usuario.endereco else '',
+                                    placeholder='Nome da cidade'
+                                ) }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                {{ form_input(
+                                    name='estado',
+                                    label='Estado (UF)',
+                                    type='text',
+                                    value=usuario.endereco.estado if usuario.endereco else '',
+                                    placeholder='SP',
+                                    max_length=2,
+                                    pattern='[A-Z]{2}'
+                                ) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botões -->
+                <div class="d-flex gap-2 mb-4">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="bi bi-check-circle me-2"></i>Salvar Alterações
+                    </button>
+                    <a href="/cliente/perfil" class="btn btn-outline-secondary btn-lg">
+                        <i class="bi bi-x-circle me-2"></i>Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Sidebar com Dicas -->
+        <div class="col-lg-4">
+            {{ alert(
+                type='info',
+                icon='lightbulb',
+                title='Mantenha seus dados atualizados',
+                message='Informações corretas facilitam a comunicação com prestadores e o recebimento de orçamentos.',
+                dismissible=False
+            ) }}
+
+            <div class="card shadow-sm border-warning mt-3">
+                <div class="card-body">
+                    <h6 class="card-title text-warning">
+                        <i class="bi bi-shield-check me-2"></i>
+                        Segurança dos Dados
+                    </h6>
+                    <p class="card-text small mb-0">
+                        Seus dados pessoais são protegidos e utilizados apenas para
+                        facilitar suas contratações na plataforma.
+                    </p>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mt-3">
+                <div class="card-body">
+                    <h6 class="card-title">
+                        <i class="bi bi-key text-warning me-2"></i>
+                        Alterar Senha
+                    </h6>
+                    <p class="card-text small">
+                        Quer alterar sua senha de acesso?
+                    </p>
+                    <a href="/cliente/perfil/alterar-senha" class="btn btn-sm btn-outline-warning w-100">
+                        <i class="bi bi-shield-lock me-1"></i>Alterar Senha
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+// Preview de foto
+document.querySelector('input[name="foto"]').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const preview = document.getElementById('previewFoto');
+            if (preview) {
+                preview.src = e.target.result;
+            } else {
+                // Criar elemento de imagem se não existir
+                const placeholder = document.getElementById('previewPlaceholder');
+                if (placeholder) {
+                    const img = document.createElement('img');
+                    img.id = 'previewFoto';
+                    img.src = e.target.result;
+                    img.className = 'rounded-circle border';
+                    img.width = 100;
+                    img.height = 100;
+                    placeholder.replaceWith(img);
+                }
+            }
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+// Máscara de telefone
+document.querySelector('input[name="telefone"]').addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\D/g, '');
+    if (value.length > 11) value = value.substring(0, 11);
+
+    if (value.length > 10) {
+        value = value.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+    } else if (value.length > 6) {
+        value = value.replace(/(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3');
+    } else if (value.length > 2) {
+        value = value.replace(/(\d{2})(\d{0,5})/, '($1) $2');
+    }
+
+    e.target.value = value;
+});
+
+// Máscara de CEP
+document.querySelector('input[name="cep"]').addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\D/g, '');
+    if (value.length > 8) value = value.substring(0, 8);
+
+    if (value.length > 5) {
+        value = value.replace(/(\d{5})(\d{1,3})/, '$1-$2');
+    }
+
+    e.target.value = value;
+});
+
+// Buscar CEP (integração com ViaCEP - opcional)
+document.querySelector('input[name="cep"]').addEventListener('blur', function(e) {
+    const cep = e.target.value.replace(/\D/g, '');
+
+    if (cep.length === 8) {
+        fetch(`https://viacep.com.br/ws/${cep}/json/`)
+            .then(response => response.json())
+            .then(data => {
+                if (!data.erro) {
+                    document.querySelector('input[name="logradouro"]').value = data.logradouro;
+                    document.querySelector('input[name="bairro"]').value = data.bairro;
+                    document.querySelector('input[name="cidade"]').value = data.localidade;
+                    document.querySelector('input[name="estado"]').value = data.uf;
+                    document.querySelector('input[name="numero"]').focus();
+                }
+            })
+            .catch(error => console.error('Erro ao buscar CEP:', error));
+    }
+});
+
+// Validação do formulário
+document.getElementById('perfilForm').addEventListener('submit', function(e) {
+    const email = document.querySelector('input[name="email"]').value;
+    const nome = document.querySelector('input[name="nome"]').value;
+
+    if (!nome || nome.trim().length < 3) {
+        e.preventDefault();
+        alert('Por favor, informe seu nome completo.');
+        return false;
+    }
+
+    if (!email || !email.includes('@')) {
+        e.preventDefault();
+        alert('Por favor, informe um email válido.');
+        return false;
+    }
+});
+</script>
+{% endblock %}
+{% endblock %}

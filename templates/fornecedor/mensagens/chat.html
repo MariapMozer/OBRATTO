@@ -1,0 +1,160 @@
+{% extends "fornecedor/base.html" %}
+
+{#
+    Template: Chat (Fornecedor)
+    Descrição: Interface de chat/mensagens
+    Estende: fornecedor/base.html
+#}
+
+{% from 'components/chat_message.html' import chat_window, chat_conversation_item %}
+{% from 'components/breadcrumbs.html' import breadcrumbs %}
+{% from 'components/empty_state.html' import empty_state %}
+
+{% block fornecedor_titulo %}Mensagens{% endblock %}
+{% block sidebar_active %}mensagens{% endblock %}
+
+{% block fornecedor_conteudo %}
+<div class="container-fluid px-4 py-4">
+    {{ breadcrumbs(items=[
+        {'text': 'Home', 'url': '/fornecedor/home'},
+        {'text': 'Mensagens', 'active': True}
+    ]) }}
+
+    <h1 class="h3 mb-4">Mensagens</h1>
+
+    <div class="row">
+        <!-- Conversations List -->
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control" placeholder="Buscar conversas...">
+                    </div>
+                </div>
+                <div class="list-group list-group-flush" style="max-height: 600px; overflow-y: auto;">
+                    {% if conversas and conversas|length > 0 %}
+                        {% for conversa in conversas %}
+                        {{ chat_conversation_item(
+                            conversa_id=conversa.id,
+                            nome=conversa.nome,
+                            avatar_url=conversa.avatar,
+                            ultima_mensagem=conversa.ultima_mensagem,
+                            timestamp=conversa.timestamp,
+                            unread_count=conversa.nao_lidas,
+                            is_online=conversa.online,
+                            is_active=(conversa.id == conversa_ativa_id)
+                        ) }}
+                        {% endfor %}
+                    {% else %}
+                    <div class="p-4 text-center text-muted">
+                        <i class="bi bi-chat-left-text fs-1 d-block mb-2"></i>
+                        <p class="mb-0">Nenhuma conversa ainda</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Window -->
+        <div class="col-md-8">
+            {% if conversa_ativa %}
+            {{ chat_window(
+                conversa_id=conversa_ativa.id,
+                nome=conversa_ativa.nome,
+                avatar_url=conversa_ativa.avatar,
+                is_online=conversa_ativa.online,
+                mensagens=mensagens|default([]),
+                usuario_atual_id=usuario_id
+            ) }}
+            {% else %}
+            <div class="card shadow-sm h-100 d-flex align-items-center justify-content-center">
+                <div class="text-center p-5">
+                    {{ empty_state(
+                        icon='chat-dots',
+                        title='Selecione uma conversa',
+                        message='Escolha uma conversa na lista ao lado para começar a trocar mensagens.',
+                        action_url='#',
+                        action_text='',
+                        show_action=False
+                    ) }}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% block fornecedor_scripts %}
+<script>
+// Auto-scroll para última mensagem
+const chatMessages = document.querySelector('.chat-messages');
+if (chatMessages) {
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+// Enviar mensagem
+const form = document.getElementById('chatForm');
+if (form) {
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const input = this.querySelector('input[name="mensagem"]');
+        const mensagem = input.value.trim();
+
+        if (mensagem) {
+            // Enviar via AJAX
+            fetch('/fornecedor/mensagens/enviar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    conversa_id: {{ conversa_ativa.id if conversa_ativa else 'null' }},
+                    mensagem: mensagem
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    input.value = '';
+                    // Recarregar mensagens
+                    location.reload();
+                }
+            })
+            .catch(error => console.error('Erro:', error));
+        }
+    });
+}
+
+// Auto-refresh a cada 10 segundos (opcional)
+let autoRefreshInterval;
+function startAutoRefresh() {
+    autoRefreshInterval = setInterval(() => {
+        const conversaId = {{ conversa_ativa.id if conversa_ativa else 'null' }};
+        if (conversaId) {
+            fetch(`/fornecedor/mensagens/atualizar/${conversaId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.novas_mensagens) {
+                        location.reload();
+                    }
+                })
+                .catch(error => console.error('Erro:', error));
+        }
+    }, 10000);
+}
+
+// Iniciar auto-refresh se houver conversa ativa
+{% if conversa_ativa %}
+startAutoRefresh();
+{% endif %}
+
+// Limpar interval ao sair da página
+window.addEventListener('beforeunload', () => {
+    if (autoRefreshInterval) {
+        clearInterval(autoRefreshInterval);
+    }
+});
+</script>
+{% endblock %}
+{% endblock %}

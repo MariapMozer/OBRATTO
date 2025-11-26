@@ -1,23 +1,27 @@
 from typing import Optional
 from fastapi import APIRouter, Form, Request, status, UploadFile, File
 from fastapi.responses import RedirectResponse
-from fastapi.templating import Jinja2Templates
 from data.servico import servico_repo
 from data.servico.servico_model import Servico
-from utils.auth_decorator import requer_autenticacao
-from utils.foto_util import (
-    salvar_nova_foto, obter_foto_principal, obter_todas_fotos,
-    excluir_foto, reordenar_fotos
+from util.auth_decorator import requer_autenticacao
+from util.template_util import criar_templates
+from util.foto_util import (
+    salvar_nova_foto,
+    obter_foto_principal,
+    obter_todas_fotos,
+    excluir_foto,
+    reordenar_fotos,
 )
 
 
 router = APIRouter()
-templates = Jinja2Templates(directory="templates")
+templates = criar_templates("templates")
+
 
 # Rota para exibir a galeria
 @router.get("/{id}/galeria")
 @requer_autenticacao(["admin"])
-async def get_galeria(request: Request, id: int, usuario_logado: dict = None):
+async def get_galeria(request: Request, id: int, usuario_logado: Optional[dict] = None):
     servico = servico_repo.obter_servico_por_id(id)
     if not servico:
         return RedirectResponse("/admin/servico", status.HTTP_303_SEE_OTHER)
@@ -25,12 +29,9 @@ async def get_galeria(request: Request, id: int, usuario_logado: dict = None):
     fotos = obter_todas_fotos(id)  # ← Obtém todas as fotos do produto
     return templates.TemplateResponse(
         "administrador/galeria.html",
-        {
-            "request": request,
-            "servico": servico,
-            "fotos": fotos
-        }
+        {"request": request, "servico": servico, "fotos": fotos},
     )
+
 
 # Rota para upload de múltiplas fotos
 @router.post("/{id}/galeria/upload")
@@ -39,7 +40,7 @@ async def post_galeria_upload(
     request: Request,
     id: int,
     fotos: list[UploadFile] = File(...),  # ← Recebe múltiplas fotos
-    usuario_logado: dict = None
+    usuario_logado: Optional[dict] = None,
 ):
     servico = servico_repo.obter_servico_por_id(id)
     if not servico:
@@ -57,6 +58,7 @@ async def post_galeria_upload(
 
     return RedirectResponse(f"/admin/servico/{id}/galeria", status.HTTP_303_SEE_OTHER)
 
+
 # Rota para excluir foto específica
 @router.post("/{id}/galeria/excluir/{numero}")
 @requer_autenticacao(["admin"])
@@ -64,7 +66,7 @@ async def post_galeria_excluir(
     request: Request,
     id: int,
     numero: int,  # ← Número da foto a ser excluída (001, 002, etc.)
-    usuario_logado: dict = None
+    usuario_logado: Optional[dict] = None,
 ):
     servico = servico_repo.obter_servico_por_id(id)
     if not servico:
@@ -77,6 +79,7 @@ async def post_galeria_excluir(
 
     return RedirectResponse(f"/admin/servico/{id}/galeria", status.HTTP_303_SEE_OTHER)
 
+
 # Rota para reordenar fotos via drag-and-drop
 @router.post("/{id}/galeria/reordenar")
 @requer_autenticacao(["admin"])
@@ -84,7 +87,7 @@ async def post_galeria_reordenar(
     request: Request,
     id: int,
     nova_ordem: str = Form(...),  # ← Recebe string: "1,3,2,4"
-    usuario_logado: dict = None
+    usuario_logado: Optional[dict] = None,
 ):
     servico = servico_repo.obter_servico_por_id(id)
     if not servico:
@@ -99,6 +102,7 @@ async def post_galeria_reordenar(
 
     return RedirectResponse(f"/admin/servico/{id}/galeria", status.HTTP_303_SEE_OTHER)
 
+
 # # Modificar rota de cadastro para aceitar foto principal
 # @router.post("/cadastrar")
 # @requer_autenticacao(["admin"])
@@ -110,7 +114,7 @@ async def post_galeria_reordenar(
 #     valor_base: int = Form(...),
 #     nome_prestador: int = Form(...),
 #     foto: Optional[UploadFile] = File(None),  # ← Foto opcional no cadastro
-#     usuario_logado: dict = None
+#     usuario_logado: Optional[dict] = None
 # ):
 #     # 1. Criar produto primeiro
 #     servico = Servico(

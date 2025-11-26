@@ -3,7 +3,7 @@ from typing import Optional, List
 from data.administrador.administrador_model import Administrador
 from data.administrador.administrador_sql import *
 from data.usuario.usuario_model import Usuario
-from utils.db import open_connection
+from util.db import open_connection
 
 
 def criar_tabela_administrador() -> bool:
@@ -36,11 +36,19 @@ def obter_todos_administradores() -> List[Usuario]:
                 senha=row["senha"],
                 cpf_cnpj=row["cpf_cnpj"],
                 telefone=row["telefone"],
+                cep=row["cep"] if "cep" in row.keys() else "",
+                rua=row["rua"] if "rua" in row.keys() else "",
+                numero=row["numero"] if "numero" in row.keys() else "",
+                complemento=row["complemento"] if "complemento" in row.keys() else "",
+                bairro=row["bairro"] if "bairro" in row.keys() else "",
+                cidade=row["cidade"] if "cidade" in row.keys() else "",
+                estado=row["estado"] if "estado" in row.keys() else "",
+                tipo_usuario=row["tipo_usuario"],
                 data_cadastro=row["data_cadastro"],
-                endereco=row["endereco"],
-                tipo_usuario=row["tipo_usuario"]
-            ) for row in rows
+            )
+            for row in rows
         ]
+
 
 def obter_administrador_por_id(administrador_id: int) -> Optional[Usuario]:
     with open_connection() as conn:
@@ -55,9 +63,15 @@ def obter_administrador_por_id(administrador_id: int) -> Optional[Usuario]:
                 senha=row["senha"],
                 cpf_cnpj=row["cpf_cnpj"],
                 telefone=row["telefone"],
+                cep=row["cep"] if "cep" in row.keys() else "",
+                rua=row["rua"] if "rua" in row.keys() else "",
+                numero=row["numero"] if "numero" in row.keys() else "",
+                complemento=row["complemento"] if "complemento" in row.keys() else "",
+                bairro=row["bairro"] if "bairro" in row.keys() else "",
+                cidade=row["cidade"] if "cidade" in row.keys() else "",
+                estado=row["estado"] if "estado" in row.keys() else "",
+                tipo_usuario=row["tipo_usuario"],
                 data_cadastro=row["data_cadastro"],
-                endereco=row["endereco"],
-                tipo_usuario=row["tipo_usuario"]
             )
     return None
 
@@ -65,10 +79,9 @@ def obter_administrador_por_id(administrador_id: int) -> Optional[Usuario]:
 def atualizar_administrador(administrador: Administrador) -> bool:
     with open_connection() as conn:
         cursor = conn.cursor()
-        cursor.execute(ATUALIZAR_ADMINISTRADOR, (
-            administrador.id_usuario,
-            administrador.id
-        ))
+        cursor.execute(
+            ATUALIZAR_ADMINISTRADOR, (administrador.id_usuario, administrador.id)
+        )
         conn.commit()
         return cursor.rowcount > 0
 
@@ -79,5 +92,3 @@ def deletar_administrador(administrador_id: int) -> bool:
         cursor.execute(DELETAR_ADMINISTRADOR, (administrador_id,))
         conn.commit()
         return cursor.rowcount > 0
-
-

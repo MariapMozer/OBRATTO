@@ -13,7 +13,7 @@ router = APIRouter(prefix="/avaliacoes", tags=["Avaliações"])
 def listar_avaliacoes(request: Request):
     avaliacoes = avaliacao_repo.obter_todos()
     return templates.TemplateResponse(
-        "avaliacao/listar.html",
+        "avaliacoes/listar.html",
         {"request": request, "avaliacoes": avaliacoes}
     )
 
@@ -24,14 +24,14 @@ def obter_avaliacao(id_avaliacao: int, request: Request):
     if not avaliacao:
         raise HTTPException(status_code=404, detail="Avaliação não encontrada")
     return templates.TemplateResponse(
-        "avaliacao/detalhes.html",
+        "avaliacoes/detalhes.html",
         {"request": request, "avaliacao": avaliacao}
     )
 
 # Formulário para criar uma nova avaliação
 @router.get("/nova")
 def nova_avaliacao(request: Request):
-    return templates.TemplateResponse("avaliacao/nova.html", {"request": request})
+    return templates.TemplateResponse("avaliacoes/nova.html", {"request": request})
 
 # Criar uma avaliação
 @router.post("/nova")
@@ -62,7 +62,7 @@ def editar_avaliacao_form(id_avaliacao: int, request: Request):
     if not avaliacao:
         raise HTTPException(status_code=404, detail="Avaliação não encontrada")
     return templates.TemplateResponse(
-        "avaliacao/editar.html",
+        "avaliacoes/editar.html",
         {"request": request, "avaliacao": avaliacao}
     )
 
@@ -107,7 +107,7 @@ def obter_avaliacoes_por_avaliado(id_avaliado: int, request: Request):
     todas = avaliacao_repo.obter_todos()
     filtradas = [a for a in todas if a.id_avaliado == id_avaliado]
     return templates.TemplateResponse(
-        "avaliacao/listar.html",
+        "avaliacoes/listar.html",
         {"request": request, "avaliacoes": filtradas}
     )
 

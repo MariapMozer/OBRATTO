@@ -1,0 +1,256 @@
+================================================================================
+RELATÓRIO DE REORGANIZAÇÃO DE TEMPLATES
+================================================================================
+
+Total de mapeamentos: 115
+Arquivos movidos: 82
+Arquivos não encontrados: 2
+Erros: 31
+
+================================================================================
+ARQUIVOS MOVIDOS COM SUCESSO
+================================================================================
+administrador/ajustar_configuracoes.html -> admin/configuracoes/ajustar.html
+administrador/aprovar_profissionais.html -> admin/moderacao/aprovar_profissionais.html
+administrador/avaliar_profissionais.html -> admin/moderacao/avaliar_profissionais.html
+administrador/base_admin.html -> base/admin.html
+administrador/configurar_seguranca.html -> admin/configuracoes/seguranca.html
+administrador/em_construcao.html -> admin/em_construcao.html
+administrador/exportar_relatorios.html -> admin/relatorios/exportar.html
+administrador/home_adm.html -> admin/dashboard.html
+administrador/lista.html -> admin/usuarios/administradores/listar.html
+administrador/listar_cliente.html -> admin/usuarios/clientes/listar.html
+administrador/listar_fornecedor.html -> admin/usuarios/fornecedores/listar.html
+administrador/listar_prestador.html -> admin/usuarios/prestadores/listar.html
+administrador/moderar_adm/cadastrar_adm.html -> admin/usuarios/administradores/cadastrar.html
+administrador/moderar_adm/editar_adm.html -> admin/usuarios/administradores/editar.html
+administrador/moderar_adm/lista_adm.html -> admin/usuarios/administradores/listar.html
+administrador/moderar_adm/remover_adm.html -> admin/usuarios/administradores/remover.html
+administrador/moderar_anuncios.html -> admin/moderacao/anuncios.html
+administrador/moderar_avaliacoes.html -> admin/moderacao/avaliacoes.html
+administrador/moderar_chat.html -> admin/moderacao/chat.html
+administrador/moderar_fornecedor/listar_fornecedor.html -> admin/usuarios/fornecedores/listar.html
+administrador/moderar_fornecedor/moderar_produtos.html -> admin/usuarios/fornecedores/produtos.html
+administrador/moderar_prestador/listar_prestador.html -> admin/usuarios/prestadores/listar.html
+administrador/moderar_prestador/moderar_servicos_prestador.html -> admin/usuarios/prestadores/servicos.html
+administrador/perfil_editar.html -> admin/perfil_editar.html
+administrador/relatorios_anuncios.html -> admin/relatorios/anuncios.html
+administrador/remover_avaliacoes.html -> admin/moderacao/remover_avaliacoes.html
+administrador/servico/galeria.html -> admin/servicos/galeria.html
+administrador/verificacao_usuario.html -> admin/verificacao_usuario.html
+administrador/visualizar_relatorios.html -> admin/relatorios/visualizar.html
+avaliacao/detalhes.html -> avaliacoes/detalhes.html
+avaliacao/editar.html -> avaliacoes/editar.html
+avaliacao/listar.html -> avaliacoes/listar.html
+avaliacao/nova.html -> avaliacoes/nova.html
+cliente/base.html -> base/cliente.html
+cliente/cliente_logout.html -> cliente/logout.html
+fornecedor/avaliacoes_recebidas.html -> fornecedor/avaliacoes/recebidas.html
+fornecedor/base.html -> base/fornecedor.html
+fornecedor/home_fornecedor.html -> fornecedor/home.html
+fornecedor/mensagens/mensagens_recebidas.html -> fornecedor/mensagens/recebidas.html
+fornecedor/orcamentos/orcamento.html -> fornecedor/orcamentos/detalhes.html
+fornecedor/orcamentos/responder_orcamentos.html -> fornecedor/orcamentos/responder.html
+fornecedor/orcamentos/solicitacoes_recebidas.html -> fornecedor/orcamentos/recebidas.html
+fornecedor/planos/alterar_plano.html -> fornecedor/planos/alterar.html
+fornecedor/planos/assinar_plano.html -> fornecedor/planos/assinar.html
+fornecedor/planos/cancelar_plano.html -> fornecedor/planos/cancelar.html
+fornecedor/planos/confirmacao_cancelamento_plano.html -> fornecedor/planos/confirmar_cancelamento.html
+fornecedor/planos/histórico_planos.html -> fornecedor/planos/historico.html
+fornecedor/planos/listar_planos.html -> fornecedor/planos/listar.html
+fornecedor/planos/renovar_plano.html -> fornecedor/planos/renovar.html
+fornecedor/produtos/alterar_produtos.html -> fornecedor/produtos/alterar.html
+fornecedor/produtos/cadastrar_produtos.html -> fornecedor/produtos/cadastrar.html
+fornecedor/produtos/excluir_produtos.html -> fornecedor/produtos/excluir.html
+fornecedor/promocao/alterar_promocoes.html -> fornecedor/promocoes/alterar.html
+fornecedor/promocao/cadastrar_promocoes.html -> fornecedor/promocoes/cadastrar.html
+fornecedor/promocao/confirmar_exclusao_promocao.html -> fornecedor/promocoes/confirmar_exclusao.html
+prestador/agenda/agenda.html -> prestador/agenda/calendario.html
+prestador/catalogo/catalogo_prestadores.html -> prestador/catalogo/listar.html
+prestador/perfil/foto/dados.html -> prestador/perfil/editar_fotos.html
+prestador/perfil/perfil.html -> prestador/perfil/visualizar.html
+prestador/planos/planos.html -> prestador/planos/listar.html
+prestador/prestador_logout.html -> prestador/logout.html
+prestador/servicos/editar_servico.html -> prestador/servicos/editar.html
+publico/cliente/perfil_publico.html -> public/perfil/cliente.html
+publico/em_construcao.html -> public/em_construcao.html
+publico/fornecedor2/cadastro_fornecedor.html -> public/cadastro/fornecedor.html
+publico/fornecedor2/perfil_publico_fornecedor.html -> public/perfil/fornecedor.html
+publico/home.html -> public/home.html
+publico/login_cadastro/cadastro_sucesso.html -> auth/cadastro_sucesso.html
+publico/login_cadastro/login.html -> auth/login.html
+publico/login_cadastro/recuperar_senha.html -> auth/recuperar_senha.html
+publico/login_cadastro/redefinir_senha.html -> auth/redefinir_senha.html
+publico/pagamento-prestador/dados_pagamento.html -> prestador/pagamento/dados.html
+publico/pagamento-prestador/pagamento_erro.html -> prestador/pagamento/erro.html
+publico/pagamento-prestador/pagamento_pendente.html -> prestador/pagamento/pendente.html
+publico/pagamento-prestador/pagamento_sucesso.html -> prestador/pagamento/sucesso.html
+publico/pagamento-prestador/processar_pagamento.html -> prestador/pagamento/processar.html
+publico/pagamento/dados_pagamento.html -> fornecedor/pagamento/dados.html
+publico/pagamento/pagamento_erro.html -> fornecedor/pagamento/erro.html
+publico/pagamento/pagamento_pendente.html -> fornecedor/pagamento/pendente.html
+publico/pagamento/pagamento_sucesso.html -> fornecedor/pagamento/sucesso.html
+publico/pagamento/processar_pagamento.html -> fornecedor/pagamento/processar.html
+publico/prestador/perfil_publico.html -> public/perfil/prestador.html
+
+================================================================================
+ARQUIVOS NÃO ENCONTRADOS
+================================================================================
+publico/cadastro_cliente.html
+publico/cadastro_prestador.html
+
+================================================================================
+ERROS
+================================================================================
+cliente/confirmacao.html: PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/cliente/confirmacao.html') and PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/cliente/confirmacao.html') are the same file
+cliente/em_construcao.html: PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/cliente/em_construcao.html') and PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/cliente/em_construcao.html') are the same file
+cliente/home.html: PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/cliente/home.html') and PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/cliente/home.html') are the same file
+cliente/login.html: PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/cliente/login.html') and PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/cliente/login.html') are the same file
+cliente/perfil/editar_fotos.html: PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/cliente/perfil/editar_fotos.html') and PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/cliente/perfil/editar_fotos.html') are the same file
+cliente/solicitar_orcamento.html: PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/cliente/solicitar_orcamento.html') and PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/cliente/solicitar_orcamento.html') are the same file
+components/toast-handler.html: PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/components/toast-handler.html') and PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/components/toast-handler.html') are the same file
+errors/404.html: PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/errors/404.html') and PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/errors/404.html') are the same file
+errors/500.html: PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/errors/500.html') and PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/errors/500.html') are the same file
+fornecedor/conta.html: PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/fornecedor/conta.html') and PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/fornecedor/conta.html') are the same file
+fornecedor/home_teste.html: PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/fornecedor/home_teste.html') and PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/fornecedor/home_teste.html') are the same file
+fornecedor/perfil.html: PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/fornecedor/perfil.html') and PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/fornecedor/perfil.html') are the same file
+fornecedor/planos/minha_assinatura.html: PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/fornecedor/planos/minha_assinatura.html') and PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/fornecedor/planos/minha_assinatura.html') are the same file
+prestador/agenda/detalhes.html: PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/prestador/agenda/detalhes.html') and PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/prestador/agenda/detalhes.html') are the same file
+prestador/home.html: PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/prestador/home.html') and PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/prestador/home.html') are the same file
+prestador/perfil/editar_dados.html: PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/prestador/perfil/editar_dados.html') and PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/prestador/perfil/editar_dados.html') are the same file
+prestador/perfil/excluir.html: PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/prestador/perfil/excluir.html') and PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/prestador/perfil/excluir.html') are the same file
+prestador/perfil/painel.html: PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/prestador/perfil/painel.html') and PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/prestador/perfil/painel.html') are the same file
+prestador/planos/assinar.html: PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/prestador/planos/assinar.html') and PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/prestador/planos/assinar.html') are the same file
+prestador/planos/cancelar.html: PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/prestador/planos/cancelar.html') and PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/prestador/planos/cancelar.html') are the same file
+prestador/planos/confirmar_assinatura.html: PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/prestador/planos/confirmar_assinatura.html') and PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/prestador/planos/confirmar_assinatura.html') are the same file
+prestador/planos/confirmar_cancelamento.html: PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/prestador/planos/confirmar_cancelamento.html') and PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/prestador/planos/confirmar_cancelamento.html') are the same file
+prestador/planos/editar.html: PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/prestador/planos/editar.html') and PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/prestador/planos/editar.html') are the same file
+prestador/planos/meu_plano.html: PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/prestador/planos/meu_plano.html') and PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/prestador/planos/meu_plano.html') are the same file
+prestador/planos/renovar.html: PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/prestador/planos/renovar.html') and PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/prestador/planos/renovar.html') are the same file
+prestador/servicos/buscar.html: PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/prestador/servicos/buscar.html') and PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/prestador/servicos/buscar.html') are the same file
+prestador/servicos/detalhes.html: PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/prestador/servicos/detalhes.html') and PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/prestador/servicos/detalhes.html') are the same file
+prestador/servicos/excluir.html: PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/prestador/servicos/excluir.html') and PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/prestador/servicos/excluir.html') are the same file
+prestador/servicos/novo.html: PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/prestador/servicos/novo.html') and PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/prestador/servicos/novo.html') are the same file
+prestador/servicos/status.html: PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/prestador/servicos/status.html') and PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/prestador/servicos/status.html') are the same file
+prestador/solicitacoes/detalhes.html: PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/prestador/solicitacoes/detalhes.html') and PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/prestador/solicitacoes/detalhes.html') are the same file
+
+================================================================================
+MAPEAMENTO DE MUDANÇAS PARA ARQUIVOS PYTHON
+================================================================================
+Substitua as seguintes referências nos arquivos .py:
+
+"administrador/ajustar_configuracoes.html" -> "admin/configuracoes/ajustar.html"
+"administrador/aprovar_profissionais.html" -> "admin/moderacao/aprovar_profissionais.html"
+"administrador/avaliar_profissionais.html" -> "admin/moderacao/avaliar_profissionais.html"
+"administrador/base_admin.html" -> "base/admin.html"
+"administrador/configurar_seguranca.html" -> "admin/configuracoes/seguranca.html"
+"administrador/em_construcao.html" -> "admin/em_construcao.html"
+"administrador/exportar_relatorios.html" -> "admin/relatorios/exportar.html"
+"administrador/home_adm.html" -> "admin/dashboard.html"
+"administrador/lista.html" -> "admin/usuarios/administradores/listar.html"
+"administrador/listar_cliente.html" -> "admin/usuarios/clientes/listar.html"
+"administrador/listar_fornecedor.html" -> "admin/usuarios/fornecedores/listar.html"
+"administrador/listar_prestador.html" -> "admin/usuarios/prestadores/listar.html"
+"administrador/moderar_adm/cadastrar_adm.html" -> "admin/usuarios/administradores/cadastrar.html"
+"administrador/moderar_adm/editar_adm.html" -> "admin/usuarios/administradores/editar.html"
+"administrador/moderar_adm/lista_adm.html" -> "admin/usuarios/administradores/listar.html"
+"administrador/moderar_adm/remover_adm.html" -> "admin/usuarios/administradores/remover.html"
+"administrador/moderar_anuncios.html" -> "admin/moderacao/anuncios.html"
+"administrador/moderar_avaliacoes.html" -> "admin/moderacao/avaliacoes.html"
+"administrador/moderar_chat.html" -> "admin/moderacao/chat.html"
+"administrador/moderar_fornecedor/listar_fornecedor.html" -> "admin/usuarios/fornecedores/listar.html"
+"administrador/moderar_fornecedor/moderar_produtos.html" -> "admin/usuarios/fornecedores/produtos.html"
+"administrador/moderar_prestador/listar_prestador.html" -> "admin/usuarios/prestadores/listar.html"
+"administrador/moderar_prestador/moderar_servicos_prestador.html" -> "admin/usuarios/prestadores/servicos.html"
+"administrador/perfil_editar.html" -> "admin/perfil_editar.html"
+"administrador/relatorios_anuncios.html" -> "admin/relatorios/anuncios.html"
+"administrador/remover_avaliacoes.html" -> "admin/moderacao/remover_avaliacoes.html"
+"administrador/servico/galeria.html" -> "admin/servicos/galeria.html"
+"administrador/verificacao_usuario.html" -> "admin/verificacao_usuario.html"
+"administrador/visualizar_relatorios.html" -> "admin/relatorios/visualizar.html"
+"avaliacao/detalhes.html" -> "avaliacoes/detalhes.html"
+"avaliacao/editar.html" -> "avaliacoes/editar.html"
+"avaliacao/listar.html" -> "avaliacoes/listar.html"
+"avaliacao/nova.html" -> "avaliacoes/nova.html"
+"cliente/base.html" -> "base/cliente.html"
+"cliente/cliente_logout.html" -> "cliente/logout.html"
+"cliente/confirmacao.html" -> "cliente/confirmacao.html"
+"cliente/em_construcao.html" -> "cliente/em_construcao.html"
+"cliente/home.html" -> "cliente/home.html"
+"cliente/login.html" -> "cliente/login.html"
+"cliente/perfil/editar_fotos.html" -> "cliente/perfil/editar_fotos.html"
+"cliente/solicitar_orcamento.html" -> "cliente/solicitar_orcamento.html"
+"components/toast-handler.html" -> "components/toast-handler.html"
+"errors/404.html" -> "errors/404.html"
+"errors/500.html" -> "errors/500.html"
+"fornecedor/avaliacoes_recebidas.html" -> "fornecedor/avaliacoes/recebidas.html"
+"fornecedor/base.html" -> "base/fornecedor.html"
+"fornecedor/conta.html" -> "fornecedor/conta.html"
+"fornecedor/home_fornecedor.html" -> "fornecedor/home.html"
+"fornecedor/home_teste.html" -> "fornecedor/home_teste.html"
+"fornecedor/mensagens/mensagens_recebidas.html" -> "fornecedor/mensagens/recebidas.html"
+"fornecedor/orcamentos/orcamento.html" -> "fornecedor/orcamentos/detalhes.html"
+"fornecedor/orcamentos/responder_orcamentos.html" -> "fornecedor/orcamentos/responder.html"
+"fornecedor/orcamentos/solicitacoes_recebidas.html" -> "fornecedor/orcamentos/recebidas.html"
+"fornecedor/perfil.html" -> "fornecedor/perfil.html"
+"fornecedor/planos/alterar_plano.html" -> "fornecedor/planos/alterar.html"
+"fornecedor/planos/assinar_plano.html" -> "fornecedor/planos/assinar.html"
+"fornecedor/planos/cancelar_plano.html" -> "fornecedor/planos/cancelar.html"
+"fornecedor/planos/confirmacao_cancelamento_plano.html" -> "fornecedor/planos/confirmar_cancelamento.html"
+"fornecedor/planos/histórico_planos.html" -> "fornecedor/planos/historico.html"
+"fornecedor/planos/listar_planos.html" -> "fornecedor/planos/listar.html"
+"fornecedor/planos/minha_assinatura.html" -> "fornecedor/planos/minha_assinatura.html"
+"fornecedor/planos/renovar_plano.html" -> "fornecedor/planos/renovar.html"
+"fornecedor/produtos/alterar_produtos.html" -> "fornecedor/produtos/alterar.html"
+"fornecedor/produtos/cadastrar_produtos.html" -> "fornecedor/produtos/cadastrar.html"
+"fornecedor/produtos/excluir_produtos.html" -> "fornecedor/produtos/excluir.html"
+"fornecedor/promocao/alterar_promocoes.html" -> "fornecedor/promocoes/alterar.html"
+"fornecedor/promocao/cadastrar_promocoes.html" -> "fornecedor/promocoes/cadastrar.html"
+"fornecedor/promocao/confirmar_exclusao_promocao.html" -> "fornecedor/promocoes/confirmar_exclusao.html"
+"prestador/agenda/agenda.html" -> "prestador/agenda/calendario.html"
+"prestador/agenda/detalhes.html" -> "prestador/agenda/detalhes.html"
+"prestador/catalogo/catalogo_prestadores.html" -> "prestador/catalogo/listar.html"
+"prestador/home.html" -> "prestador/home.html"
+"prestador/perfil/editar_dados.html" -> "prestador/perfil/editar_dados.html"
+"prestador/perfil/excluir.html" -> "prestador/perfil/excluir.html"
+"prestador/perfil/foto/dados.html" -> "prestador/perfil/editar_fotos.html"
+"prestador/perfil/painel.html" -> "prestador/perfil/painel.html"
+"prestador/perfil/perfil.html" -> "prestador/perfil/visualizar.html"
+"prestador/planos/assinar.html" -> "prestador/planos/assinar.html"
+"prestador/planos/cancelar.html" -> "prestador/planos/cancelar.html"
+"prestador/planos/confirmar_assinatura.html" -> "prestador/planos/confirmar_assinatura.html"
+"prestador/planos/confirmar_cancelamento.html" -> "prestador/planos/confirmar_cancelamento.html"
+"prestador/planos/editar.html" -> "prestador/planos/editar.html"
+"prestador/planos/meu_plano.html" -> "prestador/planos/meu_plano.html"
+"prestador/planos/planos.html" -> "prestador/planos/listar.html"
+"prestador/planos/renovar.html" -> "prestador/planos/renovar.html"
+"prestador/prestador_logout.html" -> "prestador/logout.html"
+"prestador/servicos/buscar.html" -> "prestador/servicos/buscar.html"
+"prestador/servicos/detalhes.html" -> "prestador/servicos/detalhes.html"
+"prestador/servicos/editar_servico.html" -> "prestador/servicos/editar.html"
+"prestador/servicos/excluir.html" -> "prestador/servicos/excluir.html"
+"prestador/servicos/novo.html" -> "prestador/servicos/novo.html"
+"prestador/servicos/status.html" -> "prestador/servicos/status.html"
+"prestador/solicitacoes/detalhes.html" -> "prestador/solicitacoes/detalhes.html"
+"publico/cadastro_cliente.html" -> "public/cadastro/cliente.html"
+"publico/cadastro_prestador.html" -> "public/cadastro/prestador.html"
+"publico/cliente/perfil_publico.html" -> "public/perfil/cliente.html"
+"publico/em_construcao.html" -> "public/em_construcao.html"
+"publico/fornecedor2/cadastro_fornecedor.html" -> "public/cadastro/fornecedor.html"
+"publico/fornecedor2/perfil_publico_fornecedor.html" -> "public/perfil/fornecedor.html"
+"publico/home.html" -> "public/home.html"
+"publico/login_cadastro/cadastro_sucesso.html" -> "auth/cadastro_sucesso.html"
+"publico/login_cadastro/login.html" -> "auth/login.html"
+"publico/login_cadastro/recuperar_senha.html" -> "auth/recuperar_senha.html"
+"publico/login_cadastro/redefinir_senha.html" -> "auth/redefinir_senha.html"
+"publico/pagamento-prestador/dados_pagamento.html" -> "prestador/pagamento/dados.html"
+"publico/pagamento-prestador/pagamento_erro.html" -> "prestador/pagamento/erro.html"
+"publico/pagamento-prestador/pagamento_pendente.html" -> "prestador/pagamento/pendente.html"
+"publico/pagamento-prestador/pagamento_sucesso.html" -> "prestador/pagamento/sucesso.html"
+"publico/pagamento-prestador/processar_pagamento.html" -> "prestador/pagamento/processar.html"
+"publico/pagamento/dados_pagamento.html" -> "fornecedor/pagamento/dados.html"
+"publico/pagamento/pagamento_erro.html" -> "fornecedor/pagamento/erro.html"
+"publico/pagamento/pagamento_pendente.html" -> "fornecedor/pagamento/pendente.html"
+"publico/pagamento/pagamento_sucesso.html" -> "fornecedor/pagamento/sucesso.html"
+"publico/pagamento/processar_pagamento.html" -> "fornecedor/pagamento/processar.html"
+"publico/prestador/perfil_publico.html" -> "public/perfil/prestador.html"

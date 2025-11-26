@@ -1,7 +1,293 @@
 {% extends "cliente/base.html" %}
-{% block titulo %}Minhas solicitacoes{% endblock %}
+
+{#
+    Template: Minhas Solicitações (Cliente)
+    Descrição: Lista todas as solicitações de serviço do cliente
+    Estende: cliente/base.html
+#}
+
+{% from 'components/data_table.html' import data_table %}
+{% from 'components/breadcrumbs.html' import breadcrumbs %}
+{% from 'components/search_form.html' import search_form %}
+{% from 'components/empty_state.html' import empty_state %}
+{% from 'components/pagination.html' import pagination %}
+
+{% block titulo %}Minhas Solicitações{% endblock %}
+
 {% block conteudo %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="h3">Minhas solicitacoes</h1>
+<div class="container-fluid px-4 py-4">
+    <!-- Breadcrumbs -->
+    {{ breadcrumbs(items=[
+        {'text': 'Home', 'url': '/cliente/home'},
+        {'text': 'Minhas Solicitações', 'active': True}
+    ]) }}
+
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-1">Minhas Solicitações</h1>
+            <p class="text-muted mb-0">Acompanhe o status das suas solicitações de serviço</p>
+        </div>
+        <a href="/cliente/contratacoes/solicitar" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-2"></i>Nova Solicitação
+        </a>
+    </div>
+
+    <!-- Search and Filters -->
+    <div class="card mb-4">
+        <div class="card-body">
+            {{ search_form(
+                action_url='/cliente/solicitacoes',
+                placeholder='Buscar por serviço, prestador ou descrição...',
+                show_filters=True,
+                filters=[
+                    {
+                        'name': 'status',
+                        'label': 'Status',
+                        'type': 'select',
+                        'options': [
+                            {'value': '', 'text': 'Todos'},
+                            {'value': 'pendente', 'text': 'Pendente'},
+                            {'value': 'respondida', 'text': 'Respondida'},
+                            {'value': 'aprovada', 'text': 'Aprovada'},
+                            {'value': 'recusada', 'text': 'Recusada'},
+                            {'value': 'cancelada', 'text': 'Cancelada'}
+                        ]
+                    },
+                    {
+                        'name': 'data_inicio',
+                        'label': 'Data Início',
+                        'type': 'date'
+                    },
+                    {
+                        'name': 'data_fim',
+                        'label': 'Data Fim',
+                        'type': 'date'
+                    }
+                ]
+            ) }}
+        </div>
+    </div>
+
+    <!-- Solicitações Table -->
+    {% if solicitacoes and solicitacoes|length > 0 %}
+    <div class="card">
+        <div class="card-body">
+            {{ data_table(
+                headers=[
+                    {'text': 'Nº', 'class': 'text-center', 'style': 'width: 80px'},
+                    {'text': 'Serviço', 'sortable': True},
+                    {'text': 'Prestador', 'sortable': True},
+                    {'text': 'Data Solicitação', 'sortable': True, 'class': 'text-center'},
+                    {'text': 'Respostas', 'class': 'text-center'},
+                    {'text': 'Status', 'class': 'text-center'},
+                    {'text': 'Ações', 'class': 'text-center', 'style': 'width: 180px'}
+                ],
+                rows=solicitacoes,
+                row_template='
+                    <tr>
+                        <td class="text-center"><strong>#{{ row.id }}</strong></td>
+                        <td>
+                            <div class="fw-semibold">{{ row.servico_nome|default("Serviço Geral") }}</div>
+                            <small class="text-muted">
+                                {% if row.descricao %}
+                                {{ row.descricao[:60] }}{% if row.descricao|length > 60 %}...{% endif %}
+                                {% endif %}
+                            </small>
+                        </td>
+                        <td>
+                            {% if row.prestador_nome %}
+                            <div class="d-flex align-items-center">
+                                {% if row.prestador_foto %}
+                                <img src="{{ row.prestador_foto }}" alt="{{ row.prestador_nome }}"
+                                     class="rounded-circle me-2" width="32" height="32">
+                                {% else %}
+                                <div class="bg-secondary rounded-circle me-2 d-flex align-items-center justify-content-center"
+                                     style="width: 32px; height: 32px;">
+                                    <i class="bi bi-person text-white"></i>
+                                </div>
+                                {% endif %}
+                                <div class="fw-semibold">{{ row.prestador_nome }}</div>
+                            </div>
+                            {% else %}
+                            <span class="text-muted fst-italic">Aberta para propostas</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <div>{{ row.data_solicitacao|default("N/A") }}</div>
+                            {% if row.prazo %}
+                            <small class="text-muted">Prazo: {{ row.prazo }}</small>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            {% if row.total_respostas and row.total_respostas > 0 %}
+                            <span class="badge bg-info">
+                                <i class="bi bi-chat-left-text me-1"></i>{{ row.total_respostas }}
+                            </span>
+                            {% else %}
+                            <span class="badge bg-secondary">0</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            {% if row.status == "pendente" %}
+                            <span class="badge bg-warning">
+                                <i class="bi bi-clock me-1"></i>Pendente
+                            </span>
+                            {% elif row.status == "respondida" %}
+                            <span class="badge bg-info">
+                                <i class="bi bi-chat-dots me-1"></i>Respondida
+                            </span>
+                            {% elif row.status == "aprovada" %}
+                            <span class="badge bg-success">
+                                <i class="bi bi-check-circle me-1"></i>Aprovada
+                            </span>
+                            {% elif row.status == "recusada" %}
+                            <span class="badge bg-danger">
+                                <i class="bi bi-x-circle me-1"></i>Recusada
+                            </span>
+                            {% elif row.status == "cancelada" %}
+                            <span class="badge bg-secondary">
+                                <i class="bi bi-x-circle me-1"></i>Cancelada
+                            </span>
+                            {% else %}
+                            <span class="badge bg-secondary">{{ row.status|title }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <div class="btn-group btn-group-sm" role="group">
+                                <a href="/cliente/solicitacoes/detalhes/{{ row.id }}"
+                                   class="btn btn-outline-primary"
+                                   title="Ver Detalhes">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                {% if row.total_respostas and row.total_respostas > 0 %}
+                                <a href="/cliente/solicitacoes/respostas/{{ row.id }}"
+                                   class="btn btn-outline-info"
+                                   title="Ver Propostas">
+                                    <i class="bi bi-chat-left-text"></i>
+                                </a>
+                                {% endif %}
+                                {% if row.status == "pendente" or row.status == "respondida" %}
+                                <button type="button"
+                                        class="btn btn-outline-danger"
+                                        onclick="cancelarSolicitacao({{ row.id }}, \'{{ row.servico_nome }}\')"
+                                        title="Cancelar">
+                                    <i class="bi bi-x-circle"></i>
+                                </button>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                ',
+                striped=True,
+                hover=True,
+                responsive=True
+            ) }}
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    {% if total_pages and total_pages > 1 %}
+    <div class="mt-4">
+        {{ pagination(
+            current_page=current_page|default(1),
+            total_pages=total_pages,
+            base_url='/cliente/solicitacoes'
+        ) }}
+    </div>
+    {% endif %}
+
+    {% else %}
+    <!-- Empty State -->
+    {{ empty_state(
+        icon='inbox',
+        title='Nenhuma solicitação encontrada',
+        message='Você ainda não fez nenhuma solicitação de serviço. Comece buscando prestadores ou criando uma solicitação!',
+        action_url='/cliente/contratacoes/solicitar',
+        action_text='Nova Solicitação',
+        action_icon='plus-circle'
+    ) }}
+    {% endif %}
+
+    <!-- Info Cards -->
+    <div class="row g-3 mt-4">
+        <div class="col-md-4">
+            <div class="card border-info">
+                <div class="card-body">
+                    <div class="d-flex align-items-start">
+                        <i class="bi bi-info-circle text-info fs-2 me-3"></i>
+                        <div>
+                            <h6 class="card-title mb-1">Como funciona?</h6>
+                            <p class="card-text small text-muted mb-0">
+                                Faça uma solicitação descrevendo o serviço que precisa.
+                                Prestadores interessados enviarão propostas para você avaliar.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-warning">
+                <div class="card-body">
+                    <div class="d-flex align-items-start">
+                        <i class="bi bi-clock-history text-warning fs-2 me-3"></i>
+                        <div>
+                            <h6 class="card-title mb-1">Tempo de Resposta</h6>
+                            <p class="card-text small text-muted mb-0">
+                                Em média, solicitações recebem as primeiras propostas
+                                em até 24 horas.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-success">
+                <div class="card-body">
+                    <div class="d-flex align-items-start">
+                        <i class="bi bi-shield-check text-success fs-2 me-3"></i>
+                        <div>
+                            <h6 class="card-title mb-1">Você no Controle</h6>
+                            <p class="card-text small text-muted mb-0">
+                                Compare propostas, avalie perfis e escolha o melhor
+                                prestador para suas necessidades.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+{% block scripts %}
+<script>
+function cancelarSolicitacao(id, servicoNome) {
+    const nomeExibicao = servicoNome || 'esta solicitação';
+    if (confirm(`Tem certeza que deseja cancelar "${nomeExibicao}"?\n\nEsta ação não pode ser desfeita e você perderá todas as propostas recebidas.`)) {
+        // Enviar requisição para cancelar
+        fetch(`/cliente/solicitacoes/cancelar/${id}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.reload();
+            } else {
+                alert('Erro ao cancelar solicitação: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            alert('Erro ao cancelar solicitação. Tente novamente.');
+        });
+    }
+}
+</script>
+{% endblock %}
 {% endblock %}

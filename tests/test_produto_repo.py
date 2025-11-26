@@ -55,6 +55,7 @@ class TestProdutoRepo:
         inserir_produto(produto_exemplo)
 
         produto_para_atualizar = obter_produto_por_id(produto_exemplo.id)
+        assert produto_para_atualizar is not None
         produto_para_atualizar.nome = "Nome Atualizado"
         produto_para_atualizar.preco = 29.9
         produto_para_atualizar.descricao = "Novo"
@@ -62,6 +63,7 @@ class TestProdutoRepo:
         sucesso = atualizar_produto(produto_para_atualizar)
         produto_atualizado_db = obter_produto_por_id(produto_exemplo.id)
         assert sucesso is None or sucesso is True
+        assert produto_atualizado_db is not None
         assert produto_atualizado_db.nome == "Nome Atualizado"
         assert produto_atualizado_db.preco == 29.9
         assert produto_atualizado_db.descricao == "Novo"

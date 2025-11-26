@@ -1,0 +1,349 @@
+{% extends "administrador/base_admin.html" %}
+{% block admin_css %}<link rel="stylesheet" href="/static/css/remover_adm.css">{% endblock %}
+{% block admin_titulo %}Remover Administrador{% endblock %}
+{% block admin_conteudo %} 
+    <main class="flex-grow-1">
+        <!-- Hero Section -->
+        <section class="remove-admin-hero-section">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-lg-8">
+                        <div class="breadcrumb-nav">
+                            <a href="/administrador/home" class="breadcrumb-link">
+                                <i class="bi bi-house"></i> Painel Administrativo
+                            </a>
+                            <span class="breadcrumb-separator">/</span>
+                            <span class="breadcrumb-current">Remover Administrador</span>
+                        </div>
+                        <h1 class="remove-admin-hero-title fade-in-up">
+                            <i class="bi bi-person-dash me-3"></i>
+                            Remover Administrador
+                        </h1>
+                        <p class="remove-admin-hero-subtitle fade-in-up">
+                            Remova um administrador do sistema de forma segura e controlada.
+                        </p>
+                    </div>
+                    <div class="col-lg-4 text-center">
+                        <div class="warning-card">
+                            <div class="warning-icon">
+                                <i class="bi bi-exclamation-triangle-fill"></i>
+                            </div>
+                            <div class="warning-text">
+                                <strong>Atenção!</strong><br>
+                                Esta ação é irreversível
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Content -->
+        <section class="remove-admin-content-section">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <!-- Search Form -->
+                        <div class="search-admin-card">
+                            <div class="card-header">
+                                <h3 class="card-title">
+                                    <i class="bi bi-search me-2"></i>
+                                    Buscar Administrador
+                                </h3>
+                                <p class="card-subtitle">Digite o ID do administrador que deseja remover</p>
+                            </div>
+                            <div class="card-body">
+                                <form id="searchAdminForm" class="search-form">
+                                    <div class="form-group">
+                                        <label for="adminId" class="form-label">ID do Administrador</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">
+                                                <i class="bi bi-hash"></i>
+                                            </span>
+                                            <input type="number" 
+                                                   class="form-control" 
+                                                   id="adminId" 
+                                                   name="id" 
+                                                   placeholder="Digite o ID do administrador"
+                                                   min="1"
+                                                   required>
+                                            <button type="button" class="btn btn-search" onclick="searchAdmin()">
+                                                <i class="bi bi-search me-2"></i>Buscar
+                                            </button>
+                                        </div>
+                                        <div class="form-help">
+                                            <small class="text-muted">
+                                                <i class="bi bi-info-circle me-1"></i>
+                                                O ID deve ser um número positivo válido
+                                            </small>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Admin Details Card (Hidden by default) -->
+                        <div class="admin-details-card" id="adminDetailsCard" style="display: none;">
+                            <div class="card-header">
+                                <h3 class="card-title">
+                                    <i class="bi bi-person-check me-2"></i>
+                                    Administrador Encontrado
+                                </h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="admin-profile">
+                                    <div class="admin-avatar">
+                                        <i class="bi bi-person-circle"></i>
+                                    </div>
+                                    <div class="admin-info">
+                                        <h4 class="admin-name" id="adminName">Nome do Administrador</h4>
+                                        <p class="admin-email" id="adminEmail">email@exemplo.com</p>
+                                        <div class="admin-meta">
+                                            <span class="meta-item">
+                                                <i class="bi bi-hash"></i>
+                                                ID: <span id="adminIdDisplay">-</span>
+                                            </span>
+                                            <span class="meta-item">
+                                                <i class="bi bi-calendar"></i>
+                                                Cadastrado em: <span id="adminDate">-</span>
+                                            </span>
+                                            <span class="meta-item">
+                                                <i class="bi bi-shield-check"></i>
+                                                Status: <span class="status-badge status-active">Ativo</span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="admin-permissions">
+                                    <h5 class="permissions-title">
+                                        <i class="bi bi-key me-2"></i>
+                                        Permissões Atuais
+                                    </h5>
+                                    <div class="permissions-list">
+                                        <span class="permission-badge">Gerenciar Usuários</span>
+                                        <span class="permission-badge">Moderar Conteúdo</span>
+                                        <span class="permission-badge">Visualizar Relatórios</span>
+                                        <span class="permission-badge">Configurações</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Confirmation Form -->
+                        <div class="confirmation-card" id="confirmationCard" style="display: none;">
+                            <div class="card-header danger">
+                                <h3 class="card-title">
+                                    <i class="bi bi-exclamation-triangle me-2"></i>
+                                    Confirmar Remoção
+                                </h3>
+                                <p class="card-subtitle">Esta ação não pode ser desfeita</p>
+                            </div>
+                            <div class="card-body">
+                                <div class="danger-warning">
+                                    <div class="warning-content">
+                                        <i class="bi bi-shield-exclamation"></i>
+                                        <div class="warning-text">
+                                            <strong>Você está prestes a remover um administrador!</strong>
+                                            <p>Ao confirmar esta ação:</p>
+                                            <ul>
+                                                <li>O administrador perderá acesso imediatamente</li>
+                                                <li>Todas as sessões ativas serão encerradas</li>
+                                                <li>O histórico de ações será mantido para auditoria</li>
+                                                <li>Esta ação não pode ser desfeita</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <form method="POST" action="/administrador/moderar_adm/remover" id="removeAdminForm">
+                                    <input type="hidden" name="id" id="confirmAdminId">
+                                    
+                                    <div class="form-group">
+                                        <label for="confirmationText" class="form-label">
+                                            Digite "CONFIRMAR" para prosseguir:
+                                        </label>
+                                        <input type="text" 
+                                               class="form-control" 
+                                               id="confirmationText" 
+                                               placeholder="Digite CONFIRMAR"
+                                               required>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="removalReason" class="form-label">
+                                            Motivo da remoção (opcional):
+                                        </label>
+                                        <textarea class="form-control" 
+                                                  id="removalReason" 
+                                                  name="reason"
+                                                  rows="3" 
+                                                  placeholder="Descreva o motivo da remoção..."></textarea>
+                                    </div>
+
+                                    <div class="form-actions">
+                                        <button type="button" class="btn btn-cancel" onclick="cancelRemoval()">
+                                            <i class="bi bi-x-circle me-2"></i>Cancelar
+                                        </button>
+                                        <button type="submit" class="btn btn-danger" id="confirmRemoveBtn" disabled>
+                                            <i class="bi bi-trash me-2"></i>Remover Administrador
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Success Message -->
+                        <div class="success-card" id="successCard" style="display: none;">
+                            <div class="card-header success">
+                                <h3 class="card-title">
+                                    <i class="bi bi-check-circle me-2"></i>
+                                    Administrador Removido
+                                </h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="success-content">
+                                    <div class="success-icon">
+                                        <i class="bi bi-check-circle-fill"></i>
+                                    </div>
+                                    <div class="success-text">
+                                        <h4>Remoção realizada com sucesso!</h4>
+                                        <p>O administrador foi removido do sistema e todas as sessões ativas foram encerradas.</p>
+                                        <div class="success-actions">
+                                            <a href="/administrador/lista" class="btn btn-primary">
+                                                <i class="bi bi-list me-2"></i>Ver Lista de Administradores
+                                            </a>
+                                            <a href="/administrador/home" class="btn btn-secondary">
+                                                <i class="bi bi-house me-2"></i>Voltar ao Painel
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Actions -->
+        <section class="quick-actions-section">
+            <div class="container">
+                <h2 class="section-title">Outras Ações Administrativas</h2>
+                <div class="row g-3">
+                    <div class="col-lg-3 col-md-6">
+                        <a href="/administrador/lista" class="quick-action-card">
+                            <i class="bi bi-people-fill"></i>
+                            <span>Listar Administradores</span>
+                        </a>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <a href="/administrador/moderar_administrador" class="quick-action-card">
+                            <i class="bi bi-person-plus-fill"></i>
+                            <span>Adicionar Administrador</span>
+                        </a>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <a href="/administrador/home" class="quick-action-card">
+                            <i class="bi bi-house-fill"></i>
+                            <span>Painel Principal</span>
+                        </a>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <a href="/administrador/configuracoes" class="quick-action-card">
+                            <i class="bi bi-gear-fill"></i>
+                            <span>Configurações</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Simular dados do administrador (em produção, viria do backend)
+        const mockAdminData = {
+            1: { name: "João Silva", email: "joao.silva@obratto.com", date: "15/01/2024" },
+            2: { name: "Maria Santos", email: "maria.santos@obratto.com", date: "22/02/2024" },
+            3: { name: "Carlos Oliveira", email: "carlos.oliveira@obratto.com", date: "10/03/2024" }
+        };
+
+        function searchAdmin() {
+            const adminId = document.getElementById('adminId').value;
+            const adminDetailsCard = document.getElementById('adminDetailsCard');
+            const confirmationCard = document.getElementById('confirmationCard');
+            
+            if (!adminId) {
+                alert('Por favor, digite um ID válido.');
+                return;
+            }
+
+            // Simular busca (em produção, seria uma requisição AJAX)
+            const adminData = mockAdminData[adminId];
+            
+            if (adminData) {
+                // Preencher dados do administrador
+                document.getElementById('adminName').textContent = adminData.name;
+                document.getElementById('adminEmail').textContent = adminData.email;
+                document.getElementById('adminIdDisplay').textContent = adminId;
+                document.getElementById('adminDate').textContent = adminData.date;
+                document.getElementById('confirmAdminId').value = adminId;
+                
+                // Mostrar cards
+                adminDetailsCard.style.display = 'block';
+                confirmationCard.style.display = 'block';
+                
+                // Scroll para os resultados
+                adminDetailsCard.scrollIntoView({ behavior: 'smooth' });
+            } else {
+                alert('Administrador não encontrado. Verifique o ID e tente novamente.');
+                adminDetailsCard.style.display = 'none';
+                confirmationCard.style.display = 'none';
+            }
+        }
+
+        function cancelRemoval() {
+            document.getElementById('adminDetailsCard').style.display = 'none';
+            document.getElementById('confirmationCard').style.display = 'none';
+            document.getElementById('adminId').value = '';
+            document.getElementById('confirmationText').value = '';
+            document.getElementById('removalReason').value = '';
+        }
+
+        // Validar texto de confirmação
+        document.getElementById('confirmationText').addEventListener('input', function() {
+            const confirmBtn = document.getElementById('confirmRemoveBtn');
+            if (this.value.toUpperCase() === 'CONFIRMAR') {
+                confirmBtn.disabled = false;
+                confirmBtn.classList.add('enabled');
+            } else {
+                confirmBtn.disabled = true;
+                confirmBtn.classList.remove('enabled');
+            }
+        });
+
+        // Interceptar envio do formulário para mostrar sucesso
+        document.getElementById('removeAdminForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Simular remoção bem-sucedida
+            document.getElementById('adminDetailsCard').style.display = 'none';
+            document.getElementById('confirmationCard').style.display = 'none';
+            document.getElementById('successCard').style.display = 'block';
+            
+            // Scroll para o sucesso
+            document.getElementById('successCard').scrollIntoView({ behavior: 'smooth' });
+            
+            // Em produção, aqui seria feita a requisição real para o backend
+            // fetch('/administrador/moderar_adm/remover', { method: 'POST', ... })
+        });
+
+        // Permitir busca com Enter
+        document.getElementById('adminId').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                searchAdmin();
+            }
+        });
+    </script>
+{% endblock %}

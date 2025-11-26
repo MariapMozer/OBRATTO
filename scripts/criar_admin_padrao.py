@@ -7,14 +7,13 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 projeto_dir = os.path.dirname(script_dir)
 sys.path.insert(0, projeto_dir)
 
-from utils.security import criar_hash_senha
+from util.security import criar_hash_senha
 from data.usuario import usuario_repo
 from data.usuario.usuario_model import Usuario
 from data.administrador import administrador_repo
 from data.administrador.administrador_model import Administrador
 from datetime import datetime
-from utils.seed import criar_tabelas
-
+from util.seed import criar_tabelas
 
 
 def criar_admin_padrao():
@@ -23,7 +22,7 @@ def criar_admin_padrao():
     if not admins:
         senha_hash = criar_hash_senha("admin123")
         admin_usuario = Usuario(
-            id=None,
+            id=0,
             nome="Administrador",
             email="admin@admin.com",
             senha=senha_hash,
@@ -40,7 +39,7 @@ def criar_admin_padrao():
             data_cadastro=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             foto=None,
             token_redefinicao=None,
-            data_token=None
+            data_token=None,
         )
         id_usuario = usuario_repo.inserir_usuario(admin_usuario)
         if id_usuario:

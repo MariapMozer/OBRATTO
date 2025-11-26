@@ -1,11 +1,12 @@
 import os
 import sys
+
 # Ensure project root is on sys.path so local packages (data, routes, etc.) can be imported
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from data.usuario import usuario_repo
 from data.usuario.usuario_model import Usuario
-from utils.security import criar_hash_senha
+from util.security import criar_hash_senha
 from fastapi.testclient import TestClient
 from main import app
 
@@ -13,6 +14,7 @@ from main import app
 email = "test_fornecedor@example.com"
 password = "senha123456"
 nome = "Fornecedor Teste"
+
 
 def ensure_usuario(email, password, nome):
     user = usuario_repo.obter_usuario_por_email(email)
@@ -41,26 +43,31 @@ def ensure_usuario(email, password, nome):
             foto=None,
             token_redefinicao=None,
             data_token=None,
-            tipo_usuario="Fornecedor"
+            tipo_usuario="Fornecedor",
         )
         new_id = usuario_repo.inserir_usuario(usuario)
         print(f"Inserido usuário fornecedor id={new_id}")
         return usuario_repo.obter_usuario_por_email(email)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     user = ensure_usuario(email, password, nome)
 
     client = TestClient(app)
     # Fazer login via AJAX headers
-    resp = client.post('/login', data={'email': email, 'senha': password}, headers={'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json'})
-    print('POST /login status:', resp.status_code)
-    print('JSON response:', resp.text)
-    print('Cookies after login:', resp.cookies)
+    resp = client.post(
+        "/login",
+        data={"email": email, "senha": password},
+        headers={"X-Requested-With": "XMLHttpRequest", "Accept": "application/json"},
+    )
+    print("POST /login status:", resp.status_code)
+    print("JSON response:", resp.text)
+    print("Cookies after login:", resp.cookies)
 
     # agora acessar /fornecedor
-    resp2 = client.get('/fornecedor')
-    print('/fornecedor status:', resp2.status_code)
+    resp2 = client.get("/fornecedor")
+    print("/fornecedor status:", resp2.status_code)
     if resp2.status_code == 200:
-        print('Fornecedor page content sample:', resp2.text[:200])
+        print("Fornecedor page content sample:", resp2.text[:200])
     else:
-        print('Fornecedor redirect or error, headers:', resp2.headers)
+        print("Fornecedor redirect or error, headers:", resp2.headers)

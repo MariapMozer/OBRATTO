@@ -7,7 +7,8 @@ itsdangerous
 mercadopago
 Pillow
 
-
+# Variáveis de ambiente
+python-dotenv>=1.0.0
 
 # Dependências de teste
 pytest
@@ -15,10 +16,12 @@ pytest-asyncio
 pytest-cov
 
 # Dependências de autenticação
-
 passlib[bcrypt]
 python-jose[cryptography]
 
 # DTO e validação
 pydantic>=2.0.0
 email-validator>=2.0.0
+
+# Email (opcional - para recuperação de senha)
+resend>=0.7.0

@@ -2,7 +2,8 @@ from contextlib import contextmanager
 import sqlite3
 import sys
 import os
-from data.usuario.usuario_repo import*
+from datetime import datetime
+from data.usuario.usuario_repo import *
 from data.usuario.usuario_model import Usuario
 
 class TestUsuarioRepo:
@@ -16,34 +17,40 @@ class TestUsuarioRepo:
     def test_inserir_usuario(self, test_db):
         #Arrange
         criar_tabela_usuario()
-        usuario_teste = Usuario(0,"Usuario Teste", "email", "senha", "12345678901", "99999999999", "2023-10-01 12:00:00", "Endereco Teste", "cliente")
+        usuario_teste = Usuario(0,"Usuario Teste", "email", "senha", "12345678901", "99999999999", "88888-888", "Rua Teste", "123", "", "Bairro Teste", "Cidade Teste", "ES", "cliente", "2023-10-01 12:00:00")
         #Act
         id_usuario_inserido = inserir_usuario(usuario_teste)
         #Assert
+        assert id_usuario_inserido is not None
         usuario_db = obter_usuario_por_id(id_usuario_inserido)
         assert usuario_db is not None, "A categoria inserida não deveria ser None"
+        assert id_usuario_inserido is not None
         assert usuario_db.id == id_usuario_inserido, "O ID do usuário inserido não confere com o ID retornado"
         assert usuario_db.nome == "Usuario Teste", "O nome do usuário inserido não confere"
 
     def test_atualizar_usuario(self, test_db):
         #Arrange
         criar_tabela_usuario()
-        usuario_teste = Usuario(0,"Usuario Teste", "email", "senha", "12345678901", "99999999999", "2023-10-01 12:00:00", "Endereco Teste", "cliente")
+        usuario_teste = Usuario(0,"Usuario Teste", "email", "senha", "12345678901", "99999999999", "88888-888", "Rua Teste", "123", "", "Bairro Teste", "Cidade Teste", "ES", "cliente", "2023-10-01 12:00:00")
         id_usuario_inserido = inserir_usuario(usuario_teste)
+        assert id_usuario_inserido is not None
         usuario_inserido = obter_usuario_por_id(id_usuario_inserido)
+        assert usuario_inserido is not None
         #Act
         usuario_inserido.nome = "Usuario Atualizado"
         resultado = atualizar_usuario(usuario_inserido)
         #Assert
         assert resultado == True, "A alteração do usuário deveria retornar True"
+        assert id_usuario_inserido is not None
         usuario_db = obter_usuario_por_id(id_usuario_inserido)
+        assert usuario_db is not None
         assert usuario_db.nome == "Usuario Atualizado", "O nome do usuário alterado não confere"
 
     def test_obter_usuario_por_email(self, test_db):
             # Arrange
             criar_tabela_usuario()
             email_unico = "email_unico_para_teste@email.com"
-            usuario_teste = Usuario(0, "Usuario Unico", email_unico, "senha", "11122233344", "77777777777", datetime.now(), "Endereco Unico", "cliente")
+            usuario_teste = Usuario(0, "Usuario Unico", email_unico, "senha", "11122233344", "77777777777", "88888-888", "Rua Teste", "123", "", "Bairro Teste", "Cidade Teste", "ES", "cliente", datetime.now().isoformat())
             inserir_usuario(usuario_teste)
             # Act
             usuario_db = obter_usuario_por_email(email_unico)
@@ -62,16 +69,23 @@ class TestUsuarioRepo:
             senha="senha_id",
             cpf_cnpj="55544433322",
             telefone="11222334455",
-            data_cadastro=datetime.now(),
-            endereco="Endereco Teste ID",
-            tipo_usuario="cliente"
-            
+            cep="88888-888",
+            rua="Rua Teste",
+            numero="123",
+            complemento="",
+            bairro="Bairro Teste",
+            cidade="Cidade Teste",
+            estado="ES",
+            tipo_usuario="cliente",
+            data_cadastro=datetime.now().isoformat()
         )
         id_inserido = inserir_usuario(usuario_original)
         # Act
+        assert id_inserido is not None
         usuario_encontrado = obter_usuario_por_id(id_inserido)
         # Assert
         assert usuario_encontrado is not None, "A busca por ID não deveria retornar None"
+        assert id_inserido is not None
         assert usuario_encontrado.id == id_inserido, "O ID do usuário encontrado não corresponde ao ID inserido"
         assert usuario_encontrado.email == email_unico, "O email do usuário encontrado não corresponde ao original"
         assert usuario_encontrado.nome == "Usuario ID Test", "O nome do usuário encontrado não corresponde ao original"
@@ -85,11 +99,17 @@ class TestUsuarioRepo:
                     nome=f"Usuario {i}",
                     email=f"usuario{i}@email.com",
                     senha="senha",
-                    cpf_cnpj=f"000000000{i:02d}", 
+                    cpf_cnpj=f"000000000{i:02d}",
                     telefone=f"999999999{i:02d}",
-                    data_cadastro=datetime.now(),
-                    endereco=f"Rua {i}",
-                    tipo_usuario=1
+                    cep="88888-888",
+                    rua=f"Rua {i}",
+                    numero="123",
+                    complemento="",
+                    bairro="Bairro Teste",
+                    cidade="Cidade Teste",
+                    estado="ES",
+                    tipo_usuario="1",
+                    data_cadastro=datetime.now().isoformat()
                 )
                 inserir_usuario(usuario)
             # Act
@@ -125,9 +145,15 @@ class TestUsuarioRepo:
             senha="123",
             cpf_cnpj="987654321",
             telefone="555444333",
-            data_cadastro=datetime.now(),
-            endereco="Rua dos Testes",
-            tipo_usuario="Cliente"  
+            cep="88888-888",
+            rua="Rua Teste",
+            numero="123",
+            complemento="",
+            bairro="Bairro Teste",
+            cidade="Cidade Teste",
+            estado="ES",
+            tipo_usuario="Cliente",
+            data_cadastro=datetime.now().isoformat()
         )
         id_inserido = inserir_usuario(usuario_original)
         assert id_inserido is not None and id_inserido > 0, "Falha ao inserir usuário para o teste."
@@ -154,9 +180,15 @@ class TestUsuarioRepo:
                 senha=senha_antiga,
                 cpf_cnpj="192837465",
                 telefone="11223344",
-                data_cadastro=datetime.now(),
-                endereco="Rua da Senha",
-                tipo_usuario="Cliente"
+                cep="88888-888",
+                rua="Rua Teste",
+                numero="123",
+                complemento="",
+                bairro="Bairro Teste",
+                cidade="Cidade Teste",
+                estado="ES",
+                tipo_usuario="Cliente",
+                data_cadastro=datetime.now().isoformat()
             )
             id_inserido = inserir_usuario(usuario_original)
             assert id_inserido is not None, "Falha ao inserir usuário de teste."
@@ -183,9 +215,15 @@ class TestUsuarioRepo:
                 senha="senha_temp",
                 cpf_cnpj="000000000",
                 telefone="00000000",
-                data_cadastro=datetime.now(),
-                endereco="Endereco a ser deletado",
-                tipo_usuario="Excluido"
+                cep="88888-888",
+                rua="Rua Teste",
+                numero="123",
+                complemento="",
+                bairro="Bairro Teste",
+                cidade="Cidade Teste",
+                estado="ES",
+                tipo_usuario="Excluido",
+                data_cadastro=datetime.now().isoformat()
             )
             id_inserido = inserir_usuario(usuario_para_deletar)
             assert id_inserido is not None, "Falha ao inserir o usuário que seria deletado."

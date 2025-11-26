@@ -1,6 +1,274 @@
 {% extends "cliente/base.html" %}
-{% block titulo %}Perfil{% endblock %}
+
+{#
+    Template: Perfil do Cliente
+    Descrição: Visualização do perfil e histórico do cliente
+    Estende: cliente/base.html
+#}
+
+{% from 'components/breadcrumbs.html' import breadcrumbs %}
+{% from 'components/stats_card.html' import stats_card, stats_row %}
+{% from 'components/timeline.html' import timeline %}
+
+{% block titulo %}Meu Perfil{% endblock %}
+
 {% block conteudo %}
-<h1 class="h3">Perfil</h1>
-<p>Esta página está em construção.</p>
+<div class="container-fluid px-4 py-4">
+    <!-- Breadcrumbs -->
+    {{ breadcrumbs(items=[
+        {'text': 'Home', 'url': '/cliente/home'},
+        {'text': 'Meu Perfil', 'active': True}
+    ]) }}
+
+    <!-- Profile Header -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-md-auto text-center mb-3 mb-md-0">
+                    <!-- Avatar -->
+                    {% if usuario.foto %}
+                    <img src="{{ usuario.foto }}" alt="{{ usuario.nome }}"
+                         class="rounded-circle border border-3 border-primary"
+                         width="120" height="120">
+                    {% else %}
+                    <div class="rounded-circle border border-3 border-primary bg-light d-inline-flex align-items-center justify-content-center"
+                         style="width: 120px; height: 120px;">
+                        <i class="bi bi-person-fill text-secondary" style="font-size: 4rem;"></i>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="col-md">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h2 class="mb-1">{{ usuario.nome|default("Nome do Cliente") }}</h2>
+                            <p class="text-muted mb-2">
+                                <i class="bi bi-envelope me-1"></i>{{ usuario.email }}
+                            </p>
+                            {% if usuario.telefone %}
+                            <p class="text-muted mb-2">
+                                <i class="bi bi-telephone me-1"></i>{{ usuario.telefone }}
+                            </p>
+                            {% endif %}
+                            <div class="mb-2">
+                                <span class="badge bg-primary">Cliente</span>
+                                <span class="badge bg-success">Ativo desde {{ usuario.data_cadastro|default("2024") }}</span>
+                            </div>
+                        </div>
+                        <div>
+                            <a href="/cliente/perfil/editar" class="btn btn-outline-primary">
+                                <i class="bi bi-pencil me-2"></i>Editar Perfil
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics -->
+    {% call stats_row() %}
+        {{ stats_card(
+            title='Contratações',
+            value=estatisticas.total_contratacoes|default('0'),
+            icon='briefcase',
+            icon_class='text-primary'
+        ) }}
+
+        {{ stats_card(
+            title='Em Andamento',
+            value=estatisticas.em_andamento|default('0'),
+            icon='arrow-repeat',
+            icon_class='text-info'
+        ) }}
+
+        {{ stats_card(
+            title='Concluídas',
+            value=estatisticas.concluidas|default('0'),
+            icon='check-circle',
+            icon_class='text-success'
+        ) }}
+
+        {{ stats_card(
+            title='Total Gasto',
+            value='R$ ' ~ (estatisticas.total_gasto|default('0.00')),
+            icon='cash-coin',
+            icon_class='text-warning'
+        ) }}
+    {% endcall %}
+
+    <div class="row mt-4">
+        <!-- Informações Pessoais -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-person-vcard text-primary me-2"></i>
+                        Informações Pessoais
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-sm-4 text-muted">Nome Completo:</div>
+                        <div class="col-sm-8 fw-semibold">{{ usuario.nome|default("-") }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4 text-muted">Email:</div>
+                        <div class="col-sm-8">{{ usuario.email|default("-") }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4 text-muted">Telefone:</div>
+                        <div class="col-sm-8">{{ usuario.telefone|default("-") }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4 text-muted">CPF:</div>
+                        <div class="col-sm-8">{{ usuario.cpf|default("-") }}</div>
+                    </div>
+                    <div class="row mb-0">
+                        <div class="col-sm-4 text-muted">Membro desde:</div>
+                        <div class="col-sm-8">{{ usuario.data_cadastro|default("-") }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Endereço -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-geo-alt text-danger me-2"></i>
+                        Endereço
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if usuario.endereco %}
+                    <div class="row mb-3">
+                        <div class="col-sm-4 text-muted">Logradouro:</div>
+                        <div class="col-sm-8">{{ usuario.endereco.logradouro|default("-") }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4 text-muted">Bairro:</div>
+                        <div class="col-sm-8">{{ usuario.endereco.bairro|default("-") }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4 text-muted">Cidade:</div>
+                        <div class="col-sm-8">{{ usuario.endereco.cidade|default("-") }}, {{ usuario.endereco.estado|default("-") }}</div>
+                    </div>
+                    <div class="row mb-0">
+                        <div class="col-sm-4 text-muted">CEP:</div>
+                        <div class="col-sm-8">{{ usuario.endereco.cep|default("-") }}</div>
+                    </div>
+                    {% else %}
+                    <p class="text-muted fst-italic mb-0">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Nenhum endereço cadastrado.
+                        <a href="/cliente/perfil/editar">Adicionar endereço</a>
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Atividades Recentes -->
+    {% if atividades_recentes %}
+    <div class="card shadow-sm mt-4">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">
+                <i class="bi bi-clock-history text-info me-2"></i>
+                Atividades Recentes
+            </h5>
+        </div>
+        <div class="card-body">
+            {{ timeline(events=atividades_recentes) }}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Preferências -->
+    <div class="row mt-4">
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-gear text-secondary me-2"></i>
+                        Preferências
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" id="notifEmail"
+                               {{ 'checked' if usuario.preferencias.notif_email else '' }}>
+                        <label class="form-check-label" for="notifEmail">
+                            Receber notificações por email
+                        </label>
+                    </div>
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" id="notifSMS"
+                               {{ 'checked' if usuario.preferencias.notif_sms else '' }}>
+                        <label class="form-check-label" for="notifSMS">
+                            Receber notificações por SMS
+                        </label>
+                    </div>
+                    <div class="form-check form-switch mb-0">
+                        <input class="form-check-input" type="checkbox" id="newsletter"
+                               {{ 'checked' if usuario.preferencias.newsletter else '' }}>
+                        <label class="form-check-label" for="newsletter">
+                            Receber newsletter com novidades
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-shield-lock text-warning me-2"></i>
+                        Segurança
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <small class="text-muted">Senha:</small>
+                        <div>••••••••</div>
+                    </div>
+                    <a href="/cliente/perfil/alterar-senha" class="btn btn-outline-warning">
+                        <i class="bi bi-key me-2"></i>Alterar Senha
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+// Salvar preferências via AJAX
+document.querySelectorAll('.form-check-input').forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+        const preferencia = this.id;
+        const valor = this.checked;
+
+        fetch('/cliente/perfil/preferencias', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                [preferencia]: valor
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log('Preferência atualizada');
+            }
+        })
+        .catch(error => console.error('Erro:', error));
+    });
+});
+</script>
+{% endblock %}
 {% endblock %}

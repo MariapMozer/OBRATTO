@@ -1,0 +1,63 @@
+{#
+    Componente: Modal de Confirmação
+    Descrição: Modal reutilizável para confirmação de ações (exclusão, etc)
+
+    Parâmetros:
+    - modal_id: ID único do modal - padrão: 'confirmModal'
+    - title: Título do modal - padrão: 'Confirmar Ação'
+    - icon: Ícone Bootstrap - padrão: 'exclamation-triangle'
+    - icon_class: Classe CSS do ícone - padrão: 'text-warning'
+    - message: Mensagem do modal (suporta HTML) - padrão: 'Tem certeza que deseja continuar?'
+    - confirm_text: Texto do botão confirmar - padrão: 'Confirmar'
+    - confirm_class: Classe CSS do botão confirmar - padrão: 'btn-primary'
+    - cancel_text: Texto do botão cancelar - padrão: 'Cancelar'
+
+    Uso:
+    {% from 'components/confirmation_modal.html' import confirmation_modal %}
+
+    {{ confirmation_modal(
+        modal_id='deleteModal',
+        title='Confirmar Exclusão',
+        icon='trash',
+        icon_class='text-danger',
+        message='<p>Tem certeza que deseja excluir este item?</p>',
+        confirm_text='Excluir',
+        confirm_class='btn-danger'
+    ) }}
+#}
+
+{% macro confirmation_modal(
+    modal_id='confirmModal',
+    title='Confirmar Ação',
+    icon='exclamation-triangle',
+    icon_class='text-warning',
+    message='Tem certeza que deseja continuar?',
+    confirm_text='Confirmar',
+    confirm_class='btn-primary',
+    cancel_text='Cancelar'
+) %}
+<div class="modal fade" id="{{ modal_id }}" tabindex="-1" aria-labelledby="{{ modal_id }}Label" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="{{ modal_id }}Label">
+                    <i class="bi bi-{{ icon }} {{ icon_class }} me-2"></i>
+                    {{ title }}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                {{ message|safe }}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    {{ cancel_text }}
+                </button>
+                <button type="button" class="btn {{ confirm_class }}" id="{{ modal_id }}ConfirmBtn">
+                    {{ confirm_text }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endmacro %}

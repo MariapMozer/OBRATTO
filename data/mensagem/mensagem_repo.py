@@ -3,7 +3,11 @@ import sqlite3
 from typing import Optional, List
 from data.mensagem.mensagem_model import Mensagem
 from data.mensagem.mensagem_sql import *
-from utils.db import open_connection
+from util.db import open_connection
+
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def criar_tabela_mensagem() -> bool:
@@ -17,14 +21,17 @@ def criar_tabela_mensagem() -> bool:
 def inserir_mensagem(mensagem):
     with open_connection() as conn:
         cursor = conn.cursor()
-        cursor.execute(INSERIR_MENSAGEM, (
-            mensagem.id_remetente,
-            mensagem.id_destinatario,
-            mensagem.conteudo,
-            mensagem.data_hora.isoformat(),  # use string ISO para evitar warnings
-            mensagem.nome_remetente,
-            mensagem.nome_destinatario
-        ))
+        cursor.execute(
+            INSERIR_MENSAGEM,
+            (
+                mensagem.id_remetente,
+                mensagem.id_destinatario,
+                mensagem.conteudo,
+                mensagem.data_hora.isoformat(),  # use string ISO para evitar warnings
+                mensagem.nome_remetente,
+                mensagem.nome_destinatario,
+            ),
+        )
         conn.commit()
         return cursor.lastrowid
 
@@ -36,15 +43,17 @@ def obter_mensagem(usuario_id) -> List[Mensagem]:
         rows = cursor.fetchall()
         mensagens = []
         for row in rows:
-            mensagens.append(Mensagem(
-                id_mensagem=row["id_mensagem"],
-                id_remetente=row["id_remetente"],
-                id_destinatario=row["id_destinatario"],
-                conteudo=row["conteudo"],
-                data_hora=row["data_hora"],
-                nome_remetente=row["nome_remetente"],
-                nome_destinatario=row["nome_destinatario"]
-            ))
+            mensagens.append(
+                Mensagem(
+                    id_mensagem=row["id_mensagem"],
+                    id_remetente=row["id_remetente"],
+                    id_destinatario=row["id_destinatario"],
+                    conteudo=row["conteudo"],
+                    data_hora=row["data_hora"],
+                    nome_remetente=row["nome_remetente"],
+                    nome_destinatario=row["nome_destinatario"],
+                )
+            )
         return mensagens
 
 
@@ -53,7 +62,7 @@ def obter_mensagem_por_id(id_mensagem):
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM mensagem WHERE id_mensagem = ?", (id_mensagem,))
         row = cursor.fetchone()
-        print("Linha obtida do DB:", row) 
+        logger.debug("Linha obtida do DB: %s", row)
         if row:
             return Mensagem(
                 id_mensagem=row[0],
@@ -62,14 +71,15 @@ def obter_mensagem_por_id(id_mensagem):
                 conteudo=row[3],
                 data_hora=datetime.fromisoformat(row[4]),
                 nome_remetente=row[5],
-                nome_destinatario=row[6]
+                nome_destinatario=row[6],
             )
         return None
 
+
 def obter_mensagem_por_pagina(conn, limit: int, offset: int) -> list[Mensagem]:
-    conn.row_factory = sqlite3.Row 
+    conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
-    cursor.execute(OBTER_MENSAGEM_POR_PAGINA,(limit, offset))
+    cursor.execute(OBTER_MENSAGEM_POR_PAGINA, (limit, offset))
     rows = cursor.fetchall()
     return [
         Mensagem(
@@ -79,10 +89,11 @@ def obter_mensagem_por_pagina(conn, limit: int, offset: int) -> list[Mensagem]:
             conteudo=row["conteudo"],
             data_hora=datetime.fromisoformat(row[4]),
             nome_remetente=row["nome_remetente"],
-            nome_destinatario=row["nome_destinatario"]
+            nome_destinatario=row["nome_destinatario"],
         )
         for row in rows
     ]
+
 
 def atualizar_mensagem(mensagem: Mensagem) -> bool:
     """
@@ -90,13 +101,16 @@ def atualizar_mensagem(mensagem: Mensagem) -> bool:
     """
     with open_connection() as conn:
         cursor = conn.cursor()
-        cursor.execute(ATUALIZAR_MENSAGEM, (
-            mensagem.id_remetente,
-            mensagem.id_destinatario,
-            mensagem.conteudo,
-            mensagem.data_hora,
-            mensagem.id_mensagem
-        ))
+        cursor.execute(
+            ATUALIZAR_MENSAGEM,
+            (
+                mensagem.id_remetente,
+                mensagem.id_destinatario,
+                mensagem.conteudo,
+                mensagem.data_hora,
+                mensagem.id_mensagem,
+            ),
+        )
         conn.commit()
         return cursor.rowcount > 0
 

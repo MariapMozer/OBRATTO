@@ -1,0 +1,393 @@
+{% extends "administrador/base_admin.html" %}
+{% block admin_css %}<link rel="stylesheet" href="/static/css/moderar_fornecedor.css">{% endblock %}
+{% block admin_titulo %}Moderação de Fornecedores{% endblock %}
+{% block admin_conteudo %}
+<main class="container-fluid p-0">
+    <section class="hero-section">
+        <div class="container">
+            <div class="text-center">
+                <h1 class="hero-title">
+                    <i class="bi bi-building-check me-3"></i>
+                    Moderação de Fornecedores
+                </h1>
+                <p class="hero-subtitle">Gerencie fornecedores, verifique documentos e modere denúncias</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="container">
+        <div class="estatisticas">
+            <div class="row">
+                <div class="col-lg-2 col-md-4 col-6">
+                    <div class="estatistica-item">
+                        <span class="estatistica-numero" id="totalFornecedores">89</span>
+                        <span class="estatistica-label">Total</span>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-4 col-6">
+                    <div class="estatistica-item">
+                        <span class="estatistica-numero text-warning" id="pendentes">12</span>
+                        <span class="estatistica-label">Pendentes</span>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-4 col-6">
+                    <div class="estatistica-item">
+                        <span class="estatistica-numero text-success" id="aprovados">65</span>
+                        <span class="estatistica-label">Aprovados</span>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-4 col-6">
+                    <div class="estatistica-item">
+                        <span class="estatistica-numero text-danger" id="rejeitados">7</span>
+                        <span class="estatistica-label">Rejeitados</span>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-4 col-6">
+                    <div class="estatistica-item">
+                        <span class="estatistica-numero" style="color: #fd7e14;" id="advertidos">3</span>
+                        <span class="estatistica-label">Advertidos</span>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-4 col-6">
+                    <div class="estatistica-item">
+                        <span class="estatistica-numero" style="color: #6f42c1;" id="banidos">2</span>
+                        <span class="estatistica-label">Banidos</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="filtros-section">
+        <div class="container">
+            <div class="search-container">
+                <div class="row g-3">
+                    <div class="col-lg-4">
+                        <input type="text" class="search-input" id="buscarFornecedor" placeholder="Buscar por nome, CNPJ ou razão social...">
+                    </div>
+                    <div class="col-lg-2">
+                        <select class="filtro-select form-select" id="filtroStatus">
+                            <option value="">Todos os Status</option>
+                            <option value="pendente">Pendentes</option>
+                            <option value="aprovado">Aprovados</option>
+                            <option value="rejeitado">Rejeitados</option>
+                            <option value="advertido">Advertidos</option>
+                            <option value="banido">Banidos</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-2">
+                        <select class="filtro-select form-select" id="filtroDenuncias">
+                            <option value="">Todas as Denúncias</option>
+                            <option value="com_denuncias">Com Denúncias</option>
+                            <option value="sem_denuncias">Sem Denúncias</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-2">
+                        <select class="filtro-select form-select" id="filtroData">
+                            <option value="">Todas as Datas</option>
+                            <option value="hoje">Hoje</option>
+                            <option value="semana">Esta Semana</option>
+                            <option value="mes">Este Mês</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-2">
+                        <button class="btn btn-primary w-100" onclick="aplicarFiltros()">
+                            <i class="bi bi-funnel me-2"></i>Filtrar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="fornecedores-section">
+        <div class="container">
+            <div id="listaFornecedores">
+                <div class="fornecedor-card pendente" data-status="pendente" data-denuncias="0">
+                    <div class="fornecedor-header">
+                        <h3 class="fornecedor-nome">Materiais São Paulo Ltda</h3>
+                        <span class="fornecedor-status status-pendente">Pendente</span>
+                    </div>
+                    <div class="fornecedor-info">
+                        <div class="info-item">
+                            <i class="bi bi-building"></i>
+                            <span>CNPJ: 12.345.678/0001-90</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="bi bi-calendar"></i>
+                            <span>Cadastro: 28/01/2025</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="bi bi-geo-alt"></i>
+                            <span>São Paulo, SP</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="bi bi-telephone"></i>
+                            <span>(11) 3333-3333</span>
+                        </div>
+                    </div>
+                    <div class="fornecedor-dados">
+                        <div class="dados-row">
+                            <span class="dados-label">Razão Social:</span>
+                            <span class="dados-valor">Materiais São Paulo Ltda</span>
+                        </div>
+                        <div class="dados-row">
+                            <span class="dados-label">Responsável:</span>
+                            <span class="dados-valor">Carlos Silva</span>
+                        </div>
+                        <div class="dados-row">
+                            <span class="dados-label">Email:</span>
+                            <span class="dados-valor">contato@materiaissp.com.br</span>
+                        </div>
+                        <div class="dados-row">
+                            <span class="dados-label">Documentos:</span>
+                            <span class="dados-valor">
+                                <span class="documento-status doc-pendente">3 Pendentes</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="fornecedor-acoes">
+                        <button class="btn btn-detalhes" onclick="verDetalhes(1)">
+                            <i class="bi bi-eye me-1"></i>Detalhes
+                        </button>
+                        <button class="btn btn-aprovar" onclick="aprovarFornecedor(1)">
+                            <i class="bi bi-check-lg me-1"></i>Aprovar
+                        </button>
+                        <button class="btn btn-rejeitar" onclick="rejeitarFornecedor(1)">
+                            <i class="bi bi-x-lg me-1"></i>Rejeitar
+                        </button>
+                    </div>
+                </div>
+
+                <div class="fornecedor-card aprovado" data-status="aprovado" data-denuncias="2">
+                    <div class="fornecedor-header">
+                        <h3 class="fornecedor-nome">Construmax Materiais</h3>
+                        <div class="d-flex gap-2 align-items-center">
+                            <span class="denuncias-badge">2 Denúncias</span>
+                            <span class="fornecedor-status status-aprovado">Aprovado</span>
+                        </div>
+                    </div>
+                    <div class="fornecedor-info">
+                        <div class="info-item">
+                            <i class="bi bi-building"></i>
+                            <span>CNPJ: 98.765.432/0001-10</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="bi bi-calendar"></i>
+                            <span>Cadastro: 15/01/2025</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="bi bi-geo-alt"></i>
+                            <span>Rio de Janeiro, RJ</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="bi bi-exclamation-triangle text-danger"></i>
+                            <span>Requer atenção</span>
+                        </div>
+                    </div>
+                    <div class="fornecedor-dados">
+                        <div class="dados-row">
+                            <span class="dados-label">Razão Social:</span>
+                            <span class="dados-valor">Construmax Materiais de Construção Ltda</span>
+                        </div>
+                        <div class="dados-row">
+                            <span class="dados-label">Responsável:</span>
+                            <span class="dados-valor">Ana Santos</span>
+                        </div>
+                        <div class="dados-row">
+                            <span class="dados-label">Email:</span>
+                            <span class="dados-valor">vendas@construmax.com.br</span>
+                        </div>
+                        <div class="dados-row">
+                            <span class="dados-label">Documentos:</span>
+                            <span class="dados-valor">
+                                <span class="documento-status doc-verificado">Verificados</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="fornecedor-acoes">
+                        <button class="btn btn-detalhes" onclick="verDetalhes(2)">
+                            <i class="bi bi-eye me-1"></i>Detalhes
+                        </button>
+                        <button class="btn btn-advertir" onclick="advertirFornecedor(2)">
+                            <i class="bi bi-exclamation-triangle me-1"></i>Advertir
+                        </button>
+                        <button class="btn btn-banir" onclick="banirFornecedor(2)">
+                            <i class="bi bi-ban me-1"></i>Banir
+                        </button>
+                    </div>
+                </div>
+
+                <div class="fornecedor-card advertido" data-status="advertido" data-denuncias="1">
+                    <div class="fornecedor-header">
+                        <h3 class="fornecedor-nome">Ferro & Aço Distribuidora</h3>
+                        <div class="d-flex gap-2 align-items-center">
+                            <span class="advertencias-badge">1 Advertência</span>
+                            <span class="fornecedor-status status-advertido">Advertido</span>
+                        </div>
+                    </div>
+                    <div class="fornecedor-info">
+                        <div class="info-item">
+                            <i class="bi bi-building"></i>
+                            <span>CNPJ: 11.222.333/0001-44</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="bi bi-calendar"></i>
+                            <span>Cadastro: 10/01/2025</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="bi bi-geo-alt"></i>
+                            <span>Belo Horizonte, MG</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="bi bi-shield-exclamation text-warning"></i>
+                            <span>Em observação</span>
+                        </div>
+                    </div>
+                    <div class="fornecedor-dados">
+                        <div class="dados-row">
+                            <span class="dados-label">Razão Social:</span>
+                            <span class="dados-valor">Ferro & Aço Distribuidora Ltda</span>
+                        </div>
+                        <div class="dados-row">
+                            <span class="dados-label">Responsável:</span>
+                            <span class="dados-valor">João Ferreira</span>
+                        </div>
+                        <div class="dados-row">
+                            <span class="dados-label">Email:</span>
+                            <span class="dados-valor">contato@ferroaco.com.br</span>
+                        </div>
+                        <div class="dados-row">
+                            <span class="dados-label">Última Advertência:</span>
+                            <span class="dados-valor">25/01/2025 - Atraso na entrega</span>
+                        </div>
+                    </div>
+                    <div class="fornecedor-acoes">
+                        <button class="btn btn-detalhes" onclick="verDetalhes(3)">
+                            <i class="bi bi-eye me-1"></i>Detalhes
+                        </button>
+                        <button class="btn btn-banir" onclick="banirFornecedor(3)">
+                            <i class="bi bi-ban me-1"></i>Banir
+                        </button>
+                    </div>
+                </div>
+
+                <div class="fornecedor-card aprovado" data-status="aprovado" data-denuncias="0">
+                    <div class="fornecedor-header">
+                        <h3 class="fornecedor-nome">Cimento & Cia</h3>
+                        <span class="fornecedor-status status-aprovado">Aprovado</span>
+                    </div>
+                    <div class="fornecedor-info">
+                        <div class="info-item">
+                            <i class="bi bi-building"></i>
+                            <span>CNPJ: 55.666.777/0001-88</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="bi bi-calendar"></i>
+                            <span>Cadastro: 05/01/2025</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="bi bi-geo-alt"></i>
+                            <span>Curitiba, PR</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="bi bi-check-circle text-success"></i>
+                            <span>Em conformidade</span>
+                        </div>
+                    </div>
+                    <div class="fornecedor-dados">
+                        <div class="dados-row">
+                            <span class="dados-label">Razão Social:</span>
+                            <span class="dados-valor">Cimento & Cia Materiais Ltda</span>
+                        </div>
+                        <div class="dados-row">
+                            <span class="dados-label">Responsável:</span>
+                            <span class="dados-valor">Maria Oliveira</span>
+                        </div>
+                        <div class="dados-row">
+                            <span class="dados-label">Email:</span>
+                            <span class="dados-valor">vendas@cimentoecia.com.br</span>
+                        </div>
+                        <div class="dados-row">
+                            <span class="dados-label">Avaliação:</span>
+                            <span class="dados-valor">⭐⭐⭐⭐⭐ (4.8/5.0)</span>
+                        </div>
+                    </div>
+                    <div class="fornecedor-acoes">
+                        <button class="btn btn-detalhes" onclick="verDetalhes(4)">
+                            <i class="bi bi-eye me-1"></i>Detalhes
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="paginacao">
+                <ul class="pagination">
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1">Anterior</a>
+                    </li>
+                    <li class="page-item active">
+                        <a class="page-link" href="#">1</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">2</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">3</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">Próximo</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </section>
+</main>
+
+<div class="modal fade" id="modalDetalhes" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-info-circle me-2"></i>
+                    Detalhes do Fornecedor
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="modalDetalhesContent">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                <div id="modalAcoes">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalConfirmacao" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalConfirmacaoTitulo">Confirmar Ação</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p id="modalConfirmacaoTexto"></p>
+                <div id="motivoContainer" style="display: none;">
+                    <label for="motivoAcao" class="form-label">Motivo:</label>
+                    <textarea class="form-control" id="motivoAcao" rows="3" placeholder="Descreva o motivo da ação..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btnConfirmarAcao">Confirmar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %} <script src="/static/js/moderar_fornecedor.js"></script> {% endblock %}
+{% endblock %}
+
+

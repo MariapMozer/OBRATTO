@@ -1,15 +1,123 @@
-.venv
-venv
-__pycache__
-*.pyc
-*.pyo
-*.pyd
-[env]
+# ============================================
+# Python
+# ============================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# ============================================
+# Virtual Environments
+# ============================================
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+
+# ============================================
+# IDEs
+# ============================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# ============================================
+# Environment Variables
+# ============================================
 .env
-# Ignorar bancos de dados
+.env.local
+.env.*.local
+.claude
+
+# ============================================
+# Database
+# ============================================
 *.db
+*.sqlite
 *.sqlite3
-# Ignorar arquivos temporários
+obratto.db
+test_obratto.db
+*.db-shm
+*.db-wal
+
+# ============================================
+# Logs
+# ============================================
 *.log
-*.tmp
+logs/
+*.log.*
+
+# ============================================
+# Testing
+# ============================================
 .pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+.hypothesis/
+
+# ============================================
+# Jupyter Notebook
+# ============================================
+.ipynb_checkpoints
+
+# ============================================
+# Temporary Files
+# ============================================
+*.tmp
+*.temp
+.cache/
+
+# ============================================
+# Uploads e Mídia
+# ============================================
+static/img/produto/*/
+static/img/servico/*/
+uploads/
+
+# ============================================
+# Sistema Operacional
+# ============================================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ============================================
+# Backup Files
+# ============================================
+*.backup
+*.bak
+*~
+
+# ============================================
+# Project Specific
+# ============================================
+# Mantenha o backup da refatoração por enquanto
+# routes/publico/publico_routes.py.backup

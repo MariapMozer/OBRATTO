@@ -1,0 +1,34 @@
+{#
+    Componente: Breadcrumbs
+    Descrição: Navegação breadcrumb reutilizável
+
+    Parâmetros:
+    - items: Lista de items do breadcrumb [{'label': 'Texto', 'url': '/path'}]
+            O último item não deve ter URL (será o item ativo)
+
+    Uso:
+    {% from 'components/breadcrumbs.html' import breadcrumbs %}
+
+    {{ breadcrumbs([
+        {'label': 'Home', 'url': '/'},
+        {'label': 'Produtos', 'url': '/produtos'},
+        {'label': 'Editar Produto'}
+    ]) }}
+#}
+
+{% macro breadcrumbs(items) %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        {% for item in items %}
+        <li class="breadcrumb-item {% if loop.last %}active{% endif %}"
+            {% if loop.last %}aria-current="page"{% endif %}>
+            {% if not loop.last and item.url %}
+            <a href="{{ item.url }}">{{ item.label }}</a>
+            {% else %}
+            {{ item.label }}
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ol>
+</nav>
+{% endmacro %}
