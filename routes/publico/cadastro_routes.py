@@ -1,3 +1,4 @@
+
 """
 Rotas de cadastro de prestador, cliente e fornecedor
 """
@@ -61,7 +62,7 @@ async def processar_cadastro_prestador(
     bairro: str = Form(...),
     senha: str = Form(...),
     cep: str = Form(...),
-    confirmarSenha: str = Form(...),
+    confirmar_senha: str = Form(...),
     documento: str = Form(...),
     area_atuacao: str = Form(...),
     razao_social: Optional[str] = Form(None),
@@ -98,7 +99,7 @@ async def processar_cadastro_prestador(
             bairro=bairro,
             cep=cep,
             senha=senha,
-            confirmar_senha=confirmarSenha,
+            confirmar_senha=confirmar_senha,
             cpf_cnpj=documento,
             area_atuacao=area_atuacao,
             razao_social=razao_social,
@@ -213,7 +214,6 @@ async def get_page(request: Request):
     return templates.TemplateResponse(
         "public/cadastro/cliente.html", {"request": request, "dados": None, "usuario_logado": usuario_logado}
     )
-
 
 # Rota para processar o formulário de cadastro
 @router.post("/cadastro/cliente")
