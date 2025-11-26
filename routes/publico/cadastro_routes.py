@@ -382,7 +382,15 @@ async def post_cadastro(
 async def exibir_cadastro_fornecedor(request: Request):
     usuario_logado = obter_usuario_logado(request)
     return templates.TemplateResponse(
-        "public/cadastro/fornecedor.html", {"request": request, "usuario_logado": usuario_logado}
+        "public/cadastro/fornecedor.html", {
+            "request": request, 
+            "dados": None, 
+            "usuario_logado": usuario_logado,
+            "erros": None,
+            "campos_erro": {},
+            "erros_list": [],
+            "sucesso": None,
+        }
     )
 
 
@@ -468,17 +476,7 @@ async def processar_cadastro_fornecedor(
                 status_code=status.HTTP_400_BAD_REQUEST,
             )
 
-        # Verificar se senhas coincidem (usar valores do DTO)
-        if fornecedor_dto.senha != fornecedor_dto.confirmar_senha:
-            return templates.TemplateResponse(
-                "public/cadastro/fornecedor.html",
-                {
-                    "request": request,
-                    "erro": "As senhas não coincidem.",
-                    "dados": dados_formulario,
-                },
-                status_code=status.HTTP_400_BAD_REQUEST,
-            )
+
 
         # Verificar se email já existe (usar email validado pelo DTO)
         if fornecedor_repo.obter_fornecedor_por_email(fornecedor_dto.email):
