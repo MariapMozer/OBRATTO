@@ -10,10 +10,6 @@ body {
     color: #333333;
 }
 
-.fundo-azul {
-    background: white;
-}
-
 .navbar-brand img {
     height: 25px;
     transition: transform 0.3s ease;
