@@ -45,7 +45,15 @@ async def exibir_cadastro_administrador(
     request: Request, usuario_logado: Optional[dict] = None
 ):
     return templates.TemplateResponse(
-        "admin/usuarios/administradores/cadastrar.html", {"request": request, "usuario_logado": usuario_logado}
+        "admin/usuarios/administradores/cadastrar.html", {
+            "request": request, 
+            "usuario_logado": usuario_logado,
+            "dados": None,
+            "erro": None,
+            "campos_erro": {},
+            "erros_list": [],
+            "sucesso": None,
+        }
     )
 
 
