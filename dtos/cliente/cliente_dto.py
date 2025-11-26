@@ -22,6 +22,7 @@ class CriarClienteDTO(CriarUsuarioDTO):
     @field_validator("data_nascimento")
     @classmethod
     def validar_data_nascimento(cls, v: Optional[date]) -> Optional[date]:
+        # A função validar_data_nascimento já foi corrigida para incluir a verificação de idade mínima (16 anos por padrão)
         return cls.validar_campo_wrapper(validar_data_nascimento, "Data de nascimento")(
             v
         )

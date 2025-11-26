@@ -14,6 +14,56 @@ class ValidacaoError(ValueError):
     pass
 
 
+def _calcular_digito_verificador(documento: str, pesos: list[int]) -> int:
+    """Função auxiliar para calcular o dígito verificador de CPF/CNPJ."""
+    soma = 0
+    for i, peso in enumerate(pesos):
+        soma += int(documento[i]) * peso
+    
+    resto = soma % 11
+    return 0 if resto < 2 else 11 - resto
+
+def _validar_cpf(cpf: str) -> bool:
+    """Valida o CPF com cálculo do dígito verificador."""
+    # Elimina CPFs com todos os dígitos iguais
+    if cpf in [s * 11 for s in "0123456789"]:
+        return False
+
+    # Validação do primeiro dígito
+    pesos1 = list(range(10, 1, -1))
+    digito1 = _calcular_digito_verificador(cpf[:9], pesos1)
+    if int(cpf[9]) != digito1:
+        return False
+
+    # Validação do segundo dígito
+    pesos2 = list(range(11, 1, -1))
+    digito2 = _calcular_digito_verificador(cpf[:10], pesos2)
+    if int(cpf[10]) != digito2:
+        return False
+
+    return True
+
+def _validar_cnpj(cnpj: str) -> bool:
+    """Valida o CNPJ com cálculo do dígito verificador."""
+    # Elimina CNPJs com todos os dígitos iguais
+    if cnpj in [s * 14 for s in "0123456789"]:
+        return False
+
+    # Validação do primeiro dígito
+    pesos1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]
+    digito1 = _calcular_digito_verificador(cnpj[:12], pesos1)
+    if int(cnpj[12]) != digito1:
+        return False
+
+    # Validação do segundo dígito
+    pesos2 = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]
+    digito2 = _calcular_digito_verificador(cnpj[:13], pesos2)
+    if int(cnpj[13]) != digito2:
+        return False
+
+    return True
+
+
 def validar_cpf_cnpj(valor: Optional[str], campo: str = "CPF/CNPJ") -> Optional[str]:
     """
     Valida CPF ou CNPJ brasileiro com dígitos verificadores.
@@ -34,9 +84,13 @@ def validar_cpf_cnpj(valor: Optional[str], campo: str = "CPF/CNPJ") -> Optional[
     documento = re.sub(r'[^0-9]', '', valor)
 
     if len(documento) == 11:
-        return validar_cpf_cnpj(documento)
+        if not _validar_cpf(documento):
+            raise ValidacaoError(f"CPF inválido")
+        return documento
     elif len(documento) == 14:
-        return validar_cpf_cnpj(documento)
+        if not _validar_cnpj(documento):
+            raise ValidacaoError(f"CNPJ inválido")
+        return documento
     else:
         raise ValidacaoError(f"{campo} deve conter 11 dígitos (CPF) ou 14 dígitos (CNPJ)")
 
@@ -138,16 +192,16 @@ def validar_nome_pessoa(nome: str, min_chars: int = 2, max_chars: int = 100) -> 
     if len(palavras) < 2:
         raise ValidacaoError(f'Nome deve ter pelo menos nome e sobrenome')
     
-    nome_limpo = ''.join(nome.split())
+    nome_limpo = ' '.join(palavras) # Corrigido para manter os espaços entre as palavras
+    
     if len(nome_limpo) < min_chars:
         raise ValidacaoError(f'Nome deve ter pelo menos {min_chars} caracteres')
     
     if len(nome_limpo) > max_chars:
         raise ValidacaoError(f'Nome deve ter no máximo {max_chars} caracteres')
 
-
     # Verificar se contém apenas letras, espaços e acentos
-    if not re.match(r'^[a-zA-ZÀ-ÿ\s]+$', nome_limpo):
+    if not re.match(r'^[a-zA-ZÀ-ÿ\s]+$', nome): # Usar o nome original para a verificação de caracteres
         raise ValidacaoError('Nome deve conter apenas letras e espaços')
 
     return nome_limpo
@@ -343,7 +397,7 @@ def validar_cep(cep: Optional[str]) -> Optional[str]:
     cep_limpo = re.sub(r'[^0-9]', '', cep)
 
     if len(cep_limpo) != 8:
-        raise ValidacaoError('CEP deve conter exatamente 8 dígitos')
+        raise ValidacaoError('CEP deve ter 8 dígitos')
 
     return cep_limpo
 
@@ -377,7 +431,6 @@ def validar_senha(senha: Optional[str], min_chars: int = 6, max_chars: int = 128
         raise ValidacaoError(f'Senha deve ter no máximo {max_chars} caracteres')
 
     return senha
-
 
 
 def validar_senha_forte(senha: Optional[str], min_chars: int = 8, max_chars: int = 128,
@@ -576,10 +629,9 @@ VALIDADOR_SENHA = ValidadorWrapper.criar_validador(validar_senha, "Senha")  # B�
 VALIDADOR_SENHA_FORTE = ValidadorWrapper.criar_validador(validar_senha_forte, None)  # Forte (para cadastro)
 VALIDADOR_CPF_CNPJ = ValidadorWrapper.criar_validador(validar_cpf_cnpj, "CPF/CNPJ")
 VALIDADOR_TELEFONE = ValidadorWrapper.criar_validador_opcional(validar_telefone, "Telefone")
-VALIDADOR_CEP = ValidadorWrapper.criar_validador_opcional(lambda v, c: v, "CEP")  # Pode ser validado externamente
+VALIDADOR_CEP = ValidadorWrapper.criar_validador_opcional(validar_cep, "CEP") # Corrigido para usar a função validar_cep
 VALIDADOR_NUMERO = ValidadorWrapper.criar_validador_opcional(validar_numero, "Numero")
 VALIDADOR_COMPLEMENTO = ValidadorWrapper.criar_validador_opcional(validar_texto_opcional, "Complemento", max_chars=100)
 VALIDADOR_BAIRRO = ValidadorWrapper.criar_validador(validar_texto_obrigatorio, "Bairro", min_chars=2, max_chars=100)
 VALIDADOR_CIDADE = ValidadorWrapper.criar_validador(validar_texto_obrigatorio, "Cidade", min_chars=2, max_chars=100)
 VALIDADOR_ESTADO = ValidadorWrapper.criar_validador(validar_estado_brasileiro, "Estado")
-
