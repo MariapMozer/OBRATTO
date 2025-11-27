@@ -33,7 +33,8 @@ SELECT
     u.data_cadastro,
     f.razao_social,
     f.selo_confianca,
-    u.tipo_usuario
+    u.tipo_usuario,
+    u.foto
 FROM fornecedor f
 JOIN usuario u ON f.id = u.id
 ORDER BY u.nome;
@@ -58,7 +59,8 @@ SELECT
     u.data_cadastro,
     f.razao_social,
     f.selo_confianca,
-    u.tipo_usuario
+    u.tipo_usuario,
+    u.foto
 FROM fornecedor f
 JOIN usuario u ON f.id = u.id
 WHERE f.id = ?;
@@ -67,7 +69,7 @@ WHERE f.id = ?;
 
 OBTER_FORNECEDOR_POR_PAGINA = """
 SELECT u.id, u.nome, u.email, u.senha, u.cpf_cnpj, u.telefone, u.cep, u.complemento, u.estado, u.cidade, u.rua, u.numero, u.bairro,
-       u.data_cadastro, f.razao_social, f.selo_confianca, u.tipo_usuario
+       u.data_cadastro, f.razao_social, f.selo_confianca, u.tipo_usuario, u.foto
 FROM usuario u
 JOIN fornecedor f ON f.id = u.id
 ORDER BY f.razao_social

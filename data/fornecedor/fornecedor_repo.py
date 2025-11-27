@@ -69,6 +69,7 @@ def obter_fornecedor() -> List[Fornecedor]:
                         else False
                     ),
                     tipo_usuario=row["tipo_usuario"],
+                    foto=row["foto"] if "foto" in row.keys() else None,
                 )
             )
         return fornecedores
@@ -110,6 +111,7 @@ def obter_fornecedor_por_id(fornecedor_id: int) -> Optional[Fornecedor]:
                     else False
                 ),
                 tipo_usuario=row["tipo_usuario"],
+                foto=row["foto"] if "foto" in row.keys() else None,
             )
         return None
 

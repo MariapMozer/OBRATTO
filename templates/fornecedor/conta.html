@@ -3,44 +3,594 @@
 {% block fornecedor_titulo %}Minha Conta{% endblock %}
 {% block sidebar_active %}conta{% endblock %}
 
+{% block css %}
+<link rel="stylesheet" href="/static/css/home.css">
+<link rel="stylesheet" href="/static/css/home_fornecedor.css">
+{% endblock %}
+
 {% block fornecedor_conteudo %}
-<div class="container-fluid px-4 py-4">
-    <div class="row mb-4">
-        <div class="col-md-8">
-            <h1 class="h3">Configurações da Conta</h1>
-            <p class="text-muted">Informações privadas e faturamento.</p>
+<div class="container-fluid px-4">
+    <!-- Cabeçalho da Página -->
+    <div class="row mb-4 align-items-center">
+        <div class="col">
+            <h1 class="page-title">Configurações da Conta</h1>
+            <p class="page-subtitle">Gerenciar informações de login, dados bancários e preferências de segurança.</p>
+        </div>
+        <div class="col-auto text-end">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#mudarSenhaModal">
+                <i class="bi bi-lock me-2"></i> Alterar Senha
+            </button>
         </div>
     </div>
 
-    <div class="row g-4">
-        <div class="col-md-6">
-            <div class="card shadow-sm p-3">
+    <!-- Cards de Resumo -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 h-100">
                 <div class="card-body">
-                    <h5 class="card-title">Dados de Login</h5>
-                    <form action="/fornecedor/conta/atualizar-login" method="post">
-                        <div class="mb-3">
-                            <label class="form-label">E-mail</label>
-                            <input type="email" name="email" class="form-control" value="{{ fornecedor.email if fornecedor else '' }}">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Telefone</label>
-                            <input type="text" name="telefone" class="form-control" value="{{ fornecedor.telefone if fornecedor else '' }}">
-                        </div>
-                        <button class="btn btn-primary">Salvar</button>
-                    </form>
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <h5 class="card-title mb-0">Dados de Acesso</h5>
+                        <span class="badge bg-info"><i class="bi bi-shield-lock"></i></span>
+                    </div>
+                    <p class="card-text text-muted small">Informações de login e segurança</p>
+                    <a href="#dados-acesso" class="btn btn-sm btn-outline-primary mt-2">Editar</a>
                 </div>
             </div>
         </div>
-
-        <div class="col-md-6">
-            <div class="card shadow-sm p-3">
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 h-100">
                 <div class="card-body">
-                    <h5 class="card-title">Faturamento</h5>
-                    <p class="text-muted">Gerencie formas de pagamento e histórico de cobranças.</p>
-                    <a href="/fornecedor/pagamento/dados" class="btn btn-outline-secondary">Meus Dados de Pagamento</a>
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <h5 class="card-title mb-0">Dados Pessoais</h5>
+                        <span class="badge bg-warning"><i class="bi bi-person"></i></span>
+                    </div>
+                    <p class="card-text text-muted small">Informações de contato e perfil</p>
+                    <a href="#dados-pessoais" class="btn btn-sm btn-outline-warning mt-2">Editar</a>
                 </div>
             </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <h5 class="card-title mb-0">Faturamento</h5>
+                        <span class="badge bg-success"><i class="bi bi-credit-card"></i></span>
+                    </div>
+                    <p class="card-text text-muted small">Gerenciar pagamentos e cobranças</p>
+                    <a href="#faturamento" class="btn btn-sm btn-outline-success mt-2">Gerenciar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Seção: Dados de Acesso -->
+    <section id="dados-acesso" class="mb-5">
+        <div class="row">
+            <div class="col-12 mb-3">
+                <h3 class="section-title d-flex align-items-center gap-2">
+                    <i class="bi bi-shield-lock" style="color: var(--cor-secundaria)"></i>
+                    Dados de Acesso
+                </h3>
+            </div>
+        </div>
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">E-mail</h5>
+                        <form action="/fornecedor/conta/atualizar-email" method="post" class="form-update">
+                            <div class="mb-3">
+                                <label class="form-label fw-500">Endereço de E-mail</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="bi bi-envelope"></i>
+                                    </span>
+                                    <input 
+                                        type="email" 
+                                        name="email" 
+                                        class="form-control border-start-0" 
+                                        value="{{ usuario_logado.email if usuario_logado else '' }}"
+                                        required
+                                    >
+                                </div>
+                                <small class="text-muted d-block mt-2">
+                                    <i class="bi bi-info-circle"></i> Utilize este e-mail para fazer login na plataforma.
+                                </small>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-check-circle me-2"></i> Salvar E-mail
+                                </button>
+                                <button type="reset" class="btn btn-outline-secondary">
+                                    <i class="bi bi-arrow-counterclockwise me-2"></i> Cancelar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">Senha</h5>
+                        <p class="text-muted mb-4">
+                            <i class="bi bi-exclamation-circle"></i> 
+                            Use uma senha forte com pelo menos 8 caracteres, incluindo letras, números e símbolos.
+                        </p>
+                        <button 
+                            type="button" 
+                            class="btn btn-primary w-100"
+                            data-bs-toggle="modal" 
+                            data-bs-target="#mudarSenhaModal"
+                        >
+                            <i class="bi bi-lock me-2"></i> Alterar Senha
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Seção: Dados Pessoais -->
+    <section id="dados-pessoais" class="mb-5">
+        <div class="row">
+            <div class="col-12 mb-3">
+                <h3 class="section-title d-flex align-items-center gap-2">
+                    <i class="bi bi-person" style="color: var(--cor-secundaria)"></i>
+                    Dados Pessoais
+                </h3>
+            </div>
+        </div>
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">Informações de Contato</h5>
+                        <form action="/fornecedor/conta/atualizar-contato" method="post" class="form-update">
+                            <div class="mb-3">
+                                <label class="form-label fw-500">Telefone</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="bi bi-telephone"></i>
+                                    </span>
+                                    <input 
+                                        type="tel" 
+                                        name="telefone" 
+                                        class="form-control border-start-0" 
+                                        value="{{ fornecedor.telefone if fornecedor else '' }}"
+                                        placeholder="(11) 99999-9999"
+                                    >
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-500">Celular</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="bi bi-phone"></i>
+                                    </span>
+                                    <input 
+                                        type="tel" 
+                                        name="celular" 
+                                        class="form-control border-start-0" 
+                                        value="{{ fornecedor.celular if fornecedor else '' }}"
+                                        placeholder="(11) 99999-9999"
+                                    >
+                                </div>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-check-circle me-2"></i> Salvar Contato
+                                </button>
+                                <button type="reset" class="btn btn-outline-secondary">
+                                    <i class="bi bi-arrow-counterclockwise me-2"></i> Cancelar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">Dados da Empresa/Loja</h5>
+                        <form action="/fornecedor/conta/atualizar-empresa" method="post" class="form-update">
+                            <div class="mb-3">
+                                <label class="form-label fw-500">Nome da Empresa/Loja</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="bi bi-shop"></i>
+                                    </span>
+                                    <input 
+                                        type="text" 
+                                        name="nome_empresa" 
+                                        class="form-control border-start-0" 
+                                        value="{{ fornecedor.nome_empresa if fornecedor else '' }}"
+                                    >
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-500">CPF/CNPJ</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="bi bi-file-earmark-text"></i>
+                                    </span>
+                                    <input 
+                                        type="text" 
+                                        name="cpf_cnpj" 
+                                        class="form-control border-start-0" 
+                                        value="{{ fornecedor.cpf_cnpj if fornecedor else '' }}"
+                                    >
+                                </div>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-check-circle me-2"></i> Salvar Dados
+                                </button>
+                                <button type="reset" class="btn btn-outline-secondary">
+                                    <i class="bi bi-arrow-counterclockwise me-2"></i> Cancelar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Seção: Faturamento -->
+    <section id="faturamento" class="mb-5">
+        <div class="row">
+            <div class="col-12 mb-3">
+                <h3 class="section-title d-flex align-items-center gap-2">
+                    <i class="bi bi-credit-card" style="color: var(--cor-secundaria)"></i>
+                    Faturamento e Pagamento
+                </h3>
+            </div>
+        </div>
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3 d-flex align-items-center gap-2">
+                            <i class="bi bi-credit-card" style="color: var(--cor-laranja-forte)"></i>
+                            Dados Bancários
+                        </h5>
+                        <p class="text-muted small mb-4">
+                            <i class="bi bi-shield-check"></i> 
+                            Seus dados bancários são criptografados e protegidos.
+                        </p>
+                        <a href="/fornecedor/pagamento/dados" class="btn btn-primary w-100">
+                            <i class="bi bi-pencil me-2"></i> Gerenciar Dados Bancários
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3 d-flex align-items-center gap-2">
+                            <i class="bi bi-receipt" style="color: var(--cor-laranja-forte)"></i>
+                            Histórico de Transações
+                        </h5>
+                        <p class="text-muted small mb-4">
+                            Acompanhe todas as suas transações e pagamentos realizados.
+                        </p>
+                        <a href="/fornecedor/pagamento/historico" class="btn btn-primary w-100">
+                            <i class="bi bi-graph-up me-2"></i> Ver Histórico
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Seção: Segurança e Privacidade -->
+    <section id="seguranca" class="mb-5">
+        <div class="row">
+            <div class="col-12 mb-3">
+                <h3 class="section-title d-flex align-items-center gap-2">
+                    <i class="bi bi-shield" style="color: var(--cor-secundaria)"></i>
+                    Segurança e Privacidade
+                </h3>
+            </div>
+        </div>
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">Sessões Ativas</h5>
+                        <p class="text-muted small mb-3">
+                            <i class="bi bi-info-circle"></i> 
+                            Gerencie os dispositivos conectados à sua conta.
+                        </p>
+                        <div class="device-item p-3 bg-light rounded mb-3">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="mb-1">
+                                        <i class="bi bi-laptop"></i> Navegador Atual
+                                    </h6>
+                                    <small class="text-muted">
+                                        Conectado agora
+                                    </small>
+                                </div>
+                                <span class="badge bg-success">Ativo</span>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-danger w-100">
+                            <i class="bi bi-box-arrow-right me-2"></i> Desconectar Todos
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">Autenticação de Dois Fatores</h5>
+                        <p class="text-muted small mb-3">
+                            <i class="bi bi-shield-lock"></i> 
+                            Aumente a segurança da sua conta com autenticação em duas etapas.
+                        </p>
+                        <div class="alert alert-info mb-3">
+                            <small>
+                                <i class="bi bi-info-circle"></i> 
+                                Autenticação de dois fatores está <strong>desativada</strong>
+                            </small>
+                        </div>
+                        <button type="button" class="btn btn-primary w-100">
+                            <i class="bi bi-plus-circle me-2"></i> Ativar 2FA
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Seção: Zona de Perigo -->
+    <section id="zona-perigo" class="mb-5">
+        <div class="row">
+            <div class="col-12 mb-3">
+                <h3 class="section-title d-flex align-items-center gap-2">
+                    <i class="bi bi-exclamation-triangle" style="color: var(--cor-laranja-queimado)"></i>
+                    Zona de Perigo
+                </h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="card shadow-sm border-danger border-2 h-100">
+                    <div class="card-body">
+                        <h5 class="card-title text-danger mb-3">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i> 
+                            Desativar Conta
+                        </h5>
+                        <p class="text-muted small mb-4">
+                            Desative temporariamente sua conta. Você poderá reativá-la a qualquer momento.
+                        </p>
+                        <button 
+                            type="button" 
+                            class="btn btn-outline-danger w-100"
+                            data-bs-toggle="modal" 
+                            data-bs-target="#desativarContaModal"
+                        >
+                            <i class="bi bi-pause-circle me-2"></i> Desativar Conta
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card shadow-sm border-danger border-2 h-100">
+                    <div class="card-body">
+                        <h5 class="card-title text-danger mb-3">
+                            <i class="bi bi-trash-fill me-2"></i> 
+                            Deletar Conta Permanentemente
+                        </h5>
+                        <p class="text-muted small mb-4">
+                            Delete permanentemente sua conta e todos os dados associados. <strong>Esta ação não pode ser desfeita.</strong>
+                        </p>
+                        <button 
+                            type="button" 
+                            class="btn btn-danger w-100"
+                            data-bs-toggle="modal" 
+                            data-bs-target="#deletarContaModal"
+                        >
+                            <i class="bi bi-trash-fill me-2"></i> Deletar Permanentemente
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- Modal: Alterar Senha -->
+<div class="modal fade" id="mudarSenhaModal" tabindex="-1" aria-labelledby="mudarSenhaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-gradient border-0">
+                <h5 class="modal-title" id="mudarSenhaLabel">
+                    <i class="bi bi-lock me-2"></i> Alterar Senha
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="/fornecedor/conta/atualizar-senha" method="post">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Senha Atual</label>
+                        <input 
+                            type="password" 
+                            name="senha_atual" 
+                            class="form-control" 
+                            required
+                        >
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Nova Senha</label>
+                        <input 
+                            type="password" 
+                            name="nova_senha" 
+                            class="form-control" 
+                            id="novaSenha"
+                            required
+                            minlength="8"
+                        >
+                        <small class="text-muted d-block mt-2">
+                            Mínimo 8 caracteres com letras, números e símbolos.
+                        </small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Confirmar Nova Senha</label>
+                        <input 
+                            type="password" 
+                            name="confirmar_senha" 
+                            class="form-control" 
+                            id="confirmarSenha"
+                            required
+                        >
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-circle me-2"></i> Alterar Senha
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
+
+<!-- Modal: Desativar Conta -->
+<div class="modal fade" id="desativarContaModal" tabindex="-1" aria-labelledby="desativarContaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-warning border-0">
+                <h5 class="modal-title text-dark" id="desativarContaLabel">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i> Desativar Conta
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="/fornecedor/conta/desativar" method="post">
+                <div class="modal-body">
+                    <div class="alert alert-warning mb-3">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <strong>Aviso:</strong> Sua conta será desativada, mas todos os seus dados serão preservados.
+                    </div>
+                    <p class="text-muted">
+                        Você poderá reativar sua conta a qualquer momento fazendo login novamente.
+                    </p>
+                    <div class="mb-3">
+                        <label class="form-label">Confirme sua senha para continuar:</label>
+                        <input 
+                            type="password" 
+                            name="senha" 
+                            class="form-control" 
+                            required
+                        >
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-warning">
+                        <i class="bi bi-pause-circle me-2"></i> Desativar Conta
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Deletar Conta -->
+<div class="modal fade" id="deletarContaModal" tabindex="-1" aria-labelledby="deletarContaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-danger border-0">
+                <h5 class="modal-title text-white" id="deletarContaLabel">
+                    <i class="bi bi-trash-fill me-2"></i> Deletar Conta Permanentemente
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="/fornecedor/conta/deletar" method="post">
+                <div class="modal-body">
+                    <div class="alert alert-danger mb-3">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        <strong>ATENÇÃO!</strong> Esta ação é irreversível.
+                    </div>
+                    <p class="text-danger fw-bold mb-3">
+                        Ao deletar sua conta:
+                    </p>
+                    <ul class="text-muted small">
+                        <li>Todos os seus produtos serão removidos</li>
+                        <li>Todos os seus dados serão permanentemente deletados</li>
+                        <li>Você não poderá recuperar sua conta</li>
+                        <li>Histórico de transações será mantido por lei</li>
+                    </ul>
+                    <div class="mb-3 mt-4">
+                        <label class="form-label fw-bold">Digite sua senha para confirmar:</label>
+                        <input 
+                            type="password" 
+                            name="senha" 
+                            class="form-control border-danger" 
+                            required
+                        >
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input 
+                            class="form-check-input border-danger" 
+                            type="checkbox" 
+                            id="confirmaDelecao"
+                            name="confirmacao"
+                            required
+                        >
+                        <label class="form-check-label text-danger" for="confirmaDelecao">
+                            Entendo que esta ação é permanente e irreversível
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-danger" id="btnDeletear" disabled>
+                        <i class="bi bi-trash-fill me-2"></i> Deletar Minha Conta
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block fornecedor_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Abilitar botão de deletar apenas quando checkbox está marcado
+    const confirmaDelecao = document.getElementById('confirmaDelecao');
+    const btnDeletear = document.getElementById('btnDeletear');
+    
+    if (confirmaDelecao && btnDeletear) {
+        confirmaDelecao.addEventListener('change', function() {
+            btnDeletear.disabled = !this.checked;
+        });
+    }
+
+    // Validar senhas no modal
+    const novaSenha = document.getElementById('novaSenha');
+    const confirmarSenha = document.getElementById('confirmarSenha');
+
+    if (confirmarSenha) {
+        confirmarSenha.addEventListener('input', function() {
+            if (novaSenha.value !== confirmarSenha.value) {
+                confirmarSenha.classList.add('is-invalid');
+            } else {
+                confirmarSenha.classList.remove('is-invalid');
+            }
+        });
+    }
+});
+</script>
 {% endblock %}

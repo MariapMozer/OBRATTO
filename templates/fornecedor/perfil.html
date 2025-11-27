@@ -3,103 +3,436 @@
 {% block fornecedor_titulo %}Meu Perfil{% endblock %}
 {% block sidebar_active %}perfil{% endblock %}
 
+{% block css %}
+<link rel="stylesheet" href="/static/css/home.css">
+<link rel="stylesheet" href="/static/css/home_fornecedor.css">
+<style>
+    .profile-avatar {
+        width: 180px;
+        height: 180px;
+        object-fit: cover;
+        border: 5px solid var(--cor-secundaria);
+        box-shadow: 0 10px 30px rgba(232, 137, 75, 0.3);
+    }
+    
+    .profile-header {
+        background: var(--cor-gradiente-quente);
+        color: white;
+        padding: 3rem 0;
+        position: relative;
+        overflow: hidden;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+    }
+    
+    .profile-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('../img/tela_fundo.png') center/cover;
+        opacity: 0.1;
+        z-index: 1;
+    }
+    
+    .profile-header .container {
+        position: relative;
+        z-index: 2;
+    }
+    
+    .form-section {
+        margin-bottom: 2rem;
+    }
+    
+    .form-section-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--cor-primaria);
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid var(--cor-secundaria);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .form-section-title i {
+        color: var(--cor-secundaria);
+        font-size: 1.5rem;
+    }
+</style>
+{% endblock %}
+
 {% block fornecedor_conteudo %}
-<div class="container-fluid px-4 py-4">
-    <div class="row mb-4">
-        <div class="col-md-8">
-            <h1 class="h3">Meu Perfil</h1>
-            <p class="text-muted">Informações públicas que seus clientes verão.</p>
+<div class="container-fluid px-4">
+    <!-- Cabeçalho da Página -->
+    <div class="row mb-4 align-items-center">
+        <div class="col">
+            <h1 class="page-title">Meu Perfil</h1>
+            <p class="page-subtitle">Gerencie informações públicas que seus clientes verão.</p>
         </div>
-        <div class="col-md-4 text-end">
-            <a href="/fornecedor/conta" class="btn btn-outline-secondary">Configurações da Conta</a>
+        <div class="col-auto text-end">
+            <a href="/fornecedor/conta" class="btn btn-outline-secondary">
+                <i class="bi bi-gear me-2"></i> Configurações da Conta
+            </a>
         </div>
     </div>
 
     {% if mensagem %}
-    <div class="alert alert-success">{{ mensagem }}</div>
-    {% endif %}
-    {% if request.query_params.get('erro') %}
-    <div class="alert alert-danger">Erro: {{ request.query_params.get('erro') }}</div>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle me-2"></i>
+        {{ mensagem }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
     {% endif %}
 
-    <div class="row g-4">
-        <div class="col-lg-4">
-            <div class="card shadow-sm text-center p-4">
-                <img src="{{ fornecedor.foto or '/static/img/fornecedor_default.png' }}" alt="Foto" class="rounded-circle mb-3" width="140" height="140">
-                <h5 class="mb-0">{{ fornecedor.nome }}</h5>
-                <small class="text-muted">{{ fornecedor.razao_social or '' }}</small>
+    <!-- Seção: Foto e Informações Básicas -->
+    <section class="profile-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-auto">
+                    <img 
+                        src="{{ fornecedor.foto or '/static/img/fornecedor_default.png' }}" 
+                        alt="Foto de Perfil" 
+                        class="rounded-circle profile-avatar"
+                    >
+                </div>
+                <div class="col">
+                    <h2 class="mb-2">{{ fornecedor.nome }}</h2>
+                    <p class="mb-3 opacity-75">
+                        <i class="bi bi-shop me-2"></i>
+                        {{ fornecedor.razao_social or 'Fornecedor' }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-                <form action="/fornecedor/perfil/foto" method="post" enctype="multipart/form-data" class="mt-3">
-                    <div class="mb-2">
-                        <input type="file" name="foto" accept="image/*" class="form-control form-control-sm">
-                    </div>
-                    <button class="btn btn-sm btn-primary">Enviar Foto</button>
-                </form>
+    <!-- Seção: Upload de Foto -->
+    <div class="row g-4 mb-5">
+        <div class="col-lg-6">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">
+                        <i class="bi bi-image me-2" style="color: var(--cor-secundaria)"></i>
+                        Foto de Perfil
+                    </h5>
+                    <form action="/fornecedor/perfil/foto" method="post" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <input type="file" name="foto" accept="image/*" class="form-control">
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-upload me-2"></i> Enviar Foto
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
 
-        <div class="col-lg-8">
-            <div class="card shadow-sm p-3 mb-3">
+        <div class="col-lg-6">
+            <div class="card shadow-sm border-0 h-100">
                 <div class="card-body">
-                    <h5 class="card-title">Informações Públicas</h5>
-                    <form action="/fornecedor/perfil/editar" method="post">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Nome</label>
-                                <input type="text" name="nome" class="form-control" value="{{ fornecedor.nome }}" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Razão Social</label>
-                                <input type="text" name="razao_social" class="form-control" value="{{ fornecedor.razao_social or '' }}">
-                            </div>
+                    <h5 class="card-title mb-4">
+                        <i class="bi bi-star me-2" style="color: var(--cor-laranja-forte)"></i>
+                        Informações do Perfil
+                    </h5>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>Status</span>
+                            <span class="badge bg-success">Ativo</span>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Descrição</label>
-                            <textarea name="descricao" class="form-control" rows="3">{{ fornecedor.descricao or '' }}</textarea>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Telefone</label>
-                                <input type="text" name="telefone" class="form-control" value="{{ fornecedor.telefone or '' }}">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">E-mail público</label>
-                                <input type="email" name="email" class="form-control" value="{{ fornecedor.email or '' }}">
-                            </div>
-                        </div>
-                        <button class="btn btn-primary">Salvar Alterações Públicas</button>
-                    </form>
-                </div>
-            </div>
-
-            <div class="card shadow-sm p-3 mb-3">
-                <div class="card-body">
-                    <h5 class="card-title">Segurança</h5>
-                    <form action="/fornecedor/perfil/alterar-senha" method="post">
-                        <input type="hidden" name="id" value="{{ fornecedor.id }}">
-                        <div class="mb-3">
-                            <label class="form-label">Senha Atual</label>
-                            <input type="password" name="senha_atual" class="form-control" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Nova Senha</label>
-                            <input type="password" name="nova_senha" class="form-control" required>
-                        </div>
-                        <button class="btn btn-warning">Alterar Senha</button>
-                    </form>
-                </div>
-            </div>
-
-            <div class="card shadow-sm p-3">
-                <div class="card-body">
-                    <h5 class="card-title text-danger">Excluir Conta</h5>
-                    <p class="text-muted">Ao apagar sua conta todos os seus dados serão removidos. Esta ação é irreversível.</p>
-                    <form action="/fornecedor/perfil/excluir" method="post" onsubmit="return confirm('Deseja realmente excluir sua conta?');">
-                        <button class="btn btn-danger">Excluir Conta</button>
-                    </form>
+                    </div>
+                    <small class="text-muted d-block">Seu perfil está acessível aos clientes.</small>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Seção: Informações Públicas -->
+    <section class="form-section">
+        <h3 class="form-section-title">
+            <i class="bi bi-person-fill"></i>
+            Informações Públicas
+        </h3>
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
+                <form action="/fornecedor/perfil/editar" method="post">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <label class="form-label fw-500">Nome do Fornecedor</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0">
+                                    <i class="bi bi-person"></i>
+                                </span>
+                                <input 
+                                    type="text" 
+                                    name="nome" 
+                                    class="form-control border-start-0" 
+                                    value="{{ fornecedor.nome }}" 
+                                    required
+                                >
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-500">Razão Social</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0">
+                                    <i class="bi bi-shop"></i>
+                                </span>
+                                <input 
+                                    type="text" 
+                                    name="razao_social" 
+                                    class="form-control border-start-0" 
+                                    value="{{ fornecedor.razao_social or '' }}"
+                                >
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-500">Telefone</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0">
+                                    <i class="bi bi-telephone"></i>
+                                </span>
+                                <input 
+                                    type="tel" 
+                                    name="telefone" 
+                                    class="form-control border-start-0" 
+                                    value="{{ fornecedor.telefone or '' }}"
+                                >
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-500">E-mail</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0">
+                                    <i class="bi bi-envelope"></i>
+                                </span>
+                                <input 
+                                    type="email" 
+                                    name="email" 
+                                    class="form-control border-start-0" 
+                                    value="{{ fornecedor.email or '' }}"
+                                >
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-500">Cidade</label>
+                            <input 
+                                type="text" 
+                                name="cidade" 
+                                class="form-control" 
+                                value="{{ fornecedor.cidade or '' }}"
+                            >
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-500">Estado</label>
+                            <input 
+                                type="text" 
+                                name="estado" 
+                                class="form-control" 
+                                value="{{ fornecedor.estado or '' }}"
+                                maxlength="2"
+                            >
+                        </div>
+                    </div>
+                    <div class="mt-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle me-2"></i> Salvar Alterações
+                        </button>
+                        <button type="reset" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-counterclockwise me-2"></i> Cancelar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Seção: Zona de Perigo -->
+    <section class="form-section mb-5">
+        <h3 class="form-section-title" style="color: var(--cor-laranja-queimado); border-bottom-color: var(--cor-laranja-queimado);">
+            <i class="bi bi-exclamation-triangle"></i>
+            Zona de Perigo
+        </h3>
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="card shadow-sm border-danger border-2 h-100">
+                    <div class="card-body">
+                        <h5 class="card-title text-danger mb-3">
+                            <i class="bi bi-lock me-2"></i> Alterar Senha
+                        </h5>
+                        <p class="text-muted small mb-4">
+                            Altere sua senha de acesso à plataforma.
+                        </p>
+                        <button 
+                            type="button" 
+                            class="btn btn-warning w-100"
+                            data-bs-toggle="modal" 
+                            data-bs-target="#alterarSenhaModal"
+                        >
+                            <i class="bi bi-lock me-2"></i> Alterar Senha
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card shadow-sm border-danger border-2 h-100">
+                    <div class="card-body">
+                        <h5 class="card-title text-danger mb-3">
+                            <i class="bi bi-trash-fill me-2"></i> Deletar Conta
+                        </h5>
+                        <p class="text-muted small mb-4">
+                            Delete permanentemente sua conta. <strong>Esta ação não pode ser desfeita.</strong>
+                        </p>
+                        <button 
+                            type="button" 
+                            class="btn btn-danger w-100"
+                            data-bs-toggle="modal" 
+                            data-bs-target="#deletarContaModal"
+                        >
+                            <i class="bi bi-trash-fill me-2"></i> Deletar Conta
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 </div>
+
+<!-- Modal: Alterar Senha -->
+<div class="modal fade" id="alterarSenhaModal" tabindex="-1" aria-labelledby="alterarSenhaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-gradient border-0">
+                <h5 class="modal-title" id="alterarSenhaLabel">
+                    <i class="bi bi-lock me-2"></i> Alterar Senha
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="/fornecedor/perfil/alterar-senha" method="post">
+                <input type="hidden" name="id" value="{{ fornecedor.id }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Senha Atual</label>
+                        <input 
+                            type="password" 
+                            name="senha_atual" 
+                            class="form-control" 
+                            required
+                        >
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Nova Senha</label>
+                        <input 
+                            type="password" 
+                            name="nova_senha" 
+                            class="form-control" 
+                            id="novaSenha"
+                            required
+                            minlength="8"
+                        >
+                        <small class="text-muted d-block mt-2">
+                            Mínimo 8 caracteres.
+                        </small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Confirmar Nova Senha</label>
+                        <input 
+                            type="password" 
+                            name="confirmar_senha" 
+                            class="form-control" 
+                            id="confirmarSenha"
+                            required
+                        >
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-circle me-2"></i> Alterar Senha
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Deletar Conta -->
+<div class="modal fade" id="deletarContaModal" tabindex="-1" aria-labelledby="deletarContaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-danger border-0">
+                <h5 class="modal-title text-white" id="deletarContaLabel">
+                    <i class="bi bi-trash-fill me-2"></i> Deletar Conta
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="/fornecedor/perfil/excluir" method="post">
+                <div class="modal-body">
+                    <div class="alert alert-danger mb-3">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        <strong>ATENÇÃO!</strong> Esta ação é irreversível.
+                    </div>
+                    <p class="text-danger fw-bold mb-3">
+                        Ao deletar sua conta:
+                    </p>
+                    <ul class="text-muted small">
+                        <li>Todos os seus produtos serão removidos</li>
+                        <li>Todos os seus dados serão permanentemente deletados</li>
+                        <li>Você não poderá recuperar sua conta</li>
+                    </ul>
+                    <div class="mb-3 mt-4">
+                        <label class="form-label fw-bold">Digite sua senha para confirmar:</label>
+                        <input 
+                            type="password" 
+                            name="senha" 
+                            class="form-control border-danger" 
+                            required
+                        >
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input 
+                            class="form-check-input border-danger" 
+                            type="checkbox" 
+                            id="confirmaDelecao"
+                            name="confirmacao"
+                            required
+                        >
+                        <label class="form-check-label text-danger" for="confirmaDelecao">
+                            Entendo que esta ação é permanente e irreversível
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-danger" id="btnDeletear" disabled>
+                        <i class="bi bi-trash-fill me-2"></i> Deletar Minha Conta
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block fornecedor_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const confirmaDelecao = document.getElementById('confirmaDelecao');
+    const btnDeletear = document.getElementById('btnDeletear');
+    
+    if (confirmaDelecao && btnDeletear) {
+        confirmaDelecao.addEventListener('change', function() {
+            btnDeletear.disabled = !this.checked;
+        });
+    }
+});
+</script>
 {% endblock %}

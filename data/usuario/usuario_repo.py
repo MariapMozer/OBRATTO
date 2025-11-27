@@ -158,6 +158,7 @@ def atualizar_foto(id: int, caminho_foto: str) -> bool:
     with open_connection() as conn:
         cursor = conn.cursor()
         cursor.execute(ATUALIZAR_FOTO, (caminho_foto, id))
+        conn.commit()
         return cursor.rowcount > 0
 
 

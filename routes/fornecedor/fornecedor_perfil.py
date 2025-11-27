@@ -9,6 +9,7 @@ from data.fornecedor.fornecedor_model import Fornecedor
 from data.fornecedor import fornecedor_repo
 from util.security import criar_hash_senha
 from data.usuario import usuario_repo
+from data.usuario.usuario_repo import atualizar_foto
 from data.avaliacao import avaliacao_repo
 from datetime import datetime
 
