@@ -2,23 +2,14 @@
 
 {#
     Template: Base Cliente
-    Descrição: Template base para páginas do cliente
+    Descrição: Template base para páginas do cliente com sidebar de navegação
     Estende: base_authenticated.html
 #}
 
+{% from 'components/sidebar.html' import sidebar %}
 {% from 'components/user_dropdown.html' import user_dropdown %}
 
 {% block titulo %}{% block cliente_titulo %}Cliente{% endblock %}{% endblock %}
-
-{% block navbar_search %}
-<form class="d-flex ms-auto align-items-center" role="search">
-    <input class="form-control me-2 rounded rounded-4" type="text"
-        placeholder="Busque pelos melhores serviços" aria-label="Search">
-    <a href="#" class="text-white me-3">
-        <i class="bi bi-search"></i>
-    </a>
-</form>
-{% endblock %}
 
 {% block navbar_menu %}
 {% if usuario_logado %}
@@ -38,10 +29,164 @@
 {% endif %}
 {% endblock %}
 
-{% block conteudo %}
-{% block cliente_conteudo %}{% endblock %}
+{% block auth_css %}
+<link rel="stylesheet" href="/static/css/home.css">
+<link rel="stylesheet" href="/static/css/home_cliente.css">
 {% endblock %}
 
+{% block body_content %}
+<input type="checkbox" id="toggleSidebar" hidden>
+
+<!-- Sidebar -->
+{% set menu_items = [
+    {'id': 'home', 'url': '/cliente', 'icon': 'house', 'label': 'Home'},
+    {'id': 'solicitacoes', 'url': '/cliente/solicitacoes', 'icon': 'list-check', 'label': 'Minhas Solicitações'},
+    {'id': 'contratacoes', 'url': '/cliente/contratacoes', 'icon': 'briefcase', 'label': 'Minhas Contratações'},
+    {'id': 'mensagens', 'url': '/cliente/mensagens', 'icon': 'chat-dots', 'label': 'Mensagens'},
+    {'id': 'avaliacoes', 'url': '/cliente/avaliacoes', 'icon': 'star', 'label': 'Minhas Avaliações'},
+    {'id': 'perfil', 'url': '/cliente/perfil', 'icon': 'person', 'label': 'Perfil'},
+    {'id': 'favoritos', 'url': '/cliente/favoritos', 'icon': 'heart', 'label': 'Favoritos'}
+] %}
+
+{{ sidebar(menu_items, active_item=self.sidebar_active(), logo_text='MINHA CONTA') }}
+
+<!-- Conteúdo Principal -->
+<div class="page-content">
+    {% block header %}
+    <header>
+        {% block navbar %}
+        <nav class="navbar navbar-expand-lg navbar-dark fundo-azul mb-4">
+            <div class="container-fluid">
+                <label for="toggleSidebar" class="navbar-brand toggle-btn">
+                    <i class="bi bi-list"></i>
+                </label>
+                <div class="navbar-nav ms-auto">
+                    {% block navbar_menu_override %}
+                    {% if usuario_logado %}
+                        {% set menu_cliente = [
+                            {'url': '/cliente/perfil', 'icon': 'person', 'label': 'Perfil'},
+                            {'url': '/cliente', 'icon': 'house', 'label': 'Home'},
+                            {'url': '/cliente/contratacoes', 'icon': 'briefcase', 'label': 'Minhas Contratações'},
+                            {'url': '/cliente/solicitacoes', 'icon': 'list-check', 'label': 'Minhas Solicitações'},
+                            {'divider': True},
+                            {'url': '/logout', 'icon': 'box-arrow-right', 'label': 'Sair', 'danger': True}
+                        ] %}
+                        {{ user_dropdown(usuario_logado, menu_cliente, default_label='Cliente') }}
+                    {% endif %}
+                    {% endblock %}
+                </div>
+            </div>
+        </nav>
+        {% endblock %}
+    </header>
+    {% endblock %}
+
+    <div class="main-content">
+        {% block cliente_conteudo %}{% endblock %}
+    </div>
+</div>
+
+<!-- Footer -->
+{% block footer %}
+{% include 'components/footer.html' %}
+{% endblock %}
+{% endblock %}
+
+{# Bloco para definir o item ativo da sidebar #}
+{% block sidebar_active %}home{% endblock %}
+
 {% block scripts %}
+<script>
+    // ================== SIDEBAR TOGGLE FUNCTIONALITY ==================
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggleCheckbox = document.getElementById('toggleSidebar');
+        const pageContent = document.querySelector('.page-content');
+        const toggleBtn = document.querySelector('.toggle-btn');
+        const sidebar = document.querySelector('.sidebar');
+        
+        // Restaurar estado anterior do sidebar (padrão: aberto)
+        const sidebarState = localStorage.getItem('sidebarOpen');
+        const isOpen = sidebarState !== 'false'; // Default é true
+        
+        if (!isOpen) {
+            toggleCheckbox.checked = false;
+            pageContent.classList.add('sidebar-closed');
+        } else {
+            toggleCheckbox.checked = true;
+            pageContent.classList.add('sidebar-open');
+        }
+        
+        // Função para atualizar estado do toggle
+        function updateSidebarState(isOpen) {
+            if (isOpen) {
+                pageContent.classList.remove('sidebar-closed');
+                pageContent.classList.add('sidebar-open');
+                if (toggleBtn) {
+                    toggleBtn.setAttribute('title', 'Fechar menu');
+                }
+                localStorage.setItem('sidebarOpen', 'true');
+            } else {
+                pageContent.classList.remove('sidebar-open');
+                pageContent.classList.add('sidebar-closed');
+                if (toggleBtn) {
+                    toggleBtn.setAttribute('title', 'Abrir menu');
+                }
+                localStorage.setItem('sidebarOpen', 'false');
+            }
+        }
+        
+        // Listener para mudanças no checkbox
+        toggleCheckbox.addEventListener('change', function() {
+            updateSidebarState(this.checked);
+        });
+        
+        // Botão toggle com teclado (Enter/Space)
+        toggleBtn.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                toggleCheckbox.click();
+            }
+        });
+        
+        // Fechar sidebar ao clicar em um item do menu (mobile/tablet)
+        if (window.innerWidth <= 1024) {
+            document.querySelectorAll('.sidebar-item').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    // Não fechar se for link da página atual
+                    if (!this.classList.contains('active')) {
+                        // Pequeno delay para melhor experiência visual
+                        setTimeout(() => {
+                            toggleCheckbox.checked = false;
+                            toggleCheckbox.dispatchEvent(new Event('change'));
+                        }, 100);
+                    }
+                });
+            });
+        }
+        
+        // Responsividade ao redimensionar janela
+        let resizeTimer;
+        window.addEventListener('resize', function() {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(function() {
+                if (window.innerWidth > 1024 && !toggleCheckbox.checked) {
+                    // Se tela fica grande, abrir sidebar automaticamente
+                    toggleCheckbox.checked = true;
+                    toggleCheckbox.dispatchEvent(new Event('change'));
+                }
+            }, 250);
+        });
+    });
+    
+    // Atalho de teclado: Ctrl/Cmd + Shift + M para toggle sidebar
+    document.addEventListener('keydown', function(e) {
+        if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'M') {
+            e.preventDefault();
+            const toggleCheckbox = document.getElementById('toggleSidebar');
+            toggleCheckbox.checked = !toggleCheckbox.checked;
+            toggleCheckbox.dispatchEvent(new Event('change'));
+        }
+    });
+</script>
 {% block cliente_scripts %}{% endblock %}
 {% endblock %}

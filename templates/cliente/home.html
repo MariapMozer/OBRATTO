@@ -1,107 +1,137 @@
 {% extends "cliente/base.html" %}
 
-{% from 'components/stats_card.html' import stats_card, stats_row %}
+{% block cliente_titulo %}Área do Cliente{% endblock %}
+{% block sidebar_active %}home{% endblock %}
 
-{% block titulo %}Painel do Cliente{% endblock %}
+{% block cliente_conteudo %}
+<div class="container-fluid px-4">
+    <div class="row mb-4 align-items-center">
+        <div class="col">
+            <h1 class="page-title">Bem-vindo(a), {{ usuario_logado.nome if usuario_logado else 'Cliente' }}</h1>
+            <p class="page-subtitle">Encontre os melhores prestadores e fornecedores para seus projetos.</p>
+        </div>
+        <div class="col-auto text-end">
+            <a href="/cliente/solicitacoes/nova" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-2"></i> Nova Solicitação
+            </a>
+        </div>
+    </div>
 
-{% block conteudo %}
-<div class="container px-4 py-4">
-    <!-- Welcome Banner -->
-    <div class="p-5 mb-4 bg-white rounded-3 shadow-sm">
-        <div class="container-fluid py-3">
-            <h1 class="display-5 fw-bold text-primary">Bem-vindo(a) à sua área, Cliente!</h1>
-            <p class="col-md-8 fs-5 text-muted">
-                Aqui você pode gerenciar suas contratações e solicitações de serviço de forma simples e rápida.
-            </p>
-            <div class="d-flex gap-3 mt-4">
-                <a href="{{ url_for('catalogo_prestadores') }}" class="btn btn-primary btn-lg">
-                    <i class="bi bi-search me-2"></i>Buscar Prestadores
-                </a>
-                <a href="/cliente/contratacoes/solicitar" class="btn btn-outline-primary btn-lg">
-                    <i class="bi bi-plus-circle me-2"></i>Nova Solicitação
-                </a>
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Minhas Solicitações</h5>
+                    <p class="card-text">Solicitações ativas</p>
+                    <div class="d-flex align-items-center justify-content-between">
+                        <h2 class="mb-0">—</h2>
+                        <a href="/cliente/solicitacoes" class="btn btn-sm btn-outline-secondary">Ver todas</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Contratações</h5>
+                    <p class="card-text">Projetos em andamento</p>
+                    <div class="d-flex align-items-center justify-content-between">
+                        <h2 class="mb-0">—</h2>
+                        <a href="/cliente/contratacoes" class="btn btn-sm btn-outline-secondary">Gerenciar</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Mensagens</h5>
+                    <p class="card-text">Conversas ativas</p>
+                    <div class="d-flex align-items-center justify-content-between">
+                        <h2 class="mb-0">—</h2>
+                        <a href="/cliente/mensagens" class="btn btn-sm btn-outline-secondary">Abrir</a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Stats Row (se houver dados disponíveis) -->
-    {% if mostrar_stats %}
-    {% call stats_row() %}
-        {{ stats_card(
-            title='Contratações Ativas',
-            value=total_contratacoes|default('0'),
-            icon='briefcase',
-            icon_class='text-success',
-            link_url='/cliente/contratacoes'
-        ) }}
-
-        {{ stats_card(
-            title='Solicitações Pendentes',
-            value=total_solicitacoes|default('0'),
-            icon='clock-history',
-            icon_class='text-warning',
-            link_url='/cliente/solicitacoes'
-        ) }}
-
-        {{ stats_card(
-            title='Orçamentos Recebidos',
-            value=total_orcamentos|default('0'),
-            icon='file-earmark-text',
-            icon_class='text-info'
-        ) }}
-    {% endcall %}
-    {% endif %}
-
-    <!-- Quick Actions -->
-    <div class="row g-4 mt-2">
-        <div class="col-md-4">
-            <div class="card h-100 shadow-sm hover-shadow">
-                <div class="card-body text-center">
-                    <i class="bi bi-people display-4 text-primary mb-3"></i>
-                    <h5 class="card-title">Prestadores</h5>
-                    <p class="card-text text-muted">Encontre profissionais qualificados</p>
-                    <a href="{{ url_for('catalogo_prestadores') }}" class="btn btn-outline-primary">
-                        Ver Catálogo
-                    </a>
-                </div>
+    <section class="prestadores-overview">
+        <div class="row">
+            <div class="col-12 mb-3">
+                <h3 class="section-title">Prestadores em Destaque</h3>
             </div>
         </div>
 
-        <div class="col-md-4">
-            <div class="card h-100 shadow-sm hover-shadow">
-                <div class="card-body text-center">
-                    <i class="bi bi-list-check display-4 text-success mb-3"></i>
-                    <h5 class="card-title">Minhas Contratações</h5>
-                    <p class="card-text text-muted">Acompanhe seus serviços</p>
-                    <a href="/cliente/contratacoes" class="btn btn-outline-success">
-                        Ver Contratações
-                    </a>
+        <div class="row g-4">
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card shadow-sm service-card">
+                    <div class="card-img-top" style="background: var(--cor-gradiente-secundaria); height: 200px;"></div>
+                    <div class="card-body">
+                        <h5 class="card-title">Prestador Profissional</h5>
+                        <p class="card-text">Especialista em serviços gerais</p>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="badge badge-laranja">⭐ 4.8 (127)</span>
+                        </div>
+                        <a href="#" class="btn btn-sm btn-outline-secondary">Ver Perfil</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card shadow-sm service-card">
+                    <div class="card-img-top" style="background: var(--cor-gradiente-laranja-puro); height: 200px;"></div>
+                    <div class="card-body">
+                        <h5 class="card-title">Fornecedor Confiável</h5>
+                        <p class="card-text">Amplo catálogo de produtos</p>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="badge badge-laranja">⭐ 4.9 (85)</span>
+                        </div>
+                        <a href="#" class="btn btn-sm btn-outline-secondary">Ver Loja</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card shadow-sm service-card">
+                    <div class="card-img-top" style="background: var(--cor-gradiente-quente); height: 200px;"></div>
+                    <div class="card-body">
+                        <h5 class="card-title">Serviço Especializado</h5>
+                        <p class="card-text">Projetos complexos e customizados</p>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="badge badge-laranja">⭐ 4.7 (64)</span>
+                        </div>
+                        <a href="#" class="btn btn-sm btn-outline-secondary">Ver Perfil</a>
+                    </div>
                 </div>
             </div>
         </div>
+    </section>
 
-        <div class="col-md-4">
-            <div class="card h-100 shadow-sm hover-shadow">
-                <div class="card-body text-center">
-                    <i class="bi bi-person-circle display-4 text-info mb-3"></i>
+    <div class="row mt-5">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Histórico de Contratações</h5>
+                    <p class="card-text">Acompanhe seus projetos anteriores</p>
+                    <a href="/cliente/contratacoes" class="btn btn-sm btn-outline-secondary">Ver Histórico</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
                     <h5 class="card-title">Meu Perfil</h5>
-                    <p class="card-text text-muted">Gerencie suas informações</p>
-                    <a href="/cliente/perfil" class="btn btn-outline-info">
-                        Ver Perfil
-                    </a>
+                    <p class="card-text">Atualize suas informações e preferências</p>
+                    <a href="/cliente/perfil" class="btn btn-sm btn-outline-secondary">Editar Perfil</a>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<style>
-.hover-shadow {
-    transition: all 0.3s ease;
-}
-.hover-shadow:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
-}
-</style>
+</div>
+{% endblock %}
+
+{% block cliente_scripts %}
+<!-- scripts específicos do dashboard cliente (se necessário) -->
 {% endblock %}
