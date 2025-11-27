@@ -24,7 +24,8 @@ async def home_adm(request: Request, usuario_logado: Optional[dict] = None):
         usuario_logado["id"], limit=10, offset=0
     )
     return templates.TemplateResponse(
-        "fornecedor/home.html", {"request": request, "produtos": produtos}
+        "fornecedor/home_fornecedor.html",
+        {"request": request, "produtos": produtos, "usuario_logado": usuario_logado},
     )
 
 

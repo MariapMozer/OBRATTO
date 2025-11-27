@@ -87,7 +87,7 @@ for arquivo in $(find routes -name "*.py" -type f); do
     substituir "$arquivo" "administrador/servico/galeria.html" "admin/servicos/galeria.html" && ((modificado++))
 
     # Fornecedor
-    substituir "$arquivo" "fornecedor/home_fornecedor.html" "fornecedor/home.html" && ((modificado++))
+    substituir "$arquivo" "fornecedor/home_fornecedor.html" && ((modificado++))
     substituir "$arquivo" "fornecedor/base.html" "base/fornecedor.html" && ((modificado++))
     substituir "$arquivo" "fornecedor/avaliacoes_recebidas.html" "fornecedor/avaliacoes/recebidas.html" && ((modificado++))
     substituir "$arquivo" "fornecedor/mensagens/mensagens_recebidas.html" "fornecedor/mensagens/recebidas.html" && ((modificado++))

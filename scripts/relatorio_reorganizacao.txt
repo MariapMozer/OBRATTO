@@ -47,7 +47,7 @@ cliente/base.html -> base/cliente.html
 cliente/cliente_logout.html -> cliente/logout.html
 fornecedor/avaliacoes_recebidas.html -> fornecedor/avaliacoes/recebidas.html
 fornecedor/base.html -> base/fornecedor.html
-fornecedor/home_fornecedor.html -> fornecedor/home.html
+fornecedor/home_fornecedor.html
 fornecedor/mensagens/mensagens_recebidas.html -> fornecedor/mensagens/recebidas.html
 fornecedor/orcamentos/orcamento.html -> fornecedor/orcamentos/detalhes.html
 fornecedor/orcamentos/responder_orcamentos.html -> fornecedor/orcamentos/responder.html
@@ -112,7 +112,6 @@ components/toast-handler.html: PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templ
 errors/404.html: PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/errors/404.html') and PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/errors/404.html') are the same file
 errors/500.html: PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/errors/500.html') and PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/errors/500.html') are the same file
 fornecedor/conta.html: PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/fornecedor/conta.html') and PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/fornecedor/conta.html') are the same file
-fornecedor/home_teste.html: PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/fornecedor/home_teste.html') and PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/fornecedor/home_teste.html') are the same file
 fornecedor/perfil.html: PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/fornecedor/perfil.html') and PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/fornecedor/perfil.html') are the same file
 fornecedor/planos/minha_assinatura.html: PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/fornecedor/planos/minha_assinatura.html') and PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/fornecedor/planos/minha_assinatura.html') are the same file
 prestador/agenda/detalhes.html: PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/prestador/agenda/detalhes.html') and PosixPath('/Volumes/Externo/Ifes/PI/OBRATTO/templates/prestador/agenda/detalhes.html') are the same file
@@ -186,8 +185,7 @@ Substitua as seguintes referências nos arquivos .py:
 "fornecedor/avaliacoes_recebidas.html" -> "fornecedor/avaliacoes/recebidas.html"
 "fornecedor/base.html" -> "base/fornecedor.html"
 "fornecedor/conta.html" -> "fornecedor/conta.html"
-"fornecedor/home_fornecedor.html" -> "fornecedor/home.html"
-"fornecedor/home_teste.html" -> "fornecedor/home_teste.html"
+"fornecedor/home_fornecedor.html" 
 "fornecedor/mensagens/mensagens_recebidas.html" -> "fornecedor/mensagens/recebidas.html"
 "fornecedor/orcamentos/orcamento.html" -> "fornecedor/orcamentos/detalhes.html"
 "fornecedor/orcamentos/responder_orcamentos.html" -> "fornecedor/orcamentos/responder.html"

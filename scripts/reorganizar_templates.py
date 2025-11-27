@@ -83,8 +83,7 @@ FILE_MAPPINGS: Dict[str, str] = {
     "administrador/servico/galeria.html": "admin/servicos/galeria.html",
 
     # === FORNECEDOR ===
-    "fornecedor/home_fornecedor.html": "fornecedor/home.html",
-    "fornecedor/home_teste.html": "fornecedor/home_teste.html",  # manter temporariamente
+    "fornecedor/home_fornecedor.html" # manter temporariamente
     "fornecedor/perfil.html": "fornecedor/perfil.html",
     "fornecedor/conta.html": "fornecedor/conta.html",
     "fornecedor/base.html": "base/fornecedor.html",

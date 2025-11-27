@@ -1,11 +1,28 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <h1>Todas as mensagens recebidas pelo fornecedor tipo o direct do insta</h1>
-</body>
-</html>
+{% extends "fornecedor/base.html" %}
+
+{% block fornecedor_titulo %}Mensagens{% endblock %}
+{% block sidebar_active %}mensagens{% endblock %}
+
+{% block fornecedor_conteudo %}
+<div class="container-fluid px-4 py-4">
+    <h1 class="h3 mb-4">Mensagens Recebidas</h1>
+    <div class="list-group">
+        {% if mensagens and mensagens|length > 0 %}
+            {% for m in mensagens %}
+            <a href="/fornecedor/mensagens/{{ m.id_mensagem }}" class="list-group-item list-group-item-action">
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">{{ m.nome_remetente or 'Remetente' }}</h5>
+                    <small class="text-muted">{{ m.data_hora }}</small>
+                </div>
+                <p class="mb-1">{{ m.conteudo[:120] }}</p>
+            </a>
+            {% endfor %}
+        {% else %}
+            <div class="card shadow-sm p-4 text-center">
+                <i class="bi bi-chat-left-text fs-1 mb-3"></i>
+                <p class="mb-0 text-muted">Nenhuma mensagem encontrada.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

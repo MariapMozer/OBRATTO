@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tons de Laranja - Demonstração Visual</title>
+    <style>
+        :root {
+            --cor-primaria: #171370;
+            --cor-primaria-claro: #2D1F5F;
+            --cor-secundaria: #E8894B;
+            --cor-laranja-claro: #F5A767;
+            --cor-laranja-claro-muito: #FDB750;
+            --cor-laranja-forte: #D9722F;
+            --cor-laranja-queimado: #C55A11;
+            --cor-laranja-pastel: #FDD5B1;
+            --cor-gradiente-principal: linear-gradient(135deg, #171370 0%, #E8894B 100%);
+            --cor-gradiente-secundaria: linear-gradient(135deg, #E8894B 0%, #F5A767 100%);
+            --cor-gradiente-laranja-puro: linear-gradient(135deg, #E8894B 0%, #FDB750 50%, #F5A767 100%);
+            --cor-gradiente-quente: linear-gradient(135deg, #D9722F 0%, #E8894B 50%, #F5A767 100%);
+            --cor-gradiente-azul-claro: linear-gradient(135deg, #2D1F5F 0%, #E8894B 100%);
+            --cor-gradiente-forte: linear-gradient(135deg, #C55A11 0%, #D9722F 50%, #E8894B 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            padding: 2rem;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            background: var(--cor-gradiente-quente);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
+        }
+
+        .section {
+            margin-bottom: 3rem;
+        }
+
+        .section h2 {
+            color: var(--cor-primaria);
+            border-bottom: 3px solid var(--cor-secundaria);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .color-box {
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .color-box:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .gradient-demo {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .gradient-box {
+            height: 120px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .gradient-box:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-demo {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            border-radius: 20px;
+            padding: 2rem;
+            background: linear-gradient(135deg, #ffffff 0%, rgba(253, 213, 177, 0.05) 100%);
+            border: 2px solid #E1DEE3;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--cor-gradiente-laranja-puro);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: var(--cor-laranja-claro);
+            box-shadow: 0 15px 40px rgba(232, 137, 75, 0.25);
+            transform: translateY(-6px);
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .card h3 {
+            color: var(--cor-primaria);
+            margin-bottom: 0.5rem;
+        }
+
+        .card p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .feature-list {
+            background: linear-gradient(135deg, rgba(245, 167, 103, 0.08) 0%, rgba(253, 213, 177, 0.12) 100%);
+            border-left: 5px solid var(--cor-secundaria);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .feature-list li {
+            list-style: none;
+            margin-bottom: 0.5rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .feature-list li::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: var(--cor-secundaria);
+            font-weight: bold;
+        }
+
+        .button-demo {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--cor-gradiente-principal);
+            color: white;
+            box-shadow: 0 4px 12px rgba(23, 19, 112, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: var(--cor-gradiente-quente);
+            box-shadow: 0 12px 28px rgba(201, 90, 17, 0.35);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--cor-gradiente-secundaria);
+            color: white;
+            box-shadow: 0 4px 12px rgba(232, 137, 75, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: var(--cor-gradiente-laranja-puro);
+            box-shadow: 0 12px 28px rgba(232, 137, 75, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-right: 0.5rem;
+        }
+
+        .badge-laranja {
+            background: var(--cor-gradiente-forte);
+            color: white;
+        }
+
+        .badge-pastel {
+            background: var(--cor-laranja-pastel);
+            color: var(--cor-laranja-queimado);
+        }
+
+        .info-box {
+            background: var(--cor-gradiente-laranja-puro);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 8px 24px rgba(232, 137, 75, 0.3);
+            margin-top: 2rem;
+        }
+
+        .info-box h3 {
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        code {
+            background: rgba(0, 0, 0, 0.05);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Novos Tons de Laranja & Gradientes</h1>
+        
+        <div class="section">
+            <h2>Cores Adicionadas</h2>
+            <div class="color-grid">
+                <div class="color-box" style="background: #FDB750;">
+                    <div>Laranja Muito Claro</div>
+                    <small>#FDB750</small>
+                </div>
+                <div class="color-box" style="background: #F5A767;">
+                    <div>Laranja Claro</div>
+                    <small>#F5A767</small>
+                </div>
+                <div class="color-box" style="background: #E8894B;">
+                    <div>Laranja Secundário</div>
+                    <small>#E8894B</small>
+                </div>
+                <div class="color-box" style="background: #D9722F;">
+                    <div>Laranja Forte</div>
+                    <small>#D9722F</small>
+                </div>
+                <div class="color-box" style="background: #C55A11;">
+                    <div>Laranja Queimado</div>
+                    <small>#C55A11</small>
+                </div>
+                <div class="color-box" style="background: #FDD5B1;">
+                    <div>Laranja Pastel</div>
+                    <small>#FDD5B1</small>
+                </div>
+                <div class="color-box" style="background: #171370;">
+                    <div>Azul Primário</div>
+                    <small>#171370</small>
+                </div>
+                <div class="color-box" style="background: #2D1F5F;">
+                    <div>Azul Claro</div>
+                    <small>#2D1F5F</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Novos Gradientes</h2>
+            <div class="gradient-demo">
+                <div class="gradient-box" style="background: var(--cor-gradiente-quente);">
+                    Quente<br><small>D9722F → E8894B → F5A767</small>
+                </div>
+                <div class="gradient-box" style="background: var(--cor-gradiente-laranja-puro);">
+                    Laranja Puro<br><small>E8894B → FDB750 → F5A767</small>
+                </div>
+                <div class="gradient-box" style="background: var(--cor-gradiente-forte);">
+                    Forte<br><small>C55A11 → D9722F → E8894B</small>
+                </div>
+                <div class="gradient-box" style="background: var(--cor-gradiente-azul-claro);">
+                    Azul-Claro<br><small>2D1F5F → E8894B</small>
+                </div>
+                <div class="gradient-box" style="background: var(--cor-gradiente-principal);">
+                    Principal<br><small>171370 → E8894B</small>
+                </div>
+                <div class="gradient-box" style="background: var(--cor-gradiente-inverso);">
+                    Inverso<br><small>F5A767 → 171370</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Cards com Novo Visual</h2>
+            <div class="card-demo">
+                <div class="card">
+                    <h3>Card com Destaque</h3>
+                    <p>Observa o topo quando passa o mouse - barra laranja gradiente aparece</p>
+                </div>
+                <div class="card">
+                    <h3>Sombra Laranja</h3>
+                    <p>Cards agora têm sombra com tons laranjas que aumentam no hover</p>
+                </div>
+                <div class="card">
+                    <h3>Background Suave</h3>
+                    <p>Fundo gradient subtil com laranja pastel mantém visual limpo</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Componentes Atualizados</h2>
+            <div class="feature-list">
+                <h3>✨ O que mudou:</h3>
+                <ul>
+                    <li><strong>Hero Section:</strong> Gradiente "Quente" (D9722F → E8894B → F5A767)</li>
+                    <li><strong>Menu Items:</strong> Hover com gradiente pastel + movimento X</li>
+                    <li><strong>Menu Active:</strong> Gradiente forte com sombra laranja</li>
+                    <li><strong>Botões Primary:</strong> Gradiente principal com sombra maior no hover</li>
+                    <li><strong>Botões Secondary:</strong> Gradiente laranja com efeito elevado</li>
+                    <li><strong>Abas (Tabs):</strong> Gradiente laranja puro na aba ativa</li>
+                    <li><strong>Cards:</strong> Barra gradiente no topo ao passar o mouse</li>
+                    <li><strong>Badges:</strong> 6 tipos com gradientes específicos</li>
+                    <li><strong>Seções:</strong> Novos backgrounds gradiente suaves</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Botões de Exemplo</h2>
+            <div class="button-demo">
+                <button class="btn btn-primary">Botão Primary</button>
+                <button class="btn btn-secondary">Botão Secondary</button>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Badges Atualizadas</h2>
+            <div>
+                <span class="badge badge-laranja">Laranja Forte</span>
+                <span class="badge badge-pastel">Laranja Pastel</span>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Classes CSS Novas Disponíveis</h2>
+            <div class="feature-list">
+                <ul>
+                    <li><code>.destaque-laranja</code> - Destaque com gradiente laranja</li>
+                    <li><code>.destaque-laranja-claro</code> - Destaque suave com border laranja</li>
+                    <li><code>.pulse-laranja</code> - Animação de pulso com laranja</li>
+                    <li><code>.link-laranja</code> - Links com efeito gradiente</li>
+                    <li><code>.border-laranja</code> - Bordas com tons laranjas</li>
+                    <li><code>.border-laranja-forte</code> - Bordas gradiente forte</li>
+                    <li><code>.text-gradiente-laranja</code> - Texto com gradiente laranja</li>
+                    <li><code>.text-gradiente-quente</code> - Texto com gradiente quente</li>
+                    <li><code>.shadow-laranja</code> - Sombra com tons laranjas</li>
+                    <li><code>.shadow-laranja-forte</code> - Sombra laranja forte</li>
+                    <li><code>.bg-gradiente-laranja-suave</code> - Background suave</li>
+                    <li><code>.bg-gradiente-laranja-medio</code> - Background médio</li>
+                    <li><code>.badge-laranja</code> - Badge com gradiente forte</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <h3>✅ Resumo das Mudanças</h3>
+            <p>
+                Foram adicionados <strong>6 novos tons de laranja</strong>, <strong>4 novos gradientes principais</strong>, 
+                e mais de <strong>15 novas classes CSS</strong> para aplicar o visual em toda a aplicação. 
+                O <strong>azul</strong> continua como cor primária complementar, criando contrastes visuais elegantes. 
+                Todos os componentes (buttons, cards, badges, menus) foram atualizados com os novos gradientes.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

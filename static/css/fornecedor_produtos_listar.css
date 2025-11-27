@@ -369,6 +369,28 @@ body {
     animation: fadeInUp 0.6s ease-out;
 }
 
+/* Fornecedor shared overrides to match home visual style */
+.card, .product-card, .action-card {
+    border-radius: 20px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    border: 1px solid #E1DEE3;
+    background-color: #ffffff;
+}
+
+.btn-primary {
+    background: var(--color-dark) !important;
+    border-color: var(--color-dark) !important;
+    color: #fff !important;
+}
+.btn-primary:hover {
+    background: var(--color-accent) !important;
+    border-color: var(--color-accent) !important;
+}
+
+@media (max-width: 768px) {
+    .products-grid { grid-template-columns: 1fr; }
+}
+
 .section-header {
     padding-bottom: 0.8rem;
 }

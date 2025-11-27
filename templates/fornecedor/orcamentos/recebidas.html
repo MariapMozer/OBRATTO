@@ -1,70 +1,43 @@
-{% extends "/publico/base2.html" %}
-{% block titulo%}Minhas Solicitações{% endblock %}
-{% block css %} <link rel="stylesheet" href="/static/css/fornecedor_solicitacoes_recebidas.css">{% endblock %}
-{% block menu %} 
+{% extends "fornecedor/base.html" %}
 
-<main class="container-fluid p-0">
-    <section class="solicitacoes-section">
-        <div class="container">
-            <h2 class="section-title">Solicitações Recebidas</h2>
-            <div class="row g-4">
-                
-                <!-- Card de Solicitação -->
-                <div class="col-lg-4 col-md-6">
-                    <div class="solicitacao-card">
-                        <div class="solicitacao-header d-flex align-items-center">
-                            <img src="/static/img/cliente1.jpg" alt="Cliente" class="cliente-img">
-                            <div class="ms-3">
-                                <h3 class="cliente-nome">João da Silva</h3>
-                                <p class="produto-nome">Produto solicitado: <strong>Cimento CP-II</strong></p>
-                            </div>
-                        </div>
-                        <div class="solicitacao-body">
-                            <p><strong>Mensagem:</strong> Preciso de 100 sacos de cimento para obra residencial.</p>
-                            <p><strong>Data:</strong> 02/09/2025</p>
-                        </div>
-                        <div class="solicitacao-actions">
-                            <a href="#" class="btn-acao bg-primary-custom">Ver Perfil</a>
-                            <a href="#" class="btn-acao bg-secondary-custom">Abrir Chat</a>
-                            <a href="#" class="btn-acao btn-outline">Enviar Orçamento</a>
-                        </div>
-                        <div class="solicitacao-footer">
-                            <button class="btn-acao-sm aprovar">✔ Aprovar</button>
-                            <button class="btn-acao-sm negar">✖ Negar</button>
-                            <button class="btn-acao-sm denunciar">🚩 Denunciar</button>
+{% block fornecedor_titulo %}Solicitações Recebidas{% endblock %}
+{% block css %}<link rel="stylesheet" href="/static/css/fornecedor_solicitacoes_recebidas.css">{% endblock %}
+
+{% block fornecedor_conteudo %}
+<div class="container-fluid px-4 py-4">
+    <h1 class="h3 mb-4">Solicitações Recebidas</h1>
+
+    <div class="row g-4">
+        {% if solicitacoes and solicitacoes|length > 0 %}
+            {% for s in solicitacoes %}
+            <div class="col-lg-4 col-md-6">
+                <div class="solicitacao-card card shadow-sm p-3">
+                    <div class="d-flex align-items-center mb-3">
+                        <img src="{{ s.cliente_avatar or '/static/img/cliente_default.png' }}" alt="Cliente" class="cliente-img rounded-circle">
+                        <div class="ms-3">
+                            <h5 class="mb-0">{{ s.cliente_nome }}</h5>
+                            <small class="text-muted">Produto: <strong>{{ s.produto_nome }}</strong></small>
                         </div>
                     </div>
-                </div>
-
-                <!-- Mais cards podem ser repetidos -->
-                <div class="col-lg-4 col-md-6">
-                    <div class="solicitacao-card">
-                        <div class="solicitacao-header d-flex align-items-center">
-                            <img src="/static/img/cliente2.jpg" alt="Cliente" class="cliente-img">
-                            <div class="ms-3">
-                                <h3 class="cliente-nome">Maria Oliveira</h3>
-                                <p class="produto-nome">Produto solicitado: <strong>Telha Colonial</strong></p>
-                            </div>
-                        </div>
-                        <div class="solicitacao-body">
-                            <p><strong>Mensagem:</strong> Solicito orçamento de 500 telhas com entrega.</p>
-                            <p><strong>Data:</strong> 01/09/2025</p>
-                        </div>
-                        <div class="solicitacao-actions">
-                            <a href="#" class="btn-acao bg-primary-custom">Ver Perfil</a>
-                            <a href="#" class="btn-acao bg-secondary-custom">Abrir Chat</a>
-                            <a href="#" class="btn-acao btn-outline">Enviar Orçamento</a>
-                        </div>
-                        <div class="solicitacao-footer">
-                            <button class="btn-acao-sm aprovar">✔ Aprovar</button>
-                            <button class="btn-acao-sm negar">✖ Negar</button>
-                            <button class="btn-acao-sm denunciar">🚩 Denunciar</button>
-                        </div>
+                    <p class="mb-2"><strong>Mensagem:</strong> {{ s.mensagem }}</p>
+                    <p class="mb-2"><strong>Data:</strong> {{ s.data }}</p>
+                    <div class="d-flex gap-2 mt-3">
+                        <a href="/cliente/{{ s.cliente_id }}" class="btn btn-sm btn-primary">Ver Perfil</a>
+                        <a href="/fornecedor/mensagens/abrir/{{ s.conversa_id }}" class="btn btn-sm btn-outline-secondary">Abrir Chat</a>
+                        <a href="/fornecedor/orcamentos/responder?solicitacao={{ s.id }}" class="btn btn-sm btn-outline-success">Enviar Orçamento</a>
                     </div>
                 </div>
-
             </div>
-        </div>
-    </section>
-</main>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="card shadow-sm text-center p-5">
+                    <i class="bi bi-inbox fs-1 mb-3"></i>
+                    <h5 class="mb-2">Nenhuma solicitação encontrada</h5>
+                    <p class="text-muted">Quando receber solicitações elas aparecerão aqui.</p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}

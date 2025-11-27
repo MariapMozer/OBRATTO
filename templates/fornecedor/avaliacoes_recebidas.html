@@ -1,12 +1,9 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OBRATTO</title>
-</head>
-<body>
-    <h1>Todas as avaliações recebidas</h1>
-    <hr>
-</body>
-</html>
+{% extends "fornecedor/base.html" %}
+
+{% block fornecedor_titulo %}Avaliações Recebidas{% endblock %}
+{% block fornecedor_conteudo %}
+<div class="container-fluid px-4 py-4">
+    <h1 class="h3 mb-4">Avaliações Recebidas</h1>
+    <p class="text-muted">Lista de avaliações. Use a rota correta para visualizar os detalhes.</p>
+</div>
+{% endblock %}

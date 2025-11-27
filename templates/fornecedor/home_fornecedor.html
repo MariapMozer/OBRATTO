@@ -1,132 +1,124 @@
 {% extends "fornecedor/base.html" %}
 
-{#
-    Template: Home Fornecedor
-    Descrição: Página inicial do fornecedor com produtos e promoções
-    Estende: fornecedor/base.html
-#}
-
-{% from 'components/product_card.html' import product_card %}
+{% block fornecedor_titulo %}Área do Fornecedor{% endblock %}
+{% block sidebar_active %}home{% endblock %}
 
 {% block css %}
+<link rel="stylesheet" href="/static/css/home.css">
 <link rel="stylesheet" href="/static/css/home_fornecedor.css">
 {% endblock %}
 
-{% block fornecedor_titulo %}Home - Fornecedor{% endblock %}
-
-{% block sidebar_active %}home{% endblock %}
-
 {% block fornecedor_conteudo %}
 <div class="container-fluid px-4">
-    <!-- Seção de Promoções -->
-    <section class="promotions-section mb-5">
-        <div class="section-header d-flex justify-content-between align-items-center mb-4">
-            <h2 class="section-title">PROMOÇÕES</h2>
-            <a href="/fornecedor/promocao/listar" class="view-all-btn">
-                Ver todos <i class="bi bi-arrow-right ms-1"></i>
+    <div class="row mb-4 align-items-center">
+        <div class="col">
+            <h1 class="page-title">Bem-vindo(a), {{ usuario_logado.nome if usuario_logado else 'Fornecedor' }}</h1>
+            <p class="page-subtitle">Gerencie seus produtos, promoções, orçamentos e mensagens a partir do painel.</p>
+        </div>
+        <div class="col-auto text-end">
+            <a href="/fornecedor/produtos/inserir" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-2"></i> Cadastrar Produto
             </a>
         </div>
+    </div>
 
-        {% if produtos %}
-        <div id="promotionsCarousel" class="carousel slide" data-bs-ride="false">
-            <div class="carousel-inner">
-                <div class="carousel-item active">
-                    <div class="row g-4">
-                        {% for produto in produtos[:3] %}
-                        <div class="col-lg-4 col-md-6">
-                            {{ product_card(
-                                produto=produto,
-                                show_actions=True,
-                                edit_url='/fornecedor/produtos/atualizar/' ~ produto.id,
-                                delete_handler='confirmDeleteProduct',
-                                card_class='h-100'
-                            ) }}
-                        </div>
-                        {% endfor %}
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Produtos</h5>
+                    <p class="card-text">Total de produtos cadastrados</p>
+                    <div class="d-flex align-items-center justify-content-between">
+                        <h2 class="mb-0">{{ produtos|length if produtos else 0 }}</h2>
+                        <a href="/fornecedor/produtos/listar" class="btn btn-sm btn-outline-secondary">Ver todos</a>
                     </div>
                 </div>
             </div>
-
-            {% if produtos|length > 3 %}
-            <button class="carousel-control-prev" type="button" data-bs-target="#promotionsCarousel" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Anterior</span>
-            </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#promotionsCarousel" data-bs-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Próximo</span>
-            </button>
-            {% endif %}
         </div>
-        {% else %}
-        <div class="alert alert-info">
-            <i class="bi bi-info-circle me-2"></i>
-            Nenhuma promoção ativa no momento.
-        </div>
-        {% endif %}
-    </section>
-
-    <!-- Seção de Produtos -->
-    <section class="products-section mb-5">
-        <div class="section-header d-flex justify-content-between align-items-center mb-4">
-            <h2 class="section-title">PRODUTOS</h2>
-            <a href="/fornecedor/produtos/listar" class="view-all-btn">
-                Ver todos <i class="bi bi-arrow-right ms-1"></i>
-            </a>
-        </div>
-
-        {% if produtos %}
-        <div id="productsCarousel" class="carousel slide" data-bs-ride="false">
-            <div class="carousel-inner">
-                {% for i in range(0, produtos|length, 3) %}
-                <div class="carousel-item {% if i == 0 %}active{% endif %}">
-                    <div class="row g-4">
-                        {% for produto in produtos[i:i+3] %}
-                        <div class="col-lg-4 col-md-6">
-                            {{ product_card(
-                                produto=produto,
-                                show_actions=True,
-                                edit_url='/fornecedor/produtos/atualizar/' ~ produto.id,
-                                delete_handler='confirmDeleteProduct',
-                                card_class='h-100'
-                            ) }}
-                        </div>
-                        {% endfor %}
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Orçamentos</h5>
+                    <p class="card-text">Solicitações recentes</p>
+                    <div class="d-flex align-items-center justify-content-between">
+                        <h2 class="mb-0">—</h2>
+                        <a href="/fornecedor/orcamentos/recebidas" class="btn btn-sm btn-outline-secondary">Ver</a>
                     </div>
                 </div>
-                {% endfor %}
             </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Mensagens</h5>
+                    <p class="card-text">Conversas ativas</p>
+                    <div class="d-flex align-items-center justify-content-between">
+                        <h2 class="mb-0">—</h2>
+                        <a href="/fornecedor/mensagens/recebidas" class="btn btn-sm btn-outline-secondary">Abrir</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-            {% if produtos|length > 3 %}
-            <button class="carousel-control-prev" type="button" data-bs-target="#productsCarousel" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Anterior</span>
-            </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#productsCarousel" data-bs-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Próximo</span>
-            </button>
+    <section class="products-overview">
+        {% from 'components/product_card.html' import product_card %}
+        {% from 'components/empty_state.html' import empty_state %}
+
+        <div class="row">
+            <div class="col-12 mb-3">
+                <h3 class="section-title">Últimos Produtos</h3>
+            </div>
+        </div>
+
+        <div class="row">
+            {% if produtos and produtos|length > 0 %}
+                <div class="products-grid">
+                    {% for produto in produtos %}
+                        <div class="col-lg-4 col-md-6 mb-4">
+                            {{ product_card(produto, show_actions=True) }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="col-12">
+                    {{ empty_state(
+                        icon='box-seam',
+                        title='Nenhum produto encontrado',
+                        description='Você ainda não cadastrou nenhum produto.',
+                        action_url='/fornecedor/produtos/inserir',
+                        action_text='Cadastrar Produto',
+                        action_icon='plus-circle'
+                    ) }}
+                </div>
             {% endif %}
         </div>
-        {% else %}
-        <div class="alert alert-info">
-            <i class="bi bi-info-circle me-2"></i>
-            Você ainda não cadastrou nenhum produto.
-            <a href="/fornecedor/produtos/inserir" class="alert-link">Cadastre seu primeiro produto</a>.
-        </div>
-        {% endif %}
     </section>
+
+    <div class="row mt-5">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Avaliações Recentes</h5>
+                    <p class="card-text">Veja o que seus clientes estão dizendo</p>
+                    <a href="/fornecedor/avaliacoes" class="btn btn-sm btn-outline-secondary">Ver Avaliações</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Configurações</h5>
+                    <p class="card-text">Acesse seu perfil e configurações de conta</p>
+                    <a href="/fornecedor/perfil" class="btn btn-sm btn-outline-secondary">Editar Perfil</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 {% endblock %}
 
 {% block fornecedor_scripts %}
-<script src="/static/js/home_fornecedor.js"></script>
-
-<script>
-function confirmDeleteProduct(produtoId, produtoNome) {
-    if (confirm(`Tem certeza que deseja excluir o produto "${produtoNome}"?`)) {
-        window.location.href = `/fornecedor/produtos/excluir/${produtoId}`;
-    }
-}
-</script>
+<!-- scripts específicos do dashboard fornecedor (se necessário) -->
 {% endblock %}

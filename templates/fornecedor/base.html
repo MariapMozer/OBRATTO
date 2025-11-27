@@ -28,6 +28,10 @@
 {% endif %}
 {% endblock %}
 
+{% block auth_css %}
+<link rel="stylesheet" href="/static/css/home_fornecedor.css">
+{% endblock %}
+
 {% block body_content %}
 <input type="checkbox" id="toggleSidebar" hidden>
 
@@ -53,7 +57,7 @@
         {% block navbar %}
         <nav class="navbar navbar-expand-lg navbar-dark fundo-azul mb-4">
             <div class="container-fluid">
-                <label for="toggleSidebar" class="navbar-brand toggle-btn d-md-none">
+                <label for="toggleSidebar" class="navbar-brand toggle-btn">
                     <i class="bi bi-list"></i>
                 </label>
                 <div class="navbar-nav ms-auto">
@@ -91,5 +95,97 @@
 {% block sidebar_active %}home{% endblock %}
 
 {% block scripts %}
+<script>
+    // ================== SIDEBAR TOGGLE FUNCTIONALITY ==================
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggleCheckbox = document.getElementById('toggleSidebar');
+        const pageContent = document.querySelector('.page-content');
+        const toggleBtn = document.querySelector('.toggle-btn');
+        const sidebar = document.querySelector('.sidebar');
+        
+        // Restaurar estado anterior do sidebar (padrão: aberto)
+        const sidebarState = localStorage.getItem('sidebarOpen');
+        const isOpen = sidebarState !== 'false'; // Default é true
+        
+        if (!isOpen) {
+            toggleCheckbox.checked = false;
+            pageContent.classList.add('sidebar-closed');
+        } else {
+            toggleCheckbox.checked = true;
+            pageContent.classList.add('sidebar-open');
+        }
+        
+        // Função para atualizar estado do toggle
+        function updateSidebarState(isOpen) {
+            if (isOpen) {
+                pageContent.classList.remove('sidebar-closed');
+                pageContent.classList.add('sidebar-open');
+                if (toggleBtn) {
+                    toggleBtn.setAttribute('title', 'Fechar menu');
+                }
+                localStorage.setItem('sidebarOpen', 'true');
+            } else {
+                pageContent.classList.remove('sidebar-open');
+                pageContent.classList.add('sidebar-closed');
+                if (toggleBtn) {
+                    toggleBtn.setAttribute('title', 'Abrir menu');
+                }
+                localStorage.setItem('sidebarOpen', 'false');
+            }
+        }
+        
+        // Listener para mudanças no checkbox
+        toggleCheckbox.addEventListener('change', function() {
+            updateSidebarState(this.checked);
+        });
+        
+        // Botão toggle com teclado (Enter/Space)
+        toggleBtn.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                toggleCheckbox.click();
+            }
+        });
+        
+        // Fechar sidebar ao clicar em um item do menu (mobile/tablet)
+        if (window.innerWidth <= 1024) {
+            document.querySelectorAll('.sidebar-item').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    // Não fechar se for link da página atual
+                    if (!this.classList.contains('active')) {
+                        // Pequeno delay para melhor experiência visual
+                        setTimeout(() => {
+                            toggleCheckbox.checked = false;
+                            toggleCheckbox.dispatchEvent(new Event('change'));
+                        }, 100);
+                    }
+                });
+            });
+        }
+        
+        // Responsividade ao redimensionar janela
+        let resizeTimer;
+        window.addEventListener('resize', function() {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(function() {
+                if (window.innerWidth > 1024 && !toggleCheckbox.checked) {
+                    // Se tela fica grande, abrir sidebar automaticamente
+                    toggleCheckbox.checked = true;
+                    toggleCheckbox.dispatchEvent(new Event('change'));
+                }
+            }, 250);
+        });
+    });
+    
+    // Atalho de teclado: Ctrl/Cmd + Shift + M para toggle sidebar
+    document.addEventListener('keydown', function(e) {
+        if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'M') {
+            e.preventDefault();
+            const toggleCheckbox = document.getElementById('toggleSidebar');
+            toggleCheckbox.checked = !toggleCheckbox.checked;
+            toggleCheckbox.dispatchEvent(new Event('change'));
+        }
+    });
+</script>
 {% block fornecedor_scripts %}{% endblock %}
 {% endblock %}

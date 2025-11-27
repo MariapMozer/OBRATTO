@@ -200,10 +200,12 @@ async def visualizar_avaliacoes_recebidas(
     request: Request, usuario_logado: Optional[dict] = None
 ):
     assert usuario_logado is not None
-    avaliacoes = avaliacao_repo.obter_avaliacao_por_id(usuario_logado["id"])
+    # obter todas as avaliações e filtrar pelas que foram feitas para o fornecedor logado
+    todas = avaliacao_repo.obter_todos()
+    avaliacoes = [a for a in todas if getattr(a, 'id_avaliado', None) == usuario_logado['id']]
     return templates.TemplateResponse(
         "fornecedor/avaliacoes/recebidas.html",
-        {"request": request, "avaliacoes": avaliacoes},
+        {"request": request, "avaliacoes": avaliacoes, "usuario_logado": usuario_logado},
     )
 
 

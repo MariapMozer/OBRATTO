@@ -101,6 +101,24 @@ body {
     box-shadow: 0 15px 30px rgba(0,0,0,0.15);
 }
 
+/* Harmonização visual com a home */
+.card, .solicitacao-card {
+    border-radius: 20px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    border: 1px solid #E1DEE3;
+    background: #fff;
+}
+
+.btn-primary {
+    background: var(--cor-primaria) !important;
+    border-color: var(--cor-primaria) !important;
+    color: white !important;
+}
+.btn-primary:hover {
+    background: var(--cor-secundaria) !important;
+    border-color: var(--cor-secundaria) !important;
+}
+
 .solicitacao-header {
     border-bottom: 1px solid #E1DEE3;
     padding-bottom: 1rem;

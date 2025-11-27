@@ -22,20 +22,27 @@
     <div class="sidebar-header">
         {% if logo_text %}
         <a href="{{ logo_url }}" class="logo-link">
-            <h2 class="logo">{{ logo_text }}</h2>
+            <div class="sidebar-icon">
+                <i class="bi bi-shop"></i>
+            </div>
+            <div class="sidebar-label">
+                <h2 class="logo">{{ logo_text }}</h2>
+            </div>
         </a>
         {% endif %}
-        <label for="toggleSidebar" class="toggle-btn">
-            <i class="bi bi-list"></i>
-        </label>
     </div>
 
     <nav class="sidebar-nav">
         {% for item in items %}
         <a href="{{ item.url }}"
-           class="sidebar-item {% if item.id == active_item %}active{% endif %}">
-            <i class="bi bi-{{ item.icon }}"></i>
-            <span>{{ item.label }}</span>
+           class="sidebar-item list-group-item-action {% if item.id == active_item %}active{% endif %}"
+           title="{{ item.label }}">
+            <div class="sidebar-icon">
+                <i class="bi bi-{{ item.icon }}"></i>
+            </div>
+            <div class="sidebar-label">
+                <span>{{ item.label }}</span>
+            </div>
         </a>
         {% endfor %}
     </nav>

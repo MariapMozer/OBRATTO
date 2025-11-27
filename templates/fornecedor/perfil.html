@@ -1,12 +1,105 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OBRATTO</title>
-</head>
-<body>
-    <h1>Meu perfil e informações públicas</h1>
-    <hr>
-</body>
-</html>
+{% extends "fornecedor/base.html" %}
+
+{% block fornecedor_titulo %}Meu Perfil{% endblock %}
+{% block sidebar_active %}perfil{% endblock %}
+
+{% block fornecedor_conteudo %}
+<div class="container-fluid px-4 py-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="h3">Meu Perfil</h1>
+            <p class="text-muted">Informações públicas que seus clientes verão.</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="/fornecedor/conta" class="btn btn-outline-secondary">Configurações da Conta</a>
+        </div>
+    </div>
+
+    {% if mensagem %}
+    <div class="alert alert-success">{{ mensagem }}</div>
+    {% endif %}
+    {% if request.query_params.get('erro') %}
+    <div class="alert alert-danger">Erro: {{ request.query_params.get('erro') }}</div>
+    {% endif %}
+
+    <div class="row g-4">
+        <div class="col-lg-4">
+            <div class="card shadow-sm text-center p-4">
+                <img src="{{ fornecedor.foto or '/static/img/fornecedor_default.png' }}" alt="Foto" class="rounded-circle mb-3" width="140" height="140">
+                <h5 class="mb-0">{{ fornecedor.nome }}</h5>
+                <small class="text-muted">{{ fornecedor.razao_social or '' }}</small>
+
+                <form action="/fornecedor/perfil/foto" method="post" enctype="multipart/form-data" class="mt-3">
+                    <div class="mb-2">
+                        <input type="file" name="foto" accept="image/*" class="form-control form-control-sm">
+                    </div>
+                    <button class="btn btn-sm btn-primary">Enviar Foto</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card shadow-sm p-3 mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Informações Públicas</h5>
+                    <form action="/fornecedor/perfil/editar" method="post">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Nome</label>
+                                <input type="text" name="nome" class="form-control" value="{{ fornecedor.nome }}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Razão Social</label>
+                                <input type="text" name="razao_social" class="form-control" value="{{ fornecedor.razao_social or '' }}">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Descrição</label>
+                            <textarea name="descricao" class="form-control" rows="3">{{ fornecedor.descricao or '' }}</textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Telefone</label>
+                                <input type="text" name="telefone" class="form-control" value="{{ fornecedor.telefone or '' }}">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">E-mail público</label>
+                                <input type="email" name="email" class="form-control" value="{{ fornecedor.email or '' }}">
+                            </div>
+                        </div>
+                        <button class="btn btn-primary">Salvar Alterações Públicas</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card shadow-sm p-3 mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Segurança</h5>
+                    <form action="/fornecedor/perfil/alterar-senha" method="post">
+                        <input type="hidden" name="id" value="{{ fornecedor.id }}">
+                        <div class="mb-3">
+                            <label class="form-label">Senha Atual</label>
+                            <input type="password" name="senha_atual" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Nova Senha</label>
+                            <input type="password" name="nova_senha" class="form-control" required>
+                        </div>
+                        <button class="btn btn-warning">Alterar Senha</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card shadow-sm p-3">
+                <div class="card-body">
+                    <h5 class="card-title text-danger">Excluir Conta</h5>
+                    <p class="text-muted">Ao apagar sua conta todos os seus dados serão removidos. Esta ação é irreversível.</p>
+                    <form action="/fornecedor/perfil/excluir" method="post" onsubmit="return confirm('Deseja realmente excluir sua conta?');">
+                        <button class="btn btn-danger">Excluir Conta</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
