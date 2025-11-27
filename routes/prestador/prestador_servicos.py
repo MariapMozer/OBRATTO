@@ -39,7 +39,7 @@ async def gets(request: Request, usuario_logado: Optional[dict] = None):
 @requer_autenticacao(["prestador"])
 async def form_novo_servicos(request: Request):
     return templates.TemplateResponse(
-        "prestador/servicos/novo.html", {"request": request}
+        "prestador/servicos/novo_servico.html", {"request": request}
     )
 
 
@@ -79,7 +79,7 @@ async def processar_novo_servico(
         return RedirectResponse("/meus/servicos", status.HTTP_303_SEE_OTHER)
     else:
         return templates.TemplateResponse(
-            "prestador/servicos/novo.html",
+            "prestador/servicos/.html",
             {"request": request, "erro": "Erro ao cadastrar serviço."},
         )
 
