@@ -65,9 +65,9 @@ async def processar_login(request: Request, email: str = Form(), senha: str = Fo
 
     Redirecionamentos por perfil:
         - admin/administrador: /administrador/home
-        - fornecedor: /fornecedor
+        - fornecedor: /fornecedor/home  <-- Alterado
         - cliente: /cliente
-        - prestador: /prestador
+        - prestador: /prestador/home    <-- Alterado
         - default: /
 
     Códigos de status:
@@ -120,13 +120,15 @@ async def processar_login(request: Request, email: str = Form(), senha: str = Fo
                 "/administrador/home", status_code=status.HTTP_303_SEE_OTHER
             )
         elif perfil == "fornecedor":
+            # ALTERAÇÃO: Redireciona para /fornecedor/home
             return RedirectResponse(
-                "/fornecedor", status_code=status.HTTP_303_SEE_OTHER
+                "/fornecedor/home", status_code=status.HTTP_303_SEE_OTHER
             )
         elif perfil == "cliente":
             return RedirectResponse("/cliente", status_code=status.HTTP_303_SEE_OTHER)
         elif perfil == "prestador":
-            return RedirectResponse("/prestador", status_code=status.HTTP_303_SEE_OTHER)
+            # ALTERAÇÃO: Redireciona para /prestador/home
+            return RedirectResponse("/prestador/home", status_code=status.HTTP_303_SEE_OTHER)
         else:
             return RedirectResponse("/", status_code=status.HTTP_303_SEE_OTHER)
 
