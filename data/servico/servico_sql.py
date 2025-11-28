@@ -18,7 +18,7 @@ VALUES  (?, ?, ?, ?, ?);
 """
 
 
-OBTER_SERVICO = """
+OBTER_SERVICOS = """
 SELECT 
     s.id_servico,
     s.id_prestador,

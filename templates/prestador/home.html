@@ -16,7 +16,7 @@
             <p class="page-subtitle">Gerencie sua agenda, seus serviços, orcamentos, solicitações, e pagamentos a partir do painel.</p>
         </div>
         <div class="col-auto text-end">
-            <a href="/prestador/servico/novo" class="btn btn-primary">
+            <a href="/prestador/servicos" class="btn btn-primary">
                 <i class="bi bi-plus-circle me-2"></i> Cadastrar Serviço
             </a>
         </div>
@@ -30,7 +30,7 @@
                     <p class="card-text">Total de serviços cadastrados</p>
                     <div class="d-flex align-items-center justify-content-between">
                         <h2 class="mb-0">{{ servicos|length if servicos else 0 }}</h2>
-                        <a href="/prestador/servico/listar" class="btn btn-sm btn-outline-secondary">Ver todos</a>
+                        <a href="/prestador/servicos" class="btn btn-sm btn-outline-secondary">Ver todos</a>
                     </div>
                 </div>
             </div>
@@ -72,7 +72,7 @@
         </div>
 
         <div class="row">
-            {% if servico and servico|length > 0 %}
+            {% if servicos and servicos|length > 0 %}
                 <div class="servico-grid">
                     {% for servico in servicos %}
                         <div class="col-lg-4 col-md-6 mb-4">

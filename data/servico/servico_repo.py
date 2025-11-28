@@ -4,7 +4,7 @@ from data.servico.servico_model import Servico
 from data.servico.servico_sql import (
     CRIAR_TABELA_SERVICO,
     INSERIR_SERVICO,
-    OBTER_SERVICO,
+    OBTER_SERVICOS,
     OBTER_SERVICO_POR_ID,
     ATUALIZAR_SERVICO,
     DELETAR_SERVICO,
@@ -38,10 +38,10 @@ def inserir_servico(servico: Servico) -> Optional[int]:
         return cursor.lastrowid
 
 
-def obter_servico() -> List[Servico]:
+def obter_servicos() -> List[Servico]:
     with open_connection() as conn:
         cursor = conn.cursor()
-        cursor.execute(OBTER_SERVICO)
+        cursor.execute(OBTER_SERVICOS)
         rows = cursor.fetchall()
         servicos = []
         for row in rows:

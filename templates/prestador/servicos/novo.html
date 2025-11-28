@@ -1,0 +1,42 @@
+{% extends "prestador/base.html" %}
+
+{% block prestador_titulo %}Novo Serviço{% endblock %}
+{% block sidebar_active %}meus_servicos{% endblock %}
+
+{% block prestador_conteudo %}
+
+<div class="container py-4">
+    <h2 class="mb-4">Cadastrar Novo Serviço</h2>
+
+    {# CORRIGIDO: O action do formulário agora aponta para a rota correta no FastAPI #}
+    <form action="/prestador/servicos/novo" method="post" enctype="multipart/form-data" class="card p-4 shadow-sm">
+
+        <div class="mb-3">
+            <label class="form-label">Nome do Serviço</label> {# CORRIGIDO: Usando 'Nome' para consistência com o Python #}
+            <input type="text" name="nome" class="form-control" required> {# CORRIGIDO: Usando 'name="nome"' #}
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Descrição</label>
+            <textarea name="descricao" class="form-control" rows="4" required></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Preço (R$)</label> {# CORRIGIDO: Usando 'Preço' para consistência com o Python #}
+            <input type="number" step="0.01" name="preco" class="form-control" required> {# CORRIGIDO: Usando 'name="preco"' #}
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Foto Principal</label>
+            <input type="file" name="foto" class="form-control">
+        </div>
+
+        <div class="d-flex justify-content-end gap-2">
+            <a href="/prestador/servicos" class="btn btn-secondary">Cancelar</a>
+            <button type="submit" class="btn btn-primary">Salvar</button>
+        </div>
+
+    </form>
+</div>
+
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends "prestador/base.html" %}
+
+{% block prestador_titulo %}Editar Serviço{% endblock %}
+{% block sidebar_active %}meus_servicos{% endblock %}
+
+{% block prestador_conteudo %}
+
+<div class="container py-4">
+    <h2 class="mb-4">Editar Serviço</h2>
+
+    {# CORRIGIDO: O action do formulário agora aponta para a rota correta no FastAPI, usando o ID do serviço #}
+    <form action="/prestador/servicos/{{ servico.id_servico }}" method="post" enctype="multipart/form-data" class="card p-4 shadow-sm">
+
+        <input type="hidden" name="servico_id" value="{{ servico.id_servico }}"> {# Adicionado campo hidden para o ID #}
+
+        <div class="mb-3">
+            <label class="form-label">Nome do Serviço</label> {# CORRIGIDO: Usando 'Nome' para consistência com o Python #}
+            <input type="text" name="nome" value="{{ servico.nome }}" class="form-control"> {# CORRIGIDO: Usando 'name="nome"' e 'servico.nome' #}
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Descrição</label>
+            <textarea name="descricao" class="form-control" rows="4">{{ servico.descricao }}</textarea>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Preço (R$)</label> {# CORRIGIDO: Usando 'Preço' para consistência com o Python #}
+            <input type="number" step="0.01" name="preco" value="{{ servico.preco }}" class="form-control"> {# CORRIGIDO: Usando 'name="preco"' e 'servico.preco' #}
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label d-block">Foto Atual</label>
+            {% if servico.foto %}
+                <img src="/static/uploads/{{ servico.foto }}" class="rounded mb-2" style="height: 120px;">
+            {% else %}
+                <p class="text-muted">Nenhuma foto enviada</p>
+            {% endif %}
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Enviar Nova Foto</label>
+            <input type="file" name="foto" class="form-control">
+        </div>
+
+        <div class="d-flex justify-content-between mt-4">
+            <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+            
+            {# O formulário de exclusão deve ser separado para evitar problemas de roteamento POST #}
+            <form action="/prestador/servicos/excluir" method="post"> 
+                <input type="hidden" name="id" value="{{ servico.id_servico }}">
+                <button type="submit" class="btn btn-danger">Excluir</button>
+            </form>
+        </div>
+
+    </form>
+</div>
+
+{% endblock %}
