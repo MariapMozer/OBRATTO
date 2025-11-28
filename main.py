@@ -40,6 +40,7 @@ from routes.fornecedor import fornecedor_mensagens
 from routes.fornecedor import fornecedor_perfil
 from routes.fornecedor import fornecedor_promocoes
 from routes.fornecedor import fornecedor_solicitacoes_orcamento
+from routes.fornecedor import fornecedor_avaliacoes
 
 # Administrador
 from routes.administrador import administrador_anuncios
@@ -66,6 +67,10 @@ from routes.cliente import cliente_contratacoes
 # ----------------------------------------------------------
 criar_tabelas()
 seed_usuarios_padrao()
+
+# Garantir que o fornecedor de teste sempre exista
+from util.seed import garantir_fornecedor_teste
+garantir_fornecedor_teste()
 
 # ----------------------------------------------------------
 # CRIAÇÃO DO APP
@@ -125,6 +130,7 @@ app.include_router(fornecedor_produtos.router, prefix="/fornecedor")
 app.include_router(fornecedor_planos.router, prefix="/fornecedor")
 app.include_router(fornecedor_pagamento.router, prefix="/fornecedor")
 app.include_router(fornecedor_mensagens.router, prefix="/fornecedor")
+app.include_router(fornecedor_avaliacoes.router, prefix="/fornecedor")
 
 # ----------------------------------------------------------
 # ROTAS - ADMINISTRADOR

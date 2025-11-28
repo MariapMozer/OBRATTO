@@ -4,10 +4,13 @@ Todas as configurações devem vir do arquivo .env
 """
 import os
 from pathlib import Path
-from dotenv import load_dotenv
 
-# Carregar variáveis de ambiente do .env
-load_dotenv()
+# Tentar carregar variáveis de ambiente do .env
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
 
 # === Configurações da Aplicação ===
 APP_NAME = os.getenv("APP_NAME", "OBRATTO")

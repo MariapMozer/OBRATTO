@@ -77,6 +77,13 @@ def obter_produto_por_pagina(limit: int, offset: int) -> List[Produto]:
         return [Produto.from_row(row) for row in cursor.fetchall()]
 
 
+def obter_produtos() -> List[Produto]:
+    """Obter todos os produtos"""
+    with open_connection() as conn:
+        cursor = conn.execute("SELECT * FROM produto")
+        return [Produto.from_row(row) for row in cursor.fetchall()]
+
+
 def obter_produto_por_nome(nome: str) -> List[Produto]:
     with open_connection() as conn:
         cursor = conn.execute(OBTER_PRODUTO_POR_NOME, (f"%{nome}%",))

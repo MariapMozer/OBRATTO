@@ -1,12 +1,513 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OBRATTO</title>
-</head>
-<body>
-    <h1>Cadastrar novas promoções</h1>
-    <hr>
-</body>
-</html>
+{% extends "fornecedor/base.html" %}
+
+{% block fornecedor_titulo %}Cadastrar Promoção{% endblock %}
+{% block sidebar_active %}promocoes{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="/static/css/home_fornecedor.css">
+<style>
+    .page-title {
+        color: #171370;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .page-subtitle {
+        color: #999;
+        font-size: 0.95rem;
+    }
+
+    .form-section {
+        background: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .form-section h4 {
+        color: #171370;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        color: #171370;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .form-group small {
+        display: block;
+        color: #999;
+        margin-top: 0.25rem;
+        font-size: 0.8rem;
+    }
+
+    .form-control,
+    .form-select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        outline: none;
+        border-color: #171370;
+        box-shadow: 0 0 0 3px rgba(23, 19, 112, 0.1);
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #171370 0%, #E8894B 100%);
+        border: none;
+        color: white;
+        padding: 0.75rem 2rem;
+        border-radius: 4px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(232, 137, 75, 0.3);
+    }
+
+    .btn-secondary {
+        background: #f0f0f0;
+        border: 1px solid #ddd;
+        color: #333;
+        padding: 0.75rem 2rem;
+        border-radius: 4px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-secondary:hover {
+        background: #e0e0e0;
+    }
+
+    .btn-group {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .help-text {
+        background: #f9f9f9;
+        border-left: 4px solid #E8894B;
+        padding: 1rem;
+        border-radius: 4px;
+        margin-bottom: 1.5rem;
+        font-size: 0.9rem;
+        color: #333;
+    }
+
+    .help-text strong {
+        color: #171370;
+    }
+
+    .product-card {
+        background: #f9f9f9;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        gap: 1rem;
+        align-items: start;
+    }
+
+    .product-card:hover {
+        border-color: #E8894B;
+        background: white;
+        box-shadow: 0 2px 8px rgba(232, 137, 75, 0.1);
+    }
+
+    .product-card input[type="radio"] {
+        margin-top: 0.25rem;
+        cursor: pointer;
+        width: 20px;
+        height: 20px;
+    }
+
+    .product-info {
+        flex: 1;
+    }
+
+    .product-name {
+        font-weight: 600;
+        color: #171370;
+        margin-bottom: 0.25rem;
+    }
+
+    .product-price {
+        color: #E8894B;
+        font-weight: 600;
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .product-description {
+        color: #999;
+        font-size: 0.85rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .product-stock {
+        color: #666;
+        font-size: 0.85rem;
+    }
+
+    .produto-em-promocao {
+        background: #fffacd;
+        border-color: #FFD700;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .badge-warning {
+        background: #FFF3CD;
+        color: #856404;
+    }
+
+    .badge-success {
+        background: #D4EDDA;
+        color: #155724;
+    }
+
+    .desconto-preview {
+        background: #f0f0f0;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-top: 1.5rem;
+    }
+
+    .desconto-preview h5 {
+        color: #171370;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .desconto-info {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .desconto-item {
+        padding: 0.75rem;
+        background: white;
+        border-radius: 4px;
+        text-align: center;
+    }
+
+    .desconto-label {
+        display: block;
+        color: #999;
+        font-size: 0.85rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .desconto-value {
+        display: block;
+        color: #171370;
+        font-weight: 700;
+        font-size: 1.5rem;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1.5rem;
+    }
+
+    .empty-state-icon {
+        font-size: 3rem;
+        color: #ddd;
+        margin-bottom: 1rem;
+    }
+
+    .empty-state h5 {
+        color: #171370;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-state p {
+        color: #999;
+        margin-bottom: 1.5rem;
+    }
+
+    @media (max-width: 768px) {
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+
+        .product-card {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .desconto-info {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block fornecedor_conteudo %}
+<div class="container-fluid px-4">
+    <!-- Alertas de Mensagens -->
+    {% if request.query_params.get('erro') %}
+        {% set erro = request.query_params.get('erro') %}
+        {% if erro == 'desconto_invalido' %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-circle me-2"></i>
+            <strong>Erro!</strong> O desconto deve ser um valor entre 0 e 100%.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% elif erro == 'produto_nao_encontrado' %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-circle me-2"></i>
+            <strong>Erro!</strong> Produto não encontrado ou você não tem permissão para editá-lo.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endif %}
+    {% endif %}
+
+    <!-- Cabeçalho -->
+    <div class="row mb-4 align-items-center">
+        <div class="col">
+            <h1 class="page-title">Cadastrar Promoção</h1>
+            <p class="page-subtitle">Configure uma promoção especial para seus produtos e aumente as vendas</p>
+        </div>
+    </div>
+
+    <!-- Informação de Ajuda -->
+    <div class="help-text">
+        <i class="bi bi-info-circle me-2"></i>
+        <strong>Como Funciona:</strong> Selecione um produto abaixo e defina uma porcentagem de desconto. A promoção será aplicada imediatamente ao seu catálogo.
+    </div>
+
+    <form method="POST" action="/fornecedor/promocoes/cadastrar">
+        <!-- Seção de Seleção de Produto -->
+        <div class="form-section">
+            <h4>
+                <i class="bi bi-box-seam"></i>
+                Selecionar Produto
+            </h4>
+
+            <div class="form-group">
+                <label>Escolha um produto para promover:</label>
+                <small>Apenas produtos com estoque disponível podem ser promovidos</small>
+            </div>
+
+            {% if produtos and produtos|length > 0 %}
+            <div id="produto-list">
+                {% for produto in produtos %}
+                <label class="product-card {% if produto.em_promocao %}produto-em-promocao{% endif %}" onclick="selecionarProduto({{ produto.id }}, this)">
+                    <input type="radio" name="id_produto" value="{{ produto.id }}" required 
+                           onchange="atualizarPreview({{ produto.id }}, {{ produto.preco }})">
+                    
+                    <div class="product-info">
+                        <div class="product-name">{{ produto.nome }}</div>
+                        
+                        {% if produto.em_promocao %}
+                        <span class="badge badge-warning">
+                            <i class="bi bi-percent"></i> Em Promoção
+                        </span>
+                        {% else %}
+                        <span class="badge badge-success">
+                            <i class="bi bi-check-circle"></i> Disponível
+                        </span>
+                        {% endif %}
+                        
+                        <div class="product-price">R$ {{ "%.2f"|format(produto.preco) }}</div>
+                        <div class="product-description">{{ produto.descricao[:60] }}{% if produto.descricao|length > 60 %}...{% endif %}</div>
+                        <div class="product-stock">
+                            <i class="bi bi-box"></i> 
+                            {{ produto.quantidade }} {% if produto.quantidade == 1 %}unidade{% else %}unidades{% endif %} em estoque
+                        </div>
+                    </div>
+                </label>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">
+                            <i class="bi bi-box-seam"></i>
+                        </div>
+                        <h5>Nenhum Produto Cadastrado</h5>
+                        <p>Você não tem produtos cadastrados ainda.</p>
+                        <a href="/fornecedor/produtos/inserir" class="btn btn-primary">
+                            <i class="bi bi-plus-circle me-2"></i> Cadastrar Primeiro Produto
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Seção de Desconto -->
+        {% if produtos and produtos|length > 0 %}
+        <div class="form-section">
+            <h4>
+                <i class="bi bi-percent"></i>
+                Definir Desconto
+            </h4>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="desconto">Porcentagem de Desconto (%)</label>
+                    <input type="number" id="desconto" name="desconto" class="form-control"
+                           min="0" max="100" step="0.01" placeholder="0.00"
+                           onchange="atualizarPreview()" oninput="atualizarPreview()"
+                           required>
+                    <small>Digite um valor entre 0 e 100</small>
+                </div>
+            </div>
+
+            <!-- Preview de Desconto -->
+            <div class="desconto-preview" id="desconto-preview" style="display: none;">
+                <h5>Resumo da Promoção</h5>
+                
+                <div class="desconto-info">
+                    <div class="desconto-item">
+                        <span class="desconto-label">Preço Original</span>
+                        <span class="desconto-value" id="preview-preco-original">R$ 0,00</span>
+                    </div>
+                    <div class="desconto-item">
+                        <span class="desconto-label">Desconto</span>
+                        <span class="desconto-value" id="preview-desconto" style="color: #E8894B;">-R$ 0,00</span>
+                    </div>
+                    <div class="desconto-item">
+                        <span class="desconto-label">Preço Final</span>
+                        <span class="desconto-value" id="preview-preco-final" style="color: #28a745;">R$ 0,00</span>
+                    </div>
+                    <div class="desconto-item">
+                        <span class="desconto-label">Economia</span>
+                        <span class="desconto-value" id="preview-economia" style="color: #E8894B;">0%</span>
+                    </div>
+                </div>
+
+                <div class="alert alert-info" role="alert" id="alert-promocao">
+                    <i class="bi bi-info-circle me-2"></i>
+                    <strong id="alert-produto-nome">Produto</strong> será vendido com
+                    <strong id="alert-desconto-pct">0%</strong> de desconto!
+                </div>
+            </div>
+        </div>
+
+        <!-- Seção de Botões -->
+        <div class="form-section">
+            <div class="btn-group">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-circle me-2"></i> Criar Promoção
+                </button>
+                <a href="/fornecedor/promocoes/listar" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left me-2"></i> Voltar
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </form>
+</div>
+{% endblock %}
+
+{% block fornecedor_scripts %}
+<script>
+    let produtoSelecionado = null;
+    let precoOriginal = 0;
+
+    function selecionarProduto(produtoId, element) {
+        // Remover seleção anterior
+        document.querySelectorAll('.product-card').forEach(card => {
+            card.style.borderColor = '#e0e0e0';
+            card.style.background = card.classList.contains('produto-em-promocao') ? '#fffacd' : '#f9f9f9';
+        });
+        
+        // Adicionar seleção atual
+        element.style.borderColor = '#E8894B';
+        element.style.borderWidth = '2px';
+        element.style.background = 'white';
+        
+        produtoSelecionado = produtoId;
+        atualizarPreview();
+    }
+
+    function atualizarPreview(produtoId = null, preco = null) {
+        const radioSelecionado = document.querySelector('input[name="id_produto"]:checked');
+        const descontoInput = document.getElementById('desconto');
+        
+        if (!radioSelecionado || !descontoInput.value) {
+            document.getElementById('desconto-preview').style.display = 'none';
+            return;
+        }
+
+        const desconto = parseFloat(descontoInput.value) || 0;
+        const precoFinal = preco ? parseFloat(preco) : precoOriginal;
+        
+        if (preco) {
+            precoOriginal = preco;
+        }
+
+        const valorDesconto = precoFinal * (desconto / 100);
+        const precoComDesconto = precoFinal - valorDesconto;
+
+        // Atualizar valores
+        document.getElementById('preview-preco-original').textContent = `R$ ${precoFinal.toFixed(2).replace('.', ',')}`;
+        document.getElementById('preview-desconto').textContent = `-R$ ${valorDesconto.toFixed(2).replace('.', ',')}`;
+        document.getElementById('preview-preco-final').textContent = `R$ ${precoComDesconto.toFixed(2).replace('.', ',')}`;
+        document.getElementById('preview-economia').textContent = `${desconto.toFixed(2)}%`;
+        document.getElementById('alert-desconto-pct').textContent = `${desconto.toFixed(2)}%`;
+
+        // Obter nome do produto
+        const nomeProduto = document.querySelector(`label[onclick*="${radioSelecionado.value}"] .product-name`)?.textContent || 'Produto';
+        document.getElementById('alert-produto-nome').textContent = nomeProduto;
+
+        document.getElementById('desconto-preview').style.display = 'block';
+    }
+
+    // Inicializar quando a página carregar
+    document.addEventListener('DOMContentLoaded', function() {
+        const radios = document.querySelectorAll('input[name="id_produto"]');
+        radios.forEach(radio => {
+            radio.addEventListener('change', atualizarPreview);
+        });
+    });
+</script>
+{% endblock %}

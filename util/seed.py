@@ -13,6 +13,7 @@ from data.produto.produto_repo import criar_tabela_produto
 from data.servico.servico_repo import criar_tabela_servico
 from data.usuario.usuario_repo import criar_tabela_usuario
 from data.orcamento.orcamento_repo import criar_tabela_orcamento
+from util.db import open_connection
 
 def criar_tabelas():
     criar_tabela_usuario()
@@ -31,4 +32,28 @@ def criar_tabelas():
     criar_tabela_notificacao()
     criar_tabela_orcamento()
     criar_tabela_orcamento_servico()
+    
+    # Garantir que o fornecedor de teste sempre exista
+    garantir_fornecedor_teste()
+
+
+def garantir_fornecedor_teste():
+    """
+    Garante que o fornecedor de teste (ID 7) sempre exista no banco.
+    Isso previne erros 404 na página de perfil do fornecedor.
+    """
+    with open_connection() as conn:
+        cursor = conn.cursor()
+        
+        # Verificar se usuario ID 7 existe
+        cursor.execute("SELECT id FROM usuario WHERE id = 7")
+        usuario_existe = cursor.fetchone() is not None
+        
+        # Se usuario existe, garantir que fornecedor também exista
+        if usuario_existe:
+            cursor.execute("""
+                INSERT OR IGNORE INTO fornecedor (id, razao_social, selo_confianca)
+                VALUES (7, 'Lorenzo Barbosa Alves', 0)
+            """)
+            conn.commit()
 

@@ -3,39 +3,432 @@
 {% block fornecedor_titulo %}Avaliações Recebidas{% endblock %}
 {% block sidebar_active %}avaliacoes{% endblock %}
 
-{% block fornecedor_conteudo %}
-<div class="container-fluid px-4 py-4">
-    <h1 class="h3 mb-4">Avaliações Recebidas</h1>
+{% block css %}
+<link rel="stylesheet" href="/static/css/home_fornecedor.css">
+<style>
+    .avaliacao-card {
+        background: #fff;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        transition: all 0.3s ease;
+    }
 
-    <div class="row">
-        {% if avaliacoes and avaliacoes|length > 0 %}
-            {% for a in avaliacoes %}
-            <div class="col-md-6 mb-3">
-                <div class="card shadow-sm">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <h5 class="mb-1">{{ a.nome_avaliador or 'Anônimo' }}</h5>
-                                <small class="text-muted">{{ a.data_avaliacao }}</small>
-                            </div>
-                            <div>
-                                <span class="badge bg-warning text-dark"><i class="bi bi-star-fill"></i> {{ a.nota }}</span>
-                            </div>
-                        </div>
-                        <p class="mt-3 mb-0">{{ a.descricao }}</p>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        {% else %}
-            <div class="col-12">
-                <div class="card shadow-sm text-center p-5">
-                    <i class="bi bi-star fs-1 mb-3"></i>
-                    <h5 class="mb-2">Nenhuma avaliação encontrada</h5>
-                    <p class="text-muted">Quando receber avaliações elas aparecerão aqui.</p>
-                </div>
-            </div>
+    .avaliacao-card:hover {
+        box-shadow: 0 4px 16px rgba(23, 19, 112, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .avaliacao-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        margin-bottom: 1rem;
+        border-bottom: 1px solid #f0f0f0;
+        padding-bottom: 1rem;
+    }
+
+    .avaliacao-author {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .avaliacao-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: var(--cor-primaria, #171370);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 1.25rem;
+    }
+
+    .avaliacao-author-info h6 {
+        margin: 0;
+        font-weight: 600;
+        color: #171370;
+    }
+
+    .avaliacao-author-info small {
+        color: #999;
+        font-size: 0.875rem;
+    }
+
+    .avaliacao-rating {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .stars {
+        color: #E8894B;
+        font-size: 1rem;
+    }
+
+    .nota-badge {
+        background: var(--cor-gradiente-quente);
+        background: linear-gradient(135deg, #171370 0%, #E8894B 100%);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+
+    .avaliacao-content {
+        margin: 1rem 0;
+        color: #333;
+        line-height: 1.6;
+        font-size: 0.95rem;
+    }
+
+    .avaliacao-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 1rem;
+        border-top: 1px solid #f0f0f0;
+        color: #999;
+        font-size: 0.875rem;
+    }
+
+    .avaliacao-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .avaliacao-actions .btn {
+        padding: 0.25rem 0.75rem;
+        font-size: 0.8rem;
+    }
+
+    .filtro-section {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+        border: 1px solid #e0e0e0;
+    }
+
+    .filtro-group {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .filtro-item {
+        flex: 1;
+        min-width: 200px;
+    }
+
+    .filtro-item label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #171370;
+        font-size: 0.9rem;
+    }
+
+    .filtro-item select,
+    .filtro-item input {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 0.9rem;
+    }
+
+    .filtro-item select:focus,
+    .filtro-item input:focus {
+        outline: none;
+        border-color: #171370;
+        box-shadow: 0 0 0 3px rgba(23, 19, 112, 0.1);
+    }
+
+    .stats-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-box {
+        background: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 1.5rem;
+        text-align: center;
+    }
+
+    .stat-box h3 {
+        margin: 0 0 0.5rem 0;
+        color: #171370;
+        font-weight: 700;
+    }
+
+    .stat-box p {
+        margin: 0;
+        color: #999;
+        font-size: 0.9rem;
+    }
+
+    .stat-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #171370 0%, #E8894B 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin: 0.5rem 0;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1.5rem;
+    }
+
+    .empty-state-icon {
+        font-size: 3.5rem;
+        color: #ddd;
+        margin-bottom: 1rem;
+    }
+
+    .empty-state h5 {
+        color: #171370;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-state p {
+        color: #999;
+        margin-bottom: 1.5rem;
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 2rem;
+    }
+
+    .pagination .btn {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
+    }
+
+    .page-title {
+        color: #171370;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .page-subtitle {
+        color: #999;
+        font-size: 0.95rem;
+    }
+
+    .resposta-form {
+        background: #f9f9f9;
+        padding: 1rem;
+        border-radius: 4px;
+        margin-top: 1rem;
+    }
+
+    .resposta-form textarea {
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 0.75rem;
+    }
+
+    .resposta-form textarea:focus {
+        outline: none;
+        border-color: #171370;
+        box-shadow: 0 0 0 3px rgba(23, 19, 112, 0.1);
+    }
+</style>
+{% endblock %}
+
+{% block fornecedor_conteudo %}
+<div class="container-fluid px-4">
+    <!-- Alertas de Mensagens -->
+    {% if request.query_params.get('resposta_enviada') %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle me-2"></i>
+        <strong>Sucesso!</strong> Sua resposta foi enviada com sucesso.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+
+    <!-- Cabeçalho -->
+    <div class="row mb-4 align-items-center">
+        <div class="col">
+            <h1 class="page-title">Avaliações Recebidas</h1>
+            <p class="page-subtitle">Veja o que seus clientes estão dizendo sobre seus serviços</p>
+        </div>
+    </div>
+
+    <!-- Estatísticas -->
+    {% if avaliacoes %}
+    <div class="stats-container">
+        <div class="stat-box">
+            <p>Total de Avaliações</p>
+            <div class="stat-value">{{ avaliacoes|length }}</div>
+        </div>
+        {% if media_nota is defined %}
+        <div class="stat-box">
+            <p>Nota Média</p>
+            <div class="stat-value">{{ "%.1f"|format(media_nota) }}</div>
+            <small class="stars">
+                {% for i in range(5) %}
+                    {% if i < media_nota %}★{% else %}☆{% endif %}
+                {% endfor %}
+            </small>
+        </div>
+        {% endif %}
+        {% if nota_maxima is defined %}
+        <div class="stat-box">
+            <p>Avaliação Máxima</p>
+            <div class="stat-value">{{ nota_maxima }}</div>
+        </div>
+        {% endif %}
+        {% if nota_minima is defined %}
+        <div class="stat-box">
+            <p>Avaliação Mínima</p>
+            <div class="stat-value">{{ nota_minima }}</div>
+        </div>
         {% endif %}
     </div>
+    {% endif %}
+
+    <!-- Filtros -->
+    <div class="filtro-section">
+        <h5 class="mb-3" style="color: #171370; font-weight: 600;">Filtrar Avaliações</h5>
+        <form method="GET" class="filtro-group">
+            <div class="filtro-item">
+                <label for="ordenar">Ordenar por:</label>
+                <select id="ordenar" name="ordenar" onchange="this.form.submit()">
+                    <option value="recente">Mais Recente</option>
+                    <option value="antiga">Mais Antigo</option>
+                    <option value="nota_alta">Maior Nota</option>
+                    <option value="nota_baixa">Menor Nota</option>
+                </select>
+            </div>
+            <div class="filtro-item">
+                <label for="nota_minima">Nota Mínima:</label>
+                <input type="number" id="nota_minima" name="nota_minima" min="0" max="5" step="0.5" placeholder="0">
+            </div>
+            <div class="filtro-item">
+                <label for="pesquisar">Pesquisar por Cliente:</label>
+                <input type="text" id="pesquisar" name="pesquisar" placeholder="Nome do cliente">
+            </div>
+            <div class="filtro-item" style="display: flex; align-items: flex-end;">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-funnel me-2"></i> Filtrar
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Listagem de Avaliações -->
+    {% if avaliacoes and avaliacoes|length > 0 %}
+    <div class="avaliacao-list">
+        {% for avaliacao in avaliacoes %}
+        <div class="avaliacao-card">
+            <div class="avaliacao-header">
+                <div class="avaliacao-author">
+                    <div class="avaliacao-avatar">
+                        {{ avaliacao.nome_avaliador[0].upper() if avaliacao.nome_avaliador else 'U' }}
+                    </div>
+                    <div class="avaliacao-author-info">
+                        <h6>{{ avaliacao.nome_avaliador or 'Cliente Anônimo' }}</h6>
+                        <small>
+                            {% if avaliacao.data_avaliacao %}
+                                {{ avaliacao.data_avaliacao.strftime('%d de %b de %Y') if avaliacao.data_avaliacao.strftime else avaliacao.data_avaliacao }}
+                            {% endif %}
+                        </small>
+                    </div>
+                </div>
+                <div class="avaliacao-rating">
+                    <span class="stars">
+                        {% for i in range(5) %}
+                            {% if i < avaliacao.nota %}★{% else %}☆{% endif %}
+                        {% endfor %}
+                    </span>
+                    <span class="nota-badge">{{ avaliacao.nota }}</span>
+                </div>
+            </div>
+
+            <div class="avaliacao-content">
+                {{ avaliacao.descricao }}
+            </div>
+
+            <div class="avaliacao-footer">
+                <span>Há alguns dias</span>
+                <div class="avaliacao-actions">
+                    <button class="btn btn-sm btn-outline-secondary" 
+                            onclick="toggleResposta({{ avaliacao.id_avaliacao }})">
+                        <i class="bi bi-reply me-1"></i> Responder
+                    </button>
+                </div>
+            </div>
+
+            <!-- Seção de resposta (oculta por padrão) -->
+            <div id="resposta-{{ avaliacao.id_avaliacao }}" class="resposta-form" style="display: none; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #f0f0f0;">
+                <form method="POST" action="/fornecedor/avaliacoes/responder">
+                    <input type="hidden" name="id_avaliacao" value="{{ avaliacao.id_avaliacao }}">
+                    <div class="form-group mb-3">
+                        <label class="form-label" style="font-weight: 600;">Sua Resposta:</label>
+                        <textarea class="form-control" name="resposta" rows="3" 
+                                  placeholder="Obrigado pela avaliação. Sua resposta aparecerá aqui..."
+                                  required></textarea>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button type="submit" class="btn btn-primary btn-sm">
+                            <i class="bi bi-send me-1"></i> Enviar Resposta
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" 
+                                onclick="toggleResposta({{ avaliacao.id_avaliacao }})">
+                            Cancelar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <!-- Estado Vazio -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="bi bi-star"></i>
+                </div>
+                <h5>Nenhuma Avaliação Recebida</h5>
+                <p>Você ainda não recebeu nenhuma avaliação de seus clientes.</p>
+                <p style="color: #171370; font-weight: 600;">Complete seus serviços para que seus clientes possam deixar avaliações</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
 </div>
+{% endblock %}
+
+{% block fornecedor_scripts %}
+<script>
+    function toggleResposta(id_avaliacao) {
+        const form = document.getElementById('resposta-' + id_avaliacao);
+        if (form) {
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+            if (form.style.display === 'block') {
+                form.querySelector('textarea').focus();
+            }
+        }
+    }
+</script>
 {% endblock %}

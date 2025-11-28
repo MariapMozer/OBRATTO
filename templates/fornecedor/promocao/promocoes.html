@@ -1,53 +1,267 @@
 {% extends "fornecedor/base.html" %}
 
-{#
-    Template: Promoções (Fornecedor)
-    Descrição: Lista de produtos em promoção
-    Estende: fornecedor/base.html
-#}
-
-{% from 'components/product_card.html' import product_card %}
-{% from 'components/breadcrumbs.html' import breadcrumbs %}
-{% from 'components/search_form.html' import search_form %}
-{% from 'components/empty_state.html' import empty_state %}
-{% from 'components/pagination.html' import pagination %}
-
 {% block fornecedor_titulo %}Promoções{% endblock %}
 {% block sidebar_active %}promocoes{% endblock %}
 
-{% block fornecedor_conteudo %}
-<div class="container-fluid px-4 py-4">
-    {{ breadcrumbs(items=[
-        {'text': 'Home', 'url': '/fornecedor/home'},
-        {'text': 'Promoções', 'active': True}
-    ]) }}
+{% block css %}
+<link rel="stylesheet" href="/static/css/home_fornecedor.css">
+<style>
+    .page-title {
+        color: #171370;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h1 class="h3 mb-1">Promoções Ativas</h1>
-            <p class="text-muted mb-0">Gerencie produtos em promoção</p>
+    .page-subtitle {
+        color: #999;
+        font-size: 0.95rem;
+    }
+
+    .promo-card {
+        background: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .promo-card:hover {
+        box-shadow: 0 4px 16px rgba(23, 19, 112, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .promo-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .promo-name {
+        color: #171370;
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
+
+    .promo-descricao {
+        color: #999;
+        font-size: 0.9rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .promo-info {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .info-item {
+        text-align: center;
+    }
+
+    .info-label {
+        color: #999;
+        font-size: 0.8rem;
+        display: block;
+        margin-bottom: 0.25rem;
+    }
+
+    .info-value {
+        color: #171370;
+        font-weight: 600;
+        font-size: 1.25rem;
+        display: block;
+    }
+
+    .desconto-badge {
+        background: linear-gradient(135deg, #171370 0%, #E8894B 100%);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 600;
+        display: inline-block;
+    }
+
+    .promo-actions {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid #f0f0f0;
+    }
+
+    .btn-sm {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.85rem;
+    }
+
+    .btn-edit {
+        background: #f0f0f0;
+        border: 1px solid #ddd;
+        color: #171370;
+    }
+
+    .btn-edit:hover {
+        background: #E8894B;
+        color: white;
+        border-color: #E8894B;
+    }
+
+    .btn-delete {
+        background: #f0f0f0;
+        border: 1px solid #ddd;
+        color: #dc3545;
+    }
+
+    .btn-delete:hover {
+        background: #dc3545;
+        color: white;
+        border-color: #dc3545;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1.5rem;
+    }
+
+    .empty-state-icon {
+        font-size: 3rem;
+        color: #ddd;
+        margin-bottom: 1rem;
+    }
+
+    .empty-state h5 {
+        color: #171370;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-state p {
+        color: #999;
+        margin-bottom: 1.5rem;
+    }
+
+    .alert {
+        border: none;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+    }
+
+    .alert-success {
+        background: #D4EDDA;
+        color: #155724;
+        border: 1px solid #C3E6CB;
+    }
+
+    .alert-success i {
+        color: #155724;
+    }
+
+    @media (max-width: 768px) {
+        .promo-info {
+            grid-template-columns: 1fr;
+        }
+
+        .promo-actions {
+            flex-direction: column;
+        }
+
+        .btn-sm {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block fornecedor_conteudo %}
+<div class="container-fluid px-4">
+    <!-- Cabeçalho -->
+    <div class="row mb-4 align-items-center">
+        <div class="col">
+            <h1 class="page-title">Promoções Ativas</h1>
+            <p class="page-subtitle">Gerencie seus produtos em promoção e acompanhe descontos aplicados</p>
         </div>
-        <a href="/fornecedor/produtos/inserir" class="btn btn-primary">
-            <i class="bi bi-plus-circle me-2"></i>Novo Produto
-        </a>
+        <div class="col-auto text-end">
+            <a href="/fornecedor/promocoes/cadastrar" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-2"></i> Criar Promoção
+            </a>
+        </div>
     </div>
 
-    <div class="card mb-4">
+    <!-- Alertas de Sucesso -->
+    {% if request.query_params.get('sucesso') %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle me-2"></i>
+        <strong>Sucesso!</strong> Promoção criada com sucesso!
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+
+    <!-- Lista de Promoções -->
+    {% if promocoes and promocoes|length > 0 %}
+    <div class="promocoes-list">
+        {% for promo in promocoes %}
+        <div class="promo-card">
+            <div class="promo-header">
+                <div>
+                    <h4 class="promo-name">{{ promo.nome }}</h4>
+                    <p class="promo-descricao">{{ promo.descricao[:80] }}{% if promo.descricao|length > 80 %}...{% endif %}</p>
+                </div>
+                <span class="desconto-badge">{{ promo.desconto }}% OFF</span>
+            </div>
+
+            <div class="promo-info">
+                <div class="info-item">
+                    <span class="info-label">Preço Original</span>
+                    <span class="info-value">R$ {{ "%.2f"|format(promo.preco) }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Desconto</span>
+                    <span class="info-value">R$ {{ "%.2f"|format(promo.preco * promo.desconto / 100) }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Preço Promocional</span>
+                    <span class="info-value" style="color: #28a745;">R$ {{ "%.2f"|format(promo.preco * (1 - promo.desconto / 100)) }}</span>
+                </div>
+            </div>
+
+            <div class="promo-actions">
+                <a href="/fornecedor/promocoes/alterar?id={{ promo.id }}" class="btn btn-sm btn-edit">
+                    <i class="bi bi-pencil me-1"></i> Editar
+                </a>
+                <form method="POST" action="/fornecedor/promocoes/excluir" style="display: inline;">
+                    <input type="hidden" name="id_produto" value="{{ promo.id }}">
+                    <button type="submit" class="btn btn-sm btn-delete" onclick="return confirm('Tem certeza que deseja remover esta promoção?')">
+                        <i class="bi bi-trash me-1"></i> Remover
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <!-- Estado Vazio -->
+    <div class="card border-0 shadow-sm">
         <div class="card-body">
-            {{ search_form(
-                action_url='/fornecedor/promocao/listar',
-                placeholder='Buscar produtos em promoção...',
-                show_filters=True,
-                filters=[
-                    {
-                        'name': 'desconto_min',
-                        'label': 'Desconto Mínimo (%)',
-                        'type': 'number',
-                        'placeholder': '0'
-                    },
-                    {
-                        'name': 'ordenar',
-                        'label': 'Ordenar por',
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="bi bi-percent"></i>
+                </div>
+                <h5>Nenhuma Promoção Ativa</h5>
+                <p>Você não tem nenhuma promoção em seus produtos no momento.</p>
+                <a href="/fornecedor/promocoes/cadastrar" class="btn btn-primary">
+                    <i class="bi bi-plus-circle me-2"></i> Criar Primeira Promoção
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
                         'type': 'select',
                         'options': [
                             {'value': 'desconto', 'text': 'Maior Desconto'},
@@ -129,9 +343,8 @@
 <script>
 function confirmDeleteProduct(produtoId, produtoNome) {
     if (confirm(`Tem certeza que deseja excluir o produto "${produtoNome}"?`)) {
-        window.location.href = `/fornecedor/produtos/excluir/${produtoId}`;
+        window.location.href = `/fornecedor/promocoes/excluir/${produtoId}`;
     }
 }
 </script>
-{% endblock %}
 {% endblock %}

@@ -24,8 +24,31 @@ async def visualizar_perfil_fornecedor(
 ):
     assert usuario_logado is not None
     fornecedor = fornecedor_repo.obter_fornecedor_por_id(usuario_logado["id"])
+    
+    # Se fornecedor não existe, criar automaticamente
+    if not fornecedor:
+        import sqlite3
+        from util.db import open_connection
+        
+        try:
+            with open_connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute("""
+                    INSERT OR IGNORE INTO fornecedor (id, razao_social, selo_confianca)
+                    VALUES (?, ?, 0)
+                """, (usuario_logado["id"], usuario_logado.get("nome", "Fornecedor")))
+                conn.commit()
+            
+            # Tentar obter novamente
+            fornecedor = fornecedor_repo.obter_fornecedor_por_id(usuario_logado["id"])
+        except Exception as e:
+            from util.logger_config import logger
+            logger.error(f"Erro ao criar fornecedor: {e}")
+            raise HTTPException(status_code=500, detail="Erro ao criar perfil de fornecedor")
+    
     if not fornecedor:
         raise HTTPException(status_code=404, detail="Fornecedor não encontrado")
+    
     return templates.TemplateResponse(
         "fornecedor/perfil.html", {"request": request, "fornecedor": fornecedor}
     )
@@ -113,6 +136,25 @@ async def upload_foto_perfil(
 ):
     assert usuario_logado is not None
     fornecedor = fornecedor_repo.obter_fornecedor_por_id(usuario_logado["id"])
+    
+    # Se fornecedor não existe, criar automaticamente
+    if not fornecedor:
+        from util.db import open_connection
+        
+        try:
+            with open_connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute("""
+                    INSERT OR IGNORE INTO fornecedor (id, razao_social, selo_confianca)
+                    VALUES (?, ?, 0)
+                """, (usuario_logado["id"], usuario_logado.get("nome", "Fornecedor")))
+                conn.commit()
+            
+            fornecedor = fornecedor_repo.obter_fornecedor_por_id(usuario_logado["id"])
+        except Exception as e:
+            from util.logger_config import logger
+            logger.error(f"Erro ao criar fornecedor: {e}")
+    
     if not fornecedor:
         raise HTTPException(status_code=404, detail="Fornecedor não encontrado")
 

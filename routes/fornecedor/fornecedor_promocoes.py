@@ -1,59 +1,100 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, HTTPException
+from typing import Optional
 from util.auth_decorator import requer_autenticacao
 from util.template_util import criar_templates
 from fastapi.responses import RedirectResponse
-from data.produto.produto_repo import obter_produto_por_id, atualizar_produto
+from data.produto.produto_repo import obter_produto_por_id, atualizar_produto, obter_produtos
 from data.produto.produto_model import Produto
 
-router = APIRouter()
+router = APIRouter(prefix="/promocoes")
 templates = criar_templates("templates")
 
 
 # Rota para listar todas promoções
 @router.get("/listar")
 @requer_autenticacao(["fornecedor"])
-async def listar_promocoes(request: Request):
+async def listar_promocoes(request: Request, usuario_logado: Optional[dict] = None):
+    assert usuario_logado is not None
+    
+    # Obter todos os produtos
+    produtos = obter_produtos()
+    
+    # Filtrar produtos em promoção do fornecedor
+    promocoes = [p for p in produtos if p.em_promocao and p.fornecedor_id == usuario_logado.get("id")]
+    
     return templates.TemplateResponse(
-        "fornecedor/promocao/promocoes.html", {"request": request}
+        "fornecedor/promocao/promocoes.html", 
+        {
+            "request": request,
+            "usuario_logado": usuario_logado,
+            "promocoes": promocoes
+        }
     )
 
 
 # Rota para cadastrar promoção
 @router.get("/cadastrar")
 @requer_autenticacao(["fornecedor"])
-async def cadastrar_promocao(request: Request):
+async def cadastrar_promocao(request: Request, usuario_logado: Optional[dict] = None):
+    assert usuario_logado is not None
+    
+    # Obter produtos do fornecedor
+    produtos = obter_produtos()
+    
+    # Filtrar apenas produtos do fornecedor logado
+    produtos_fornecedor = [p for p in produtos if p.fornecedor_id == usuario_logado.get("id")]
+    
     return templates.TemplateResponse(
-        "fornecedor/promocoes/cadastrar.html", {"request": request}
+        "fornecedor/promocao/cadastrar_promocoes.html", 
+        {
+            "request": request,
+            "usuario_logado": usuario_logado,
+            "produtos": produtos_fornecedor
+        }
     )
 
 
 # Rota para cadastrar promoção
 @router.post("/cadastrar")
 @requer_autenticacao(["fornecedor"])
-async def cadastrar_promocao_post(request: Request):
+async def cadastrar_promocao_post(request: Request, usuario_logado: Optional[dict] = None):
+    assert usuario_logado is not None
+    
     dados = await request.form()
     id_produto_raw = dados.get("id_produto")
     if isinstance(id_produto_raw, str):
         id_produto = int(id_produto_raw)
     else:
         id_produto = 0
+    
     desconto_raw = dados.get("desconto", "0")
     if isinstance(desconto_raw, str):
         desconto = float(desconto_raw)
     else:
         desconto = 0.0
+    
+    # Validar desconto
+    if desconto < 0 or desconto > 100:
+        return RedirectResponse(
+            "/fornecedor/promocoes/cadastrar?erro=desconto_invalido",
+            status_code=303
+        )
+    
     produto = obter_produto_por_id(id_produto)
-    if produto:
+    if produto and produto.fornecedor_id == usuario_logado.get("id"):
         produto.em_promocao = True
         produto.desconto = desconto
         atualizar_produto(produto)
-        mensagem = f"Promoção cadastrada para o produto {produto.nome}!"
+        
+        return RedirectResponse(
+            f"/fornecedor/promocoes/listar?sucesso=promocao_criada&produto={produto.nome}",
+            status_code=303
+        )
     else:
-        mensagem = "Produto não encontrado."
-    return templates.TemplateResponse(
-        "fornecedor/promocoes/cadastrar.html",
-        {"request": request, "mensagem": mensagem},
-    )
+        return RedirectResponse(
+            "/fornecedor/promocoes/cadastrar?erro=produto_nao_encontrado",
+            status_code=303
+        )
 
 
 # Rota para alterar promoção
