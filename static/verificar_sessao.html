@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificar Sessão - OBRATTO</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { padding: 20px; }
+        .card { margin-bottom: 20px; }
+        .status-ok { color: #28a745; }
+        .status-error { color: #dc3545; }
+        code { background: #f4f4f4; padding: 10px; border-radius: 4px; display: block; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Verificador de Sessão</h1>
+        <p class="text-muted">Esta página verifica o status da sua sessão</p>
+        
+        <div class="card">
+            <div class="card-header">Cookies no Navegador</div>
+            <div class="card-body">
+                <p>Cookie 'session' enviado: <span id="cookie-status" class="badge bg-warning">Verificando...</span></p>
+                <div id="cookies-info"></div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">Status da Sessão no Servidor</div>
+            <div class="card-body">
+                <p id="session-status">Verificando...</p>
+                <div id="session-info"></div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">Próximos Passos</div>
+            <div class="card-body">
+                <ol id="steps-list">
+                    <li id="step1">Aguarde a verificação...</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Verificar cookies
+        function verificarCookies() {
+            const cookies = document.cookie;
+            const temSession = cookies.includes('session');
+            
+            const statusEl = document.getElementById('cookie-status');
+            const infoEl = document.getElementById('cookies-info');
+            
+            if (temSession) {
+                statusEl.textContent = '✓ Presente';
+                statusEl.classList.add('bg-success');
+                statusEl.classList.remove('bg-warning');
+                infoEl.innerHTML = `<p class="text-success">✓ Você tem um cookie de sessão válido!</p>`;
+            } else {
+                statusEl.textContent = '✗ Ausente';
+                statusEl.classList.add('bg-danger');
+                statusEl.classList.remove('bg-warning');
+                infoEl.innerHTML = `<p class="text-danger">✗ Cookie de sessão não encontrado. Você precisa fazer login.</p>`;
+            }
+            
+            return temSession;
+        }
+        
+        // Verificar sessão no servidor
+        async function verificarSessao() {
+            try {
+                const response = await fetch('/fornecedor/promocoes/debug-test');
+                const data = await response.json();
+                
+                const statusEl = document.getElementById('session-status');
+                const infoEl = document.getElementById('session-info');
+                
+                if (data.usuario) {
+                    statusEl.innerHTML = `<span class="status-ok">✓ Logado como:</span> ${data.usuario.nome}`;
+                    infoEl.innerHTML = `
+                        <p><strong>ID:</strong> ${data.usuario.id}</p>
+                        <p><strong>Email:</strong> ${data.usuario.email}</p>
+                        <p><strong>Perfil:</strong> ${data.usuario.perfil}</p>
+                    `;
+                    return true;
+                } else {
+                    statusEl.innerHTML = `<span class="status-error">✗ Sessão inválida ou expirada</span>`;
+                    infoEl.innerHTML = `<p class="text-danger">A sessão no servidor não é válida.</p>`;
+                    return false;
+                }
+            } catch (error) {
+                document.getElementById('session-status').innerHTML = `<span class="status-error">✗ Erro ao verificar:</span> ${error.message}`;
+                return false;
+            }
+        }
+        
+        // Atualizar passos
+        function atualizarPassos(temCookie, temSessao) {
+            const stepsList = document.getElementById('steps-list');
+            stepsList.innerHTML = '';
+            
+            if (!temCookie) {
+                stepsList.innerHTML = `
+                    <li style="color: red;">❌ Você não tem cookie de sessão</li>
+                    <li><a href="/login">Clique aqui para fazer login</a></li>
+                    <li>Depois volte para esta página</li>
+                `;
+            } else if (!temSessao) {
+                stepsList.innerHTML = `
+                    <li style="color: red;">❌ Sessão inválida ou expirada</li>
+                    <li>Faça logout (se precisar) e faça login novamente</li>
+                    <li><a href="/logout">Clique aqui para logout</a> (se necessário)</li>
+                    <li><a href="/login">Clique aqui para fazer login novamente</a></li>
+                    <li>Depois <a href="/fornecedor/promocoes/cadastrar">acesse a página de cadastro de promoções</a></li>
+                `;
+            } else {
+                stepsList.innerHTML = `
+                    <li style="color: green;">✓ Tudo OK!</li>
+                    <li><a href="/fornecedor/promocoes/cadastrar" class="btn btn-primary">Acessar página de cadastro de promoção</a></li>
+                    <li><a href="/fornecedor/home" class="btn btn-secondary">Voltar para home</a></li>
+                `;
+            }
+        }
+        
+        // Executar verificações
+        async function executar() {
+            const temCookie = verificarCookies();
+            const temSessao = await verificarSessao();
+            atualizarPassos(temCookie, temSessao);
+        }
+        
+        // Executar ao carregar
+        window.addEventListener('load', executar);
+    </script>
+</body>
+</html>

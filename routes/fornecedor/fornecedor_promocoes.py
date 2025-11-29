@@ -10,6 +10,19 @@ router = APIRouter(prefix="/promocoes")
 templates = criar_templates("templates")
 
 
+# Rota de teste para debug
+@router.get("/debug-test")
+async def debug_test(request: Request):
+    """Rota de teste sem autenticação"""
+    usuario = request.session.get("usuario") if hasattr(request, "session") else None
+    return {
+        "status": "ok",
+        "usuario": usuario,
+        "tem_session": hasattr(request, "session"),
+        "path": request.url.path
+    }
+
+
 # Rota para listar todas promoções
 @router.get("/listar")
 @requer_autenticacao(["fornecedor"])

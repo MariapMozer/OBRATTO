@@ -1,0 +1,685 @@
+{% extends "fornecedor/base.html" %}
+
+{% block fornecedor_titulo %}Cadastrar Fornecedor{% endblock %}
+{% block sidebar_active %}cadastro{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="/static/css/home.css">
+<link rel="stylesheet" href="/static/css/home_fornecedor.css">
+<style>
+    .cadastro-hero {
+        background: linear-gradient(135deg, #171370 0%, #1a1a8f 100%);
+        color: white;
+        padding: 3rem 0;
+        margin-bottom: 2rem;
+        border-radius: 12px;
+    }
+
+    .cadastro-hero h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .cadastro-hero p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+    }
+
+    .form-section {
+        background: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .form-section-title {
+        color: #171370;
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #E8894B;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .form-section-title i {
+        color: #E8894B;
+        font-size: 1.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.25rem;
+    }
+
+    .form-group label {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .form-group label .required {
+        color: #E8894B;
+    }
+
+    .form-control, .form-select {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 0.75rem;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #E8894B;
+        box-shadow: 0 0 0 0.2rem rgba(232, 137, 75, 0.25);
+    }
+
+    .form-text {
+        font-size: 0.85rem;
+        color: #666;
+        margin-top: 0.25rem;
+    }
+
+    .btn-submit {
+        background: linear-gradient(135deg, #E8894B 0%, #d67a38 100%);
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 0.75rem 2rem;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+        margin-top: 1rem;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(232, 137, 75, 0.4);
+        background: linear-gradient(135deg, #d67a38 0%, #c46a2f 100%);
+        color: white;
+    }
+
+    .btn-submit:active {
+        transform: translateY(0);
+    }
+
+    .btn-submit:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .input-group .btn {
+        border-color: #ddd;
+        color: #666;
+        background: white;
+    }
+
+    .input-group .btn:hover {
+        background: #f8f9fa;
+        color: #E8894B;
+    }
+
+    .checkbox-group {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+        margin-top: 0.25rem;
+        cursor: pointer;
+        accent-color: #E8894B;
+    }
+
+    .checkbox-group label {
+        margin-bottom: 0;
+        font-weight: 400;
+        cursor: pointer;
+        flex: 1;
+    }
+
+    .form-error {
+        color: #dc3545;
+        font-size: 0.85rem;
+        margin-top: 0.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .form-error i {
+        font-size: 0.75rem;
+    }
+
+    .success-message {
+        background: #d4edda;
+        color: #155724;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+        border-left: 4px solid #28a745;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .success-message i {
+        font-size: 1.25rem;
+        color: #28a745;
+    }
+
+    .error-message {
+        background: #f8d7da;
+        color: #721c24;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+        border-left: 4px solid #dc3545;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .error-message i {
+        font-size: 1.25rem;
+        color: #dc3545;
+    }
+
+    .benefits-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e0e0e0;
+    }
+
+    .benefit-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+
+    .benefit-item i {
+        color: #E8894B;
+        font-size: 1.25rem;
+        margin-top: 0.25rem;
+    }
+
+    .benefit-item strong {
+        color: #171370;
+        display: block;
+        margin-bottom: 0.25rem;
+    }
+
+    .benefit-item small {
+        color: #666;
+    }
+
+    .progress-indicator {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+        padding: 1rem 0;
+    }
+
+    .progress-step {
+        flex: 1;
+        text-align: center;
+        position: relative;
+    }
+
+    .progress-step::after {
+        content: '';
+        position: absolute;
+        top: 1.5rem;
+        left: 50%;
+        width: 100%;
+        height: 2px;
+        background: #ddd;
+        z-index: -1;
+    }
+
+    .progress-step:last-child::after {
+        display: none;
+    }
+
+    .progress-step.active .step-circle {
+        background: linear-gradient(135deg, #E8894B 0%, #d67a38 100%);
+        color: white;
+    }
+
+    .progress-step.completed .step-circle {
+        background: #28a745;
+        color: white;
+    }
+
+    .step-circle {
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 50%;
+        background: #f0f0f0;
+        color: #666;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        margin: 0 auto 0.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .step-label {
+        font-size: 0.85rem;
+        color: #666;
+        font-weight: 500;
+    }
+
+    .step-label.active {
+        color: #E8894B;
+        font-weight: 600;
+    }
+
+    .campo-duplo {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    @media (max-width: 768px) {
+        .campo-duplo {
+            grid-template-columns: 1fr;
+        }
+
+        .cadastro-hero h1 {
+            font-size: 1.75rem;
+        }
+
+        .benefits-list {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block fornecedor_conteudo %}
+<div class="container-fluid px-4">
+    <!-- Hero Section -->
+    <div class="cadastro-hero">
+        <h1><i class="bi bi-building me-2"></i>Cadastre um Novo Fornecedor</h1>
+        <p>Preencha os dados abaixo para registrar um novo fornecedor na plataforma Obratto</p>
+    </div>
+
+    <!-- Mensagens -->
+    {% if sucesso %}
+    <div class="success-message">
+        <i class="bi bi-check-circle-fill"></i>
+        <div>
+            <strong>Sucesso!</strong>
+            <p>{{ sucesso }}</p>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if erro %}
+    <div class="error-message">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <div>
+            <strong>Erro!</strong>
+            <p>{{ erro }}</p>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Formulário -->
+    <form method="POST" class="cadastro-form" novalidate>
+        <!-- Seção 1: Informações Básicas -->
+        <div class="form-section">
+            <div class="form-section-title">
+                <i class="bi bi-person-badge"></i>
+                Informações Básicas
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="nome">Nome Completo <span class="required">*</span></label>
+                        <input type="text" class="form-control" id="nome" name="nome" placeholder="Ex: João Silva" 
+                               value="{{ fornecedor.nome or '' }}" required>
+                        {% if erros.nome %}
+                        <div class="form-error">
+                            <i class="bi bi-exclamation-circle"></i>
+                            {{ erros.nome[0] }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="razao_social">Razão Social (Empresa) <span class="required">*</span></label>
+                        <input type="text" class="form-control" id="razao_social" name="razao_social" 
+                               placeholder="Ex: Construções Silva LTDA" value="{{ fornecedor.razao_social or '' }}" required>
+                        {% if erros.razao_social %}
+                        <div class="form-error">
+                            <i class="bi bi-exclamation-circle"></i>
+                            {{ erros.razao_social[0] }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="cpf_cnpj">CPF / CNPJ <span class="required">*</span></label>
+                        <input type="text" class="form-control" id="cpf_cnpj" name="cpf_cnpj" 
+                               placeholder="Ex: 123.456.789-00" value="{{ fornecedor.cpf_cnpj or '' }}" required>
+                        <small class="form-text">Apenas números, sem pontuação</small>
+                        {% if erros.cpf_cnpj %}
+                        <div class="form-error">
+                            <i class="bi bi-exclamation-circle"></i>
+                            {{ erros.cpf_cnpj[0] }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="telefone">Telefone <span class="required">*</span></label>
+                        <input type="tel" class="form-control" id="telefone" name="telefone" 
+                               placeholder="Ex: (11) 98765-4321" value="{{ fornecedor.telefone or '' }}" required>
+                        {% if erros.telefone %}
+                        <div class="form-error">
+                            <i class="bi bi-exclamation-circle"></i>
+                            {{ erros.telefone[0] }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Seção 2: Endereço -->
+        <div class="form-section">
+            <div class="form-section-title">
+                <i class="bi bi-geo-alt"></i>
+                Endereço
+            </div>
+
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="form-group">
+                        <label for="rua">Rua / Logradouro <span class="required">*</span></label>
+                        <input type="text" class="form-control" id="rua" name="rua" placeholder="Ex: Rua das Flores" 
+                               value="{{ fornecedor.rua or '' }}" required>
+                        {% if erros.rua %}
+                        <div class="form-error">{{ erros.rua[0] }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="numero">Número <span class="required">*</span></label>
+                        <input type="text" class="form-control" id="numero" name="numero" placeholder="Ex: 123" 
+                               value="{{ fornecedor.numero or '' }}" required>
+                        {% if erros.numero %}
+                        <div class="form-error">{{ erros.numero[0] }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="cep">CEP <span class="required">*</span></label>
+                        <input type="text" class="form-control" id="cep" name="cep" placeholder="Ex: 12345-678" 
+                               value="{{ fornecedor.cep or '' }}" required>
+                        {% if erros.cep %}
+                        <div class="form-error">{{ erros.cep[0] }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="bairro">Bairro <span class="required">*</span></label>
+                        <input type="text" class="form-control" id="bairro" name="bairro" placeholder="Ex: Centro" 
+                               value="{{ fornecedor.bairro or '' }}" required>
+                        {% if erros.bairro %}
+                        <div class="form-error">{{ erros.bairro[0] }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="complemento">Complemento</label>
+                        <input type="text" class="form-control" id="complemento" name="complemento" 
+                               placeholder="Ex: Apto 45" value="{{ fornecedor.complemento or '' }}">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="cidade">Cidade <span class="required">*</span></label>
+                        <input type="text" class="form-control" id="cidade" name="cidade" placeholder="Ex: São Paulo" 
+                               value="{{ fornecedor.cidade or '' }}" required>
+                        {% if erros.cidade %}
+                        <div class="form-error">{{ erros.cidade[0] }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="estado">Estado <span class="required">*</span></label>
+                        <select class="form-select" id="estado" name="estado" required>
+                            <option value="">Selecione um estado...</option>
+                            <option value="AC">Acre</option>
+                            <option value="AL">Alagoas</option>
+                            <option value="AP">Amapá</option>
+                            <option value="AM">Amazonas</option>
+                            <option value="BA">Bahia</option>
+                            <option value="CE">Ceará</option>
+                            <option value="DF">Distrito Federal</option>
+                            <option value="ES">Espírito Santo</option>
+                            <option value="GO">Goiás</option>
+                            <option value="MA">Maranhão</option>
+                            <option value="MT">Mato Grosso</option>
+                            <option value="MS">Mato Grosso do Sul</option>
+                            <option value="MG">Minas Gerais</option>
+                            <option value="PA">Pará</option>
+                            <option value="PB">Paraíba</option>
+                            <option value="PR">Paraná</option>
+                            <option value="PE">Pernambuco</option>
+                            <option value="PI">Piauí</option>
+                            <option value="RJ">Rio de Janeiro</option>
+                            <option value="RN">Rio Grande do Norte</option>
+                            <option value="RS">Rio Grande do Sul</option>
+                            <option value="RO">Rondônia</option>
+                            <option value="RR">Roraima</option>
+                            <option value="SC">Santa Catarina</option>
+                            <option value="SP">São Paulo</option>
+                            <option value="SE">Sergipe</option>
+                            <option value="TO">Tocantins</option>
+                        </select>
+                        {% if erros.estado %}
+                        <div class="form-error">{{ erros.estado[0] }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Seção 3: Credenciais -->
+        <div class="form-section">
+            <div class="form-section-title">
+                <i class="bi bi-shield-lock"></i>
+                Credenciais de Acesso
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email <span class="required">*</span></label>
+                <input type="email" class="form-control" id="email" name="email" placeholder="Ex: email@example.com" 
+                       value="{{ fornecedor.email or '' }}" required>
+                <small class="form-text">Será usado para login na plataforma</small>
+                {% if erros.email %}
+                <div class="form-error">{{ erros.email[0] }}</div>
+                {% endif %}
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="senha">Senha <span class="required">*</span></label>
+                        <input type="password" class="form-control" id="senha" name="senha" placeholder="Mínimo 8 caracteres" required>
+                        <small class="form-text">Deve conter pelo menos 8 caracteres e um número</small>
+                        {% if erros.senha %}
+                        <div class="form-error">{{ erros.senha[0] }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="confirmar_senha">Confirmar Senha <span class="required">*</span></label>
+                        <input type="password" class="form-control" id="confirmar_senha" name="confirmar_senha" 
+                               placeholder="Repita a senha" required>
+                        {% if erros.confirmar_senha %}
+                        <div class="form-error">{{ erros.confirmar_senha[0] }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Seção 4: Termos -->
+        <div class="form-section">
+            <div class="form-section-title">
+                <i class="bi bi-file-text"></i>
+                Termos e Condições
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="termos" name="termos" value="1" required>
+                <label for="termos">
+                    Concordo com os <a href="#" target="_blank" style="color: #E8894B; text-decoration: none;">Termos de Serviço</a> 
+                    e <a href="#" target="_blank" style="color: #E8894B; text-decoration: none;">Política de Privacidade</a>
+                </label>
+            </div>
+            {% if erros.termos %}
+            <div class="form-error" style="margin-top: 0.5rem;">{{ erros.termos[0] }}</div>
+            {% endif %}
+
+            <div class="benefits-list">
+                <div class="benefit-item">
+                    <i class="bi bi-shield-check"></i>
+                    <div>
+                        <strong>Seguro</strong>
+                        <small>Seus dados estão protegidos</small>
+                    </div>
+                </div>
+                <div class="benefit-item">
+                    <i class="bi bi-star"></i>
+                    <div>
+                        <strong>Visibilidade</strong>
+                        <small>Aumente seus clientes</small>
+                    </div>
+                </div>
+                <div class="benefit-item">
+                    <i class="bi bi-graph-up"></i>
+                    <div>
+                        <strong>Crescimento</strong>
+                        <small>Oportunidades de negócio</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botão Submit -->
+        <div class="row">
+            <div class="col-md-6 mx-auto">
+                <button type="submit" class="btn-submit">
+                    <i class="bi bi-check-circle me-2"></i>Cadastrar Fornecedor
+                </button>
+                <p style="text-align: center; margin-top: 1rem; color: #666;">
+                    Já tem conta? <a href="/login" style="color: #E8894B; font-weight: 600; text-decoration: none;">Faça login</a>
+                </p>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block fornecedor_scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Validação básica de forma
+        const form = document.querySelector('.cadastro-form');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                if (!form.checkValidity()) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            });
+        }
+
+        // Mascaras
+        const cpfCnpjInput = document.getElementById('cpf_cnpj');
+        if (cpfCnpjInput) {
+            cpfCnpjInput.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length <= 11) {
+                    value = value.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+                } else {
+                    value = value.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
+                }
+                e.target.value = value;
+            });
+        }
+
+        const telefonInput = document.getElementById('telefone');
+        if (telefonInput) {
+            telefonInput.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                value = value.replace(/(\d{2})(\d{4,5})(\d{4})/, '($1) $2-$3');
+                e.target.value = value;
+            });
+        }
+
+        const cepInput = document.getElementById('cep');
+        if (cepInput) {
+            cepInput.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                value = value.replace(/(\d{5})(\d{3})/, '$1-$2');
+                e.target.value = value;
+            });
+        }
+
+        // Validação de senha
+        const senhaInput = document.getElementById('senha');
+        const confirmarSenhaInput = document.getElementById('confirmar_senha');
+        
+        if (confirmarSenhaInput) {
+            confirmarSenhaInput.addEventListener('change', function() {
+                if (this.value !== senhaInput.value) {
+                    this.setCustomValidity('As senhas não coincidem');
+                } else {
+                    this.setCustomValidity('');
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

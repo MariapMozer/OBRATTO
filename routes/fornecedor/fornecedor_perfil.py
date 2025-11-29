@@ -12,9 +12,244 @@ from data.usuario import usuario_repo
 from data.usuario.usuario_repo import atualizar_foto
 from data.avaliacao import avaliacao_repo
 from datetime import datetime
+from util.logger_config import logger
 
 router = APIRouter()
 templates = criar_templates("templates")
+
+
+@router.get("/home")
+@requer_autenticacao(["fornecedor"])
+async def home_fornecedor(request: Request, usuario_logado: Optional[dict] = None):
+    """Página inicial do fornecedor"""
+    assert usuario_logado is not None
+    
+    # Obter estatísticas para dashboard
+    fornecedor = fornecedor_repo.obter_fornecedor_por_id(usuario_logado["id"])
+    
+    return templates.TemplateResponse(
+        "fornecedor/home_fornecedor.html",
+        {
+            "request": request,
+            "usuario_logado": usuario_logado,
+            "fornecedor": fornecedor,
+        }
+    )
+
+
+@router.get("/cadastro")
+@requer_autenticacao(["administrador"])
+async def formulario_cadastro_fornecedor(request: Request, usuario_logado: Optional[dict] = None):
+    """Formulário para cadastrar novo fornecedor (apenas administrador)"""
+    assert usuario_logado is not None
+    
+    return templates.TemplateResponse(
+        "fornecedor/cadastro_fornecedor.html",
+        {
+            "request": request,
+            "usuario_logado": usuario_logado,
+        }
+    )
+
+
+@router.post("/cadastro")
+@requer_autenticacao(["administrador"])
+async def processar_cadastro_fornecedor(
+    request: Request,
+    nome: str = Form(...),
+    razao_social: str = Form(...),
+    cpf_cnpj: str = Form(...),
+    telefone: str = Form(...),
+    rua: str = Form(...),
+    numero: str = Form(...),
+    bairro: str = Form(...),
+    cidade: str = Form(...),
+    estado: str = Form(...),
+    cep: str = Form(...),
+    complemento: str = Form(None),
+    email: str = Form(...),
+    senha: str = Form(...),
+    confirmar_senha: str = Form(...),
+    termos: str = Form(None),
+    usuario_logado: Optional[dict] = None,
+):
+    """Processar cadastro de novo fornecedor"""
+    assert usuario_logado is not None
+    
+    erros = {}
+    
+    # Validações básicas
+    if not nome or len(nome) < 2:
+        erros['nome'] = ['Nome deve ter no mínimo 2 caracteres']
+    
+    if not razao_social or len(razao_social) < 2:
+        erros['razao_social'] = ['Razão social deve ter no mínimo 2 caracteres']
+    
+    if not cpf_cnpj or len(cpf_cnpj.replace('.', '').replace('-', '')) < 11:
+        erros['cpf_cnpj'] = ['CPF/CNPJ inválido']
+    
+    if not telefone or len(telefone.replace('(', '').replace(')', '').replace('-', '').replace(' ', '')) < 10:
+        erros['telefone'] = ['Telefone inválido']
+    
+    if not email or '@' not in email:
+        erros['email'] = ['Email inválido']
+    
+    if not senha or len(senha) < 8:
+        erros['senha'] = ['Senha deve ter no mínimo 8 caracteres']
+    
+    if not confirmar_senha or confirmar_senha != senha:
+        erros['confirmar_senha'] = ['As senhas não coincidem']
+    
+    if not rua or len(rua) < 2:
+        erros['rua'] = ['Rua é obrigatória']
+    
+    if not numero:
+        erros['numero'] = ['Número é obrigatório']
+    
+    if not bairro or len(bairro) < 2:
+        erros['bairro'] = ['Bairro é obrigatório']
+    
+    if not cidade or len(cidade) < 2:
+        erros['cidade'] = ['Cidade é obrigatória']
+    
+    if not cep or len(cep.replace('-', '')) < 8:
+        erros['cep'] = ['CEP inválido']
+    
+    if not estado or len(estado) != 2:
+        erros['estado'] = ['Estado é obrigatório']
+    
+    if not termos:
+        erros['termos'] = ['Você deve aceitar os termos de serviço']
+    
+    # Se houver erros, retornar formulário com erros
+    if erros:
+        return templates.TemplateResponse(
+            "fornecedor/cadastro_fornecedor.html",
+            {
+                "request": request,
+                "usuario_logado": usuario_logado,
+                "erros": erros,
+                "fornecedor": {
+                    "nome": nome,
+                    "razao_social": razao_social,
+                    "cpf_cnpj": cpf_cnpj,
+                    "telefone": telefone,
+                    "rua": rua,
+                    "numero": numero,
+                    "bairro": bairro,
+                    "cidade": cidade,
+                    "estado": estado,
+                    "cep": cep,
+                    "complemento": complemento,
+                    "email": email,
+                }
+            },
+            status_code=400
+        )
+    
+    try:
+        # Verificar se email já existe
+        user_existente = usuario_repo.obter_usuario_por_email(email)
+        if user_existente:
+            erros['email'] = ['Email já cadastrado']
+            return templates.TemplateResponse(
+                "fornecedor/cadastro_fornecedor.html",
+                {
+                    "request": request,
+                    "usuario_logado": usuario_logado,
+                    "erros": erros,
+                    "fornecedor": {
+                        "nome": nome,
+                        "razao_social": razao_social,
+                        "cpf_cnpj": cpf_cnpj,
+                        "telefone": telefone,
+                        "rua": rua,
+                        "numero": numero,
+                        "bairro": bairro,
+                        "cidade": cidade,
+                        "estado": estado,
+                        "cep": cep,
+                        "complemento": complemento,
+                        "email": email,
+                    }
+                },
+                status_code=400
+            )
+        
+        # Criar novo usuário
+        from util.security import criar_hash_senha
+        from data.usuario.usuario_model import Usuario
+        
+        novo_usuario = Usuario(
+            id=0,
+            nome=nome,
+            email=email,
+            senha_hash=criar_hash_senha(senha),
+            tipo_usuario="fornecedor",
+            ativo=True,
+            data_criacao=datetime.now(),
+            foto=None
+        )
+        
+        usuario_id = usuario_repo.inserir_usuario(novo_usuario)
+        
+        # Criar fornecedor vinculado
+        novo_fornecedor = Fornecedor(
+            id=usuario_id,
+            razao_social=razao_social,
+            selo_confianca=False
+        )
+        
+        fornecedor_repo.inserir_fornecedor(novo_fornecedor)
+        
+        # Atualizar dados de endereço do usuário
+        import sqlite3
+        from util.db import open_connection
+        
+        with open_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                UPDATE usuario 
+                SET cpf_cnpj=?, telefone=?, rua=?, numero=?, bairro=?, cidade=?, estado=?, cep=?, complemento=?
+                WHERE id=?
+            """, (cpf_cnpj, telefone, rua, numero, bairro, cidade, estado, cep, complemento, usuario_id))
+            conn.commit()
+        
+        # Retornar com mensagem de sucesso
+        return templates.TemplateResponse(
+            "fornecedor/cadastro_fornecedor.html",
+            {
+                "request": request,
+                "usuario_logado": usuario_logado,
+                "sucesso": f"Fornecedor {nome} cadastrado com sucesso! ID: {usuario_id}"
+            }
+        )
+        
+    except Exception as e:
+        logger.error(f"Erro ao cadastrar fornecedor: {e}")
+        return templates.TemplateResponse(
+            "fornecedor/cadastro_fornecedor.html",
+            {
+                "request": request,
+                "usuario_logado": usuario_logado,
+                "erro": "Erro ao cadastrar fornecedor. Tente novamente.",
+                "fornecedor": {
+                    "nome": nome,
+                    "razao_social": razao_social,
+                    "cpf_cnpj": cpf_cnpj,
+                    "telefone": telefone,
+                    "rua": rua,
+                    "numero": numero,
+                    "bairro": bairro,
+                    "cidade": cidade,
+                    "estado": estado,
+                    "cep": cep,
+                    "complemento": complemento,
+                    "email": email,
+                }
+            },
+            status_code=500
+        )
 
 
 @router.get("/perfil")

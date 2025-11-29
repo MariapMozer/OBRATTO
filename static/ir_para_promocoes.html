@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirecionar para Promoções - OBRATTO</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: #f8f9fa;
+        }
+        .container {
+            text-align: center;
+        }
+        .spinner-border {
+            color: #171370;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="spinner-border mb-3" role="status">
+            <span class="visually-hidden">Carregando...</span>
+        </div>
+        <h2>Redirecionando...</h2>
+        <p class="text-muted">Por favor, aguarde.</p>
+    </div>
+    
+    <script>
+        // Tentar acessar a página de promoções
+        async function acessarPromocoes() {
+            try {
+                // Fazer uma requisição para verificar se está autenticado
+                const response = await fetch('/fornecedor/promocoes/debug-test');
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.usuario) {
+                        // Logado! Redirecionar para a página
+                        window.location.href = '/fornecedor/promocoes/cadastrar';
+                    } else {
+                        // Sessão inválida
+                        window.location.href = '/login?redirect=/fornecedor/promocoes/cadastrar';
+                    }
+                } else {
+                    // Erro na requisição
+                    window.location.href = '/login?redirect=/fornecedor/promocoes/cadastrar';
+                }
+            } catch (error) {
+                // Erro de rede
+                window.location.href = '/login?redirect=/fornecedor/promocoes/cadastrar';
+            }
+        }
+        
+        // Executar ao carregar
+        setTimeout(acessarPromocoes, 500);
+    </script>
+</body>
+</html>

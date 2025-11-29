@@ -1,11 +1,253 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <h1>Todas as mensagens recebidas pelo fornecedor tipo o direct do insta</h1>
-</body>
-</html>
+{% extends "fornecedor/base.html" %}
+
+{% block fornecedor_titulo %}Mensagens - Fornecedor{% endblock %}
+{% block sidebar_active %}mensagens{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="/static/css/home.css">
+<link rel="stylesheet" href="/static/css/home_fornecedor.css">
+<link rel="stylesheet" href="/static/css/mensagens_fornecedor.css">
+{% endblock %}
+
+{% block fornecedor_conteudo %}
+<div class="container-fluid px-4">
+    <!-- Cabeçalho -->
+    <div class="row mb-4 align-items-center">
+        <div class="col">
+            <h1 class="page-title">Mensagens</h1>
+            <p class="page-subtitle">Gerencie suas conversas com clientes e parceiros</p>
+        </div>
+        <div class="col-auto">
+            <div class="d-flex gap-2">
+                <button class="btn btn-outline-secondary" id="btnFiltro">
+                    <i class="bi bi-funnel me-2"></i> Filtrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs de Navegação -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <ul class="nav nav-tabs nav-tabs-custom" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button 
+                        class="nav-link active" 
+                        id="tab-recebidas" 
+                        data-bs-toggle="tab" 
+                        data-bs-target="#recebidas-content" 
+                        type="button" 
+                        role="tab"
+                        aria-controls="recebidas-content" 
+                        aria-selected="true"
+                    >
+                        <i class="bi bi-inbox me-2"></i> Recebidas
+                        <span class="badge bg-primary ms-2">{{ mensagens|length if mensagens else 0 }}</span>
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button 
+                        class="nav-link" 
+                        id="tab-enviadas" 
+                        data-bs-toggle="tab" 
+                        data-bs-target="#enviadas-content" 
+                        type="button" 
+                        role="tab"
+                        aria-controls="enviadas-content" 
+                        aria-selected="false"
+                    >
+                        <i class="bi bi-arrow-up-right me-2"></i> Enviadas
+                        <span class="badge bg-secondary ms-2">0</span>
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button 
+                        class="nav-link" 
+                        id="tab-arquivo" 
+                        data-bs-toggle="tab" 
+                        data-bs-target="#arquivo-content" 
+                        type="button" 
+                        role="tab"
+                        aria-controls="arquivo-content" 
+                        aria-selected="false"
+                    >
+                        <i class="bi bi-archive me-2"></i> Arquivo
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Conteúdo das Tabs -->
+    <div class="tab-content">
+        <!-- Tab: Recebidas -->
+        <div class="tab-pane fade show active" id="recebidas-content" role="tabpanel" aria-labelledby="tab-recebidas">
+            <div class="row">
+                <div class="col-12">
+                    {% if mensagens and mensagens|length > 0 %}
+                        <div class="mensagens-list">
+                            {% for msg in mensagens %}
+                                <div class="mensagem-item" data-msg-id="{{ msg.id_mensagem if msg.id_mensagem else msg.get('id_mensagem', '') }}">
+                                    <div class="mensagem-avatar">
+                                        <div class="avatar-placeholder">
+                                            <i class="bi bi-person-circle"></i>
+                                        </div>
+                                    </div>
+                                    <div class="mensagem-conteudo">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <div>
+                                                <h5 class="mensagem-titulo mb-0">
+                                                    {{ msg.nome_remetente if msg.nome_remetente else 'Usuário' }}
+                                                </h5>
+                                                <small class="text-muted">
+                                                    <i class="bi bi-envelope-open"></i>
+                                                    {% if msg.data_hora %}
+                                                        {{ msg.data_hora.strftime('%d/%m/%Y às %H:%M') }}
+                                                    {% else %}
+                                                        Data desconhecida
+                                                    {% endif %}
+                                                </small>
+                                            </div>
+                                            <div class="mensagem-actions">
+                                                <button class="btn-action" title="Marcar como importante">
+                                                    <i class="bi bi-star"></i>
+                                                </button>
+                                                <button class="btn-action" title="Arquivar">
+                                                    <i class="bi bi-archive"></i>
+                                                </button>
+                                                <button class="btn-action btn-danger" title="Deletar">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <p class="mensagem-preview mb-0">
+                                            {{ msg.conteudo[:100] if msg.conteudo else 'Sem conteúdo' }}{% if msg.conteudo and msg.conteudo|length > 100 %}...{% endif %}
+                                        </p>
+                                    </div>
+                                    <div class="mensagem-status">
+                                        <span class="status-indicator novo"></span>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <i class="bi bi-inbox"></i>
+                            </div>
+                            <h5>Nenhuma mensagem recebida</h5>
+                            <p>Você não tem mensagens recebidas no momento.</p>
+                            <a href="/fornecedor" class="btn btn-primary mt-3">
+                                <i class="bi bi-arrow-left me-2"></i> Voltar para Home
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: Enviadas -->
+        <div class="tab-pane fade" id="enviadas-content" role="tabpanel" aria-labelledby="tab-enviadas">
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="bi bi-arrow-up-right"></i>
+                </div>
+                <h5>Nenhuma mensagem enviada</h5>
+                <p>Você ainda não enviou nenhuma mensagem.</p>
+            </div>
+        </div>
+
+        <!-- Tab: Arquivo -->
+        <div class="tab-pane fade" id="arquivo-content" role="tabpanel" aria-labelledby="tab-arquivo">
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="bi bi-archive"></i>
+                </div>
+                <h5>Arquivo vazio</h5>
+                <p>Mensagens arquivadas aparecerão aqui.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Seção de Informações -->
+    <div class="row mt-5">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-chat-dots me-2"></i> Conversa Rápida
+                    </h5>
+                    <p class="card-text">Envie mensagens diretas para seus clientes e parceiros</p>
+                    <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#novaConversaModal">
+                        <i class="bi bi-plus-circle me-2"></i> Nova Conversa
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-shield-check me-2"></i> Dicas
+                    </h5>
+                    <p class="card-text">Responda rapidamente às mensagens para melhorar sua reputação</p>
+                    <button class="btn btn-sm btn-outline-secondary" disabled>
+                        <i class="bi bi-question-circle me-2"></i> Saiba mais
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Nova Conversa -->
+<div class="modal fade" id="novaConversaModal" tabindex="-1" aria-labelledby="novaConversaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="novaConversaLabel">
+                    <i class="bi bi-chat-dots me-2"></i> Nova Conversa
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" action="/fornecedor/mensagens/enviar">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="destinatario" class="form-label">Selecione o destinatário</label>
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            id="destinatario" 
+                            placeholder="Digite o nome ou email do destinatário"
+                        >
+                        <div id="destinatarioList" class="list-group mt-2" style="display: none;">
+                            <!-- Resultados da busca aparecerão aqui -->
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="conteudo" class="form-label">Mensagem</label>
+                        <textarea 
+                            class="form-control" 
+                            id="conteudo" 
+                            name="conteudo" 
+                            rows="4" 
+                            placeholder="Digite sua mensagem..."
+                        ></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-send me-2"></i> Enviar Mensagem
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block fornecedor_scripts %}
+<script src="/static/js/mensagens_fornecedor.js"></script>
+{% endblock %}

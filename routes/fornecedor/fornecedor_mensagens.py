@@ -5,7 +5,7 @@ from util.template_util import criar_templates
 from data.mensagem import mensagem_repo
 from data.usuario import usuario_repo
 
-router = APIRouter()
+router = APIRouter(prefix="/mensagens")
 templates = criar_templates("templates")
 
 
