@@ -1,0 +1,62 @@
+{% extends "prestador/base.html" %}
+
+{% block prestador_titulo %}Meus Serviços{% endblock %}
+{% block sidebar_active %}servicos{% endblock %}
+
+{% block prestador_conteudo %}
+<div class="container py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Meus Serviços</h2>
+
+        <a href="/prestador/servicos/novo" class="btn btn-primary">
+            + Novo Serviço
+        </a>
+    </div>
+
+    <div class="row g-4">
+
+        {% for s in servicos %} {# CORRIGIDO: Iterando diretamente sobre 'servicos' e chamando o item de 's' #}
+        {# Assumindo que 's' é o objeto Servico e que ele tem um atributo 'foto' #}
+        {% set foto = s.foto %} 
+
+        <div class="col-md-6 col-lg-4">
+            <div class="card shadow-sm service-card">
+
+                {% if foto %}
+                <img src="/static/uploads/{{ foto }}" class="card-img-top" style="height: 180px; object-fit: cover;">
+                {% else %}
+                <img src="/static/img/sem-foto.jpg" class="card-img-top" style="height: 180px; object-fit: cover;">
+                {% endif %}
+
+                <div class="card-body">
+                    <h5 class="card-title">{{ s.nome }}</h5> {# CORRIGIDO: Usando 'nome' em vez de 'titulo' #}
+
+                    <p class="card-text text-muted">
+                        {{ s.descricao[:120] }}{% if s.descricao|length > 120 %}...{% endif %}
+                    </p>
+
+                    <div class="d-flex justify-content-between mt-3">
+                        <span class="badge bg-success">Ativo</span>
+                        <span class="text-muted">R$ {{ "%.2f"|format(s.preco) }}</span> {# CORRIGIDO: Usando 'preco' em vez de 'valor_base' #}
+                    </div>
+
+                    <div class="d-flex gap-2 mt-3">
+                        {# CORRIGIDO: Rota de edição ajustada para usar o ID do serviço e o prefixo /prestador #}
+                        <a href="/prestador/servicos/{{ s.id_servico }}" class="btn btn-outline-primary btn-sm">Editar</a> 
+                        <a href="/prestador/servicos/detalhes/{{ s.id_servico }}" class="btn btn-outline-secondary btn-sm">Detalhes</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% endfor %}
+
+        {% if servicos|length == 0 %}
+        <p class="text-muted">Nenhum serviço cadastrado ainda.</p>
+        {% endif %}
+
+    </div>
+
+</div>
+{% endblock %}
