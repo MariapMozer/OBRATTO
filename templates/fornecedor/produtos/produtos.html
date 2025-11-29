@@ -16,71 +16,171 @@
 {% block sidebar_active %}produtos{% endblock %}
 
 {% block css %}
-<link rel="stylesheet" href="/static/css/fornecedor_produtos_listar.css">
+<link rel="stylesheet" href="/static/css/home.css">
+<link rel="stylesheet" href="/static/css/home_fornecedor.css">
+<link rel="stylesheet" href="/static/css/produtos_fornecedor.css">
 {% endblock %}
 
 {% block fornecedor_conteudo %}
 <div class="container-fluid px-4">
-    <!-- Breadcrumbs -->
-    {{ breadcrumbs([
-        {'label': 'Home', 'url': '/fornecedor/home'},
-        {'label': 'Meus Produtos'}
-    ]) }}
-
     <!-- Header da página -->
-    <section class="page-header mb-4">
-        <div class="row align-items-center">
-            <div class="col-lg-8">
-                <h1 class="page-title">Meus Produtos</h1>
-                <p class="page-subtitle">Gerencie todos os seus produtos cadastrados</p>
-            </div>
-            <div class="col-lg-4 text-end">
-                <div class="stats-container">
-                    <div class="stat-item">
-                        <span class="stat-number">{{ produtos|length if produtos else 0 }}</span>
-                        <span class="stat-label">Total</span>
+    <div class="row mb-4 align-items-center">
+        <div class="col">
+            <h1 class="page-title">Meus Produtos</h1>
+            <p class="page-subtitle">Gerencie e visualize todos os seus produtos cadastrados</p>
+        </div>
+        <div class="col-auto text-end">
+            <a href="/fornecedor/produtos/inserir" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-2"></i> Cadastrar Produto
+            </a>
+        </div>
+    </div>
+
+    <!-- Cards de Estatísticas -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card shadow-sm stats-card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <h6 class="card-title mb-1">Total de Produtos</h6>
+                            <h2 class="mb-0">{{ produtos|length if produtos else 0 }}</h2>
+                        </div>
+                        <i class="bi bi-box-seam stats-icon"></i>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
+        <div class="col-md-3">
+            <div class="card shadow-sm stats-card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <h6 class="card-title mb-1">Em Estoque</h6>
+                            <h2 class="mb-0">{% if produtos %}{{ produtos|length }}{% else %}0{% endif %}</h2>
+                        </div>
+                        <i class="bi bi-check-circle stats-icon"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm stats-card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <h6 class="card-title mb-1">Fora de Estoque</h6>
+                            <h2 class="mb-0">0</h2>
+                        </div>
+                        <i class="bi bi-exclamation-circle stats-icon"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm stats-card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <h6 class="card-title mb-1">Preço Médio</h6>
+                            <h2 class="mb-0">R$ 0</h2>
+                        </div>
+                        <i class="bi bi-currency-dollar stats-icon"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <!-- Busca -->
-    <section class="search-section mb-4">
-        {{ search_form(
-            action='/fornecedor/produtos/buscar',
-            fields=[
-                {'name': 'id', 'type': 'number', 'label': 'Buscar por ID', 'placeholder': 'Digite o ID do produto'},
-                {'name': 'nome', 'type': 'text', 'label': 'Buscar por Nome', 'placeholder': 'Digite o nome do produto'}
-            ],
-            clear_url='/fornecedor/produtos/listar'
-        ) }}
-    </section>
-
-    <!-- Botão Cadastrar Novo Produto -->
-    <section class="action-section mb-4">
-        <a href="/fornecedor/produtos/inserir" class="btn btn-primary">
-            <i class="bi bi-plus-circle me-2"></i> Cadastrar Novo Produto
-        </a>
-    </section>
+    <!-- Seção de Filtros e Busca -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm filter-card">
+                <div class="card-body">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-4">
+                            <label for="searchInput" class="form-label">Buscar Produto</label>
+                            <input 
+                                type="text" 
+                                class="form-control" 
+                                id="searchInput" 
+                                placeholder="Digite o nome ou ID do produto..."
+                                onkeyup="filterProducts()"
+                            >
+                        </div>
+                        <div class="col-md-3">
+                            <label for="sortSelect" class="form-label">Ordenar por</label>
+                            <select class="form-select" id="sortSelect" onchange="filterProducts()">
+                                <option value="name-asc">Nome (A-Z)</option>
+                                <option value="name-desc">Nome (Z-A)</option>
+                                <option value="price-asc">Preço (Menor)</option>
+                                <option value="price-desc">Preço (Maior)</option>
+                                <option value="newest">Mais Recente</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="viewSelect" class="form-label">Visualização</label>
+                            <div class="btn-group w-100" role="group">
+                                <input type="radio" class="btn-check" name="view" id="viewGrid" value="grid" checked onchange="changeView('grid')">
+                                <label class="btn btn-outline-secondary" for="viewGrid">
+                                    <i class="bi bi-grid-3x3-gap"></i> Grade
+                                </label>
+                                <input type="radio" class="btn-check" name="view" id="viewList" value="list" onchange="changeView('list')">
+                                <label class="btn btn-outline-secondary" for="viewList">
+                                    <i class="bi bi-list-ul"></i> Lista
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Lista de Produtos -->
     <section class="products-section">
-        {% if produtos %}
-        <div class="products-grid" id="productsContainer">
-            {% for produto in produtos %}
-                {{ product_card(produto, show_actions=True) }}
-            {% endfor %}
-        </div>
+        {% if produtos and produtos|length > 0 %}
+            <div class="products-grid" id="productsGrid">
+                {% for produto in produtos %}
+                    <div class="product-item" data-product-name="{{ produto.nome }}" data-product-price="{{ produto.preco }}">
+                        <div class="product-card">
+                            <div class="product-image-wrapper">
+                                <img src="{{ produto.foto if produto.foto else 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=300&fit=crop' }}" alt="{{ produto.nome }}" class="product-image">
+                                <div class="product-overlay">
+                                    <a href="/fornecedor/produtos/alterar/{{ produto.id_produto }}" class="btn btn-sm btn-primary me-2">
+                                        <i class="bi bi-pencil"></i> Editar
+                                    </a>
+                                    <button class="btn btn-sm btn-danger" onclick="confirmDelete({{ produto.id_produto }}, '{{ produto.nome }}')">
+                                        <i class="bi bi-trash"></i> Deletar
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="product-info">
+                                <h5 class="product-name">{{ produto.nome }}</h5>
+                                <p class="product-description">{{ produto.descricao[:60] }}{% if produto.descricao|length > 60 %}...{% endif %}</p>
+                                <div class="product-footer">
+                                    <span class="product-price">R$ {{ "%.2f"|format(produto.preco) }}</span>
+                                    <span class="product-stock">
+                                        <i class="bi bi-box-seam"></i>
+                                        {{ produto.quantidade if produto.quantidade else 0 }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
         {% else %}
-        {{ empty_state(
-            icon='box-seam',
-            title='Nenhum produto encontrado',
-            description='Você ainda não cadastrou nenhum produto ou a busca não retornou resultados.',
-            action_url='/fornecedor/produtos/inserir',
-            action_text='Cadastrar Primeiro Produto',
-            action_icon='plus-circle'
-        ) }}
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="bi bi-box-seam"></i>
+                </div>
+                <h5>Nenhum produto cadastrado</h5>
+                <p>Você ainda não cadastrou nenhum produto. Comece agora mesmo!</p>
+                <a href="/fornecedor/produtos/inserir" class="btn btn-primary mt-3">
+                    <i class="bi bi-plus-circle me-2"></i> Cadastrar Primeiro Produto
+                </a>
+            </div>
         {% endif %}
     </section>
 </div>
@@ -98,6 +198,7 @@
 {% endblock %}
 
 {% block fornecedor_scripts %}
+<script src="/static/js/produtos_fornecedor.js"></script>
 <script>
     // Função para confirmar exclusão de produto
     function confirmDelete(productId, productName) {
@@ -123,7 +224,6 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // Recarregar página ou remover elemento do DOM
                 location.reload();
             } else {
                 alert('Erro ao excluir produto: ' + (data.message || 'Erro desconhecido'));
